@@ -36,7 +36,6 @@
 
 ## 开发调试
 1. 克隆仓库
-1. 克隆仓库
 ```bash
 git clone URL_ADDRESSgit clone https://github.com/yourusername/obsidian-xiangqi.git
 ``` 
