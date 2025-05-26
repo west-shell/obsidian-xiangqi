@@ -4,8 +4,9 @@
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 
 ## 简介
-`Obsidian Xiangqi` 是一个为 Obsidian 设计的中国象棋渲染引擎插件，它允许你在 Obsidian 笔记中轻松渲染中国象棋棋盘和棋局，方便你记录和分享象棋相关的内容。
-
+`Obsidian Xiangqi` 是一个为 Obsidian 设计的中国象棋渲染引擎插件，它允许你在 Obsidian 笔记中轻松渲染中国象棋fen格式棋局，并手动推演。支持设置主题、棋盘大小.并可以重置悔棋。
+## 演示
+![暗色棋盘](https://github.com/west-shell/obsidian-xiangqi/tree/main/IMAGES/暗色棋盘.png)
 ## 功能特性
 - **棋盘渲染**：在 Obsidian 笔记中渲染中国象棋棋盘。
 - **自定义设置**：支持通过设置项对棋盘样式等进行自定义调整。
