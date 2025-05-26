@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="500" height="560" viewBox="0 0 500 560" xmlns="http://www.w3.org/2000/svg">
+  <!-- 1. 棋盘基础 -->
+  <rect width="500" height="560" fill="#E8C887" rx="5" stroke="#5C3317" stroke-width="3"/>
+
+  <!-- 2. 横线(10条) -->
+  <g stroke="#000" stroke-width="2" fill="none">
+    <!-- 从上往下数(黑方在上) -->
+    <path d="M 50,50 h 400 v 50 h -400 v 50 h 400 v 50 h -400 v 50 h 400 v 50 h -400 v 50 h 400 v 50 h -400 v 50 h 400 v 50 h -400 Z"/>
+    <!-- 3. 竖线(9条) -->
+    <path d="M 50,50 v 200 h 50 v -200 h 50 v 200 h 50 v -200 h 50 v 200 h 50 v -200 h 50 v 200 h 50 v -200 h 50 v 200"/>
+    <path d="M 50,50 v 450 h 50 v -200 h 50 v 200 h 50 v -200 h 50 v 200 h 50 v -200 h 50 v 200 h 50 v -200 h 50 v 200"/>
+  </g>
+  <path d="M 45,45 H 455 V 505 H 45 Z" stroke="#000" stroke-width="4" fill="none"/>
+
+  <!-- 4. 黑方九宫格(第4-6路 x 第1-3横线) -->
+  <g stroke="#000" stroke-width="1.5">
+    <line x1="200" y1="50" x2="300" y2="150"/>  <!-- 对角线1 -->
+    <line x1="200" y1="150" x2="300" y2="50"/>  <!-- 对角线2 -->
+  </g>
+
+  <!-- 5. 红方九宫格(第4-6路 x 第8-10横线) -->
+  <g stroke="#000" stroke-width="1.5">
+    <line x1="200" y1="400" x2="300" y2="500"/>  <!-- 对角线1 -->
+    <line x1="200" y1="500" x2="300" y2="400"/>  <!-- 对角线2 -->
+  </g>
+
+  <!-- 6. 楚河汉界(严格位于第5-6横线之间) -->
+  <!-- <rect x="51" y="251" width="398" height="48" fill="#E8C887"/> -->
+  <text x="250" y="285" font-size="30" text-anchor="middle" font-family="SimSun">楚　河　　汉　界</text>
+
+  <!-- 7. 炮兵位(严格对齐交叉点) -->
+  <g stroke="#000" stroke-width="2" fill="none">
+    <!-- 黑炮 -->
+    <path d="M 100,150 m -12,-4 h 8 v -8 m 8,0 v 8 h 8 m 0,8 h -8 v 8 m -8,0 v -8 h -8" />
+    <path d="M 400,150 m -12,-4 h 8 v -8 m 8,0 v 8 h 8 m 0,8 h -8 v 8 m -8,0 v -8 h -8" />
+    <!-- 红炮 -->
+    <path d="M 100,400 m -12,-4 h 8 v -8 m 8,0 v 8 h 8 m 0,8 h -8 v 8 m -8,0 v -8 h -8" />
+    <path d="M 400,400 m -12,-4 h 8 v -8 m 8,0 v 8 h 8 m 0,8 h -8 v 8 m -8,0 v -8 h -8" />
+    <!-- 黑卒 -->
+    <path d="M 50,200 m 4,-12 v 8 h 8 m 0,8 h -8 v 8"/>
+    <path d="M 150,200 m -12,-4 h 8 v -8 m 8,0 v 8 h 8 m 0,8 h -8 v 8 m -8,0 v -8 h -8" />
+    <path d="M 250,200 m -12,-4 h 8 v -8 m 8,0 v 8 h 8 m 0,8 h -8 v 8 m -8,0 v -8 h -8" />
+    <path d="M 350,200 m -12,-4 h 8 v -8 m 8,0 v 8 h 8 m 0,8 h -8 v 8 m -8,0 v -8 h -8" />
+    <path d="M 450,200 m -12,-4 h 8 v -8 m 0,24 v -8 h -8" />
+    <!-- 红兵 -->
+    <path d="M 50,350 m 4,-12 v 8 h 8 m 0,8 h -8 v 8"/>
+    <path d="M 150,350 m -12,-4 h 8 v -8 m 8,0 v 8 h 8 m 0,8 h -8 v 8 m -8,0 v -8 h -8" />
+    <path d="M 250,350 m -12,-4 h 8 v -8 m 8,0 v 8 h 8 m 0,8 h -8 v 8 m -8,0 v -8 h -8" />
+    <path d="M 350,350 m -12,-4 h 8 v -8 m 8,0 v 8 h 8 m 0,8 h -8 v 8 m -8,0 v -8 h -8" />
+    <path d="M 450,350 m -12,-4 h 8 v -8 m 0,24 v -8 h -8" />
+  </g>
+</svg>

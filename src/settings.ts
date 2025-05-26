@@ -1,0 +1,69 @@
+import XiangqiPlugin from "./main";
+import { App, PluginSettingTab, Setting } from "obsidian";
+const THEME_STYLES = ["light", "dark"];
+export interface ISettings {
+  theme: 'light' | 'dark';
+  cellSize: number;
+}
+
+export const DEFAULT_SETTINGS: ISettings = {
+  theme: 'light',
+  cellSize: 50
+};
+
+export class settingTab extends PluginSettingTab {
+  plugin: XiangqiPlugin;
+
+  constructor(app: App, plugin: XiangqiPlugin) {
+    super(app, plugin);
+    this.plugin = plugin;
+  }
+
+  display(): void {
+    let { containerEl } = this;
+
+    containerEl.empty();
+
+    containerEl.createEl("h2", { text: "Obsidian 中国象棋设置" });
+
+    new Setting(containerEl)
+      .setName("主题")
+      .setDesc("设置棋盘主题.")
+      .addDropdown((dropdown) => {
+        let styles: Record<string, string> = {};
+        THEME_STYLES.map((style) => (styles[style] = style));
+        dropdown.addOptions(styles);
+
+        dropdown.setValue(this.plugin.settings.theme).onChange((theme) => {
+          this.plugin.settings.theme = theme as 'light' | 'dark';
+          this.plugin.saveSettings();
+        });
+      });
+    new Setting(containerEl)
+      .setName("界面大小")
+      .setDesc("调整界面大小（单位：px）")
+      .addSlider((slider) => {
+        slider
+          .setLimits(20, 60, 1) // 最小值 30 最大值 60，步长 5
+          .setValue(this.plugin.settings.cellSize) // 默认值
+          .onChange(async (value) => {
+            this.plugin.settings.cellSize = value;
+            await this.plugin.saveSettings(); // 保存设置
+            // this.applyCellsize(value); // 应用新字体大小
+          });
+
+        // 可选：在滑块旁边显示当前值
+        slider.sliderEl.createSpan({
+          text: ` ${this.plugin.settings.cellSize}px`,
+          cls: "slider-value",
+        });
+        // 实时更新显示值
+        slider.sliderEl.oninput = (evt) => {
+          const value = (evt.target as HTMLInputElement).value;
+          const displayEl = slider.sliderEl.nextSibling as HTMLSpanElement;
+          if (displayEl) displayEl.textContent = ` ${value}px`;
+        };
+      });
+
+  }
+}
