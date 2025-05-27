@@ -14,8 +14,3 @@ export class EventEmitter {
         this.listeners[event] = (this.listeners[event] || []).filter(fn => fn !== callback);
     }
 }
-
-// 使用
-const emitter = new EventEmitter();
-emitter.on('click', (x: number) => console.log(x));
-emitter.emit('click', 123); // 输出 123

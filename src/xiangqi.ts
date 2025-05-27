@@ -88,20 +88,10 @@ export class BoardRender extends MarkdownRenderChild {
             this.boardClickBound = true;
         }
         const resetButton = this.toolbarContainer!.querySelector('#reset');
-        if (resetButton) {
-            resetButton.addEventListener('click', () => {
-                this.onunload(); // 卸载当前棋盘
-                this.history = []; // 清空历史
-                this.undoHistory = []; // 清空撤销历史
-                this.main(); // 重新渲染
-            });
-            this.markedPiece = null; // 重置标记棋子
-            this.currentTurn = this.source.includes('w') ? 'red' : 'black'; // 重置当前回合
-        }
+        if (resetButton) resetButton.addEventListener('click', this.handleResetClick);
         const undoButton = this.toolbarContainer!.querySelector('#undo');
         if (undoButton) {
             undoButton.addEventListener('click', () => {
-                console.log(this.history);
                 this.undoMove(); // 撤销上一步 
             })
         }
@@ -198,7 +188,6 @@ export class BoardRender extends MarkdownRenderChild {
                 capture: clickedPiece ? clickedPiece : null,
                 Step: this.currentStep++
             });
-            console.log(this.history);
             // 如果目标有棋子，隐藏目标棋子
             if (clickedPiece) {
                 clickedPiece.hidden = true;
@@ -225,7 +214,11 @@ export class BoardRender extends MarkdownRenderChild {
             this.markedPiece = null;
         }
     };
-
+    private handleResetClick = () => {
+        while (this.history.length > 0) {
+            this.undoMove(); // 撤销上一步
+        }
+    }
     private markPiece(pieceEl: SVGGElement) {
         if (!pieceEl.hasAttribute('data-original-transform')) {
             const originalTransform = pieceEl.getAttribute('transform') || '';
@@ -329,6 +322,16 @@ export class BoardRender extends MarkdownRenderChild {
             this.boardContainer.removeEventListener('click', this.handleBoardClick);
             this.boardClickBound = false;
         }
+
+        // 移除按钮事件监听器
+        const resetButton = this.toolbarContainer?.querySelector('#reset');
+        const undoButton = this.toolbarContainer?.querySelector('#undo');
+        const redoButton = this.toolbarContainer?.querySelector('#redo');
+
+        if (resetButton) resetButton.remove();
+        if (undoButton) undoButton.remove();
+        if (redoButton) redoButton.remove();
+
         // 确保卸载时重置当前标记的棋子
         this.markedPiece = null;
     }

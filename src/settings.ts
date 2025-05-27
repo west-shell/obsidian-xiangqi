@@ -24,8 +24,6 @@ export class settingTab extends PluginSettingTab {
 
     containerEl.empty();
 
-    containerEl.createEl("h2", { text: "Obsidian 中国象棋设置" });
-
     new Setting(containerEl)
       .setName("主题")
       .setDesc("设置棋盘主题.")
@@ -41,7 +39,7 @@ export class settingTab extends PluginSettingTab {
       });
     new Setting(containerEl)
       .setName("界面大小")
-      .setDesc("调整界面大小（单位：px）")
+      .setDesc("调整界面大小")
       .addSlider((slider) => {
         slider
           .setLimits(20, 60, 1) // 最小值 30 最大值 60，步长 5
