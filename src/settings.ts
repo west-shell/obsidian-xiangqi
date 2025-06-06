@@ -1,7 +1,6 @@
 import XiangqiPlugin from "./main";
-import { chessRenderChild } from "./xiangqi";
 import { ISettings } from "./types";
-import {  App, PluginSettingTab, Setting,} from "obsidian";
+import { App, PluginSettingTab, Setting, } from "obsidian";
 
 const LAYOUT_POSITIONS = ["bottom", "right"];
 const THEME_STYLES = ["light", "dark"];
@@ -76,12 +75,7 @@ export class settingTab extends PluginSettingTab {
       });
   }
   async hide() {
-    // 1. 保存设置
     this.plugin.saveSettings();
-    this.plugin.renderChildren.forEach((child) => {
-      if (child instanceof chessRenderChild) {
-        child.refresh();
-      }
-    })
+    this.plugin.renderChildren.forEach((child) => child.refresh())
   }
 }

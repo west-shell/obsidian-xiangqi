@@ -35,7 +35,7 @@ export class chessRenderChild extends MarkdownRenderChild {
     // 主函数
     onload() {
         this.plugin.renderChildren.add(this);
-        this.parseSource(this.source);
+        this.parseSource();
         this.rend();
         this.bindEvents();
     }
@@ -95,8 +95,8 @@ export class chessRenderChild extends MarkdownRenderChild {
     }
 
     // 解析相关私有方法
-    private parseSource(source: string) {
-        const { board, moves, pieces, firstTurn } = parseSource(source);
+    private parseSource() {
+        const { board, moves, pieces, firstTurn } = parseSource(this.source);
         this.pieces = pieces;
         this.board = board;
         this.moves = moves;

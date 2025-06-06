@@ -1,4 +1,3 @@
-import { Setting } from 'obsidian';
 import { ISettings, IPiece } from './types';
 const PIECE_CHARS: Record<string, string> = {
   // 红方
@@ -38,7 +37,7 @@ function boardSvgString(settings: ISettings): string {
   }[position];
   return `
   <svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
-  <rect width="${width}" height="${height}" fill="${bgColor}" rx="5" stroke="${lineColor}" stroke-width="3"/>
+  <rect width="${width}" height="${height}" fill="${bgColor}" rx="5" stroke="${lineColor}" stroke-width="${cellSize * 0.06}"/>
   <!-- 网格 -->
   <path d="M ${cellSize - margin},${cellSize - margin} h ${8 * cellSize + 2 * margin} v ${9 * cellSize + 2 * margin} h -${8 * cellSize + 2 * margin} Z" stroke="${lineColor}" stroke-width="${cellSize * 0.08}" fill="none"/>
   <g stroke="${lineColor}" stroke-width="${cellSize * 0.04}" fill="none">
@@ -57,9 +56,9 @@ function boardSvgString(settings: ISettings): string {
   <!-- 九宫 -->
   <g stroke="${lineColor}" stroke-width="${cellSize * 0.03}">
     <path d="M ${cellSize * 4},${cellSize} l ${cellSize * 2} ${cellSize * 2} m 0,${-2 * cellSize} l ${-2 * cellSize} ${2 * cellSize}"/>
-          stroke="${lineColor}" stroke-width="2" fill="none"/>
+          stroke="${lineColor}" stroke-width="${cellSize * 0.04}" fill="none"/>
     <path d="M ${cellSize * 4},${8 * cellSize} l ${cellSize * 2} ${cellSize * 2} m 0,${-2 * cellSize} l ${-2 * cellSize} ${2 * cellSize}"/>
-          stroke="${lineColor}" stroke-width="2" fill="none"/>
+          stroke="${lineColor}" stroke-width="${cellSize * 0.04}" fill="none"/>
   </g>
   <!-- 楚河汉界 -->
   <text x="${5 * cellSize}" y="${5 * cellSize + 7 * margin}" font-size="${cellSize * 0.6}" text-anchor="middle" font-family="SimSun" fill="${textColor}">楚　河　　汉　界</text>
