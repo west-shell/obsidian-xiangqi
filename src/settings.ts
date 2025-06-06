@@ -35,7 +35,6 @@ export class settingTab extends PluginSettingTab {
         dropdown.addOptions(styles);
         dropdown.setValue(this.plugin.settings.theme).onChange((theme) => {
           this.plugin.settings.theme = theme as 'light' | 'dark';
-          // this.plugin.saveSettings();
         });
       });
 
@@ -49,7 +48,6 @@ export class settingTab extends PluginSettingTab {
 
         dropdown.setValue(this.plugin.settings.position).onChange((position) => {
           this.plugin.settings.position = position as 'bottom' | 'right';
-          // this.plugin.saveSettings();
         });
       });
 
@@ -58,12 +56,10 @@ export class settingTab extends PluginSettingTab {
       .setDesc("调整界面大小")
       .addSlider((slider) => {
         slider
-          .setLimits(20, 60, 1) // 最小值 30 最大值 60，步长 5
+          .setLimits(20, 60, 1)
           .setValue(this.plugin.settings.cellSize) // 默认值
           .onChange(async (value) => {
             this.plugin.settings.cellSize = value;
-            // await this.plugin.saveSettings(); // 保存设置
-            // this.applyCellsize(value); // 应用新字体大小
           });
 
         // // 可选：在滑块旁边显示当前值

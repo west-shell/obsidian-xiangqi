@@ -311,6 +311,8 @@ export class chessRenderChild extends MarkdownRenderChild {
     }
     refresh() {
         // 刷新棋盘和棋子
+        this.settings = this.plugin.settings; // 确保 settings 是最新的
+        this.cellSize=this.plugin.settings.cellSize; // 确保 cellSize 是最新的
         this.rend();
         this.bindEvents();
     }
