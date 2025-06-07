@@ -92,6 +92,12 @@ export class chessRenderChild extends MarkdownRenderChild {
                 this.redoMove();
             });
         }
+        const saveButton = this.toolbarContainer!.querySelector('#save');
+        if (saveButton) {
+            saveButton.addEventListener('click', () => {
+                this.redoMove();
+            });
+        }
     }
 
     // 解析相关私有方法
@@ -312,7 +318,7 @@ export class chessRenderChild extends MarkdownRenderChild {
     refresh() {
         // 刷新棋盘和棋子
         this.settings = this.plugin.settings; // 确保 settings 是最新的
-        this.cellSize=this.plugin.settings.cellSize; // 确保 cellSize 是最新的
+        this.cellSize = this.plugin.settings.cellSize; // 确保 cellSize 是最新的
         this.rend();
         this.bindEvents();
     }

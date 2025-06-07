@@ -130,6 +130,7 @@ function ToolbarString(settings: ISettings): string {
     { type: "reset", symbol: "↻", color: "#8B4513", hint: "重置棋盘" },
     { type: "undo", symbol: "↩", color: "#4169E1", hint: "撤销上一步" },
     { type: "redo", symbol: "↪", color: "#228B22", hint: "重做撤销" },
+    { type: "save", symbol: "🖫", color: "#228B22", hint: "保存" }
   ];
 
   const buttonRadius = cellSize * 0.4;
