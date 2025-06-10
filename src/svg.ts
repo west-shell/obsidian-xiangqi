@@ -90,7 +90,8 @@ export function createPieceSvg(
   return gNode as Element;
 }
 function pieceString(piece: IPiece, settings: ISettings): string {
-  const { type, x, y } = piece;
+  const { type, position } = piece;
+  const { x, y } = position;
   const { theme, cellSize } = settings;;
   const isRed = type === type.toUpperCase();
   const pieceColor = isRed ? '#c00' : '#000';

@@ -1,4 +1,4 @@
-import XiangqiPlugin from "./main";
+import XQPlugin from "./main";
 import { ISettings } from "./types";
 import { App, PluginSettingTab, Setting, } from "obsidian";
 
@@ -12,10 +12,10 @@ export const DEFAULT_SETTINGS: ISettings = {
   cellSize: 50
 };
 
-export class settingTab extends PluginSettingTab {
-  plugin: XiangqiPlugin;
+export class XQSettingTab extends PluginSettingTab {
+  plugin: XQPlugin;
 
-  constructor(app: App, plugin: XiangqiPlugin) {
+  constructor(app: App, plugin: XQPlugin) {
     super(app, plugin);
     this.plugin = plugin;
   }

@@ -1,17 +1,17 @@
 import { Plugin } from 'obsidian';
-import { chessRenderChild } from './xiangqi';
+import { XQRenderChild } from './xiangqi';
 import { ISettings } from './types';
-import { settingTab, DEFAULT_SETTINGS } from "./settings";
-export default class XiangqiPlugin extends Plugin {
+import { XQSettingTab, DEFAULT_SETTINGS } from "./settings";
+export default class XQPlugin extends Plugin {
     settings: ISettings = DEFAULT_SETTINGS;
-    renderChildren = new Set<chessRenderChild>();
+    renderChildren = new Set<XQRenderChild>();
     async onload() {
         await this.loadSettings();
-        this.addSettingTab(new settingTab(this.app, this));
+        this.addSettingTab(new XQSettingTab(this.app, this));
         this.registerMarkdownCodeBlockProcessor('xiangqi', (source, el, ctx) => {
-            const child = new chessRenderChild(this, this.settings, el, source);
-            ctx.addChild(child);
-            this.renderChildren.add(child);
+            const renderChild = new XQRenderChild(el, ctx, source,this);
+            ctx.addChild(renderChild);
+            this.renderChildren.add(renderChild);
         });
     }
     async loadSettings() {

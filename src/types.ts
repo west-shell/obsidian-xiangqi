@@ -3,15 +3,28 @@ export interface ISettings {
   theme: 'light' | 'dark';
   cellSize: number;
 }
+export type PieceType = 'r' | 'R' | 'n' | 'N' | 'b' | 'B' | 'a' | 'A' | 'k' | 'K' | 'c' | 'C' | 'p' | 'P';
+export type IBoard = (PieceType | null)[][];
+export type IPosition = { x: number; y: number };
 export interface IPiece {
-    type: string;
-    x: number;
-    y: number;
-    pieceEl?: Element;
-    hidden?: boolean;
+  type: PieceType;
+  position: IPosition;
+  pieceEl?: Element;
+  hidden?: boolean;
 }
 export interface IMove {
-        fromX: number, fromY: number,
-        toX: number, toY: number,
-        capture: IPiece | null
-    }
+  from: IPosition;
+  to: IPosition;
+  capture?: IPiece | null
+}
+export type IHistory = IMove[]
+export interface IState {
+  board: IBoard;
+  pieces: IPiece[] | null;
+  currentTurn: 'red' | 'black';
+  currentStep: number;
+  history: IHistory;
+  cellSize: number;
+  PGN: string[];
+  modified: boolean;
+}

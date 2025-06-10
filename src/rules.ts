@@ -2,15 +2,28 @@
  * 象棋走子规则校验模块
  * 支持基本的棋子走法合法性判断
  */
+import { IBoard, IMove, IPosition } from "./types";
 
-export type PieceType = 'r' | 'R' | 'n' | 'N' | 'b' | 'B' | 'a' | 'A' | 'k' | 'K' | 'c' | 'C' | 'p' | 'P';
+export function isValidMove(from: IPosition, to: IPosition, board: IBoard): boolean {
+    // 通用校验
+    if (!board) return false;
+    const err = baseCheck(from, to, board);
+    if (err) return false;
+    const fromPiece = board[from.x][from.y];
+    const toPiece = board[to.x][to.y];
+    if (isSameSide(fromPiece!, toPiece)) return false;;
 
-export interface Move {
-    from: { x: number; y: number };
-    to: { x: number; y: number };
-    board: (string | null)[][];
+    switch (fromPiece!.toUpperCase()) {
+        case 'R': return canRMove(from, to, board);
+        case 'N': return canNMove(from, to, board);
+        case 'B': return canBMove(from, to, board);
+        case 'A': return canAMove(from, to, board);
+        case 'K': return canKMove(from, to, board);
+        case 'C': return canCMove(from, to, board);
+        case 'P': return canPMove(from, to, board);
+        default: return false;
+    }
 }
-
 // 通用校验：越界、原地不动、无棋子
 function baseCheck(from: { x: number; y: number }, to: { x: number; y: number }, board: (string | null)[][]): string | null {
     if (
@@ -28,29 +41,8 @@ function isSameSide(fromPiece: string, toPiece: string | null): boolean {
     return (fromPiece === fromPiece.toUpperCase()) === (toPiece === toPiece.toUpperCase());
 }
 
-export function isValidMove(move: Move): boolean {
-    const { from, to, board} = move;
-    // 通用校验
-    const err = baseCheck(from, to, board);
-    if (err) return false;
-    const fromPiece = board[from.x][from.y];
-    const toPiece = board[to.x][to.y];
-    if (isSameSide(fromPiece!, toPiece)) return false;;
-
-    switch (fromPiece!.toUpperCase()) {
-        case 'R': return canRookMove(from, to, board);
-        case 'N': return canKnightMove(from, to, board);
-        case 'B': return canElephantMove(from, to, board);
-        case 'A': return canAdvisorMove(from, to, board);
-        case 'K': return canKingMove(from, to, board);
-        case 'C': return canCannonMove(from, to, board);
-        case 'P': return canPawnMove(from, to, board);
-        default: return false;
-    }
-}
-
 // 车
-function canRookMove(from: { x: number; y: number }, to: { x: number; y: number }, board: (string | null)[][]): boolean {
+function canRMove(from: { x: number; y: number }, to: { x: number; y: number }, board: (string | null)[][]): boolean {
     if (from.x !== to.x && from.y !== to.y) return false;
     if (from.x === to.x) {
         const [min, max] = [from.y, to.y].sort((a, b) => a - b);
@@ -67,7 +59,7 @@ function canRookMove(from: { x: number; y: number }, to: { x: number; y: number 
 }
 
 // 马
-function canKnightMove(from: { x: number; y: number }, to: { x: number; y: number }, board: (string | null)[][]): boolean {
+function canNMove(from: { x: number; y: number }, to: { x: number; y: number }, board: (string | null)[][]): boolean {
     const dx = to.x - from.x, dy = to.y - from.y;
     if (!((Math.abs(dx) === 2 && Math.abs(dy) === 1) || (Math.abs(dx) === 1 && Math.abs(dy) === 2))) return false;
     if (Math.abs(dx) === 2) {
@@ -79,7 +71,7 @@ function canKnightMove(from: { x: number; y: number }, to: { x: number; y: numbe
 }
 
 // 相/象
-function canElephantMove(from: { x: number; y: number }, to: { x: number; y: number }, board: (string | null)[][]): boolean {
+function canBMove(from: { x: number; y: number }, to: { x: number; y: number }, board: (string | null)[][]): boolean {
     const dx = to.x - from.x, dy = to.y - from.y;
     if (Math.abs(dx) !== 2 || Math.abs(dy) !== 2) return false;
     const fromPiece = board[from.x][from.y]!
@@ -90,7 +82,7 @@ function canElephantMove(from: { x: number; y: number }, to: { x: number; y: num
 }
 
 // 士/仕
-function canAdvisorMove(from: { x: number; y: number }, to: { x: number; y: number }, board: (string | null)[][]): boolean {
+function canAMove(from: { x: number; y: number }, to: { x: number; y: number }, board: (string | null)[][]): boolean {
     const dx = Math.abs(to.x - from.x), dy = Math.abs(to.y - from.y);
     if (dx !== 1 || dy !== 1) return false;
     const fromPiece = board[from.x][from.y]!;
@@ -103,7 +95,7 @@ function canAdvisorMove(from: { x: number; y: number }, to: { x: number; y: numb
 }
 
 // 将/帅
-function canKingMove(from: { x: number; y: number }, to: { x: number; y: number }, board: (string | null)[][]): boolean {
+function canKMove(from: { x: number; y: number }, to: { x: number; y: number }, board: (string | null)[][]): boolean {
     const dx = Math.abs(to.x - from.x), dy = Math.abs(to.y - from.y);
     if (dx + dy !== 1) return false;
     const fromPiece = board[from.x][from.y]!;
@@ -117,7 +109,7 @@ function canKingMove(from: { x: number; y: number }, to: { x: number; y: number 
 }
 
 // 炮
-function canCannonMove(from: { x: number; y: number }, to: { x: number; y: number }, board: (string | null)[][]): boolean {
+function canCMove(from: { x: number; y: number }, to: { x: number; y: number }, board: (string | null)[][]): boolean {
     if (from.x !== to.x && from.y !== to.y) return false;
     let count = 0;
     if (from.x === to.x) {
@@ -142,7 +134,7 @@ function canCannonMove(from: { x: number; y: number }, to: { x: number; y: numbe
 }
 
 // 兵/卒
-function canPawnMove(from: { x: number; y: number }, to: { x: number; y: number }, board: (string | null)[][]): boolean {
+function canPMove(from: { x: number; y: number }, to: { x: number; y: number }, board: (string | null)[][]): boolean {
     const fromPiece = board[from.x][from.y]!;
     const isRed = fromPiece === fromPiece.toUpperCase();
     const dx = to.x - from.x, dy = to.y - from.y;
