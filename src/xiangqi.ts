@@ -1,15 +1,14 @@
 import XQPlugin from './main';
 import { MarkdownRenderChild, MarkdownPostProcessorContext, MarkdownView } from 'obsidian';
-import { ISettings, IPiece, IMove, IState, IBoard } from './types';
-import { parseSource } from './parseSource';
+import { ISettings, IPiece, IMove, IState, IBoard, ITurn } from './types';
+import { parseSource, getPGN } from './parseSource';
 import { generateBoardSvg, createPieceSvg, createButtonSvg } from './svg';
 import { isValidMove } from './rules';
-import { runMove, undoMove, redoMove, savePGN } from './action';
+import { runMove, undoMove, redoMove } from './action';
 import { findPieceAt, markPiece, restorePiece } from './utils';
 
 export class XQRenderChild extends MarkdownRenderChild implements IState {
-    // 修改为更具描述性的变量名
-    settings: ISettings; // 用于存储设置
+    settings: ISettings;
     PGN: IMove[] = [];
     boardContainer: HTMLDivElement | null = null;
     toolbarContainer: HTMLDivElement | null = null;
@@ -17,7 +16,7 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
     pieces: IPiece[] = [];
     markedPiece: IPiece | null = null;
     history: IMove[] = [];
-    currentTurn: 'red' | 'black' = 'red'; // 新增，默认红方先手
+    currentTurn: ITurn = 'red'; // 新增，默认红方先手
     currentStep: number = 0;
     modified: boolean = false;
 
@@ -33,7 +32,6 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
 
     // 主函数
     onload() {
-        console.log('load');
         this.plugin.renderChildren.add(this);
         this.parseSource();
         this.rend();
@@ -79,12 +77,17 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
             // 假设 #toolbar 是 <svg> 或 <g> 节点
             toolbar.appendChild(buttonGroup);
         }
+        const saveButton = this.toolbarContainer!.querySelector('#save');
+        if (saveButton) {
+            const circle = saveButton.querySelector('circle');
+            if (circle) {
+                circle.setAttribute('fill', this.PGN.length > 0 ? 'green' : '#FF9500');
+            }
+        }
     }
     private bindEvents() {
         // 只绑定一次棋盘点击事件
-        if (this.boardContainer) {
-            this.boardContainer.addEventListener('click', this.handleBoardClick);
-        }
+        this.boardContainer?.addEventListener('click', this.handleBoardClick);
         const resetButton = this.toolbarContainer!.querySelector('#reset');
         resetButton?.addEventListener('click', this.handleResetClick);
         const undoButton = this.toolbarContainer!.querySelector('#undo');
@@ -92,15 +95,16 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
         const redoButton = this.toolbarContainer!.querySelector('#redo');
         redoButton?.addEventListener('click', () => redoMove(this));
         const saveButton = this.toolbarContainer!.querySelector('#save');
-        saveButton?.addEventListener('click', () => savePGN(this));
+        saveButton?.addEventListener('click', () => this.savePGN());
     }
     private handleBoardClick = (e: MouseEvent) => {
         if (!this.boardContainer) return;
+        const cellSize = this.settings.cellSize;
         const boardRect = this.boardContainer.getBoundingClientRect();
         const mouseX = e.clientX - boardRect.left;
         const mouseY = e.clientY - boardRect.top;
-        const gridX = Math.round(mouseX / this.cellSize) - 1;
-        const gridY = Math.round(mouseY / this.cellSize) - 1;
+        const gridX = Math.round(mouseX / cellSize) - 1;
+        const gridY = Math.round(mouseY / cellSize) - 1;
         const gridPos = { x: gridX, y: gridY };
         const clickedPiece = findPieceAt(gridPos, this);
 
@@ -159,6 +163,39 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
     // 卸载相关方法
     onunload() {
         this.plugin.renderChildren.delete(this);
-        console.log('unload');
+    }
+    async savePGN() {
+        const view = this.plugin.app.workspace.getActiveViewOfType(MarkdownView);
+        if (!view) return;
+        const file = view.file; // TFile
+        if (!file) return;
+        const section = this.ctx.getSectionInfo(this.containerEl);
+        if (!section) return;
+        const { lineStart, lineEnd } = section;
+        const content = await this.plugin.app.vault.read(file);
+        const lines = content.split('\n');
+        let blockLines = lines.slice(lineStart, lineEnd + 1);
+        if (blockLines.length < 2) return;
+        // 1. 删除所有符合 PGN 格式的行（A0-H8 这样的走棋记录）
+        blockLines = blockLines.filter(line => !/[A-Z]\d-[A-Z]\d/.test(line));
+        // 2. 生成新的 PGN（确保没有多余的换行符）
+        // 生成新的PGN（自动格式化）
+        const moves = this.history.map(move => getPGN(move));
+        let pgnLines = [];
+        for (let i = 0; i < moves.length; i += 2) {
+            const line = `${Math.ceil((i + 1) / 2)}. ${moves[i]} ${moves[i + 1] || ""}`.trim();
+            pgnLines.push(line);
+        }
+        const PGN = pgnLines.join("\n");
+
+        // 然后插入到blockLines中
+        blockLines.splice(blockLines.length - 1, 0, PGN);
+        // 4. 替换原始内容，不进行额外的 split/join 操作
+        const newContent = [
+            ...lines.slice(0, lineStart),
+            ...blockLines,
+            ...lines.slice(lineEnd + 1),
+        ].join('\n');
+        await this.plugin.app.vault.modify(file, newContent);
     }
 }

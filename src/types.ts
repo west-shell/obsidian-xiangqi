@@ -3,6 +3,7 @@ export interface ISettings {
     theme: 'light' | 'dark';
     cellSize: number;
 }
+export type ITurn = 'red' | 'black';
 export type PieceType = 'r' | 'R' | 'n' | 'N' | 'b' | 'B' | 'a' | 'A' | 'k' | 'K' | 'c' | 'C' | 'p' | 'P';
 export type IBoard = (PieceType | null)[][];
 export type IPosition = { x: number; y: number };
@@ -22,7 +23,7 @@ export interface IState {
     settings: ISettings;
     board: IBoard;
     pieces: IPiece[] | null;
-    currentTurn: 'red' | 'black';
+    currentTurn: ITurn;
     currentStep: number;
     history: IHistory;
     PGN: IMove[];

@@ -1,9 +1,9 @@
-import { IPosition, IPiece, IBoard, PieceType, IMove } from './types';
+import { IPiece, IBoard, PieceType, IMove, ITurn } from './types';
 export function parseSource(source: string): {
     pieces: IPiece[];
     board: IBoard;
     PGN: IMove[];
-    firstTurn: 'black' | 'red';
+    firstTurn: ITurn;
 } {
     // 1. 提取FEN（优先从提示词中提取）
     let fen =
@@ -57,7 +57,7 @@ export function parsePGN(PGN: string): IMove {
  * @param move 包含 from 和 to 的对象，例如 { from: { x: 0, y: 0 }, to: { x: 1, y: 7 } }
  * @returns 返回 "A0-B7" 格式的字符串
  */
-export function formatChessMove(move: IMove): string {
+export function getPGN(move: IMove): string {
     // 校验输入
     if (move.from.x == null || move.from.y == null || move.to.x == null || move.to.y == null) {
         throw new Error('Invalid move: x and y must be numbers');
