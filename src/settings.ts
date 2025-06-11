@@ -1,15 +1,14 @@
-import XQPlugin from "./main";
-import { ISettings } from "./types";
-import { App, PluginSettingTab, Setting, } from "obsidian";
+import XQPlugin from './main';
+import { ISettings } from './types';
+import { App, PluginSettingTab, Setting } from 'obsidian';
 
-const LAYOUT_POSITIONS = ["bottom", "right"];
-const THEME_STYLES = ["light", "dark"];
-
+const LAYOUT_POSITIONS = ['bottom', 'right'];
+const THEME_STYLES = ['light', 'dark'];
 
 export const DEFAULT_SETTINGS: ISettings = {
   position: 'right',
   theme: 'light',
-  cellSize: 50
+  cellSize: 50,
 };
 
 export class XQSettingTab extends PluginSettingTab {
@@ -26,8 +25,8 @@ export class XQSettingTab extends PluginSettingTab {
     containerEl.empty();
 
     new Setting(containerEl)
-      .setName("主题")
-      .setDesc("设置棋盘主题.")
+      .setName('主题')
+      .setDesc('设置棋盘主题.')
       .addDropdown((dropdown) => {
         let styles: Record<string, string> = {};
         THEME_STYLES.map((style) => (styles[style] = style));
@@ -38,8 +37,8 @@ export class XQSettingTab extends PluginSettingTab {
       });
 
     new Setting(containerEl)
-      .setName("按钮布局")
-      .setDesc("设置按钮的位置.")
+      .setName('按钮布局')
+      .setDesc('设置按钮的位置.')
       .addDropdown((dropdown) => {
         let positions: Record<string, string> = {};
         LAYOUT_POSITIONS.map((position) => (positions[position] = position));
@@ -51,8 +50,8 @@ export class XQSettingTab extends PluginSettingTab {
       });
 
     new Setting(containerEl)
-      .setName("界面大小")
-      .setDesc("调整界面大小")
+      .setName('界面大小')
+      .setDesc('调整界面大小')
       .addSlider((slider) => {
         slider
           .setLimits(20, 60, 1)
@@ -76,6 +75,6 @@ export class XQSettingTab extends PluginSettingTab {
   }
   async hide() {
     this.plugin.saveSettings();
-    this.plugin.renderChildren.forEach((child) => child.refresh())
+    this.plugin.renderChildren.forEach((child) => child.refresh());
   }
 }

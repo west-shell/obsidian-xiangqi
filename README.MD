@@ -6,9 +6,11 @@
 [![zh-CN](https://img.shields.io/badge/lang-简体中文-green)](./README.zh-CN.MD)
 
 ## Introduction
+
 `Obsidian Xiangqi` is a Chinese chess rendering engine plugin designed for Obsidian. It allows you to easily render Chinese chess games in FEN and PGN formats within your notes and manually play through the moves. The plugin supports themes, button positions, board size adjustments, and provides features like reset, undo, and redo.
 
 ## Demonstration
+
 ````markdown
 ```xiangqi
 3akab2/1R1Pn4/c6C1/p3P3p/4p1b2/1R7/P3c3P/C3B4/1nr1A4/4KAB2
@@ -23,13 +25,15 @@ D6-D7 D8-D9
 D7-D8 D9-E9
 D8-D9
 ```
-`````
+````
 
 ## Rendering
+
 ![pgnShow](./IMAGE/pgnShow.png)
 ![Show](./IMAGE/Show.png)
 
 ## Features
+
 - **Chessboard Rendering**: Render Chinese chess games and play through moves directly in Obsidian notes.
 - **Custom Settings**: Adjust themes, button positions, and board size through settings.
   1. Themes include dark and light modes.
@@ -40,6 +44,7 @@ D8-D9
 - **Format Support**: Supports FEN format and ICCS-style PGN notation.
 
 ## Usage Instructions
+
 Place chess game information in a code block with the language set to `xiangqi`.  
 The format is flexible and can automatically recognize FEN and moves.  
 You can use `fen:` to mark the FEN string, but it's optional.  
@@ -50,6 +55,7 @@ After manually moving pieces, clicking "Next Step" will stop providing PGN moves
 To re-display PGN moves, click the "Reset" button.
 
 ### Manual Installation (Not yet available in the plugin market)
+
 1. Download the latest version of this plugin.
 2. Open Obsidian and go to `Settings` -> `Community Plugins`.
 3. Disable `Safe Mode`.

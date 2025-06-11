@@ -3,7 +3,21 @@ export interface ISettings {
   theme: 'light' | 'dark';
   cellSize: number;
 }
-export type PieceType = 'r' | 'R' | 'n' | 'N' | 'b' | 'B' | 'a' | 'A' | 'k' | 'K' | 'c' | 'C' | 'p' | 'P';
+export type PieceType =
+  | 'r'
+  | 'R'
+  | 'n'
+  | 'N'
+  | 'b'
+  | 'B'
+  | 'a'
+  | 'A'
+  | 'k'
+  | 'K'
+  | 'c'
+  | 'C'
+  | 'p'
+  | 'P';
 export type IBoard = (PieceType | null)[][];
 export type IPosition = { x: number; y: number };
 export interface IPiece {
@@ -15,9 +29,9 @@ export interface IPiece {
 export interface IMove {
   from: IPosition;
   to: IPosition;
-  capture?: IPiece | null
+  capture?: IPiece | null;
 }
-export type IHistory = IMove[]
+export type IHistory = IMove[];
 export interface IState {
   board: IBoard;
   pieces: IPiece[] | null;
