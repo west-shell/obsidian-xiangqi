@@ -11,7 +11,7 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
     // 修改为更具描述性的变量名
     settings: ISettings; // 用于存储设置
     cellSize: number; // 每个格子的大小
-    PGN: string[] = [];
+    PGN: IMove[] = [];
     boardContainer: HTMLDivElement | null = null;
     toolbarContainer: HTMLDivElement | null = null;
     board: IBoard = [];

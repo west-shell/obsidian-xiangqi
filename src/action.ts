@@ -37,19 +37,10 @@ export function undoMove(state: IState) {
 export function redoMove(state: IState) {
     // 如果没有悔棋记录且没有预定义的走法，直接返回
     // 如果没有悔棋记录但有预定义的走法，从 moves 中执行下一步
-    if (!state.modified && state.PGN!.length>0) {
+    if (!state.modified && state.PGN!.length > 0) {
         const nextMove = state.PGN[state.currentStep]; // 获取并移除 moves 中的第一步
         if (!nextMove) return;
-
-        // 解析走法，例如 "H2-D2" -> 起点和终点
-        const [fromSting, toSting] = nextMove.split('-');
-        const fromX = fromSting.charCodeAt(0) - 'A'.charCodeAt(0);
-        const fromY = 9 - parseInt(fromSting[1]); // 修正 Y 坐标，从下往上数
-        const toX = toSting.charCodeAt(0) - 'A'.charCodeAt(0);
-        const toY = 9 - parseInt(toSting[1]); // 修正 Y 坐标，从下往上数
-        const from = { x: fromX, y: fromY }
-        const to = { x: toX, y: toY }
-        runMove({ from, to }, state);
+        runMove(nextMove, state);
         return
     }
     if (state.history.length <= state.currentStep) return;

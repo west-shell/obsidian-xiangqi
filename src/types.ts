@@ -25,6 +25,6 @@ export interface IState {
   currentStep: number;
   history: IHistory;
   cellSize: number;
-  PGN: string[];
+  PGN: IMove[];
   modified: boolean;
 }
