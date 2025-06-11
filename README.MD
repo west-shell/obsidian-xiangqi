@@ -36,10 +36,10 @@ D8-D9
 
 - **Chessboard Rendering**: Render Chinese chess games and play through moves directly in Obsidian notes.
 - **Custom Settings**: Adjust themes, button positions, and board size through settings.
-  1. Themes include dark and light modes.
-  2. Button positions can be set to the right or bottom, suitable for both landscape and portrait modes.
-  3. Board size can be continuously adjusted to fit screen size.
-  4. Auto-refresh for setting changed without affecting the current step.
+    1. Themes include dark and light modes.
+    2. Button positions can be set to the right or bottom, suitable for both landscape and portrait modes.
+    3. Board size can be continuously adjusted to fit screen size.
+    4. Auto-refresh for setting changed without affecting the current step.
 - **Mobile Support**: Adapt to mobile devices by manually adjusting button positions and board size.
 - **Format Support**: Supports FEN format and ICCS-style PGN notation.
 

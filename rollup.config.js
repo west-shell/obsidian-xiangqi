@@ -10,18 +10,18 @@ if you want to view the source visit the plugins github repository
 `;
 
 export default {
-  input: './src/main.ts',
-  output: {
-    dir: '.',
-    sourcemap: 'inline',
-    sourcemapExcludeSources: isProd,
-    format: 'cjs',
-    exports: 'default',
-    banner,
-  },
-  external: ['obsidian'],
-  plugins: [typescript({ allowSyntheticDefaultImports: true }), nodeResolve({ browser: true })],
-  watch: {
-    ignored: ['src/**'], // 忽略 src 目录的变更
-  },
+    input: './src/main.ts',
+    output: {
+        dir: '.',
+        sourcemap: 'inline',
+        sourcemapExcludeSources: isProd,
+        format: 'cjs',
+        exports: 'default',
+        banner,
+    },
+    external: ['obsidian'],
+    plugins: [typescript({ allowSyntheticDefaultImports: true }), nodeResolve({ browser: true })],
+    watch: {
+        ignored: ['src/**'], // 忽略 src 目录的变更
+    },
 };
