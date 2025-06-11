@@ -38,16 +38,7 @@ function baseCheck(
     to: { x: number; y: number },
     board: (string | null)[][],
 ): string | null {
-    if (
-        from.x < 0 ||
-        from.x > 8 ||
-        from.y < 0 ||
-        from.y > 9 ||
-        to.x < 0 ||
-        to.x > 8 ||
-        to.y < 0 ||
-        to.y > 9
-    )
+    if (from.x < 0 || from.x > 8 || from.y < 0 || from.y > 9 || to.x < 0 || to.x > 8 || to.y < 0 || to.y > 9)
         return 'out-of-board';
     if (from.x === to.x && from.y === to.y) return 'same-pos';
     if (!board[from.x][from.y]) return 'no-piece';
@@ -61,11 +52,7 @@ function isSameSide(fromPiece: string, toPiece: string | null): boolean {
 }
 
 // 车
-function canRMove(
-    from: { x: number; y: number },
-    to: { x: number; y: number },
-    board: (string | null)[][],
-): boolean {
+function canRMove(from: { x: number; y: number }, to: { x: number; y: number }, board: (string | null)[][]): boolean {
     if (from.x !== to.x && from.y !== to.y) return false;
     if (from.x === to.x) {
         const [min, max] = [from.y, to.y].sort((a, b) => a - b);
@@ -82,15 +69,10 @@ function canRMove(
 }
 
 // 马
-function canNMove(
-    from: { x: number; y: number },
-    to: { x: number; y: number },
-    board: (string | null)[][],
-): boolean {
+function canNMove(from: { x: number; y: number }, to: { x: number; y: number }, board: (string | null)[][]): boolean {
     const dx = to.x - from.x,
         dy = to.y - from.y;
-    if (!((Math.abs(dx) === 2 && Math.abs(dy) === 1) || (Math.abs(dx) === 1 && Math.abs(dy) === 2)))
-        return false;
+    if (!((Math.abs(dx) === 2 && Math.abs(dy) === 1) || (Math.abs(dx) === 1 && Math.abs(dy) === 2))) return false;
     if (Math.abs(dx) === 2) {
         if (board[from.x + dx / 2][from.y]) return false;
     } else {
@@ -100,11 +82,7 @@ function canNMove(
 }
 
 // 相/象
-function canBMove(
-    from: { x: number; y: number },
-    to: { x: number; y: number },
-    board: (string | null)[][],
-): boolean {
+function canBMove(from: { x: number; y: number }, to: { x: number; y: number }, board: (string | null)[][]): boolean {
     const dx = to.x - from.x,
         dy = to.y - from.y;
     if (Math.abs(dx) !== 2 || Math.abs(dy) !== 2) return false;
@@ -116,11 +94,7 @@ function canBMove(
 }
 
 // 士/仕
-function canAMove(
-    from: { x: number; y: number },
-    to: { x: number; y: number },
-    board: (string | null)[][],
-): boolean {
+function canAMove(from: { x: number; y: number }, to: { x: number; y: number }, board: (string | null)[][]): boolean {
     const dx = Math.abs(to.x - from.x),
         dy = Math.abs(to.y - from.y);
     if (dx !== 1 || dy !== 1) return false;
@@ -134,11 +108,7 @@ function canAMove(
 }
 
 // 将/帅
-function canKMove(
-    from: { x: number; y: number },
-    to: { x: number; y: number },
-    board: (string | null)[][],
-): boolean {
+function canKMove(from: { x: number; y: number }, to: { x: number; y: number }, board: (string | null)[][]): boolean {
     const dx = Math.abs(to.x - from.x),
         dy = Math.abs(to.y - from.y);
     if (dx + dy !== 1) return false;
@@ -153,11 +123,7 @@ function canKMove(
 }
 
 // 炮
-function canCMove(
-    from: { x: number; y: number },
-    to: { x: number; y: number },
-    board: (string | null)[][],
-): boolean {
+function canCMove(from: { x: number; y: number }, to: { x: number; y: number }, board: (string | null)[][]): boolean {
     if (from.x !== to.x && from.y !== to.y) return false;
     let count = 0;
     if (from.x === to.x) {
@@ -182,11 +148,7 @@ function canCMove(
 }
 
 // 兵/卒
-function canPMove(
-    from: { x: number; y: number },
-    to: { x: number; y: number },
-    board: (string | null)[][],
-): boolean {
+function canPMove(from: { x: number; y: number }, to: { x: number; y: number }, board: (string | null)[][]): boolean {
     const fromPiece = board[from.x][from.y]!;
     const isRed = fromPiece === fromPiece.toUpperCase();
     const dx = to.x - from.x,

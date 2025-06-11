@@ -108,10 +108,7 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
             // 没有标记棋子时，只能选中当前行棋方的棋子
             if (clickedPiece) {
                 const clickedIsRed = clickedPiece.type === clickedPiece.type.toUpperCase();
-                if (
-                    (this.currentTurn === 'red' && clickedIsRed) ||
-                    (this.currentTurn === 'black' && !clickedIsRed)
-                ) {
+                if ((this.currentTurn === 'red' && clickedIsRed) || (this.currentTurn === 'black' && !clickedIsRed)) {
                     markPiece(clickedPiece.pieceEl!);
                     this.markedPiece = clickedPiece;
                 }
@@ -137,10 +134,7 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
             // 如果点击的是当前方棋子，重新标记
             if (clickedPiece) {
                 const clickedIsRed = clickedPiece.type === clickedPiece.type.toUpperCase();
-                if (
-                    (this.currentTurn === 'red' && clickedIsRed) ||
-                    (this.currentTurn === 'black' && !clickedIsRed)
-                ) {
+                if ((this.currentTurn === 'red' && clickedIsRed) || (this.currentTurn === 'black' && !clickedIsRed)) {
                     markPiece(clickedPiece.pieceEl!);
                     this.markedPiece = clickedPiece;
                     return;

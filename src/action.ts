@@ -53,23 +53,19 @@ export function redoMove(state: IState) {
 export async function savePGN(state: IState) {
     // const view = this.plugin.app.workspace.getActiveViewOfType(MarkdownView);
     // if (!view) return;
-
     // const file = view.file; // TFile
     // if (!file) return;
-
     // const section = this.ctx.getSectionInfo(this.containerEl);
     // if (!section) return;
     // const { lineStart, lineEnd } = section;
     // const content = await this.plugin.app.vault.read(file);
     // const lines = content.split('\n');
     // const blockLines = lines.slice(lineStart, lineEnd + 1);
-
     // // 在结尾 ``` 之前插入时间戳
     // if (blockLines.length < 2) return;
     // const TIMESTAMP = `时间戳: ${new Date().toLocaleString()}`;
     // blockLines.splice(blockLines.length - 1, 0, TIMESTAMP);
     // const newBlock = blockLines.join('\n');
-
     // // 替换原始 lines 的对应行
     // const newLines = [
     //     ...lines.slice(0, lineStart),
@@ -77,6 +73,5 @@ export async function savePGN(state: IState) {
     //     ...lines.slice(lineEnd + 1),
     // ];
     // const newContent = newLines.join('\n');
-
     // await this.plugin.app.vault.modify(file, newContent);
 }
