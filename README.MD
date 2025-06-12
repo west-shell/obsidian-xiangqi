@@ -1,15 +1,15 @@
 # Obsidian Xiangqi
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](./LICENSE)
-[![en](https://img.shields.io/badge/lang-English-blue)](./README.MD)
-[![zh-CN](https://img.shields.io/badge/lang-简体中文-green)](./README.zh-CN.MD)
+![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)  
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](./LICENSE)  
+[![en](https://img.shields.io/badge/lang-English-blue)](README.md)  
+[![zh-CN](https://img.shields.io/badge/lang-简体中文-green)](README.zh-CN.md)
 
 ## Introduction
 
-`Obsidian Xiangqi` is a Chinese chess rendering engine plugin designed for Obsidian. It allows you to easily render Chinese chess games in FEN and PGN formats within your notes and manually play through the moves. The plugin supports themes, button positions, board size adjustments, and provides features like reset, undo, and redo.
+`Obsidian Xiangqi` is a Chinese chess rendering engine plugin designed for Obsidian. It allows you to easily render Chinese chess positions in FEN or PGN format within Obsidian notes and manually play through moves. The plugin supports theme customization, button positioning, board resizing, resetting, undo/redo moves, and saving game records.
 
-## Demonstration
+## Demo
 
 ````markdown
 ```xiangqi
@@ -29,38 +29,41 @@ D8-D9
 
 ## Rendering
 
-![pgnShow](./IMAGE/pgnShow.png)
+![pgnShow](./IMAGE/pgnShow.png)  
 ![Show](./IMAGE/Show.png)
 
 ## Features
 
-- **Chessboard Rendering**: Render Chinese chess games and play through moves directly in Obsidian notes.
-- **Custom Settings**: Adjust themes, button positions, and board size through settings.
-    1. Themes include dark and light modes.
-    2. Button positions can be set to the right or bottom, suitable for both landscape and portrait modes.
-    3. Board size can be continuously adjusted to fit screen size.
-    4. Auto-refresh for setting changed without affecting the current step.
-- **Mobile Support**: Adapt to mobile devices by manually adjusting button positions and board size.
-- **Format Support**: Supports FEN format and ICCS-style PGN notation.
+- **Board Rendering**: Render and play through Chinese chess games in Obsidian notes
+- **Customization**:
+    - Dark/light themes
+    - Adjustable button positions (right/bottom)
+    - Resizable board
+    - Settings apply without resetting current game
+- **Game Records**:
+    - Save move history as PGN
+    - Visual save button states (yellow/green)
+    - Save confirmation prompt
+- **Mobile Support**: Adapts to landscape/portrait modes
+- **Format Support**: FEN and ICCS-style PGN notations
 
-## Usage Instructions
+## Usage
 
-Place chess game information in a code block with the language set to `xiangqi`.  
-The format is flexible and can automatically recognize FEN and moves.  
-You can use `fen:` to mark the FEN string, but it's optional.  
-PGN games without FEN will default to the standard opening.  
-If you haven't moved any pieces manually, clicking the "Next Step" button will execute moves from the PGN notation.  
-During this process, you can use "Previous Step" and "Next Step" to display moves.  
-After manually moving pieces, clicking "Next Step" will stop providing PGN moves.  
-To re-display PGN moves, click the "Reset" button.
+1. Place game records in a `xiangqi` code block
+2. Parser automatically detects FEN and PGN moves
+3. Navigation:
+    - "Next" to follow PGN moves (if no manual moves made)
+    - "Previous"/"Next" to browse moves
+    - "Reset" to return to PGN display
+4. Click "Save" to update PGN record
 
-### Manual Installation (Not yet available in the plugin market)
+## Installation
 
-1. Download the latest version of this plugin.
-2. Open Obsidian and go to `Settings` -> `Community Plugins`.
-3. Disable `Safe Mode`.
-4. Click `Browse` -> `Open Plugins Folder`.
-5. Create a new folder and place the downloaded files into it.
-6. Return to the `Community Plugins` page in Obsidian, find `Obsidian Xiangqi`, and enable it.
+1. Download plugin files
+2. In Obsidian:
+    - Go to Settings → Community plugins
+    - Disable Safe mode
+    - Open plugins folder and add files
+3. Enable plugin
 
-The plugin is not yet available in the official Obsidian plugin market. Once supported, you can search for `Chinese chess` in the market to install it.
+_Note: Coming soon to Obsidian's official marketplace (search "Chinese chess")_
