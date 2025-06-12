@@ -1,11 +1,12 @@
 import XQPlugin from './main';
-import { MarkdownRenderChild, MarkdownPostProcessorContext, MarkdownView } from 'obsidian';
+import { MarkdownRenderChild, MarkdownPostProcessorContext, MarkdownView, Notice } from 'obsidian';
 import { ISettings, IPiece, IMove, IState, IBoard, ITurn } from './types';
 import { parseSource, getPGN } from './parseSource';
 import { generateBoardSvg, createPieceSvg, createButtonSvg } from './svg';
 import { isValidMove } from './rules';
 import { runMove, undoMove, redoMove } from './action';
 import { findPieceAt, markPiece, restorePiece } from './utils';
+import { ConfirmModal } from './confirmModal';
 
 export class XQRenderChild extends MarkdownRenderChild implements IState {
     settings: ISettings;
@@ -95,7 +96,7 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
         const redoButton = this.toolbarContainer!.querySelector('#redo');
         redoButton?.addEventListener('click', () => redoMove(this));
         const saveButton = this.toolbarContainer!.querySelector('#save');
-        saveButton?.addEventListener('click', () => this.savePGN());
+        saveButton?.addEventListener('click', () => this.handleSaveClick());
     }
     private handleBoardClick = (e: MouseEvent) => {
         if (!this.boardContainer) return;
@@ -147,6 +148,7 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
             this.markedPiece = null;
         }
     };
+
     private handleResetClick = () => {
         while (this.currentStep > 0) {
             undoMove(this); // 撤销上一步
@@ -164,6 +166,25 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
     onunload() {
         this.plugin.renderChildren.delete(this);
     }
+    async handleSaveClick() {
+        let message = '';
+        if (this.history.length === 0 && this.PGN.length === 0) {
+            new Notice('PGN记录为空，无需保存！');
+            return;
+        }
+        if (this.history.length === 0 && this.PGN.length > 0) message = '当前PGN记录不为空，是否要清空？';
+        if (this.history.length > 0 && this.PGN.length === 0) message = '当前PGN记录为空，是否要保存历史为PGN？';
+        if (this.history.length > 0 && this.PGN.length > 0) message = '当前PGN记录不为空，是否要覆盖保存？';
+        const modal = new ConfirmModal(this.plugin.app, '确认保存', message, '保存', '取消');
+
+        modal.open();
+        const userConfirmed = await modal.promise;
+
+        if (userConfirmed) {
+            await this.savePGN();
+            new Notice('保存成功！');
+        }
+    }
     async savePGN() {
         const view = this.plugin.app.workspace.getActiveViewOfType(MarkdownView);
         if (!view) return;
@@ -176,26 +197,21 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
         const lines = content.split('\n');
         let blockLines = lines.slice(lineStart, lineEnd + 1);
         if (blockLines.length < 2) return;
-        // 1. 删除所有符合 PGN 格式的行（A0-H8 这样的走棋记录）
-        blockLines = blockLines.filter(line => !/[A-Z]\d-[A-Z]\d/.test(line));
-        // 2. 生成新的 PGN（确保没有多余的换行符）
-        // 生成新的PGN（自动格式化）
-        const moves = this.history.map(move => getPGN(move));
-        let pgnLines = [];
-        for (let i = 0; i < moves.length; i += 2) {
-            const line = `${Math.ceil((i + 1) / 2)}. ${moves[i]} ${moves[i + 1] || ""}`.trim();
-            pgnLines.push(line);
+        // 1. 删除所有符合 PGN 格式的行（无论 currentStep 是多少）
+        blockLines = blockLines.filter((line) => !/[A-Z]\d-[A-Z]\d/.test(line));
+        // 2. 仅当 currentStep > 0 时生成并插入新的 PGN
+        if (this.currentStep > 0) {
+            const moves = this.history.slice(0, this.currentStep).map((move) => getPGN(move));
+            let pgnLines = [];
+            for (let i = 0; i < moves.length; i += 2) {
+                const line = `${Math.ceil((i + 1) / 2)}. ${moves[i]} ${moves[i + 1] || ''}`.trim();
+                pgnLines.push(line);
+            }
+            const PGN = pgnLines.join('\n');
+            blockLines.splice(blockLines.length - 1, 0, PGN);
         }
-        const PGN = pgnLines.join("\n");
-
-        // 然后插入到blockLines中
-        blockLines.splice(blockLines.length - 1, 0, PGN);
-        // 4. 替换原始内容，不进行额外的 split/join 操作
-        const newContent = [
-            ...lines.slice(0, lineStart),
-            ...blockLines,
-            ...lines.slice(lineEnd + 1),
-        ].join('\n');
+        // 3. 更新文件内容（无论是否插入 PGN，都会执行清理）
+        const newContent = [...lines.slice(0, lineStart), ...blockLines, ...lines.slice(lineEnd + 1)].join('\n');
         await this.plugin.app.vault.modify(file, newContent);
     }
 }
