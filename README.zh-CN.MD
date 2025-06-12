@@ -1,15 +1,15 @@
-# Obsidian Xiangqi
+# Obsidian 中国象棋插件
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](./LICENSE)
-[![en](https://img.shields.io/badge/lang-English-blue)](README.md)
-[![zh-CN](https://img.shields.io/badge/lang-简体中文-green)](README.zh-CN.md)
+![版本](https://img.shields.io/badge/版本-1.0.0-blue.svg)
+[![许可证](https://img.shields.io/badge/许可证-MIT-green.svg)](./LICENSE)
+[![英文](https://img.shields.io/badge/语言-英文-blue)](README.md)
+[![中文](https://img.shields.io/badge/语言-简体中文-green)](README.zh-CN.md)
 
 ## 简介
 
-`Obsidian Xiangqi` 是一个为 Obsidian 设计的中国象棋渲染引擎插件，它允许你在 Obsidian 笔记中轻松渲染中国象棋fen格式和pgn格式棋局，并手动推演。支持设置主题、按钮位置、棋盘大小，重置、悔棋、前进,并保存棋谱。
+`Obsidian 中国象棋插件` 是一款专为 Obsidian 设计的中国象棋渲染引擎插件，它允许您在 Obsidian 笔记中轻松渲染中国象棋的 FEN 格式和 PGN 格式棋局，并支持手动推演。插件支持主题设置、按钮位置调整、棋盘大小调节、重置棋局、悔棋/前进以及保存棋谱等功能。
 
-## 演示
+## 演示示例
 
 ````markdown
 ```xiangqi
@@ -27,48 +27,50 @@ D8-D9
 ```
 ````
 
-## 渲染
+## 效果展示
 
-![pgnShow](./IMAGE/pgnShow.png)
-![Show](./IMAGE/Show.png)
+![PGN展示](./IMAGE/pgnShow.png)
+![棋盘展示](./IMAGE/Show.png)
 
-## 功能特性
+## 功能特点
 
-- **棋盘渲染**：在 Obsidian 笔记中渲染中国象棋并推演。
-- **自定义设置**：支持通过设置项对主题、按钮位置和棋盘大小进行调整。
+- **棋盘渲染**：在 Obsidian 笔记中渲染中国象棋并进行推演
+- **自定义设置**：
 
-1.  主题包括暗色和亮色两种。
-2.  按钮位置有右侧和下侧两种，方便适应横屏和竖屏。
-3.  棋盘大小可以手动连续调节，以适应屏幕大小。
-4.  设置更改后自动刷新，并保持现有棋局不变。
+    - 支持深色/浅色主题
+    - 可调整按钮位置（右侧/底部）
+    - 可调节棋盘大小
+    - 设置更改后自动刷新，保持当前棋局不变
 
-- **保存棋谱** 将历史记录保存为pgn格式。
+- **保存棋谱**：
 
-1. 没有PGN棋谱时，保存按钮为黄色。
-2. 有PGN棋谱时，保存按钮为绿色。
-3. 点击保存会有确认提醒，历史记录为空时保存将清除PGN。
+    1. 将走棋历史保存为 PGN 格式
+    2. 当没有 PGN 棋谱时，保存按钮显示为黄色
+    3. 当存在 PGN 棋谱时，保存按钮显示为绿色
+    4. 点击保存时会弹出确认提示
+    5. 当走棋历史为空时保存将清除 PGN 记录
 
-- **移动端支持**：可以通过手动调整按钮位置和棋盘大小，适配移动端横竖屏。
-- **格式支持**：支持fen格式和ICCS格式的pgn棋谱。
+- **移动端适配**：支持横屏/竖屏显示模式
+- **格式支持**：兼容 FEN 格式和 ICCS 格式的 PGN 棋谱
 
 ## 使用说明
 
-将棋谱信息放在代码块中，指定语言为 `xiangqi`。  
-格式相对宽松，能自动识别fen和PGN招法。标注不标注FEN都可以。  
-不带fen的pgn棋谱，默认为正常开局。  
-如从未自己移动棋子，点击下一步按钮，执行pgn棋谱中的招法。  
-期间可以上一步和下一步进行展示。  
-自己移动棋子后，点击下一步按钮，不再提供pgn招法。  
-如要重新展示pgn招法，点击重置按钮。  
-点击保存，会将已走招法保存并覆盖原有PGN。
+1. 将棋谱信息放在标记为 `xiangqi` 的代码块中
+2. 解析器会自动识别 FEN 和 PGN 走法（FEN 标签可选）
+3. 操作导航：
+    - 如果没有手动走棋，"下一步"会执行 PGN 中的走法
+    - 使用"上一步"/"下一步"浏览走棋记录
+    - 手动走棋后，"下一步"不再跟随 PGN 走法
+    - 点击"重置"可恢复 PGN 走法显示
+4. 点击"保存"会用当前走法覆盖原有 PGN 记录
 
-### 手动安装（暂未上线、暂不支持自动安装）
+## 安装指南
 
-1. 下载本插件的最新版本文件。
-2. 在 Obsidian 中打开 `设置` -> `第三方插件`。
-3. 关闭 `安全模式`。
-4. 点击 `浏览` -> `打开插件文件夹`。
-5. 新建文件夹并将下载的文件放到该文件夹中。
-6. 返回 Obsidian 的 `第三方插件` 页面，找到 `Obsidian Xiangqi` 并启用。
+1. 下载插件文件
+2. 在 Obsidian 中：
+    - 进入设置 → 第三方插件
+    - 关闭安全模式
+    - 打开插件文件夹新建文件夹并添加文件
+3. 启用插件
 
-暂未上架 Obsidian 官方插件市场，后续支持后可直接在 Obsidian 插件市场中搜索 `Chinese chess` 进行安装。
+_注：即将登陆 Obsidian 官方插件市场（搜索"Chinese chess"）_

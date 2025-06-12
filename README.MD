@@ -34,28 +34,35 @@ D8-D9
 
 ## Features
 
-- **Board Rendering**: Render and play through Chinese chess games in Obsidian notes
+- **Board Rendering**: Render and play through Chinese chess games in Obsidian notes.
 - **Customization**:
+
     - Dark/light themes
     - Adjustable button positions (right/bottom)
     - Resizable board
     - Settings apply without resetting current game
-- **Game Records**:
-    - Save move history as PGN
-    - Visual save button states (yellow/green)
-    - Save confirmation prompt
+
+- **Save Game Records**:
+
+    1. Save move history as PGN format
+    2. Save button turns yellow when no PGN record exists
+    3. Save button turns green when PGN record exists
+    4. Clicking save triggers confirmation prompt
+    5. Saving with empty move history will clear PGN
+
 - **Mobile Support**: Adapts to landscape/portrait modes
 - **Format Support**: FEN and ICCS-style PGN notations
 
 ## Usage
 
 1. Place game records in a `xiangqi` code block
-2. Parser automatically detects FEN and PGN moves
+2. Parser automatically detects FEN and PGN moves (FEN labels optional)
 3. Navigation:
-    - "Next" to follow PGN moves (if no manual moves made)
-    - "Previous"/"Next" to browse moves
-    - "Reset" to return to PGN display
-4. Click "Save" to update PGN record
+    - "Next" follows PGN moves if no manual moves made
+    - Use "Previous"/"Next" to browse moves
+    - After manual moves, "Next" won't follow PGN
+    - Click "Reset" to return to PGN display
+4. Click "Save" to overwrite existing PGN with current moves
 
 ## Installation
 
@@ -63,7 +70,7 @@ D8-D9
 2. In Obsidian:
     - Go to Settings → Community plugins
     - Disable Safe mode
-    - Open plugins folder and add files
+    - Open plugins folder then create new folder and add files
 3. Enable plugin
 
 _Note: Coming soon to Obsidian's official marketplace (search "Chinese chess")_
