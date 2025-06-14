@@ -2,8 +2,8 @@
 
 ![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](./LICENSE)
-[![en](https://img.shields.io/badge/lang-English-blue)](./README.md)
-[![zh-CN](https://img.shields.io/badge/lang-简体中文-green)](./README.zh-CN.md)
+[![en](https://img.shields.io/badge/lang-English-blue)](./README.MD)
+[![zh-CN](https://img.shields.io/badge/lang-简体中文-green)](./README.zh-CN.MD)
 
 ## Introduction
 
