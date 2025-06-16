@@ -55,21 +55,21 @@ export class XQSettingTab extends PluginSettingTab {
             .setDesc('调整界面大小')
             .addSlider((slider) => {
                 slider
-                    .setLimits(10, 60, 1)
+                    .setLimits(20, 60, 1)
                     .setValue(this.plugin.settings.cellSize) // 默认值
                     .onChange(async (value) => {
                         this.plugin.settings.cellSize = value;
                     });
             });
         new Setting(containerEl)
-            .setName("启用棋谱朗读")
-            .setDesc("是否朗读棋谱走法")
-            .addToggle(toggle => toggle
-                .setValue(this.plugin.settings.enableSpeech)
-                .onChange(async (value) => {
+            .setName('启用棋谱朗读')
+            .setDesc('是否朗读棋谱走法')
+            .addToggle((toggle) =>
+                toggle.setValue(this.plugin.settings.enableSpeech).onChange(async (value) => {
                     this.plugin.settings.enableSpeech = value;
                     await this.plugin.saveSettings();
-                }));
+                }),
+            );
     }
     async hide() {
         this.plugin.saveSettings();

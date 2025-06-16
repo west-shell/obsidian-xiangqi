@@ -8,14 +8,62 @@
     flex-direction: column;
 }
 
-.toolbar-container.bottom {
+.XQ-container .toolbar-container.bottom {
     display: flex;
     flex-direction: row;
     gap: 4px;
 }
 
-.toolbar-container.right {
+.XQ-container .toolbar-container.right {
     display: flex;
     flex-direction: column;
     gap: 4px;
+}
+
+.XQ-container .toolbar-btn {
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition:
+        background-color 0.2s ease,
+        transform 0.1s ease;
+}
+
+/* 默认颜色 */
+.XQ-container .toolbar-btn.unsaved {
+    background-color: hsl(35, 100%, 50%);
+}
+
+.XQ-container .toolbar-btn.saved {
+    background-color: hsl(122, 39%, 49%);
+}
+
+/* 浅色模式下悬停变暗 */
+@media (prefers-color-scheme: light) {
+    .XQ-container .toolbar-btn.unsaved:hover {
+        background-color: hsl(35, 100%, 45%);
+    }
+
+    .XQ-container .toolbar-btn.saved:hover {
+        background-color: hsl(122, 39%, 38%);
+    }
+}
+
+/* 暗色模式下悬停变亮 */
+@media (prefers-color-scheme: dark) {
+    .XQ-container .toolbar-btn.unsaved:hover {
+        background-color: hsl(35, 100%, 60%);
+    }
+
+    .XQ-container .toolbar-btn.saved:hover {
+        background-color: hsl(122, 39%, 60%);
+    }
+}
+
+/* 点击效果 */
+.XQ-container .toolbar-btn:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }

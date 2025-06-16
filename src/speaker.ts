@@ -8,7 +8,7 @@ const NUMBERS_BLACK = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
 const MOVE_TYPES = {
     horizontal: '平',
     forward: '进',
-    backward: '退'
+    backward: '退',
 };
 
 export function speak(move: IMove, board: IBoard) {
@@ -43,7 +43,6 @@ export function speak(move: IMove, board: IBoard) {
         }
     }
 
-
     // 获取起始位置描述（红方和黑方的坐标系是相反的）
     let pre = '';
     let samecol: number[] = [];
@@ -76,25 +75,28 @@ export function speak(move: IMove, board: IBoard) {
     let moveType: string;
     let dest: string;
 
-    if (fromx === tox) { // 纵向移动
+    if (fromx === tox) {
+        // 纵向移动
         const delta = toy - fromy;
         moveType = delta > 0 ? MOVE_TYPES.forward : MOVE_TYPES.backward;
         dest = numbers[Math.abs(delta) - 1];
-    } else if (fromy === toy) { // 横向移动
+    } else if (fromy === toy) {
+        // 横向移动
         moveType = MOVE_TYPES.horizontal;
         dest = numbers[tox];
     } else {
         moveType = fromy < toy ? MOVE_TYPES.forward : MOVE_TYPES.backward;
-        dest = numbers[tox]
+        dest = numbers[tox];
     }
 
     const finalSpeech = `${turn}:${pre}${moveType}${dest}`;
-    const finalSpeechReplace = finalSpeech.replace(/卒/g, '族')      // "卒"（zú）常被读错为 cù
-        .replace(/將/g, '酱')      // 繁体“將”可替代“将”，避免 jiāng
-        .replace(/将/g, '酱')      // 简体“将”也处理
-        .replace(/相/g, '巷')      // "相" 发 xiāng 时可能被误读
-        .replace(/仕/g, '市')      // "仕"（shì）有时被读成 sī
-        .replace(/炮/g, '泡')      // 部分语音引擎读成 bāo，替换为发音更接近的
+    const finalSpeechReplace = finalSpeech
+        .replace(/卒/g, '族') // "卒"（zú）常被读错为 cù
+        .replace(/將/g, '酱') // 繁体“將”可替代“将”，避免 jiāng
+        .replace(/将/g, '酱') // 简体“将”也处理
+        .replace(/相/g, '巷') // "相" 发 xiāng 时可能被误读
+        .replace(/仕/g, '市') // "仕"（shì）有时被读成 sī
+        .replace(/炮/g, '泡') // 部分语音引擎读成 bāo，替换为发音更接近的
         .replace(/兵/g, '冰')
         .replace(/傌/g, '马');
     // 发音

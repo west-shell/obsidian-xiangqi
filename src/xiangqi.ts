@@ -1,5 +1,5 @@
 import XQPlugin from './main';
-import { MarkdownRenderChild, MarkdownPostProcessorContext, MarkdownView, Notice } from 'obsidian';
+import { MarkdownRenderChild, MarkdownPostProcessorContext, MarkdownView, setIcon, Notice } from 'obsidian';
 import { ISettings, IPiece, IMove, IState, IBoard, ITurn } from './types';
 import { parseSource, getPGN } from './parseSource';
 import { generateBoardSvg, createPieceSvg } from './svg';
@@ -47,13 +47,13 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
     }
     private rend() {
         this.containerEl.empty();
-        this.containerEl.classList.add("XQ-container");
+        this.containerEl.classList.add('XQ-container');
         if (this.settings.position === 'right') {
-            this.containerEl.classList.remove("bottom");
-            this.containerEl.classList.add("right");
+            this.containerEl.classList.remove('bottom');
+            this.containerEl.classList.add('right');
         } else {
-            this.containerEl.classList.remove("right");
-            this.containerEl.classList.add("bottom");
+            this.containerEl.classList.remove('right');
+            this.containerEl.classList.add('bottom');
         }
         // 创建棋盘容器
         this.boardContainer = this.containerEl.createDiv({ cls: 'board-container' });
@@ -78,34 +78,56 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
         });
         this.boardContainer?.addEventListener('click', this.handleBoardClick);
 
-        const container = this.containerEl.createEl("div", {
-            cls: "toolbar-container",
+        const container = this.containerEl.createEl('div', {
+            cls: 'toolbar-container',
         });
         if (this.settings.position === 'right') {
-            container.classList.remove("bottom");
-            container.classList.add("right");
+            container.classList.remove('bottom');
+            container.classList.add('right');
         } else {
-            container.classList.remove("right");
-            container.classList.add("bottom");
+            container.classList.remove('right');
+            container.classList.add('bottom');
         }
 
         // 添加按钮
-        const resetButton = container.createEl("button", {
-            text: "↻",
-            cls: "toolbar-btn",
-        }).addEventListener("click", this.handleResetClick);
-        const undoButton = container.createEl("button", {
-            text: "↩",
-            cls: "toolbar-btn",
-        }).addEventListener("click", () => undoMove(this));
-        const redoButton = container.createEl("button", {
-            text: "↪",
-            cls: "toolbar-btn",
-        }).addEventListener("click", () => redoMove(this));
-        const saveButton = container.createEl("button", {
-            text: "🖫",
-            cls: "toolbar-btn",
-        }).addEventListener("click", () => this.handleSaveClick());
+        // 重置按钮
+        const resetButton = container.createEl('button', {
+            attr: { title: '重置' },
+            cls: 'toolbar-btn',
+        });
+        setIcon(resetButton, 'refresh-cw');
+        resetButton.addEventListener('click', this.handleResetClick);
+
+        // 回退按钮
+        const undoButton = container.createEl('button', {
+            attr: { title: '回退' },
+            cls: 'toolbar-btn',
+        });
+        setIcon(undoButton, 'undo-dot');
+        undoButton.addEventListener('click', () => undoMove(this));
+
+        // 前进按钮
+        const redoButton = container.createEl('button', {
+            attr: { title: '前进' },
+            cls: 'toolbar-btn',
+        });
+        setIcon(redoButton, 'redo-dot');
+        redoButton.addEventListener('click', () => redoMove(this));
+
+        // 保存按钮
+        const saveButton = container.createEl('button', {
+            attr: { title: '保存' },
+            cls: 'toolbar-btn',
+        });
+        setIcon(saveButton, 'save'); // 注意 Lucide 默认并无 save 图标，见下方说明
+        saveButton.addEventListener('click', () => this.handleSaveClick());
+        if (this.PGN.length === 0) {
+            saveButton.removeClass('saved');
+            saveButton.classList.add('unsaved');
+        } else {
+            saveButton.removeClass('unsaved');
+            saveButton.classList.add('saved');
+        }
     }
     private handleBoardClick = (e: MouseEvent) => {
         if (!this.boardContainer) return;
