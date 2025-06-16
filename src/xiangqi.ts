@@ -48,6 +48,13 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
     private rend() {
         this.containerEl.empty();
         this.containerEl.classList.add("XQ-container");
+        if (this.settings.position === 'right') {
+            this.containerEl.classList.remove("bottom");
+            this.containerEl.classList.add("right");
+        } else {
+            this.containerEl.classList.remove("right");
+            this.containerEl.classList.add("bottom");
+        }
         // 创建棋盘容器
         this.boardContainer = this.containerEl.createDiv({ cls: 'board-container' });
         const boardSvg = generateBoardSvg(this.settings);
@@ -74,23 +81,27 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
         const container = this.containerEl.createEl("div", {
             cls: "toolbar-container",
         });
+        if (this.settings.position === 'right') {
+            container.classList.remove("bottom");
+            container.classList.add("right");
+        } else {
+            container.classList.remove("right");
+            container.classList.add("bottom");
+        }
 
         // 添加按钮
         const resetButton = container.createEl("button", {
             text: "↻",
             cls: "toolbar-btn",
         }).addEventListener("click", this.handleResetClick);
-
         const undoButton = container.createEl("button", {
             text: "↩",
             cls: "toolbar-btn",
         }).addEventListener("click", () => undoMove(this));
-
         const redoButton = container.createEl("button", {
             text: "↪",
             cls: "toolbar-btn",
         }).addEventListener("click", () => redoMove(this));
-
         const saveButton = container.createEl("button", {
             text: "🖫",
             cls: "toolbar-btn",
@@ -156,13 +167,6 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
         this.currentStep = 0;
     };
 
-    refresh() {
-        this.rend();
-    }
-    // 卸载相关方法
-    onunload() {
-        this.plugin.renderChildren.delete(this);
-    }
     async handleSaveClick() {
         let message = '';
         if (this.history.length === 0 && this.PGN.length === 0) {
@@ -210,5 +214,12 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
         // 3. 更新文件内容（无论是否插入 PGN，都会执行清理）
         const newContent = [...lines.slice(0, lineStart), ...blockLines, ...lines.slice(lineEnd + 1)].join('\n');
         await this.plugin.app.vault.modify(file, newContent);
+    }
+    refresh() {
+        this.rend();
+    }
+    // 卸载相关方法
+    onunload() {
+        this.plugin.renderChildren.delete(this);
     }
 }

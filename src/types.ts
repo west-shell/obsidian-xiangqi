@@ -2,6 +2,7 @@ export interface ISettings {
     position: 'bottom' | 'right';
     theme: 'light' | 'dark';
     cellSize: number;
+    enableSpeech: boolean;
 }
 export type ITurn = 'red' | 'black';
 export const PIECE_CHARS: Record<string, string> = {

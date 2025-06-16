@@ -1,12 +1,20 @@
-.XQ-container {
+.XQ-container.right {
     display: flex;
+    flex-direction: row;
 }
 
-.board-container {
-    display: grid;
+.XQ-container.bottom {
+    display: flex;
+    flex-direction: column;
 }
 
-.toolbar-container {
+.toolbar-container.bottom {
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+}
+
+.toolbar-container.right {
     display: flex;
     flex-direction: column;
     gap: 4px;

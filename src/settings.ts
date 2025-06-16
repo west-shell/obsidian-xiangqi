@@ -9,6 +9,7 @@ export const DEFAULT_SETTINGS: ISettings = {
     position: 'right',
     theme: 'light',
     cellSize: 50,
+    enableSpeech: true,
 };
 
 export class XQSettingTab extends PluginSettingTab {
@@ -59,19 +60,16 @@ export class XQSettingTab extends PluginSettingTab {
                     .onChange(async (value) => {
                         this.plugin.settings.cellSize = value;
                     });
-
-                // // 可选：在滑块旁边显示当前值
-                // slider.sliderEl.createSpan({
-                //   text: ` ${this.plugin.settings.cellSize}px`,
-                //   cls: "slider-value",
-                // });
-                // // 实时更新显示值
-                // slider.sliderEl.oninput = (evt) => {
-                //   const value = (evt.target as HTMLInputElement).value;
-                //   const displayEl = slider.sliderEl.nextSibling as HTMLSpanElement;
-                //   if (displayEl) displayEl.textContent = ` ${value}px`;
-                // };
             });
+        new Setting(containerEl)
+            .setName("启用棋谱朗读")
+            .setDesc("是否朗读棋谱走法")
+            .addToggle(toggle => toggle
+                .setValue(this.plugin.settings.enableSpeech)
+                .onChange(async (value) => {
+                    this.plugin.settings.enableSpeech = value;
+                    await this.plugin.saveSettings();
+                }));
     }
     async hide() {
         this.plugin.saveSettings();
