@@ -1,0 +1,13 @@
+.XQ-container {
+    display: flex;
+}
+
+.board-container {
+    display: grid;
+}
+
+.toolbar-container {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}

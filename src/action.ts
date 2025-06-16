@@ -1,6 +1,8 @@
 import { IMove, IState } from './types';
 import { findPieceAt, editHistory, movePiece } from './utils';
+import { speak } from './speaker';
 export function runMove(move: IMove, state: IState) {
+    speak(move, state.board);
     const { from, to } = move;
     const fromPiece = findPieceAt(from, state);
     const toPiece = findPieceAt(to, state);

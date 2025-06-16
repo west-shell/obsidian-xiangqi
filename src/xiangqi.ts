@@ -2,7 +2,7 @@ import XQPlugin from './main';
 import { MarkdownRenderChild, MarkdownPostProcessorContext, MarkdownView, Notice } from 'obsidian';
 import { ISettings, IPiece, IMove, IState, IBoard, ITurn } from './types';
 import { parseSource, getPGN } from './parseSource';
-import { generateBoardSvg, createPieceSvg, createButtonSvg } from './svg';
+import { generateBoardSvg, createPieceSvg } from './svg';
 import { isValidMove } from './rules';
 import { runMove, undoMove, redoMove } from './action';
 import { findPieceAt, markPiece, restorePiece } from './utils';
@@ -36,7 +36,6 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
         this.plugin.renderChildren.add(this);
         this.parseSource();
         this.rend();
-        this.bindEvents();
     }
     // 解析相关私有方法
     private parseSource() {
@@ -48,8 +47,9 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
     }
     private rend() {
         this.containerEl.empty();
+        this.containerEl.classList.add("XQ-container");
         // 创建棋盘容器
-        this.boardContainer = this.containerEl.createDiv({ cls: 'xiangqi-container' });
+        this.boardContainer = this.containerEl.createDiv({ cls: 'board-container' });
         const boardSvg = generateBoardSvg(this.settings);
         this.boardContainer.prepend(boardSvg);
         // 渲染棋子
@@ -69,34 +69,32 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
                 }
             }
         });
-
-        const toolbar = this.boardContainer.querySelector('#toolbar');
-        this.toolbarContainer = toolbar as HTMLDivElement;
-        if (toolbar) {
-            toolbar.empty(); // 清空现有内容
-            const buttonGroup = createButtonSvg(this.settings); // 返回 <g>...</g> 的 Element
-            // 假设 #toolbar 是 <svg> 或 <g> 节点
-            toolbar.appendChild(buttonGroup);
-        }
-        const saveButton = this.toolbarContainer!.querySelector('#save');
-        if (saveButton) {
-            const circle = saveButton.querySelector('circle');
-            if (circle) {
-                circle.setAttribute('fill', this.PGN.length > 0 ? 'green' : '#FF9500');
-            }
-        }
-    }
-    private bindEvents() {
-        // 只绑定一次棋盘点击事件
         this.boardContainer?.addEventListener('click', this.handleBoardClick);
-        const resetButton = this.toolbarContainer!.querySelector('#reset');
-        resetButton?.addEventListener('click', this.handleResetClick);
-        const undoButton = this.toolbarContainer!.querySelector('#undo');
-        undoButton?.addEventListener('click', () => undoMove(this));
-        const redoButton = this.toolbarContainer!.querySelector('#redo');
-        redoButton?.addEventListener('click', () => redoMove(this));
-        const saveButton = this.toolbarContainer!.querySelector('#save');
-        saveButton?.addEventListener('click', () => this.handleSaveClick());
+
+        const container = this.containerEl.createEl("div", {
+            cls: "toolbar-container",
+        });
+
+        // 添加按钮
+        const resetButton = container.createEl("button", {
+            text: "↻",
+            cls: "toolbar-btn",
+        }).addEventListener("click", this.handleResetClick);
+
+        const undoButton = container.createEl("button", {
+            text: "↩",
+            cls: "toolbar-btn",
+        }).addEventListener("click", () => undoMove(this));
+
+        const redoButton = container.createEl("button", {
+            text: "↪",
+            cls: "toolbar-btn",
+        }).addEventListener("click", () => redoMove(this));
+
+        const saveButton = container.createEl("button", {
+            text: "🖫",
+            cls: "toolbar-btn",
+        }).addEventListener("click", () => this.handleSaveClick());
     }
     private handleBoardClick = (e: MouseEvent) => {
         if (!this.boardContainer) return;
@@ -160,7 +158,6 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
 
     refresh() {
         this.rend();
-        this.bindEvents();
     }
     // 卸载相关方法
     onunload() {
