@@ -100,6 +100,9 @@ export function speak(move: IMove, board: IBoard) {
         .replace(/兵/g, '冰')
         .replace(/傌/g, '马');
     // 发音
+    if (!window.speechSynthesis) {
+        return;
+    }
     const utter = new SpeechSynthesisUtterance(finalSpeechReplace);
     utter.lang = 'zh-CN';
     window.speechSynthesis.cancel(); // 停止前一条朗读

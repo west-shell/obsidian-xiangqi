@@ -61,15 +61,17 @@ export class XQSettingTab extends PluginSettingTab {
                         this.plugin.settings.cellSize = value;
                     });
             });
-        new Setting(containerEl)
-            .setName('启用棋谱朗读')
-            .setDesc('是否朗读棋谱走法')
-            .addToggle((toggle) =>
-                toggle.setValue(this.plugin.settings.enableSpeech).onChange(async (value) => {
-                    this.plugin.settings.enableSpeech = value;
-                    await this.plugin.saveSettings();
-                }),
-            );
+        if (window.speechSynthesis) {
+            new Setting(containerEl)
+                .setName('启用棋谱朗读')
+                .setDesc('是否朗读棋谱走法')
+                .addToggle((toggle) =>
+                    toggle.setValue(this.plugin.settings.enableSpeech).onChange(async (value) => {
+                        this.plugin.settings.enableSpeech = value;
+                        await this.plugin.saveSettings();
+                    }),
+                );
+        }
     }
     async hide() {
         this.plugin.saveSettings();
