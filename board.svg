@@ -1,48 +1,50 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg width="500" height="560" viewBox="0 0 500 560" xmlns="http://www.w3.org/2000/svg">
-  <!-- 1. 棋盘基础 -->
-  <rect width="500" height="560" fill="#1e1e1e" rx="5" stroke="#cccccc" stroke-width="3"/>
+<svg width="500" height="550" viewBox="0 0 500 550"
+    xmlns="http://www.w3.org/2000/svg"
+    style="user-select: none; cursor: default;">
 
-  <path d="M 45,45 H 455 V 505 H 45 Z" stroke="#cccccc" stroke-width="4" fill="none"/>
-  <!-- 2. 横线(10条) -->
-  <g stroke="#cccccc" stroke-width="2" fill="none">
-    <!-- 从上往下数(黑方在上) -->
-    <path d="M 50,50 h 400 v 50 h -400 v 50 h 400 v 50 h -400 v 50 h 400 v 50 h -400 v 50 h 400 v 50 h -400 v 50 h 400 v 50 h -400 Z"/>
-    <!-- 3. 竖线(9条) -->
-    <path d="M 50,50 v 200 h 50 v -200 h 50 v 200 h 50 v -200 h 50 v 200 h 50 v -200 h 50 v 200 h 50 v -200 h 50 v 200"/>
-    <path d="M 50,50 v 450 h 50 v -200 h 50 v 200 h 50 v -200 h 50 v 200 h 50 v -200 h 50 v 200 h 50 v -200 h 50 v 200"/>
+    <!-- 背景 -->
+    <rect width="500" height="550" fill="#2d2d2d" rx="5" stroke="#ffffff" stroke-width="3" />
 
+    <!-- 网格 -->
+    <path d="M 45,45 h 410 v 460 h -410 Z"
+        stroke="#ffffff" stroke-width="4" fill="none" />
 
-    <!-- 4. 黑方九宫格(第4-6路 x 第1-3横线) -->
-    <line x1="200" y1="50" x2="300" y2="150"/>  <!-- 对角线1 -->
-    <line x1="200" y1="150" x2="300" y2="50"/>  <!-- 对角线2 -->
+    <g stroke="#ffffff" stroke-width="2" fill="none">
+        <!-- 横线 -->
+        <path d="M 50,50 h 400"/><path d="M 50,100 h 400"/><path d="M 50,150 h 400"/><path d="M 50,200 h 400"/><path d="M 50,250 h 400"/><path d="M 50,300 h 400"/><path d="M 50,350 h 400"/><path d="M 50,400 h 400"/><path d="M 50,450 h 400"/><path d="M 50,500 h 400"/>
 
-    <!-- 5. 红方九宫格(第4-6路 x 第8-10横线) -->
-    <line x1="200" y1="400" x2="300" y2="500"/>  <!-- 对角线1 -->
-    <line x1="200" y1="500" x2="300" y2="400"/>  <!-- 对角线2 -->
+        <!-- 竖线（上半部分） -->
+        <path d="M 50,50 v 200"/><path d="M 100,50 v 200"/><path d="M 150,50 v 200"/><path d="M 200,50 v 200"/><path d="M 250,50 v 200"/><path d="M 300,50 v 200"/><path d="M 350,50 v 200"/><path d="M 400,50 v 200"/><path d="M 450,50 v 200"/>
 
-    <!-- 6. 楚河汉界(严格位于第5-6横线之间) -->
-    <!-- <rect x="51" y="251" width="398" height="48" fill="#E8C887"/> -->
-    <text x="250" y="285" font-size="30" text-anchor="middle" fill="#8B4513" font-family="SimSun">楚　河　　汉　界</text>
+        <!-- 竖线（下半部分） -->
+        <path d="M 50,300 v 200"/><path d="M 100,300 v 200"/><path d="M 150,300 v 200"/><path d="M 200,300 v 200"/><path d="M 250,300 v 200"/><path d="M 300,300 v 200"/><path d="M 350,300 v 200"/><path d="M 400,300 v 200"/><path d="M 450,300 v 200"/>
 
-    <!-- 7. 炮兵位(严格对齐交叉点) -->
-    <!-- 黑炮 -->
-    <path d="M 100,150 m -12,-4 h 8 v -8 m 8,0 v 8 h 8 m 0,8 h -8 v 8 m -8,0 v -8 h -8" />
-    <path d="M 400,150 m -12,-4 h 8 v -8 m 8,0 v 8 h 8 m 0,8 h -8 v 8 m -8,0 v -8 h -8" />
-    <!-- 红炮 -->
-    <path d="M 100,400 m -12,-4 h 8 v -8 m 8,0 v 8 h 8 m 0,8 h -8 v 8 m -8,0 v -8 h -8" />
-    <path d="M 400,400 m -12,-4 h 8 v -8 m 8,0 v 8 h 8 m 0,8 h -8 v 8 m -8,0 v -8 h -8" />
-    <!-- 黑卒 -->
-    <path d="M 50,200 m 4,-12 v 8 h 8 m 0,8 h -8 v 8"/>
-    <path d="M 150,200 m -12,-4 h 8 v -8 m 8,0 v 8 h 8 m 0,8 h -8 v 8 m -8,0 v -8 h -8" />
-    <path d="M 250,200 m -12,-4 h 8 v -8 m 8,0 v 8 h 8 m 0,8 h -8 v 8 m -8,0 v -8 h -8" />
-    <path d="M 350,200 m -12,-4 h 8 v -8 m 8,0 v 8 h 8 m 0,8 h -8 v 8 m -8,0 v -8 h -8" />
-    <path d="M 450,200 m -12,-4 h 8 v -8 m 0,24 v -8 h -8" />
-    <!-- 红兵 -->
-    <path d="M 50,350 m 4,-12 v 8 h 8 m 0,8 h -8 v 8"/>
-    <path d="M 150,350 m -12,-4 h 8 v -8 m 8,0 v 8 h 8 m 0,8 h -8 v 8 m -8,0 v -8 h -8" />
-    <path d="M 250,350 m -12,-4 h 8 v -8 m 8,0 v 8 h 8 m 0,8 h -8 v 8 m -8,0 v -8 h -8" />
-    <path d="M 350,350 m -12,-4 h 8 v -8 m 8,0 v 8 h 8 m 0,8 h -8 v 8 m -8,0 v -8 h -8" />
-    <path d="M 450,350 m -12,-4 h 8 v -8 m 0,24 v -8 h -8" />
-  </g>
+        <!-- 左右边界线 -->
+        <line x1="50" y1="50" x2="50" y2="500" stroke="#ffffff" stroke-width="2" />
+        <line x1="450" y1="50" x2="450" y2="500" stroke="#ffffff" stroke-width="2" />
+    </g>
+
+    <!-- 九宫格 -->
+    <g stroke="#ffffff" stroke-width="1.5">
+        <path d="M 200,50 l 100 100 m 0,-100 l -100 100"
+            stroke="#ffffff" stroke-width="2" fill="none" />
+        <path d="M 200,400 l 100 100 m 0,-100 l -100 100"
+            stroke="#ffffff" stroke-width="2" fill="none" />
+    </g>
+
+    <!-- 楚河汉界 -->
+    <text x="250" y="285" font-size="30" text-anchor="middle" font-family="SimSun" fill="#ffffff">楚　河　　汉　界</text>
+
+    <!-- 炮兵位 -->
+    <g stroke="#ffffff" stroke-width="1" fill="none">
+        <path d="M 100,150 m -15,-5 h 10 v -10 m 10,0 v 10 h 10 m 0,10 h -10 v 10 m -10,0 v -10 h -10" /><path d="M 400,150 m -15,-5 h 10 v -10 m 10,0 v 10 h 10 m 0,10 h -10 v 10 m -10,0 v -10 h -10" /><path d="M 100,400 m -15,-5 h 10 v -10 m 10,0 v 10 h 10 m 0,10 h -10 v 10 m -10,0 v -10 h -10" /><path d="M 400,400 m -15,-5 h 10 v -10 m 10,0 v 10 h 10 m 0,10 h -10 v 10 m -10,0 v -10 h -10" /><path d="M 150,200 m -15,-5 h 10 v -10 m 10,0 v 10 h 10 m 0,10 h -10 v 10 m -10,0 v -10 h -10" /><path d="M 250,200 m -15,-5 h 10 v -10 m 10,0 v 10 h 10 m 0,10 h -10 v 10 m -10,0 v -10 h -10" /><path d="M 350,200 m -15,-5 h 10 v -10 m 10,0 v 10 h 10 m 0,10 h -10 v 10 m -10,0 v -10 h -10" /><path d="M 150,350 m -15,-5 h 10 v -10 m 10,0 v 10 h 10 m 0,10 h -10 v 10 m -10,0 v -10 h -10" /><path d="M 250,350 m -15,-5 h 10 v -10 m 10,0 v 10 h 10 m 0,10 h -10 v 10 m -10,0 v -10 h -10" /><path d="M 350,350 m -15,-5 h 10 v -10 m 10,0 v 10 h 10 m 0,10 h -10 v 10 m -10,0 v -10 h -10" />
+
+        <path d="M 50,200 m 5,-15 v 10 h 10 m 0,10 h -10 v 10" /><path d="M 50,350 m 5,-15 v 10 h 10 m 0,10 h -10 v 10" />
+
+        <path d="M 450,200 m -15,-5 h 10 v -10 m 0,30 v -10 h -10" /><path d="M 450,350 m -15,-5 h 10 v -10 m 0,30 v -10 h -10" />
+    </g>
+
+    <!-- 棋子占位 -->
+    <g id="xiangqi-pieces"></g>
+    <g id="toolbar"></g>
 </svg>
