@@ -1,5 +1,11 @@
 import XQPlugin from './main';
-import { MarkdownRenderChild, MarkdownPostProcessorContext, MarkdownView, setIcon, Notice } from 'obsidian';
+import {
+    MarkdownRenderChild,
+    MarkdownPostProcessorContext,
+    MarkdownView,
+    setIcon,
+    Notice,
+} from 'obsidian';
 import { ISettings, IPiece, IMove, IState, IBoard, ITurn } from './types';
 import { parseSource, getPGN } from './parseSource';
 import { generateBoardSvg, createPieceSvg } from './svg';
@@ -144,7 +150,10 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
             // 没有标记棋子时，只能选中当前行棋方的棋子
             if (clickedPiece) {
                 const clickedIsRed = clickedPiece.type === clickedPiece.type.toUpperCase();
-                if ((this.currentTurn === 'red' && clickedIsRed) || (this.currentTurn === 'black' && !clickedIsRed)) {
+                if (
+                    (this.currentTurn === 'red' && clickedIsRed) ||
+                    (this.currentTurn === 'black' && !clickedIsRed)
+                ) {
                     markPiece(clickedPiece.pieceEl!);
                     this.markedPiece = clickedPiece;
                 }
@@ -170,7 +179,10 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
             // 如果点击的是当前方棋子，重新标记
             if (clickedPiece) {
                 const clickedIsRed = clickedPiece.type === clickedPiece.type.toUpperCase();
-                if ((this.currentTurn === 'red' && clickedIsRed) || (this.currentTurn === 'black' && !clickedIsRed)) {
+                if (
+                    (this.currentTurn === 'red' && clickedIsRed) ||
+                    (this.currentTurn === 'black' && !clickedIsRed)
+                ) {
                     markPiece(clickedPiece.pieceEl!);
                     this.markedPiece = clickedPiece;
                     return;
@@ -195,9 +207,12 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
             new Notice('PGN记录为空，无需保存！');
             return;
         }
-        if (this.history.length === 0 && this.PGN.length > 0) message = '当前PGN记录不为空，是否要清空？';
-        if (this.history.length > 0 && this.PGN.length === 0) message = '当前PGN记录为空，是否要保存历史为PGN？';
-        if (this.history.length > 0 && this.PGN.length > 0) message = '当前PGN记录不为空，是否要覆盖保存？';
+        if (this.history.length === 0 && this.PGN.length > 0)
+            message = '当前PGN记录不为空，是否要清空？';
+        if (this.history.length > 0 && this.PGN.length === 0)
+            message = '当前PGN记录为空，是否要保存历史为PGN？';
+        if (this.history.length > 0 && this.PGN.length > 0)
+            message = '当前PGN记录不为空，是否要覆盖保存？';
         const modal = new ConfirmModal(this.plugin.app, '确认保存', message, '保存', '取消');
 
         modal.open();
@@ -234,7 +249,11 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
             blockLines.splice(blockLines.length - 1, 0, PGN);
         }
         // 3. 更新文件内容（无论是否插入 PGN，都会执行清理）
-        const newContent = [...lines.slice(0, lineStart), ...blockLines, ...lines.slice(lineEnd + 1)].join('\n');
+        const newContent = [
+            ...lines.slice(0, lineStart),
+            ...blockLines,
+            ...lines.slice(lineEnd + 1),
+        ].join('\n');
         await this.plugin.app.vault.modify(file, newContent);
     }
     refresh() {

@@ -4,7 +4,10 @@ export function movePiece(piece: IPiece, from: IPosition, to: IPosition, state: 
     state.board[from.x][from.y] = null;
     state.board[to.x][to.y] = piece.type;
     piece.position = { ...to };
-    piece.pieceEl!.setAttribute('transform', `translate(${(to.x + 1) * cellSize},${(to.y + 1) * cellSize})`);
+    piece.pieceEl!.setAttribute(
+        'transform',
+        `translate(${(to.x + 1) * cellSize},${(to.y + 1) * cellSize})`,
+    );
 }
 export function editHistory(move: IMove, state: IState) {
     let { currentStep, history } = state;
@@ -54,5 +57,7 @@ export function findPieceAt(position: IPosition, state: IState): IPiece | undefi
     if (!state.pieces) {
         return undefined;
     }
-    return state.pieces.find((p) => p.position.x === position.x && p.position.y === position.y && !p.hidden);
+    return state.pieces.find(
+        (p) => p.position.x === position.x && p.position.y === position.y && !p.hidden,
+    );
 }

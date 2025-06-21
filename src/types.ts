@@ -23,7 +23,21 @@ export const PIECE_CHARS: Record<string, string> = {
     c: '砲',
     p: '卒',
 };
-export type PieceType = 'r' | 'R' | 'n' | 'N' | 'b' | 'B' | 'a' | 'A' | 'k' | 'K' | 'c' | 'C' | 'p' | 'P';
+export type PieceType =
+    | 'r'
+    | 'R'
+    | 'n'
+    | 'N'
+    | 'b'
+    | 'B'
+    | 'a'
+    | 'A'
+    | 'k'
+    | 'K'
+    | 'c'
+    | 'C'
+    | 'p'
+    | 'P';
 export type IBoard = (PieceType | null)[][];
 export type IPosition = { x: number; y: number };
 export interface IPiece {
