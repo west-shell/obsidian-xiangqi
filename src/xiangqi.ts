@@ -8,7 +8,7 @@ import {
 } from 'obsidian';
 import { ISettings, IPiece, IMove, IState, IBoard, ITurn } from './types';
 import { parseSource, getPGN } from './parseSource';
-import { generateBoardSvg, createPieceSvg } from './svg';
+import { genBoardSVG, createPieceSvg } from './svg';
 import { isValidMove } from './rules';
 import { runMove, undoMove, redoMove } from './action';
 import { findPieceAt, markPiece, restorePiece } from './utils';
@@ -54,22 +54,15 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
     private rend() {
         this.containerEl.empty();
         this.containerEl.classList.add('XQ-container');
-        if (this.settings.position === 'right') {
-            this.containerEl.classList.remove('bottom');
-            this.containerEl.classList.add('right');
-        } else {
-            this.containerEl.classList.remove('right');
-            this.containerEl.classList.add('bottom');
-        }
+        this.containerEl.classList.toggle('right', this.settings.position === 'right');
+        this.containerEl.classList.toggle('bottom', this.settings.position === 'bottom');
         // 创建棋盘容器
         this.boardContainer = this.containerEl.createDiv({ cls: 'board-container' });
-        const boardSvg = generateBoardSvg(this.settings);
-        this.boardContainer.prepend(boardSvg);
+        const boardSVG = genBoardSVG(this.settings);
+        this.boardContainer.prepend(boardSVG);
         // 渲染棋子
         const piecesContainer = this.boardContainer.querySelector('#xiangqi-pieces');
-        if (!piecesContainer) {
-            return;
-        }
+        if (!piecesContainer) return
         piecesContainer.empty();
         this.pieces.forEach((piece, index) => {
             const pieceEL = createPieceSvg(piece, this.settings);
@@ -82,22 +75,34 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
                 }
             }
         });
-        this.boardContainer?.addEventListener('click', this.handleBoardClick);
-
-        const container = this.containerEl.createEl('div', {
+        this.boardContainer.addEventListener('click', this.handleBoardClick);
+        this.creatButtons();
+        const moveContainer = this.containerEl.createDiv({ cls: 'move-container' });
+        this.PGN.forEach((move, index) => {
+            const btn = moveContainer.createEl('button', { text: `${index + 1}:` });
+            if (index === this.currentStep) {
+                btn.classList.add('active'); // 高亮当前步
+            }
+            btn.addEventListener('click', () => {
+                while (this.currentStep < index && this.currentStep < this.PGN.length - 1) {
+                    redoMove(this);
+                }
+                while (this.currentStep > index && this.currentStep > 0) {
+                    undoMove(this);
+                }
+            });
+        });
+    }
+    private creatButtons() {
+        // 创建工具栏容器
+        const toolbarContainer = this.containerEl.createEl('div', {
             cls: 'toolbar-container',
         });
-        if (this.settings.position === 'right') {
-            container.classList.remove('bottom');
-            container.classList.add('right');
-        } else {
-            container.classList.remove('right');
-            container.classList.add('bottom');
-        }
+        toolbarContainer.classList.toggle('right', this.settings.position === 'right');
+        toolbarContainer.classList.toggle('bottom', this.settings.position === 'bottom');
 
-        // 添加按钮
         // 重置按钮
-        const resetButton = container.createEl('button', {
+        const resetButton = toolbarContainer.createEl('button', {
             attr: { title: '重置' },
             cls: 'toolbar-btn',
         });
@@ -105,7 +110,7 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
         resetButton.addEventListener('click', this.handleResetClick);
 
         // 回退按钮
-        const undoButton = container.createEl('button', {
+        const undoButton = toolbarContainer.createEl('button', {
             attr: { title: '回退' },
             cls: 'toolbar-btn',
         });
@@ -113,7 +118,7 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
         undoButton.addEventListener('click', () => undoMove(this));
 
         // 前进按钮
-        const redoButton = container.createEl('button', {
+        const redoButton = toolbarContainer.createEl('button', {
             attr: { title: '前进' },
             cls: 'toolbar-btn',
         });
@@ -121,19 +126,14 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
         redoButton.addEventListener('click', () => redoMove(this));
 
         // 保存按钮
-        const saveButton = container.createEl('button', {
+        const saveButton = toolbarContainer.createEl('button', {
             attr: { title: '保存' },
             cls: 'toolbar-btn',
         });
-        setIcon(saveButton, 'save'); // 注意 Lucide 默认并无 save 图标，见下方说明
+        setIcon(saveButton, 'save');
         saveButton.addEventListener('click', () => this.handleSaveClick());
-        if (this.PGN.length === 0) {
-            saveButton.removeClass('saved');
-            saveButton.classList.add('unsaved');
-        } else {
-            saveButton.removeClass('unsaved');
-            saveButton.classList.add('saved');
-        }
+        saveButton.classList.toggle('saved', this.PGN.length > 0);
+        saveButton.classList.toggle('unsaved', this.PGN.length === 0);
     }
     private handleBoardClick = (e: MouseEvent) => {
         if (!this.boardContainer) return;
@@ -264,3 +264,7 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
         this.plugin.renderChildren.delete(this);
     }
 }
+function PGNViewer(move: IMove) {
+    throw new Error('Function not implemented.');
+}
+
