@@ -77,18 +77,31 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
         });
         this.boardContainer.addEventListener('click', this.handleBoardClick);
         this.creatButtons();
-        const moveContainer = this.containerEl.createDiv({ cls: 'move-container' });
-        this.PGN.forEach((move, index) => {
-            const btn = moveContainer.createEl('button', { text: `${index + 1}:` });
-            if (index === this.currentStep) {
-                btn.classList.add('active'); // 高亮当前步
-            }
+        this.containerEl.createEl('div', { cls: 'move-container' });
+        this.PGNViewer();
+    }
+    private PGNViewer() {
+        const moveContainer = this.containerEl.querySelector('.move-container');
+        if (!moveContainer) return;
+        moveContainer.empty();
+        let toShow: IMove[] = [];
+        if (this.modified) {
+            toShow = this.history
+        } else { toShow = this.PGN }
+        toShow.forEach((move, index) => {
+            const btn = moveContainer.createEl('button', {
+                text: `${index + 1}:`,
+                cls: 'move-btn',
+                attr: { id: `move-btn-${index + 1}` }
+            });
             btn.addEventListener('click', () => {
-                while (this.currentStep < index && this.currentStep < this.PGN.length - 1) {
-                    redoMove(this);
-                }
-                while (this.currentStep > index && this.currentStep > 0) {
-                    undoMove(this);
+                const diff = index - this.currentStep + 1;
+                const moveFunc = diff > 0 ? redoMove : undoMove;
+                console.log(this.currentStep, index, diff);
+                moveContainer.querySelector(`#move-btn-${this.currentStep}`)?.classList.remove('active');
+                moveContainer.querySelector(`#move-btn-${index + 1}`)?.classList.add('active');
+                for (let i = 0; i < Math.abs(diff); i++) {
+                    moveFunc(this);
                 }
             });
         });
@@ -173,6 +186,7 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
             runMove(move, this);
             this.markedPiece = null; // 移动后取消标记
             this.modified = true; // 标记为已修改
+            this.PGNViewer();
         } else {
             // 不能走，取消标记
             restorePiece(this.markedPiece.pieceEl!);
@@ -198,6 +212,7 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
         }
         this.history = [];
         this.modified = false; // 重置修改状态
+        this.PGNViewer();
         this.currentStep = 0;
     };
 
