@@ -26,6 +26,7 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
     currentTurn: ITurn = 'red'; // 新增，默认红方先手
     currentStep: number = 0;
     modified: boolean = false;
+    moveContainer: HTMLDivElement | null = null;
 
     constructor(
         public containerEl: HTMLElement,
@@ -77,11 +78,11 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
         });
         this.boardContainer.addEventListener('click', this.handleBoardClick);
         this.creatButtons();
-        this.containerEl.createEl('div', { cls: 'move-container' });
+        this.moveContainer = this.containerEl.createEl('div', { cls: 'move-container' });
         this.PGNViewer();
     }
     private PGNViewer() {
-        const moveContainer = this.containerEl.querySelector('.move-container');
+        const moveContainer = this.moveContainer;
         if (!moveContainer) return;
         moveContainer.empty();
         let toShow: IMove[] = [];
@@ -94,6 +95,9 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
                 cls: 'move-btn',
                 attr: { id: `move-btn-${index + 1}` }
             });
+            if (index === this.currentStep - 1) {
+                btn.classList.add('active'); // 高亮当前步
+            }
             btn.addEventListener('click', () => {
                 const diff = index - this.currentStep + 1;
                 const moveFunc = diff > 0 ? redoMove : undoMove;
@@ -128,7 +132,11 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
             cls: 'toolbar-btn',
         });
         setIcon(undoButton, 'undo-dot');
-        undoButton.addEventListener('click', () => undoMove(this));
+        undoButton.addEventListener('click', () => {
+            undoMove(this);
+            this.moveContainer?.querySelector(`#move-btn-${this.currentStep + 1}`)?.classList.remove('active');
+            this.moveContainer?.querySelector(`#move-btn-${this.currentStep}`)?.classList.add('active');
+        });
 
         // 前进按钮
         const redoButton = toolbarContainer.createEl('button', {
@@ -136,7 +144,11 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
             cls: 'toolbar-btn',
         });
         setIcon(redoButton, 'redo-dot');
-        redoButton.addEventListener('click', () => redoMove(this));
+        redoButton.addEventListener('click', () => {
+            redoMove(this);
+            this.moveContainer?.querySelector(`#move-btn-${this.currentStep - 1}`)?.classList.remove('active');
+            this.moveContainer?.querySelector(`#move-btn-${this.currentStep}`)?.classList.add('active');
+        });
 
         // 保存按钮
         const saveButton = toolbarContainer.createEl('button', {
