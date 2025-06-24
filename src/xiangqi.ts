@@ -91,10 +91,14 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
         } else { toShow = this.PGN }
         toShow.forEach((move, index) => {
             const btn = moveContainer.createEl('button', {
-                text: `${index + 1}:`,
+                text: `${index + 1}`,
                 cls: 'move-btn',
                 attr: { id: `move-btn-${index + 1}` }
             });
+            btn.style.width = '25px';
+            btn.style.height = '25px';
+            btn.style.borderRadius = '50%';
+            // setIcon(btn, 'refresh-cw');
             if (index === this.currentStep - 1) {
                 btn.classList.add('active'); // 高亮当前步
             }
