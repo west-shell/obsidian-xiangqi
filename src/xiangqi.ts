@@ -27,6 +27,7 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
     currentStep: number = 0;
     modified: boolean = false;
     moveContainer: HTMLDivElement | null = null;
+    saveButton: HTMLButtonElement | null = null;
 
     constructor(
         public containerEl: HTMLElement,
@@ -95,10 +96,6 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
                 cls: 'move-btn',
                 attr: { id: `move-btn-${index + 1}` }
             });
-            btn.style.width = '25px';
-            btn.style.height = '25px';
-            btn.style.borderRadius = '50%';
-            // setIcon(btn, 'refresh-cw');
             if (index === this.currentStep - 1) {
                 btn.classList.add('active'); // 高亮当前步
             }
@@ -159,10 +156,11 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
             attr: { title: '保存' },
             cls: 'toolbar-btn',
         });
+        this.saveButton = saveButton;
         setIcon(saveButton, 'save');
         saveButton.addEventListener('click', () => this.handleSaveClick());
         saveButton.classList.toggle('saved', this.PGN.length > 0);
-        saveButton.classList.toggle('unsaved', this.PGN.length === 0);
+        saveButton.classList.toggle('empty', this.PGN.length === 0);
     }
     private handleBoardClick = (e: MouseEvent) => {
         if (!this.boardContainer) return;
@@ -202,6 +200,7 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
             runMove(move, this);
             this.markedPiece = null; // 移动后取消标记
             this.modified = true; // 标记为已修改
+            this.saveButton?.classList.add('unsaved');
             this.PGNViewer();
         } else {
             // 不能走，取消标记

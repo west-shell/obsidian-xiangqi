@@ -30,45 +30,64 @@
         transform 0.1s ease;
 }
 
-/* 默认颜色 */
-.XQ-container .toolbar-btn.unsaved {
-    background-color: hsl(35, 100%, 50%);
+/* === 状态颜色 === */
+.XQ-container .toolbar-btn.empty {
+    background-color: hsl(33, 5%, 57%);
 }
 
 .XQ-container .toolbar-btn.saved {
     background-color: hsl(122, 39%, 49%);
 }
 
-/* 浅色模式下悬停变暗 */
+.XQ-container .toolbar-btn.unsaved {
+    background-color: hsl(35, 100%, 50%);
+}
+
+/* === 浅色模式下 hover（变暗） === */
 @media (prefers-color-scheme: light) {
-    .XQ-container .toolbar-btn.unsaved:hover {
-        background-color: hsl(35, 100%, 45%);
+    .XQ-container .toolbar-btn.empty:hover {
+        background-color: hsl(33, 5%, 50%);
     }
 
     .XQ-container .toolbar-btn.saved:hover {
         background-color: hsl(122, 39%, 38%);
     }
+
+    .XQ-container .toolbar-btn.unsaved:hover {
+        background-color: hsl(35, 100%, 45%);
+    }
 }
 
-/* 暗色模式下悬停变亮 */
+/* === 暗色模式下 hover（变亮） === */
 @media (prefers-color-scheme: dark) {
-    .XQ-container .toolbar-btn.unsaved:hover {
-        background-color: hsl(35, 100%, 60%);
+    .XQ-container .toolbar-btn.empty:hover {
+        background-color: hsl(33, 5%, 65%);
     }
 
     .XQ-container .toolbar-btn.saved:hover {
         background-color: hsl(122, 39%, 60%);
     }
+
+    .XQ-container .toolbar-btn.unsaved:hover {
+        background-color: hsl(35, 100%, 60%);
+    }
 }
 
-/* 点击效果 */
+/* === 通用点击效果 === */
 .XQ-container .toolbar-btn:active {
     transform: translateY(2px);
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
-button.active {
+.XQ-container button.active {
     background: #ffd700;
     color: #222;
     font-weight: bold;
+}
+
+.XQ-container .move-btn {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    font-size: 12px;
 }
