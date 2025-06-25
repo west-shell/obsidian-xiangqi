@@ -103,6 +103,12 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
         this.creatButtons();
         this.moveContainer = this.containerEl.createEl('div', { cls: 'move-container' });
         this.PGNViewer();
+        this.moveContainer.querySelector(`#move-btn-${this.currentStep}`)
+            ?.scrollIntoView({
+                behavior: 'smooth', // 平滑滚动
+                block: 'center',
+                inline: 'center'
+            });
     }
     private PGNViewer() {
         const moveContainer = this.moveContainer;
@@ -116,7 +122,7 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
         }
         toShow.forEach((move, index) => {
             const btn = moveContainer.createEl('button', {
-                text: `${index + 1}:${move.WXF}`,
+                text: `${index + 1}：${move.WXF}`,
                 cls: 'move-btn',
                 attr: { id: `move-btn-${index + 1}` },
             });
@@ -127,16 +133,13 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
                 const diff = index - this.currentStep + 1;
                 const moveFunc = diff > 0 ? redoMove : undoMove;
                 console.log(this.currentStep, index, diff);
-                moveContainer
-                    .querySelector(`#move-btn-${this.currentStep}`)
+                moveContainer.querySelector(`#move-btn-${this.currentStep}`)
                     ?.classList.remove('active');
-                moveContainer.querySelector(`#move-btn-${index + 1}`)?.classList.add('active');
+                moveContainer.querySelector(`#move-btn-${index + 1}`)!.classList.add('active');
                 for (let i = 0; i < Math.abs(diff); i++) {
                     moveFunc(this);
-                    if (this.settings.enableSpeech) {
-                        speak(move);
-                    }
                 }
+                speak(toShow[this.currentStep - 1])
             });
         });
     }
