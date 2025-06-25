@@ -49,6 +49,8 @@ export interface IMove {
     from: IPosition;
     to: IPosition;
     capture?: IPiece | null;
+    ICCS?: string;
+    WXF?: string;
 }
 export type IHistory = IMove[];
 export interface IState {

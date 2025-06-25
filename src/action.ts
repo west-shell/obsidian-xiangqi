@@ -3,7 +3,7 @@ import { findPieceAt, editHistory, movePiece } from './utils';
 import { speak } from './speaker';
 export function runMove(move: IMove, state: IState) {
     if (state.settings.enableSpeech) {
-        speak(move, state.board);
+        speak(move);
     }
     const { from, to } = move;
     const fromPiece = findPieceAt(from, state);

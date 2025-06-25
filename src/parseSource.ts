@@ -1,4 +1,14 @@
-import { IPiece, IBoard, PieceType, IMove, ITurn } from './types';
+import { IPiece, IBoard, PIECE_CHARS, PieceType, IMove, ITurn } from './types';
+// 数字到中文的映射（红方和黑方视角不同）
+const NUMBERS_RED = ['一', '二', '三', '四', '五', '六', '七', '八', '九'];
+const NUMBERS_BLACK = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
+
+// 移动类型描述
+const MOVE_TYPES = {
+    horizontal: '平',
+    forward: '进',
+    backward: '退',
+};
 export function parseSource(source: string): {
     haveFEN: boolean;
     pieces: IPiece[];
@@ -18,9 +28,6 @@ export function parseSource(source: string): {
     } else {
         haveFEN = true;
     }
-    // 2. 提取最后一段走法（去掉注释和换行）
-    const PGNString = source.match(/\b[A-Z]\d-[A-Z]\d\b/g) || [];
-    const PGN = PGNString.map((string) => parsePGN(string)); // 移除空格和换行符
     const board: IBoard = Array.from({ length: 10 }, () => Array(9).fill(null));
     const pieces: IPiece[] = [];
     const [position, turn] = fen.trim().split(/\s+/);
@@ -40,7 +47,10 @@ export function parseSource(source: string): {
     });
     const firstTurn = turn === 'b' ? 'black' : 'red';
     console.log(firstTurn);
-
+    // 2. 提取最后一段走法（去掉注释和换行）
+    const PGNString = source.match(/\b[A-Z]\d-[A-Z]\d\b/g) || [];
+    let tmpBoard: IBoard = board.map((row) => [...row]);
+    const PGN = PGNString.map((string) => parsePGN(string, tmpBoard)); // 移除空格和换行符
     return {
         haveFEN,
         pieces,
@@ -49,24 +59,25 @@ export function parseSource(source: string): {
         firstTurn,
     };
 }
-export function parsePGN(PGN: string): IMove {
+export function parsePGN(ICCS: string, board: IBoard): IMove {
     // 解析 PGN 字符串为 IMove 数组
     // 解析走法，例如 "H2-D2" -> 起点和终点
-    const [fromSting, toSting] = PGN.split('-');
+    const [fromSting, toSting] = ICCS.split('-');
     const fromX = fromSting.charCodeAt(0) - 'A'.charCodeAt(0);
     const fromY = 9 - parseInt(fromSting[1]); // 修正 Y 坐标，从下往上数
     const toX = toSting.charCodeAt(0) - 'A'.charCodeAt(0);
     const toY = 9 - parseInt(toSting[1]); // 修正 Y 坐标，从下往上数
     const from = { x: fromX, y: fromY };
     const to = { x: toX, y: toY };
-    return { from, to };
+    const WXF = getWXF({ from, to }, board);
+    return { from, to, ICCS, WXF };
 }
 /**
  * 将 { from: { x, y }, to: { x, y } } 转换为 "A0-B7" 格式
  * @param move 包含 from 和 to 的对象，例如 { from: { x: 0, y: 0 }, to: { x: 1, y: 7 } }
  * @returns 返回 "A0-B7" 格式的字符串
  */
-export function getPGN(move: IMove): string {
+export function getICCS(move: IMove): string {
     // 校验输入
     if (move.from.x == null || move.from.y == null || move.to.x == null || move.to.y == null) {
         throw new Error('Invalid move: x and y must be numbers');
@@ -82,4 +93,81 @@ export function getPGN(move: IMove): string {
     const toStr = `${xToLetter(move.to.x)}${9 - move.to.y}`;
 
     return `${fromStr}-${toStr}`;
+}
+export function getWXF(move: IMove, board: IBoard): string {
+    const { from, to } = move;
+    const piece = board[from.x][from.y];
+    if (!piece) return '';
+
+    const isRed = piece === piece.toUpperCase();
+    const numbers = isRed ? NUMBERS_RED : NUMBERS_BLACK;
+    const BOARD: IBoard = Array.from({ length: 9 }, () => Array(10).fill(null));
+    let fromx = from.x;
+    let fromy = from.y;
+    let tox = to.x;
+    let toy = to.y;
+    if (isRed) {
+        for (let x = 0; x < 9; x++) {
+            for (let y = 0; y < 10; y++) {
+                BOARD[x][y] = board[8 - x][9 - y];
+            }
+        }
+        fromx = 8 - from.x;
+        fromy = 9 - from.y;
+        tox = 8 - to.x;
+        toy = 9 - to.y;
+    } else {
+        for (let x = 0; x < 9; x++) {
+            for (let y = 0; y < 10; y++) {
+                BOARD[x][y] = board[x][y];
+            }
+        }
+    }
+
+    // 获取起始位置描述（红方和黑方的坐标系是相反的）
+    let pre = '';
+    let samecol: number[] = [];
+    // 检查同列是否有相同棋子
+    for (let y = 0; y < 10; y++) {
+        if (BOARD[fromx][y] === piece) {
+            samecol.push(y);
+        }
+    }
+    if (samecol.length === 1) {
+        pre = PIECE_CHARS[piece] + numbers[fromx];
+    } else if (samecol.length === 2) {
+        const index = samecol.indexOf(fromy);
+        if (index === 0) {
+            pre = '后' + PIECE_CHARS[piece];
+        } else if (index === 1) {
+            pre = '前' + PIECE_CHARS[piece];
+        }
+    } else if (samecol.length === 3) {
+        const index = samecol.indexOf(fromy);
+        if (index === 0) {
+            pre = '后' + PIECE_CHARS[piece];
+        } else if (index === 1) {
+            pre = '中' + PIECE_CHARS[piece];
+        } else if (index === 2) {
+            pre = '前' + PIECE_CHARS[piece];
+        }
+    }
+    // 确定移动类型和距离
+    let moveType: string;
+    let dest: string;
+
+    if (fromx === tox) {
+        // 纵向移动
+        const delta = toy - fromy;
+        moveType = delta > 0 ? MOVE_TYPES.forward : MOVE_TYPES.backward;
+        dest = numbers[Math.abs(delta) - 1];
+    } else if (fromy === toy) {
+        // 横向移动
+        moveType = MOVE_TYPES.horizontal;
+        dest = numbers[tox];
+    } else {
+        moveType = fromy < toy ? MOVE_TYPES.forward : MOVE_TYPES.backward;
+        dest = numbers[tox];
+    }
+    return `${pre}${moveType}${dest}`;
 }

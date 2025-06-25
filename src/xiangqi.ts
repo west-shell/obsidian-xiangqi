@@ -7,7 +7,7 @@ import {
     Notice,
 } from 'obsidian';
 import { ISettings, IPiece, IMove, IState, IBoard, ITurn } from './types';
-import { parseSource, getPGN } from './parseSource';
+import { parseSource, getICCS } from './parseSource';
 import { genBoardSVG, createPieceSvg } from './svg';
 import { isValidMove } from './rules';
 import { runMove, undoMove, redoMove } from './action';
@@ -303,7 +303,7 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
         blockLines = blockLines.filter((line) => !/[A-Z]\d-[A-Z]\d/.test(line));
         // 2. 仅当 currentStep > 0 时生成并插入新的 PGN
         if (this.currentStep > 0) {
-            const moves = this.history.slice(0, this.currentStep).map((move) => getPGN(move));
+            const moves = this.history.slice(0, this.currentStep).map((move) => getICCS(move));
             let pgnLines = [];
             for (let i = 0; i < moves.length; i += 2) {
                 const line = `${Math.ceil((i + 1) / 2)}. ${moves[i]} ${moves[i + 1] || ''}`.trim();
