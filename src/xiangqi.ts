@@ -16,6 +16,7 @@ import { ConfirmModal } from './confirmModal';
 
 export class XQRenderChild extends MarkdownRenderChild implements IState {
     settings: ISettings;
+    haveFEN: boolean = false;
     PGN: IMove[] = [];
     boardContainer: HTMLDivElement | null = null;
     toolbarContainer: HTMLDivElement | null = null;
@@ -47,7 +48,8 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
     }
     // 解析相关私有方法
     private parseSource() {
-        const { pieces, board, PGN, firstTurn } = parseSource(this.source);
+        const { haveFEN, pieces, board, PGN, firstTurn } = parseSource(this.source);
+        this.haveFEN = haveFEN;
         this.pieces = pieces;
         this.board = board;
         this.PGN = PGN;
@@ -80,6 +82,23 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
             }
         });
         this.boardContainer.addEventListener('click', this.handleBoardClick);
+        switch (this.settings.autoJump) {
+            case 'never':
+                break;
+            case 'always':
+                if (this.PGN.length > 0) {
+                    for (let i = 0; i < this.PGN.length; i++) {
+                        redoMove(this);
+                    }
+                    break;
+                }
+            case 'auto':
+                if (this.PGN.length > 0 && !this.haveFEN) {
+                    this.PGN.forEach(() => redoMove(this));
+                    break;
+                }
+                break;
+        }
         this.creatButtons();
         this.moveContainer = this.containerEl.createEl('div', { cls: 'move-container' });
         this.PGNViewer();
