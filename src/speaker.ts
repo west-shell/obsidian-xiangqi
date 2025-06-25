@@ -34,7 +34,7 @@ export function speak(move: IMove, board: IBoard) {
 export function getChPGN(move: IMove, board: IBoard): string {
     const { from, to } = move;
     const piece = board[from.x][from.y];
-    if (!piece) return "";
+    if (!piece) return '';
 
     const isRed = piece === piece.toUpperCase();
     const pieceChar = PIECE_CHARS[piece];

@@ -6,7 +6,6 @@ export interface ISettings {
 }
 export type ITurn = 'red' | 'black';
 export const PIECE_CHARS: Record<string, string> = {
-    // 红方
     R: '俥',
     N: '傌',
     B: '相',
@@ -14,7 +13,6 @@ export const PIECE_CHARS: Record<string, string> = {
     K: '帅',
     C: '炮',
     P: '兵',
-    // 黑方
     r: '车',
     n: '马',
     b: '象',

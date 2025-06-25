@@ -59,12 +59,14 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
         this.containerEl.classList.toggle('right', this.settings.position === 'right');
         this.containerEl.classList.toggle('bottom', this.settings.position === 'bottom');
         // 创建棋盘容器
-        this.boardContainer = this.containerEl.createDiv({ cls: 'board-container' });
+        this.boardContainer = this.containerEl.createDiv({
+            cls: `board-container ${this.settings.position}`, // 直接拼接
+        });
         const boardSVG = genBoardSVG(this.settings);
         this.boardContainer.prepend(boardSVG);
         // 渲染棋子
         const piecesContainer = this.boardContainer.querySelector('#xiangqi-pieces');
-        if (!piecesContainer) return
+        if (!piecesContainer) return;
         piecesContainer.empty();
         this.pieces.forEach((piece, index) => {
             const pieceEL = createPieceSvg(piece, this.settings);
@@ -88,13 +90,15 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
         moveContainer.empty();
         let toShow: IMove[] = [];
         if (this.modified) {
-            toShow = this.history
-        } else { toShow = this.PGN }
+            toShow = this.history;
+        } else {
+            toShow = this.PGN;
+        }
         toShow.forEach((move, index) => {
             const btn = moveContainer.createEl('button', {
                 text: `${index + 1}`,
                 cls: 'move-btn',
-                attr: { id: `move-btn-${index + 1}` }
+                attr: { id: `move-btn-${index + 1}` },
             });
             if (index === this.currentStep - 1) {
                 btn.classList.add('active'); // 高亮当前步
@@ -103,7 +107,9 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
                 const diff = index - this.currentStep + 1;
                 const moveFunc = diff > 0 ? redoMove : undoMove;
                 console.log(this.currentStep, index, diff);
-                moveContainer.querySelector(`#move-btn-${this.currentStep}`)?.classList.remove('active');
+                moveContainer
+                    .querySelector(`#move-btn-${this.currentStep}`)
+                    ?.classList.remove('active');
                 moveContainer.querySelector(`#move-btn-${index + 1}`)?.classList.add('active');
                 for (let i = 0; i < Math.abs(diff); i++) {
                     moveFunc(this);
@@ -135,8 +141,12 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
         setIcon(undoButton, 'undo-dot');
         undoButton.addEventListener('click', () => {
             undoMove(this);
-            this.moveContainer?.querySelector(`#move-btn-${this.currentStep + 1}`)?.classList.remove('active');
-            this.moveContainer?.querySelector(`#move-btn-${this.currentStep}`)?.classList.add('active');
+            this.moveContainer
+                ?.querySelector(`#move-btn-${this.currentStep + 1}`)
+                ?.classList.remove('active');
+            this.moveContainer
+                ?.querySelector(`#move-btn-${this.currentStep}`)
+                ?.classList.add('active');
         });
 
         // 前进按钮
@@ -147,8 +157,12 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
         setIcon(redoButton, 'redo-dot');
         redoButton.addEventListener('click', () => {
             redoMove(this);
-            this.moveContainer?.querySelector(`#move-btn-${this.currentStep - 1}`)?.classList.remove('active');
-            this.moveContainer?.querySelector(`#move-btn-${this.currentStep}`)?.classList.add('active');
+            this.moveContainer
+                ?.querySelector(`#move-btn-${this.currentStep - 1}`)
+                ?.classList.remove('active');
+            this.moveContainer
+                ?.querySelector(`#move-btn-${this.currentStep}`)
+                ?.classList.add('active');
         });
 
         // 保存按钮
@@ -297,4 +311,3 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
 function PGNViewer(move: IMove) {
     throw new Error('Function not implemented.');
 }
-

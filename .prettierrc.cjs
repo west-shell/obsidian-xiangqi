@@ -1,6 +1,6 @@
 // .prettierrc.js
 module.exports = {
-    printWidth: 100, // 一行最大 120 字符
+    printWidth: 100, // 一行最大 100 字符
     tabWidth: 4, // 缩进 4 空格
     useTabs: false, // 不使用 tab
     semi: true, // 行末加分号
