@@ -7,12 +7,13 @@ import {
     Notice,
 } from 'obsidian';
 import { ISettings, IPiece, IMove, IState, IBoard, ITurn } from './types';
-import { parseSource, getICCS } from './parseSource';
+import { parseSource, getICCS, getWXF } from './parseSource';
 import { genBoardSVG, createPieceSvg } from './svg';
 import { isValidMove } from './rules';
 import { runMove, undoMove, redoMove } from './action';
 import { findPieceAt, markPiece, restorePiece } from './utils';
 import { ConfirmModal } from './confirmModal';
+import { speak } from './speaker';
 
 export class XQRenderChild extends MarkdownRenderChild implements IState {
     settings: ISettings;
@@ -115,7 +116,7 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
         }
         toShow.forEach((move, index) => {
             const btn = moveContainer.createEl('button', {
-                text: `${index + 1}`,
+                text: `${index + 1}:${move.WXF}`,
                 cls: 'move-btn',
                 attr: { id: `move-btn-${index + 1}` },
             });
@@ -132,6 +133,9 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
                 moveContainer.querySelector(`#move-btn-${index + 1}`)?.classList.add('active');
                 for (let i = 0; i < Math.abs(diff); i++) {
                     moveFunc(this);
+                    if (this.settings.enableSpeech) {
+                        speak(move);
+                    }
                 }
             });
         });
@@ -229,6 +233,7 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
                 from: { ...this.markedPiece.position },
                 to: { ...gridPos },
             };
+            move.WXF = getWXF(move, this.board);
             restorePiece(this.markedPiece.pieceEl!);
             runMove(move, this);
             this.markedPiece = null; // 移动后取消标记

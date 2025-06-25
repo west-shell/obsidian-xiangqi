@@ -85,9 +85,20 @@
     font-weight: bold;
 }
 
-.XQ-container .move-btn {
+.XQ-container .move-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    max-height: 300px;
+    /* 容器最大高度 */
+    overflow-y: auto;
+    /* 超出时显示滚动条 */
+    border: 1px solid #ddd;
+    /* 可选：边框 */
+}
+
+/* .XQ-container .move-btn {
     width: 25px;
     height: 25px;
     border-radius: 50%;
     font-size: 12px;
-}
+} */

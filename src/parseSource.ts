@@ -46,11 +46,15 @@ export function parseSource(source: string): {
         }
     });
     const firstTurn = turn === 'b' ? 'black' : 'red';
-    console.log(firstTurn);
     // 2. 提取最后一段走法（去掉注释和换行）
     const PGNString = source.match(/\b[A-Z]\d-[A-Z]\d\b/g) || [];
     let tmpBoard: IBoard = board.map((row) => [...row]);
-    const PGN = PGNString.map((string) => parsePGN(string, tmpBoard)); // 移除空格和换行符
+    const PGN = PGNString.map((string) => {
+        const move = parseICCS(string, tmpBoard);
+        move.WXF = getWXF(move, tmpBoard);
+        runMove(move, tmpBoard);
+        return move;
+    });
     return {
         haveFEN,
         pieces,
@@ -59,7 +63,7 @@ export function parseSource(source: string): {
         firstTurn,
     };
 }
-export function parsePGN(ICCS: string, board: IBoard): IMove {
+export function parseICCS(ICCS: string, tmpBoard: IBoard): IMove {
     // 解析 PGN 字符串为 IMove 数组
     // 解析走法，例如 "H2-D2" -> 起点和终点
     const [fromSting, toSting] = ICCS.split('-');
@@ -69,8 +73,11 @@ export function parsePGN(ICCS: string, board: IBoard): IMove {
     const toY = 9 - parseInt(toSting[1]); // 修正 Y 坐标，从下往上数
     const from = { x: fromX, y: fromY };
     const to = { x: toX, y: toY };
-    const WXF = getWXF({ from, to }, board);
-    return { from, to, ICCS, WXF };
+    const type = tmpBoard[fromX][fromY];
+    if (!type) {
+        return { from, to, ICCS };
+    }
+    return { type, from, to, ICCS };
 }
 /**
  * 将 { from: { x, y }, to: { x, y } } 转换为 "A0-B7" 格式
@@ -94,9 +101,10 @@ export function getICCS(move: IMove): string {
 
     return `${fromStr}-${toStr}`;
 }
-export function getWXF(move: IMove, board: IBoard): string {
+
+export function getWXF(move: IMove, tmpBoard: IBoard): string {
     const { from, to } = move;
-    const piece = board[from.x][from.y];
+    const piece = tmpBoard[from.x][from.y];
     if (!piece) return '';
 
     const isRed = piece === piece.toUpperCase();
@@ -109,7 +117,7 @@ export function getWXF(move: IMove, board: IBoard): string {
     if (isRed) {
         for (let x = 0; x < 9; x++) {
             for (let y = 0; y < 10; y++) {
-                BOARD[x][y] = board[8 - x][9 - y];
+                BOARD[x][y] = tmpBoard[8 - x][9 - y];
             }
         }
         fromx = 8 - from.x;
@@ -119,7 +127,7 @@ export function getWXF(move: IMove, board: IBoard): string {
     } else {
         for (let x = 0; x < 9; x++) {
             for (let y = 0; y < 10; y++) {
-                BOARD[x][y] = board[x][y];
+                BOARD[x][y] = tmpBoard[x][y];
             }
         }
     }
@@ -170,4 +178,11 @@ export function getWXF(move: IMove, board: IBoard): string {
         dest = numbers[tox];
     }
     return `${pre}${moveType}${dest}`;
+}
+function runMove(move: IMove, board: IBoard) {
+    const { from, to } = move;
+    const piece = board[from.x][from.y];
+    if (!piece) return;
+    board[to.x][to.y] = piece;
+    board[from.x][from.y] = null;
 }

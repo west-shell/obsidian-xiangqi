@@ -46,6 +46,7 @@ export interface IPiece {
     hidden?: boolean;
 }
 export interface IMove {
+    type?: PieceType;
     from: IPosition;
     to: IPosition;
     capture?: IPiece | null;
