@@ -240,6 +240,7 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
             undoMove(this); // 撤销上一步
         }
         this.history = [];
+        this.saveButton?.classList.remove('unsaved');
         this.modified = false; // 重置修改状态
         this.PGNViewer();
         this.currentStep = 0;
@@ -307,7 +308,4 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
     onunload() {
         this.plugin.renderChildren.delete(this);
     }
-}
-function PGNViewer(move: IMove) {
-    throw new Error('Function not implemented.');
 }

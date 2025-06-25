@@ -2,6 +2,7 @@ export interface ISettings {
     position: 'bottom' | 'right';
     theme: 'light' | 'dark';
     cellSize: number;
+    autoJump?: 'never' | 'always' | 'auto';
     enableSpeech: boolean;
 }
 export type ITurn = 'red' | 'black';
