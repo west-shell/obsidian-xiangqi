@@ -57,7 +57,7 @@ export class XQSettingTab extends PluginSettingTab {
                 slider
                     .setLimits(20, 100, 1)
                     .setValue(this.plugin.settings.cellSize) // 默认值
-                    .onChange(async (value) => {
+                    .onChange((value) => {
                         this.plugin.settings.cellSize = value;
                     });
             });
@@ -69,7 +69,7 @@ export class XQSettingTab extends PluginSettingTab {
                 slider
                     .setLimits(1, 20, 1)
                     .setValue(this.plugin.settings.fontSize || 10) // 默认值
-                    .onChange(async (value) => {
+                    .onChange((value) => {
                         this.plugin.settings.fontSize = value;
                     });
             });
@@ -89,7 +89,7 @@ export class XQSettingTab extends PluginSettingTab {
             .setName('显示棋谱')
             .setDesc('是否朗读棋谱走法')
             .addToggle((toggle) =>
-                toggle.setValue(this.plugin.settings.enableSpeech).onChange(async (value) => {
+                toggle.setValue(this.plugin.settings.enableSpeech).onChange((value) => {
                     this.plugin.settings.enableSpeech = value;
                 }),
             );
