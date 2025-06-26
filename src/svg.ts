@@ -27,8 +27,8 @@ function boardSvgString(settings: ISettings): string {
     const height = cellSize * 11;
     return `
 <svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" 
-    xmlns="http://www.w3.org/2000/svg"
-    style="user-select: none; cursor: default;">
+    preserveAspectRatio="xMidYMid meet"
+    xmlns="http://www.w3.org/2000/svg" class="xq-board">
   <rect width="${width}" height="${height}" fill="${bgColor}" rx="5" stroke="${lineColor}" stroke-width="${cellSize * 0.06}"/>
   <!-- 网格 -->
   <path d="M ${cellSize - margin},${cellSize - margin} h ${8 * cellSize + 2 * margin} v ${9 * cellSize + 2 * margin} h -${8 * cellSize + 2 * margin} Z" stroke="${lineColor}" stroke-width="${cellSize * 0.08}" fill="none"/>

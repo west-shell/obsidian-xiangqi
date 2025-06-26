@@ -30,11 +30,7 @@ export function editHistory(move: IMove, state: IState) {
     history.splice(currentStep);
 
     // 2. 添加新 move（直接 push 到原数组）
-    history.push({
-        from: { ...currentMove.from },
-        to: { ...currentMove.to },
-        capture: currentMove.capture || null,
-    });
+    history.push(currentMove);
 }
 
 export function markPiece(pieceEl: Element) {

@@ -19,10 +19,10 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
     settings: ISettings;
     haveFEN: boolean = false;
     PGN: IMove[] = [];
-    boardContainer: HTMLDivElement | null = null;
     toolbarContainer: HTMLDivElement | null = null;
     board: IBoard = [];
     pieces: IPiece[] = [];
+    boardSVG: SVGSVGElement | null = null;
     markedPiece: IPiece | null = null;
     history: IMove[] = [];
     currentTurn: ITurn = 'red'; // 新增，默认红方先手
@@ -62,13 +62,13 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
         this.containerEl.classList.toggle('right', this.settings.position === 'right');
         this.containerEl.classList.toggle('bottom', this.settings.position === 'bottom');
         // 创建棋盘容器
-        this.boardContainer = this.containerEl.createDiv({
+        const boardContainer = this.containerEl.createDiv({
             cls: `board-container ${this.settings.position}`, // 直接拼接
         });
-        const boardSVG = genBoardSVG(this.settings);
-        this.boardContainer.prepend(boardSVG);
+        this.boardSVG = genBoardSVG(this.settings) as SVGSVGElement;
+        boardContainer.prepend(this.boardSVG);
         // 渲染棋子
-        const piecesContainer = this.boardContainer.querySelector('#xiangqi-pieces');
+        const piecesContainer = this.boardSVG.querySelector('#xiangqi-pieces');
         if (!piecesContainer) return;
         piecesContainer.empty();
         this.pieces.forEach((piece, index) => {
@@ -82,7 +82,7 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
                 }
             }
         });
-        this.boardContainer.addEventListener('click', this.handleBoardClick);
+        this.boardSVG.addEventListener('click', this.handleBoardClick);
         switch (this.settings.autoJump) {
             case 'never':
                 break;
@@ -102,15 +102,22 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
         }
         this.creatButtons();
         this.moveContainer = this.containerEl.createEl('div', { cls: 'move-container' });
-        this.PGNViewer();
-        this.moveContainer.querySelector(`#move-btn-${this.currentStep}`)
-            ?.scrollIntoView({
-                behavior: 'smooth', // 平滑滚动
-                block: 'center',
-                inline: 'center'
+        this.moveList();
+        if (
+            (this.settings.autoJump === 'auto' && !this.haveFEN) ||
+            this.settings.autoJump === 'always'
+        ) {
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    this.moveContainer!.scrollTo({
+                        top: this.moveContainer!.scrollHeight,
+                        behavior: 'smooth',
+                    });
+                });
             });
+        }
     }
-    private PGNViewer() {
+    private moveList() {
         const moveContainer = this.moveContainer;
         if (!moveContainer) return;
         moveContainer.empty();
@@ -120,6 +127,7 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
         } else {
             toShow = this.PGN;
         }
+        console.log(toShow);
         toShow.forEach((move, index) => {
             const btn = moveContainer.createEl('button', {
                 text: `${index + 1}：${move.WXF}`,
@@ -132,14 +140,14 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
             btn.addEventListener('click', () => {
                 const diff = index - this.currentStep + 1;
                 const moveFunc = diff > 0 ? redoMove : undoMove;
-                console.log(this.currentStep, index, diff);
-                moveContainer.querySelector(`#move-btn-${this.currentStep}`)
+                moveContainer
+                    .querySelector(`#move-btn-${this.currentStep}`)
                     ?.classList.remove('active');
                 moveContainer.querySelector(`#move-btn-${index + 1}`)!.classList.add('active');
                 for (let i = 0; i < Math.abs(diff); i++) {
                     moveFunc(this);
                 }
-                speak(toShow[this.currentStep - 1])
+                speak(toShow[this.currentStep - 1]);
             });
         });
     }
@@ -203,16 +211,16 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
         saveButton.classList.toggle('empty', this.PGN.length === 0);
     }
     private handleBoardClick = (e: MouseEvent) => {
-        if (!this.boardContainer) return;
+        if (!this.boardSVG) return;
         const cellSize = this.settings.cellSize;
-        const boardRect = this.boardContainer.getBoundingClientRect();
+        const boardRect = this.boardSVG.getBoundingClientRect();
         const mouseX = e.clientX - boardRect.left;
         const mouseY = e.clientY - boardRect.top;
         const gridX = Math.round(mouseX / cellSize) - 1;
         const gridY = Math.round(mouseY / cellSize) - 1;
         const gridPos = { x: gridX, y: gridY };
         const clickedPiece = findPieceAt(gridPos, this);
-
+        // 你的后续逻辑
         if (!this.markedPiece) {
             // 没有标记棋子时，只能选中当前行棋方的棋子
             if (clickedPiece) {
@@ -237,12 +245,13 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
                 to: { ...gridPos },
             };
             move.WXF = getWXF(move, this.board);
+            console.log(move);
             restorePiece(this.markedPiece.pieceEl!);
             runMove(move, this);
             this.markedPiece = null; // 移动后取消标记
             this.modified = true; // 标记为已修改
             this.saveButton?.classList.add('unsaved');
-            this.PGNViewer();
+            this.moveList();
         } else {
             // 不能走，取消标记
             restorePiece(this.markedPiece.pieceEl!);
@@ -269,7 +278,7 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
         this.history = [];
         this.saveButton?.classList.remove('unsaved');
         this.modified = false; // 重置修改状态
-        this.PGNViewer();
+        this.moveList();
         this.currentStep = 0;
     };
 
