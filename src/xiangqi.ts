@@ -67,8 +67,8 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
         });
         this.boardSVG = genBoardSVG(this.settings) as SVGSVGElement;
         boardContainer.prepend(this.boardSVG);
-        boardContainer.style.width = `${10 * this.settings.cellSize}px`;
-        boardContainer.style.height = `${11 * this.settings.cellSize}px`;
+        boardContainer.style.width = `${10 * this.settings.cellSize}px`
+        boardContainer.style.height = `${11 * this.settings.cellSize}px`
 
         // 渲染棋子
         const piecesContainer = this.boardSVG.querySelector('#xiangqi-pieces');
@@ -85,7 +85,9 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
                 }
             }
         });
+
         this.boardSVG.addEventListener('click', this.handleBoardClick);
+
         switch (this.settings.autoJump) {
             case 'never':
                 break;
@@ -106,8 +108,8 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
         this.creatButtons();
         this.moveContainer = this.containerEl.createEl('div', { cls: 'move-container' });
         if (this.settings.position === 'right') {
-            this.moveContainer.classList.add('right');
-            this.moveContainer.style.height = `${11 * this.settings.cellSize}px`;
+            this.moveContainer.classList.add('right')
+            this.moveContainer.style.height = `${11 * this.settings.cellSize}px`
         }
         this.moveList();
         if (
@@ -124,6 +126,7 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
             });
         }
     }
+
     private moveList() {
         const moveContainer = this.moveContainer;
         if (!moveContainer) return;
@@ -135,14 +138,14 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
             toShow = this.PGN;
         }
         toShow.forEach((move, index) => {
-            let text = '';
-            let cls = '';
+            let text = ''
+            let cls = ''
             if (this.settings.position === 'right') {
-                text = `${index + 1}：${move.WXF}`;
-                cls = 'move-btn';
+                text = `${index + 1}：${move.WXF}`
+                cls = 'move-btn'
             } else if (this.settings.position === 'bottom') {
-                text = `${index + 1}`;
-                cls = 'move-btn circle';
+                text = `${index + 1}`
+                cls = 'move-btn circle'
             }
             const btn = moveContainer.createEl('button', {
                 text,
@@ -166,6 +169,7 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
             });
         });
     }
+
     private creatButtons() {
         // 创建工具栏容器
         const toolbarContainer = this.containerEl.createEl('div', {
@@ -225,6 +229,7 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
         saveButton.classList.toggle('saved', this.PGN.length > 0);
         saveButton.classList.toggle('empty', this.PGN.length === 0);
     }
+
     private handleBoardClick = (e: MouseEvent) => {
         if (!this.boardSVG) return;
         const cellSize = this.settings.cellSize;
@@ -256,6 +261,7 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
 
         if (moveValid) {
             const move: IMove = {
+                type: this.markedPiece.type,
                 from: { ...this.markedPiece.position },
                 to: { ...gridPos },
             };
@@ -318,6 +324,7 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
             new Notice('保存成功！');
         }
     }
+
     async savePGN() {
         const view = this.plugin.app.workspace.getActiveViewOfType(MarkdownView);
         if (!view) return;
@@ -351,9 +358,11 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
         ].join('\n');
         await this.plugin.app.vault.modify(file, newContent);
     }
+
     refresh() {
         this.rend();
     }
+
     // 卸载相关方法
     onunload() {
         this.plugin.renderChildren.delete(this);
