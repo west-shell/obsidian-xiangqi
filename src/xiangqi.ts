@@ -67,6 +67,9 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
         });
         this.boardSVG = genBoardSVG(this.settings) as SVGSVGElement;
         boardContainer.prepend(this.boardSVG);
+        boardContainer.style.width = `${10 * this.settings.cellSize}px`;
+        boardContainer.style.height = `${11 * this.settings.cellSize}px`;
+
         // 渲染棋子
         const piecesContainer = this.boardSVG.querySelector('#xiangqi-pieces');
         if (!piecesContainer) return;
@@ -102,6 +105,10 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
         }
         this.creatButtons();
         this.moveContainer = this.containerEl.createEl('div', { cls: 'move-container' });
+        if (this.settings.position === 'right') {
+            this.moveContainer.classList.add('right');
+            this.moveContainer.style.height = `${11 * this.settings.cellSize}px`;
+        }
         this.moveList();
         if (
             (this.settings.autoJump === 'auto' && !this.haveFEN) ||
@@ -127,11 +134,19 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
         } else {
             toShow = this.PGN;
         }
-        console.log(toShow);
         toShow.forEach((move, index) => {
+            let text = '';
+            let cls = '';
+            if (this.settings.position === 'right') {
+                text = `${index + 1}：${move.WXF}`;
+                cls = 'move-btn';
+            } else if (this.settings.position === 'bottom') {
+                text = `${index + 1}`;
+                cls = 'move-btn circle';
+            }
             const btn = moveContainer.createEl('button', {
-                text: `${index + 1}：${move.WXF}`,
-                cls: 'move-btn',
+                text,
+                cls,
                 attr: { id: `move-btn-${index + 1}` },
             });
             if (index === this.currentStep - 1) {
@@ -245,7 +260,6 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
                 to: { ...gridPos },
             };
             move.WXF = getWXF(move, this.board);
-            console.log(move);
             restorePiece(this.markedPiece.pieceEl!);
             runMove(move, this);
             this.markedPiece = null; // 移动后取消标记

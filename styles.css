@@ -9,10 +9,10 @@
     flex-direction: column;
 }
 
-.XQ-container .board-container {
+/* .XQ-container .board-container {
     border: 1px solid #ddd;
 }
-
+ */
 .XQ-container .xq-board {
     user-select: none;
     cursor: default;
@@ -91,11 +91,10 @@
 
 .XQ-container button.active {
     background: #ffd700;
-    color: #222;
-    font-weight: bold;
+    color: black;
 }
 
-.XQ-container .move-container {
+.XQ-container .move-container.right {
     display: grid;
     grid-template-columns: 1fr 1fr;
     align-content: start;
