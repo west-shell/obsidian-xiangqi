@@ -106,24 +106,27 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
                 break;
         }
         this.creatButtons();
-        this.moveContainer = this.containerEl.createEl('div', { cls: 'move-container' });
-        if (this.settings.position === 'right') {
-            this.moveContainer.classList.add('right')
-            this.moveContainer.style.height = `${11 * this.settings.cellSize}px`
-        }
-        this.moveList();
-        if (
-            (this.settings.autoJump === 'auto' && !this.haveFEN) ||
-            this.settings.autoJump === 'always'
-        ) {
-            requestAnimationFrame(() => {
+        if (this.settings.showPGN) {
+            this.moveContainer = this.containerEl.createEl('div', { cls: 'move-container' });
+            if (this.settings.position === 'right') {
+                this.moveContainer.classList.add('right')
+                this.moveContainer.style.height = `${11 * this.settings.cellSize}px`
+            } else if (this.settings.position === 'bottom') {
+                this.moveContainer.classList.add('bottom')
+                this.moveContainer.style.width = `${10 * this.settings.cellSize}px`
+            }
+            this.moveList();
+            if ((this.settings.autoJump === 'auto' && !this.haveFEN) ||
+                this.settings.autoJump === 'always') {
                 requestAnimationFrame(() => {
-                    this.moveContainer!.scrollTo({
-                        top: this.moveContainer!.scrollHeight,
-                        behavior: 'smooth',
+                    requestAnimationFrame(() => {
+                        this.moveContainer!.scrollTo({
+                            top: this.moveContainer!.scrollHeight,
+                            behavior: 'smooth',
+                        });
                     });
                 });
-            });
+            }
         }
     }
 
@@ -152,6 +155,7 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
                 cls,
                 attr: { id: `move-btn-${index + 1}` },
             });
+            btn.style.fontSize = `${this.settings.fontSize}px`
             if (index === this.currentStep - 1) {
                 btn.classList.add('active'); // 高亮当前步
             }

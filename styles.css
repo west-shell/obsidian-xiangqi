@@ -90,6 +90,10 @@
 }
 
 .XQ-container button.active {
+    border: 1px solid #ddd;
+}
+
+.XQ-container button.active {
     background: #ffd700;
     color: black;
 }
@@ -99,13 +103,19 @@
     grid-template-columns: 1fr 1fr;
     align-content: start;
     height: 100%;
+    row-gap: 1px;
     overflow-y: auto;
     border: 1px solid #ddd;
 }
+
+/* .XQ-container .move-container.bottom {
+    border: 1px solid #ddd;
+} */
 
 .XQ-container .move-btn.circle {
     width: 25px;
     height: 25px;
     border-radius: 50%;
     font-size: 12px;
+    border: 1px solid #ddd;
 }

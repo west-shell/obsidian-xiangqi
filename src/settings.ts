@@ -2,15 +2,13 @@ import XQPlugin from './main';
 import { ISettings } from './types';
 import { App, PluginSettingTab, Setting } from 'obsidian';
 
-const LAYOUT_POSITIONS = ['bottom', 'right'];
-const THEME_STYLES = ['light', 'dark'];
-
 export const DEFAULT_SETTINGS: ISettings = {
     position: 'right',
-    theme: 'light',
+    theme: 'dark',
     cellSize: 50,
-    enableSpeech: true,
     autoJump: 'auto',
+    enableSpeech: true,
+    showPGN: true
 };
 
 export class XQSettingTab extends PluginSettingTab {
@@ -57,22 +55,45 @@ export class XQSettingTab extends PluginSettingTab {
             .setDesc('调整界面大小')
             .addSlider((slider) => {
                 slider
-                    .setLimits(20, 60, 1)
+                    .setLimits(20, 100, 1)
                     .setValue(this.plugin.settings.cellSize) // 默认值
                     .onChange(async (value) => {
                         this.plugin.settings.cellSize = value;
                     });
             });
+
+        new Setting(containerEl)
+            .setName('字体大小')
+            .setDesc('调整棋谱显示字体大小')
+            .addSlider((slider) => {
+                slider
+                    .setLimits(1, 20, 1)
+                    .setValue(this.plugin.settings.fontSize || 10) // 默认值
+                    .onChange(async (value) => {
+                        this.plugin.settings.fontSize = value;
+                    });
+            });
+
         if (window.speechSynthesis) {
             new Setting(containerEl)
                 .setName('启用棋谱朗读')
                 .setDesc('是否朗读棋谱走法')
                 .addToggle((toggle) =>
-                    toggle.setValue(this.plugin.settings.enableSpeech).onChange(async (value) => {
-                        this.plugin.settings.enableSpeech = value;
+                    toggle.setValue(this.plugin.settings.showPGN || true).onChange((value) => {
+                        this.plugin.settings.showPGN = value;
                     }),
                 );
         }
+
+        new Setting(containerEl)
+            .setName('显示棋谱')
+            .setDesc('是否朗读棋谱走法')
+            .addToggle((toggle) =>
+                toggle.setValue(this.plugin.settings.enableSpeech).onChange(async (value) => {
+                    this.plugin.settings.enableSpeech = value;
+                }),
+            );
+
         new Setting(containerEl)
             .setName('开局跳转')
             .setDesc('初始渲染时默认跳转至终局')
