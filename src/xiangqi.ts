@@ -190,6 +190,21 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
         setIcon(resetButton, 'refresh-cw');
         resetButton.addEventListener('click', this.handleResetClick);
 
+        const toStartBTM = toolbarContainer.createEl('button', {
+            attr: { title: '开局' },
+            cls: 'toolbar-btn',
+        });
+        setIcon(toStartBTM, 'arrow-left-to-line');
+        toStartBTM.addEventListener('click', () => {
+            console.log(this.currentStep)
+            this.moveContainer
+                ?.querySelector(`#move-btn-${this.currentStep}`)
+                ?.classList.remove('active');
+            while (this.currentStep != 0) {
+                undoMove(this)
+            }
+        });
+
         // 回退按钮
         const undoButton = toolbarContainer.createEl('button', {
             attr: { title: '回退' },
@@ -217,6 +232,25 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
             this.moveContainer
                 ?.querySelector(`#move-btn-${this.currentStep - 1}`)
                 ?.classList.remove('active');
+            this.moveContainer
+                ?.querySelector(`#move-btn-${this.currentStep}`)
+                ?.classList.add('active');
+        });
+
+        const toEndBTN = toolbarContainer.createEl('button', {
+            attr: { title: '终局' },
+            cls: 'toolbar-btn',
+        });
+        setIcon(toEndBTN, 'arrow-right-to-line');
+        toEndBTN.addEventListener('click', () => {
+            const step = this.modified ? this.history.length : this.PGN.length
+            const dif = step - this.currentStep
+            this.moveContainer
+                ?.querySelector(`#move-btn-${this.currentStep}`)
+                ?.classList.remove('active');
+            for (let i = 0; i < dif; i++) {
+                redoMove(this)
+            }
             this.moveContainer
                 ?.querySelector(`#move-btn-${this.currentStep}`)
                 ?.classList.add('active');

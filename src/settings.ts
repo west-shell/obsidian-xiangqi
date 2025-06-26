@@ -52,10 +52,10 @@ export class XQSettingTab extends PluginSettingTab {
 
         new Setting(containerEl)
             .setName('界面大小')
-            .setDesc('调整界面大小')
+            .setDesc('调整棋盘大小')
             .addSlider((slider) => {
                 slider
-                    .setLimits(20, 100, 1)
+                    .setLimits(25, 100, 1)
                     .setValue(this.plugin.settings.cellSize) // 默认值
                     .onChange((value) => {
                         this.plugin.settings.cellSize = value;
