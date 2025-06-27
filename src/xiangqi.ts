@@ -1,10 +1,8 @@
 import XQPlugin from './main';
+// prettier-ignore
 import {
-    MarkdownRenderChild,
-    MarkdownPostProcessorContext,
-    MarkdownView,
-    setIcon,
-    Notice,
+    MarkdownRenderChild, MarkdownPostProcessorContext,
+    MarkdownView, setIcon, Notice,
 } from 'obsidian';
 import { ISettings, IPiece, IMove, IState, IBoard, ITurn } from './types';
 import { parseSource, getICCS, getWXF } from './parseSource';
@@ -158,7 +156,7 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
                 cls,
                 attr: { id: `move-btn-${index + 1}` },
             });
-            if (this.settings.fontSize) {
+            if (this.settings.fontSize > 0) {
                 btn.style.fontSize = `${this.settings.fontSize}px`;
             }
             if (this.settings.position === 'bottom') {
@@ -201,6 +199,7 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
         setIcon(resetButton, 'refresh-cw');
         resetButton.addEventListener('click', this.handleResetClick);
 
+        // 开局按钮
         const toStartBTM = toolbarContainer.createEl('button', {
             attr: { title: '开局' },
             cls: 'toolbar-btn',
@@ -227,9 +226,11 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
             this.moveContainer
                 ?.querySelector(`#move-btn-${this.currentStep + 1}`)
                 ?.classList.remove('active');
-            this.moveContainer
+            const activeBTN = this.moveContainer
                 ?.querySelector(`#move-btn-${this.currentStep}`)
                 ?.classList.add('active');
+            if (activeBTN && this.moveContainer)
+                scrollBTN(activeBTN, this.moveContainer)
         });
 
         // 前进按钮
@@ -240,20 +241,24 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
         setIcon(redoButton, 'redo-dot');
         redoButton.addEventListener('click', () => {
             redoMove(this);
+            if (!this.moveContainer) return
             this.moveContainer
                 ?.querySelector(`#move-btn-${this.currentStep - 1}`)
                 ?.classList.remove('active');
-            this.moveContainer
-                ?.querySelector(`#move-btn-${this.currentStep}`)
-                ?.classList.add('active');
+            const activeBTN = this.moveContainer.querySelector(`#move-btn-${this.currentStep}`) as HTMLElement
+            if (!activeBTN) return
+            activeBTN.classList.add('active');
+            scrollBTN(activeBTN, this.moveContainer)
         });
 
+        // 终局按钮
         const toEndBTN = toolbarContainer.createEl('button', {
             attr: { title: '终局' },
             cls: 'toolbar-btn',
         });
         setIcon(toEndBTN, 'arrow-right-to-line');
         toEndBTN.addEventListener('click', () => {
+            if (!this.moveContainer) return
             const step = this.modified ? this.history.length : this.PGN.length;
             const dif = step - this.currentStep;
             this.moveContainer
@@ -262,9 +267,11 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
             for (let i = 0; i < dif; i++) {
                 redoMove(this);
             }
-            this.moveContainer
-                ?.querySelector(`#move-btn-${this.currentStep}`)
-                ?.classList.add('active');
+            const activeBTN = this.moveContainer.querySelector(`#move-btn-${this.currentStep}`) as HTMLElement
+            if (!activeBTN) return
+            activeBTN.classList.add('active');
+            console.log('enter')
+            scrollBTN(activeBTN, this.moveContainer)
         });
 
         // 保存按钮
@@ -352,13 +359,12 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
         this.currentStep = 0;
         for (let i = 0; i < this.modifiedStep; i++) {
             redoMove(this);
-            this.moveContainer
-                ?.querySelector(`#move-btn-${this.currentStep - 1}`)
-                ?.classList.remove('active');
-            this.moveContainer
-                ?.querySelector(`#move-btn-${this.currentStep}`)
-                ?.classList.add('active');
         }
+        const activeBTN = this.moveContainer
+            ?.querySelector(`#move-btn-${this.currentStep}`)
+            ?.classList.add('active');
+        if (activeBTN && this.moveContainer)
+            scrollBTN(activeBTN, this.moveContainer)
     };
 
     async handleSaveClick() {

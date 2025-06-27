@@ -22,6 +22,7 @@ export class XQSettingTab extends PluginSettingTab {
     }
 
     display(): void {
+        const settings = this.plugin.settings
         let { containerEl } = this;
         containerEl.empty();
 
@@ -33,8 +34,8 @@ export class XQSettingTab extends PluginSettingTab {
                     light: '浅色',
                     dark: '深色',
                 });
-                dropdown.setValue(this.plugin.settings.theme).onChange((theme) => {
-                    this.plugin.settings.theme = theme as 'light' | 'dark';
+                dropdown.setValue(settings.theme).onChange((theme) => {
+                    settings.theme = theme as 'light' | 'dark';
                 });
             });
 
@@ -47,8 +48,8 @@ export class XQSettingTab extends PluginSettingTab {
                     bottom: '底部',
                 });
 
-                dropdown.setValue(this.plugin.settings.position).onChange((position) => {
-                    this.plugin.settings.position = position as 'bottom' | 'right';
+                dropdown.setValue(settings.position).onChange((position) => {
+                    settings.position = position as 'bottom' | 'right';
                 });
             });
 
@@ -58,52 +59,100 @@ export class XQSettingTab extends PluginSettingTab {
             .addSlider((slider) => {
                 slider
                     .setLimits(25, 100, 1)
-                    .setValue(this.plugin.settings.cellSize) // 默认值
+                    .setValue(settings.cellSize) // 默认值
                     .onChange((value) => {
-                        this.plugin.settings.cellSize = value;
+                        settings.cellSize = value;
                     });
             });
 
-        new Setting(containerEl)
-            .setName('字体大小')
-            .setDesc('调整棋谱显示字体大小')
-            .addSlider((slider) => {
-                slider
-                    .setLimits(1, 20, 1)
-                    .setValue(this.plugin.settings.fontSize) // 默认值
-                    .onChange((value) => {
-                        this.plugin.settings.fontSize = value;
-                    });
-            });
+        containerEl.createEl('h2', { text: '着法列表设置' });
 
         new Setting(containerEl)
-            .setName('启用棋谱显示')
+            .setName('启用着法列表')
             .setDesc('是否显示棋谱')
             .addToggle((toggle) =>
-                toggle.setValue(this.plugin.settings.showPGN).onChange((value) => {
-                    this.plugin.settings.showPGN = value;
+                toggle.setValue(settings.showPGN).onChange((value) => {
+                    settings.showPGN = value;
                 }),
             );
-
-        if (window.speechSynthesis) {
-            new Setting(containerEl)
-                .setName('朗读着法')
-                .setDesc('是否朗读棋谱走法')
-                .addToggle((toggle) =>
-                    toggle.setValue(this.plugin.settings.enableSpeech).onChange((value) => {
-                        this.plugin.settings.enableSpeech = value;
-                    }),
-                );
-        }
 
         new Setting(containerEl)
             .setName('显示着法文字')
             .setDesc('是否显示棋谱着法文字')
             .addToggle((toggle) =>
-                toggle.setValue(this.plugin.settings.showPGNtxt).onChange((value) => {
-                    this.plugin.settings.showPGNtxt = value;
+                toggle.setValue(settings.showPGNtxt).onChange((value) => {
+                    settings.showPGNtxt = value;
+                    this.display()
                 }),
             );
+
+        if (settings.showPGNtxt) {
+            new Setting(containerEl)
+                .setName("着法字体调整")
+                .setDesc("开启自动或手动调节")
+                .addToggle(toggle => {
+                    // 根据 settings.fontSize 初始判断自动模式
+                    toggle.setValue(settings.fontSize < 0);
+
+                    const controlEl = toggle.toggleEl.parentElement!;
+                    controlEl.style.display = "flex";
+                    controlEl.style.alignItems = "center";
+                    controlEl.style.gap = "1em";
+
+                    // 创建滑块
+                    const rangeSlider = createEl("input", {
+                        type: "range",
+                        attr: {
+                            min: "5",
+                            max: "25",
+                            value: Math.abs(settings.fontSize).toString(),
+                        },
+                    });
+                    rangeSlider.addClass("slider");
+                    rangeSlider.addClass("mod-range");
+                    rangeSlider.style.flex = "1";
+
+                    // 创建显示滑块值的标签
+                    const valueLabel = createEl("span", { text: Math.abs(settings.fontSize).toString() });
+                    valueLabel.style.minWidth = "2.5em"; // 防止数字宽度抖动
+
+                    // 根据 toggle 初始值显示或隐藏滑块和数字
+                    if (settings.fontSize < 0) {
+                        rangeSlider.style.display = "none";
+                        valueLabel.style.display = "none";
+                    } else {
+                        rangeSlider.style.display = "inline-block";
+                        valueLabel.style.display = "inline-block";
+                    }
+
+                    // 插入滑块和标签到 toggle 左侧
+                    controlEl.prepend(valueLabel);
+                    controlEl.prepend(rangeSlider);
+
+                    // toggle 切换时显示或隐藏滑块和标签，同时同步 settings.fontSize
+                    toggle.onChange(value => {
+                        if (value) {
+                            // 自动模式，字体大小为负数
+                            settings.fontSize = -Math.abs(settings.fontSize);
+                            rangeSlider.style.display = "none";
+                            valueLabel.style.display = "none";
+                        } else {
+                            // 手动模式，字体大小为正数
+                            settings.fontSize = Math.abs(settings.fontSize);
+                            rangeSlider.style.display = "inline-block";
+                            valueLabel.style.display = "inline-block";
+                        }
+                    });
+
+                    // 滑块拖动时更新 settings.fontSize 和显示标签
+                    rangeSlider.addEventListener("input", (e) => {
+                        const val = Number((e.target as HTMLInputElement).value);
+                        settings.fontSize = val;
+                        valueLabel.textContent = val.toString();
+                    });
+                });
+        }
+
 
         new Setting(containerEl)
             .setName('开局跳转')
@@ -115,11 +164,23 @@ export class XQSettingTab extends PluginSettingTab {
                         always: '始终',
                         auto: '无FEN即正常开局时',
                     })
-                    .setValue(this.plugin.settings.autoJump)
+                    .setValue(settings.autoJump)
                     .onChange(async (value) => {
-                        this.plugin.settings.autoJump = value as 'never' | 'always' | 'auto';
+                        settings.autoJump = value as 'never' | 'always' | 'auto';
                     });
             });
+
+        if (window.speechSynthesis) {
+            new Setting(containerEl)
+                .setName('朗读着法')
+                .setDesc('是否朗读棋谱走法')
+                .addToggle((toggle) =>
+                    toggle.setValue(settings.enableSpeech).onChange((value) => {
+                        settings.enableSpeech = value;
+                    }),
+                );
+        }
+
     }
     async hide() {
         this.plugin.saveSettings();

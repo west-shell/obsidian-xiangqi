@@ -9,37 +9,14 @@ export interface ISettings {
     showPGNtxt: boolean;
 }
 export type ITurn = 'red' | 'black';
-export const PIECE_CHARS: Record<string, string> = {
-    R: '俥',
-    N: '傌',
-    B: '相',
-    A: '仕',
-    K: '帅',
-    C: '炮',
-    P: '兵',
-    r: '车',
-    n: '马',
-    b: '象',
-    a: '士',
-    k: '将',
-    c: '砲',
-    p: '卒',
-};
-export type PieceType =
-    | 'r'
-    | 'R'
-    | 'n'
-    | 'N'
-    | 'b'
-    | 'B'
-    | 'a'
-    | 'A'
-    | 'k'
-    | 'K'
-    | 'c'
-    | 'C'
-    | 'p'
-    | 'P';
+// prettier-ignore
+export const PIECE_CHARS = {
+    // 红方 (大写)
+    R: '俥', N: '傌', B: '相', A: '仕', K: '帅', C: '炮', P: '兵',
+    // 黑方 (小写)
+    r: '车', n: '马', b: '象', a: '士', k: '将', c: '砲', p: '卒',
+} as const;
+export type PieceType = keyof typeof PIECE_CHARS;
 export type IBoard = (PieceType | null)[][];
 export type IPosition = { x: number; y: number };
 export interface IPiece {
