@@ -213,6 +213,12 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
             while (this.currentStep != 0) {
                 undoMove(this);
             }
+            if (this.moveContainer) {
+                this.moveContainer.scrollTo({
+                    top: 0,
+                    behavior: 'smooth',
+                });
+            }
         });
 
         // 回退按钮
@@ -229,8 +235,7 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
             const activeBTN = this.moveContainer
                 ?.querySelector(`#move-btn-${this.currentStep}`)
                 ?.classList.add('active');
-            if (activeBTN && this.moveContainer)
-                scrollBTN(activeBTN, this.moveContainer)
+            if (activeBTN && this.moveContainer) scrollBTN(activeBTN, this.moveContainer);
         });
 
         // 前进按钮
@@ -241,14 +246,16 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
         setIcon(redoButton, 'redo-dot');
         redoButton.addEventListener('click', () => {
             redoMove(this);
-            if (!this.moveContainer) return
+            if (!this.moveContainer) return;
             this.moveContainer
                 ?.querySelector(`#move-btn-${this.currentStep - 1}`)
                 ?.classList.remove('active');
-            const activeBTN = this.moveContainer.querySelector(`#move-btn-${this.currentStep}`) as HTMLElement
-            if (!activeBTN) return
+            const activeBTN = this.moveContainer.querySelector(
+                `#move-btn-${this.currentStep}`,
+            ) as HTMLElement;
+            if (!activeBTN) return;
             activeBTN.classList.add('active');
-            scrollBTN(activeBTN, this.moveContainer)
+            scrollBTN(activeBTN, this.moveContainer);
         });
 
         // 终局按钮
@@ -258,7 +265,7 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
         });
         setIcon(toEndBTN, 'arrow-right-to-line');
         toEndBTN.addEventListener('click', () => {
-            if (!this.moveContainer) return
+            if (!this.moveContainer) return;
             const step = this.modified ? this.history.length : this.PGN.length;
             const dif = step - this.currentStep;
             this.moveContainer
@@ -267,11 +274,13 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
             for (let i = 0; i < dif; i++) {
                 redoMove(this);
             }
-            const activeBTN = this.moveContainer.querySelector(`#move-btn-${this.currentStep}`) as HTMLElement
-            if (!activeBTN) return
+            const activeBTN = this.moveContainer.querySelector(
+                `#move-btn-${this.currentStep}`,
+            ) as HTMLElement;
+            if (!activeBTN) return;
             activeBTN.classList.add('active');
-            console.log('enter')
-            scrollBTN(activeBTN, this.moveContainer)
+            console.log('enter');
+            scrollBTN(activeBTN, this.moveContainer);
         });
 
         // 保存按钮
@@ -357,14 +366,25 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
         this.modified = false; // 重置修改状态
         this.moveList();
         this.currentStep = 0;
+        if (this.modifiedStep === 0 && this.moveContainer) {
+            this.moveContainer.scrollTo({
+                top: 0,
+                behavior: 'smooth',
+            });
+            return;
+        }
         for (let i = 0; i < this.modifiedStep; i++) {
             redoMove(this);
         }
-        const activeBTN = this.moveContainer
-            ?.querySelector(`#move-btn-${this.currentStep}`)
-            ?.classList.add('active');
-        if (activeBTN && this.moveContainer)
-            scrollBTN(activeBTN, this.moveContainer)
+        if (!this.moveContainer) return;
+        const activeBTN = this.moveContainer.querySelector(
+            `#move-btn-${this.currentStep}`,
+        ) as HTMLElement;
+        if (activeBTN) {
+            activeBTN.classList.add('active');
+            scrollBTN(activeBTN, this.moveContainer);
+        }
+        this.modifiedStep = 0;
     };
 
     async handleSaveClick() {

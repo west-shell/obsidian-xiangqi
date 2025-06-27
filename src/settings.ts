@@ -6,7 +6,7 @@ export const DEFAULT_SETTINGS: ISettings = {
     position: 'right',
     theme: 'dark',
     cellSize: 50,
-    fontSize: 10,
+    fontSize: -15,
     autoJump: 'auto',
     enableSpeech: true,
     showPGN: true,
@@ -22,7 +22,7 @@ export class XQSettingTab extends PluginSettingTab {
     }
 
     display(): void {
-        const settings = this.plugin.settings
+        const settings = this.plugin.settings;
         let { containerEl } = this;
         containerEl.empty();
 
@@ -82,47 +82,49 @@ export class XQSettingTab extends PluginSettingTab {
             .addToggle((toggle) =>
                 toggle.setValue(settings.showPGNtxt).onChange((value) => {
                     settings.showPGNtxt = value;
-                    this.display()
+                    this.display();
                 }),
             );
 
         if (settings.showPGNtxt) {
             new Setting(containerEl)
-                .setName("着法字体调整")
-                .setDesc("开启自动或手动调节")
-                .addToggle(toggle => {
+                .setName('着法字体调整')
+                .setDesc('开启自动或手动调节')
+                .addToggle((toggle) => {
                     // 根据 settings.fontSize 初始判断自动模式
                     toggle.setValue(settings.fontSize < 0);
 
                     const controlEl = toggle.toggleEl.parentElement!;
-                    controlEl.style.display = "flex";
-                    controlEl.style.alignItems = "center";
-                    controlEl.style.gap = "1em";
+                    controlEl.style.display = 'flex';
+                    controlEl.style.alignItems = 'center';
+                    controlEl.style.gap = '1em';
 
                     // 创建滑块
-                    const rangeSlider = createEl("input", {
-                        type: "range",
+                    const rangeSlider = createEl('input', {
+                        type: 'range',
                         attr: {
-                            min: "5",
-                            max: "25",
+                            min: '5',
+                            max: '25',
                             value: Math.abs(settings.fontSize).toString(),
                         },
                     });
-                    rangeSlider.addClass("slider");
-                    rangeSlider.addClass("mod-range");
-                    rangeSlider.style.flex = "1";
+                    rangeSlider.addClass('slider');
+                    rangeSlider.addClass('mod-range');
+                    rangeSlider.style.flex = '1';
 
                     // 创建显示滑块值的标签
-                    const valueLabel = createEl("span", { text: Math.abs(settings.fontSize).toString() });
-                    valueLabel.style.minWidth = "2.5em"; // 防止数字宽度抖动
+                    const valueLabel = createEl('span', {
+                        text: Math.abs(settings.fontSize).toString(),
+                    });
+                    valueLabel.style.minWidth = '2.5em'; // 防止数字宽度抖动
 
                     // 根据 toggle 初始值显示或隐藏滑块和数字
                     if (settings.fontSize < 0) {
-                        rangeSlider.style.display = "none";
-                        valueLabel.style.display = "none";
+                        rangeSlider.style.display = 'none';
+                        valueLabel.style.display = 'none';
                     } else {
-                        rangeSlider.style.display = "inline-block";
-                        valueLabel.style.display = "inline-block";
+                        rangeSlider.style.display = 'inline-block';
+                        valueLabel.style.display = 'inline-block';
                     }
 
                     // 插入滑块和标签到 toggle 左侧
@@ -130,29 +132,28 @@ export class XQSettingTab extends PluginSettingTab {
                     controlEl.prepend(rangeSlider);
 
                     // toggle 切换时显示或隐藏滑块和标签，同时同步 settings.fontSize
-                    toggle.onChange(value => {
+                    toggle.onChange((value) => {
                         if (value) {
                             // 自动模式，字体大小为负数
                             settings.fontSize = -Math.abs(settings.fontSize);
-                            rangeSlider.style.display = "none";
-                            valueLabel.style.display = "none";
+                            rangeSlider.style.display = 'none';
+                            valueLabel.style.display = 'none';
                         } else {
                             // 手动模式，字体大小为正数
                             settings.fontSize = Math.abs(settings.fontSize);
-                            rangeSlider.style.display = "inline-block";
-                            valueLabel.style.display = "inline-block";
+                            rangeSlider.style.display = 'inline-block';
+                            valueLabel.style.display = 'inline-block';
                         }
                     });
 
                     // 滑块拖动时更新 settings.fontSize 和显示标签
-                    rangeSlider.addEventListener("input", (e) => {
+                    rangeSlider.addEventListener('input', (e) => {
                         const val = Number((e.target as HTMLInputElement).value);
                         settings.fontSize = val;
                         valueLabel.textContent = val.toString();
                     });
                 });
         }
-
 
         new Setting(containerEl)
             .setName('开局跳转')
@@ -180,7 +181,6 @@ export class XQSettingTab extends PluginSettingTab {
                     }),
                 );
         }
-
     }
     async hide() {
         this.plugin.saveSettings();
