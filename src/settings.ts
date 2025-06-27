@@ -6,9 +6,11 @@ export const DEFAULT_SETTINGS: ISettings = {
     position: 'right',
     theme: 'dark',
     cellSize: 50,
+    fontSize: 10,
     autoJump: 'auto',
     enableSpeech: true,
-    showPGN: true
+    showPGN: true,
+    showPGNtxt: true,
 };
 
 export class XQSettingTab extends PluginSettingTab {
@@ -68,29 +70,38 @@ export class XQSettingTab extends PluginSettingTab {
             .addSlider((slider) => {
                 slider
                     .setLimits(1, 20, 1)
-                    .setValue(this.plugin.settings.fontSize || 10) // 默认值
+                    .setValue(this.plugin.settings.fontSize) // 默认值
                     .onChange((value) => {
                         this.plugin.settings.fontSize = value;
                     });
             });
 
+        new Setting(containerEl)
+            .setName('启用棋谱显示')
+            .setDesc('是否显示棋谱')
+            .addToggle((toggle) =>
+                toggle.setValue(this.plugin.settings.showPGN).onChange((value) => {
+                    this.plugin.settings.showPGN = value;
+                }),
+            );
+
         if (window.speechSynthesis) {
             new Setting(containerEl)
-                .setName('启用棋谱朗读')
+                .setName('朗读着法')
                 .setDesc('是否朗读棋谱走法')
                 .addToggle((toggle) =>
-                    toggle.setValue(this.plugin.settings.showPGN || true).onChange((value) => {
-                        this.plugin.settings.showPGN = value;
+                    toggle.setValue(this.plugin.settings.enableSpeech).onChange((value) => {
+                        this.plugin.settings.enableSpeech = value;
                     }),
                 );
         }
 
         new Setting(containerEl)
-            .setName('显示棋谱')
-            .setDesc('是否朗读棋谱走法')
+            .setName('显示着法文字')
+            .setDesc('是否显示棋谱着法文字')
             .addToggle((toggle) =>
-                toggle.setValue(this.plugin.settings.enableSpeech).onChange((value) => {
-                    this.plugin.settings.enableSpeech = value;
+                toggle.setValue(this.plugin.settings.showPGNtxt).onChange((value) => {
+                    this.plugin.settings.showPGNtxt = value;
                 }),
             );
 
@@ -104,7 +115,7 @@ export class XQSettingTab extends PluginSettingTab {
                         always: '始终',
                         auto: '无FEN即正常开局时',
                     })
-                    .setValue(this.plugin.settings.autoJump || 'auto') // 默认选"无FEN时"
+                    .setValue(this.plugin.settings.autoJump)
                     .onChange(async (value) => {
                         this.plugin.settings.autoJump = value as 'never' | 'always' | 'auto';
                     });

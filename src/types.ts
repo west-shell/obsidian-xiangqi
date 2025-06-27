@@ -2,10 +2,11 @@ export interface ISettings {
     position: 'bottom' | 'right';
     theme: 'light' | 'dark';
     cellSize: number;
-    fontSize?: number;
-    autoJump?: 'never' | 'always' | 'auto';
+    fontSize: number;
+    autoJump: 'never' | 'always' | 'auto';
     enableSpeech: boolean;
-    showPGN?: boolean;
+    showPGN: boolean;
+    showPGNtxt: boolean;
 }
 export type ITurn = 'red' | 'black';
 export const PIECE_CHARS: Record<string, string> = {

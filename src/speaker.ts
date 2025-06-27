@@ -3,8 +3,8 @@ import { IMove } from './types';
 export function speak(move: IMove) {
     const { type, WXF } = move;
     if (!WXF || !type) return;
-    const turn = type === type.toUpperCase() ? '红：' : '黑：'
-    const finalSpeech = turn + WXF
+    const turn = type === type.toUpperCase() ? '红：' : '黑：';
+    const finalSpeech = turn + WXF;
     const finalSpeechReplace = finalSpeech
         .replace(/卒/g, '族') // "卒"（zú）常被读错为 cù
         .replace(/將/g, '酱') // 繁体“將”可替代“将”，避免 jiāng

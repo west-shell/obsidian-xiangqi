@@ -11,7 +11,7 @@ import { parseSource, getICCS, getWXF } from './parseSource';
 import { genBoardSVG, createPieceSvg } from './svg';
 import { isValidMove } from './rules';
 import { runMove, undoMove, redoMove } from './action';
-import { findPieceAt, markPiece, restorePiece } from './utils';
+import { findPieceAt, markPiece, restorePiece, scrollBTN } from './utils';
 import { ConfirmModal } from './confirmModal';
 import { speak } from './speaker';
 
@@ -28,6 +28,7 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
     currentTurn: ITurn = 'red'; // 新增，默认红方先手
     currentStep: number = 0;
     modified: boolean = false;
+    modifiedStep: number = 0;
     moveContainer: HTMLDivElement | null = null;
     saveButton: HTMLButtonElement | null = null;
 
@@ -67,8 +68,8 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
         });
         this.boardSVG = genBoardSVG(this.settings) as SVGSVGElement;
         boardContainer.prepend(this.boardSVG);
-        boardContainer.style.width = `${10 * this.settings.cellSize}px`
-        boardContainer.style.height = `${11 * this.settings.cellSize}px`
+        boardContainer.style.width = `${10 * this.settings.cellSize}px`;
+        boardContainer.style.height = `${11 * this.settings.cellSize}px`;
 
         // 渲染棋子
         const piecesContainer = this.boardSVG.querySelector('#xiangqi-pieces');
@@ -109,15 +110,17 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
         if (this.settings.showPGN) {
             this.moveContainer = this.containerEl.createEl('div', { cls: 'move-container' });
             if (this.settings.position === 'right') {
-                this.moveContainer.classList.add('right')
-                this.moveContainer.style.height = `${11 * this.settings.cellSize}px`
+                this.moveContainer.classList.add('right');
+                this.moveContainer.style.height = `${11 * this.settings.cellSize}px`;
             } else if (this.settings.position === 'bottom') {
-                this.moveContainer.classList.add('bottom')
-                this.moveContainer.style.width = `${10 * this.settings.cellSize}px`
+                this.moveContainer.classList.add('bottom');
+                this.moveContainer.style.width = `${10 * this.settings.cellSize}px`;
             }
             this.moveList();
-            if ((this.settings.autoJump === 'auto' && !this.haveFEN) ||
-                this.settings.autoJump === 'always') {
+            if (
+                (this.settings.autoJump === 'auto' && !this.haveFEN) ||
+                this.settings.autoJump === 'always'
+            ) {
                 requestAnimationFrame(() => {
                     requestAnimationFrame(() => {
                         this.moveContainer!.scrollTo({
@@ -141,21 +144,28 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
             toShow = this.PGN;
         }
         toShow.forEach((move, index) => {
-            let text = ''
-            let cls = ''
-            if (this.settings.position === 'right') {
-                text = `${index + 1}：${move.WXF}`
-                cls = 'move-btn'
-            } else if (this.settings.position === 'bottom') {
-                text = `${index + 1}`
-                cls = 'move-btn circle'
+            let text = '';
+            let cls = '';
+            if (this.settings.showPGNtxt) {
+                text = `${index + 1}：${move.WXF}`;
+                cls = 'move-btn';
+            } else {
+                text = `${index + 1}`;
+                cls = 'move-btn circle';
             }
             const btn = moveContainer.createEl('button', {
                 text,
                 cls,
                 attr: { id: `move-btn-${index + 1}` },
             });
-            btn.style.fontSize = `${this.settings.fontSize}px`
+            if (this.settings.fontSize) {
+                btn.style.fontSize = `${this.settings.fontSize}px`;
+            }
+            if (this.settings.position === 'bottom') {
+                btn.style.width = `${0.8 * this.settings.cellSize}px`;
+                btn.style.height = `${0.8 * this.settings.cellSize}px`;
+            }
+
             if (index === this.currentStep - 1) {
                 btn.classList.add('active'); // 高亮当前步
             }
@@ -170,6 +180,7 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
                     moveFunc(this);
                 }
                 speak(toShow[this.currentStep - 1]);
+                scrollBTN(btn, moveContainer);
             });
         });
     }
@@ -196,12 +207,12 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
         });
         setIcon(toStartBTM, 'arrow-left-to-line');
         toStartBTM.addEventListener('click', () => {
-            console.log(this.currentStep)
+            console.log(this.currentStep);
             this.moveContainer
                 ?.querySelector(`#move-btn-${this.currentStep}`)
                 ?.classList.remove('active');
             while (this.currentStep != 0) {
-                undoMove(this)
+                undoMove(this);
             }
         });
 
@@ -243,13 +254,13 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
         });
         setIcon(toEndBTN, 'arrow-right-to-line');
         toEndBTN.addEventListener('click', () => {
-            const step = this.modified ? this.history.length : this.PGN.length
-            const dif = step - this.currentStep
+            const step = this.modified ? this.history.length : this.PGN.length;
+            const dif = step - this.currentStep;
             this.moveContainer
                 ?.querySelector(`#move-btn-${this.currentStep}`)
                 ?.classList.remove('active');
             for (let i = 0; i < dif; i++) {
-                redoMove(this)
+                redoMove(this);
             }
             this.moveContainer
                 ?.querySelector(`#move-btn-${this.currentStep}`)
@@ -305,6 +316,7 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
             };
             move.WXF = getWXF(move, this.board);
             restorePiece(this.markedPiece.pieceEl!);
+            if (!this.modified) this.modifiedStep = this.currentStep;
             runMove(move, this);
             this.markedPiece = null; // 移动后取消标记
             this.modified = true; // 标记为已修改
@@ -338,6 +350,15 @@ export class XQRenderChild extends MarkdownRenderChild implements IState {
         this.modified = false; // 重置修改状态
         this.moveList();
         this.currentStep = 0;
+        for (let i = 0; i < this.modifiedStep; i++) {
+            redoMove(this);
+            this.moveContainer
+                ?.querySelector(`#move-btn-${this.currentStep - 1}`)
+                ?.classList.remove('active');
+            this.moveContainer
+                ?.querySelector(`#move-btn-${this.currentStep}`)
+                ?.classList.add('active');
+        }
     };
 
     async handleSaveClick() {
