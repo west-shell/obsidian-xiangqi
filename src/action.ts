@@ -1,7 +1,8 @@
-import { IMove, IState } from './types';
+import { XQRenderChild } from './XQRenderChild';
+import { IMove } from './types';
 import { findPieceAt, editHistory, movePiece } from './utils';
 import { speak } from './speaker';
-export function runMove(move: IMove, state: IState) {
+export function runMove(move: IMove, state: XQRenderChild) {
     if (state.settings.enableSpeech) {
         speak(move);
     }
@@ -20,7 +21,7 @@ export function runMove(move: IMove, state: IState) {
     state.currentStep++;
     state.currentTurn = state.currentTurn === 'red' ? 'black' : 'red';
 }
-export function undoMove(state: IState) {
+export function undoMove(state: XQRenderChild) {
     if (state.history.length === 0) return;
     const move = state.history[state.currentStep - 1];
     if (!move) return;
@@ -38,7 +39,7 @@ export function undoMove(state: IState) {
     state.currentStep--;
     state.currentTurn = state.currentTurn === 'red' ? 'black' : 'red';
 }
-export function redoMove(state: IState) {
+export function redoMove(state: XQRenderChild) {
     // 如果没有悔棋记录且没有预定义的走法，直接返回
     // 如果没有悔棋记录但有预定义的走法，从 moves 中执行下一步
     if (!state.modified && state.PGN!.length > 0) {

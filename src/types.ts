@@ -34,13 +34,3 @@ export interface IMove {
     WXF?: string;
 }
 export type IHistory = IMove[];
-export interface IState {
-    settings: ISettings;
-    board: IBoard;
-    pieces: IPiece[] | null;
-    currentTurn: ITurn;
-    currentStep: number;
-    history: IHistory;
-    PGN: IMove[];
-    modified: boolean;
-}

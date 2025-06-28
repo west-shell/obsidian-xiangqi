@@ -1,5 +1,6 @@
-import { IPiece, IPosition, IState, IMove } from './types';
-export function movePiece(piece: IPiece, from: IPosition, to: IPosition, state: IState) {
+import { XQRenderChild } from './XQRenderChild';
+import { IPiece, IPosition, IMove } from './types';
+export function movePiece(piece: IPiece, from: IPosition, to: IPosition, state: XQRenderChild) {
     const { cellSize } = state.settings;
     state.board[from.x][from.y] = null;
     state.board[to.x][to.y] = piece.type;
@@ -9,7 +10,7 @@ export function movePiece(piece: IPiece, from: IPosition, to: IPosition, state: 
         `translate(${(to.x + 1) * cellSize},${(to.y + 1) * cellSize})`,
     );
 }
-export function editHistory(move: IMove, state: IState) {
+export function editHistory(move: IMove, state: XQRenderChild) {
     let { currentStep, history } = state;
     const currentMove = move;
 
@@ -49,12 +50,12 @@ export function restorePiece(pieceEl: Element) {
         pieceEl.removeAttribute('data-original-transform');
     }
 }
-export function findPieceAt(position: IPosition, state: IState): IPiece | undefined {
+export function findPieceAt(position: IPosition, state: XQRenderChild): IPiece | undefined {
     if (!state.pieces) {
         return undefined;
     }
     return state.pieces.find(
-        (p) => p.position.x === position.x && p.position.y === position.y && !p.hidden,
+        (p: IPiece) => p.position.x === position.x && p.position.y === position.y && !p.hidden,
     );
 }
 
