@@ -1,4 +1,4 @@
-import { XQRenderChild } from './XQRenderChild';
+import { XQRenderChild } from './xiangqi';
 import { IMove } from './types';
 import { findPieceAt, editHistory, movePiece } from './utils';
 import { speak } from './speaker';

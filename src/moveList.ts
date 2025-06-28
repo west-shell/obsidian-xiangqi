@@ -1,7 +1,7 @@
-import { XQRenderChild } from './XQRenderChild';
+import { XQRenderChild } from './xiangqi';
 import { IMove } from './types';
 import { redoMove, undoMove } from './action';
-import { scrollBTN, } from './utils';
+import { scrollBTN } from './utils';
 import { speak } from './speaker';
 
 export function showMoveList(state: XQRenderChild) {
@@ -9,7 +9,7 @@ export function showMoveList(state: XQRenderChild) {
     if (!moveContainer) return;
     moveContainer.empty();
     let toShow: IMove[] = [];
-    if (state.modified > 0) {
+    if (state.modified) {
         toShow = state.history;
     } else {
         toShow = state.PGN;

@@ -1,5 +1,5 @@
 import { Plugin } from 'obsidian';
-import { XQRenderChild } from './XQRenderChild';
+import { XQRenderChild } from './xiangqi';
 import { ISettings } from './types';
 import { XQSettingTab, DEFAULT_SETTINGS } from './settings';
 export default class XQPlugin extends Plugin {

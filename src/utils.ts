@@ -1,4 +1,4 @@
-import { XQRenderChild } from './XQRenderChild';
+import { XQRenderChild } from './xiangqi';
 import { IPiece, IPosition, IMove } from './types';
 export function movePiece(piece: IPiece, from: IPosition, to: IPosition, state: XQRenderChild) {
     const { cellSize } = state.settings;
