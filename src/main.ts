@@ -8,6 +8,7 @@ export default class XQPlugin extends Plugin {
     renderChildren = new Set<XQRenderChild>();
     async onload() {
         await this.loadSettings();
+
         this.addSettingTab(new XQSettingTab(this.app, this));
         const codeBlockNames = ['xq', 'xiangqi', '象棋'];
         for (const name of codeBlockNames) {
@@ -17,7 +18,20 @@ export default class XQPlugin extends Plugin {
                 this.renderChildren.add(renderChild);
             });
         }
+
+        this.registerEvent(
+            this.app.workspace.on('css-change', () => {
+                // 主题已改变
+                if (this.settings.autoTheme) {
+                    const isDarkMode = () => document.body.classList.contains("theme-dark");
+                    this.settings.theme = isDarkMode() ? 'dark' : 'light'; // 自动主题时默认使用深色
+                    this.renderChildren.forEach((child) => { child.refresh(); });
+                }
+            })
+        );
     }
+
+
     async loadSettings() {
         const savedData = await this.loadData();
         this.settings = {

@@ -1,6 +1,7 @@
 export interface ISettings {
     position: 'bottom' | 'right';
     theme: 'light' | 'dark';
+    autoTheme: boolean;
     cellSize: number;
     fontSize: number;
     autoJump: 'never' | 'always' | 'auto';
