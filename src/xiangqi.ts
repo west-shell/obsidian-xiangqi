@@ -4,7 +4,7 @@ import { redoMove, runMove } from './action';
 import { parseSource, getWXF } from './parseSource';
 import { isValidMove } from './rules';
 import { showMoveList } from './moveList';
-import { genBoardSVG, createPieceSvg } from './svg';
+import { genBoardSVG, createPieceSvg, updateRectStroke } from './svg';
 import { ISettings, IMove, IBoard, IPiece, ITurn } from './types';
 import { IOptions } from './parseSource';
 import { findPieceAt, markPiece, restorePiece } from './utils';
@@ -19,6 +19,7 @@ export class XQRenderChild extends MarkdownRenderChild {
     board: IBoard = [];
     pieces: IPiece[] = [];
     boardSVG: SVGSVGElement | null = null;
+    boardRect: SVGRectElement | null = null;
     markedPiece: IPiece | null = null;
     history: IMove[] = [];
     currentTurn: ITurn = 'red'; // 新增，默认红方先手
@@ -78,9 +79,8 @@ export class XQRenderChild extends MarkdownRenderChild {
             this.boardSVG.setAttribute('transform', 'rotate(180)');
         }
         boardContainer.prepend(this.boardSVG);
-        boardContainer.style.width = `${10 * this.settings.cellSize}px`;
-        boardContainer.style.height = `${11 * this.settings.cellSize}px`;
-
+        this.boardRect = this.boardSVG.getElementById('boardRect') as SVGRectElement | null;
+        updateRectStroke(this);
         // 渲染棋子
         const piecesContainer = this.boardSVG.querySelector('#xiangqi-pieces');
         if (!piecesContainer) return;

@@ -67,7 +67,7 @@ export class XQSettingTab extends PluginSettingTab {
                     });
             });
 
-        containerEl.createEl('h2', { text: '着法列表设置' });
+        containerEl.createEl('h2', { text: '着法列表' });
 
         new Setting(containerEl)
             .setName('启用着法列表')

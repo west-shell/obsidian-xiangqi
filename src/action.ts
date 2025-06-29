@@ -1,6 +1,7 @@
 import { XQRenderChild } from './xiangqi';
 import { IMove } from './types';
 import { findPieceAt, editHistory, movePiece } from './utils';
+import { updateRectStroke } from './svg';
 import { speak } from './speaker';
 export function runMove(move: IMove, state: XQRenderChild) {
     if (state.settings.enableSpeech) {
@@ -20,6 +21,7 @@ export function runMove(move: IMove, state: XQRenderChild) {
     movePiece(fromPiece, from, to, state);
     state.currentStep++;
     state.currentTurn = state.currentTurn === 'red' ? 'black' : 'red';
+    updateRectStroke(state);
 }
 export function undoMove(state: XQRenderChild) {
     if (state.history.length === 0) return;
@@ -38,6 +40,7 @@ export function undoMove(state: XQRenderChild) {
     }
     state.currentStep--;
     state.currentTurn = state.currentTurn === 'red' ? 'black' : 'red';
+    updateRectStroke(state);
 }
 export function redoMove(state: XQRenderChild) {
     // 如果没有悔棋记录且没有预定义的走法，直接返回

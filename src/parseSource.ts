@@ -79,20 +79,21 @@ export function parseSource(source: string): {
 function parseOption(source: string): IOptions {
     const options: IOptions = {};
     const optionPatterns = [
-        { key: 'protected', regex: /protected\s*:\s*(true|false)/i },
-        { key: 'rotated', regex: /rotated\s*:\s*(true|false)/i },
-        // { key: 'showPGN', regex: /showPGN\s*:\s*(true|false)/i }
+        { key: 'protected', regex: /\b(protected|P)\s*[:：]\s*(true|false)\s*/i },
+        { key: 'rotated', regex: /\b(rotated|r)\s*[:：]\s*(true|false)\s*/i },
+        // { key: 'showPGN', regex: /\b(showPGN|s)\s*[:：]\s*(true|false)\s*/i }
     ];
 
     optionPatterns.forEach(({ key, regex }) => {
         const match = source.match(regex);
         if (match) {
-            options[key as keyof IOptions] = match[1].toLowerCase() === 'true';
+            options[key as keyof IOptions] = match[2].toLowerCase() === 'true';
         }
     });
 
     return options;
 }
+
 
 export function parseICCS(ICCS: string, tmpBoard: IBoard): IMove {
     // 解析 PGN 字符串为 IMove 数组
