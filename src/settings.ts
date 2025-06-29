@@ -70,11 +70,19 @@ export class XQSettingTab extends PluginSettingTab {
             .setName('界面大小')
             .setDesc('调整棋盘大小')
             .addSlider((slider) => {
+                const controlEl = slider.sliderEl.parentElement!;
+                // 创建显示滑块值的标签
+                const valueLabel = createEl('span', {
+                    text: Math.abs(settings.cellSize).toString(),
+                });
+                valueLabel.style.minWidth = '2.5em'; // 防止数字宽度抖动
+                controlEl.prepend(valueLabel);
                 slider
-                    .setLimits(25, 100, 1)
+                    .setLimits(15, 100, 1)
                     .setValue(settings.cellSize) // 默认值
                     .onChange((value) => {
                         settings.cellSize = value;
+                        valueLabel.textContent = value.toString();
                         this.plugin.refresh();
                     });
             });
