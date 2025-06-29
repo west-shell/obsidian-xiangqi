@@ -73,7 +73,10 @@ export class XQRenderChild extends MarkdownRenderChild {
         const boardContainer = this.containerEl.createDiv({
             cls: `board-container ${this.settings.position}`, // 直接拼接
         });
-        this.boardSVG = genBoardSVG(this.settings) as SVGSVGElement;
+        this.boardSVG = genBoardSVG(this.settings, this.options) as SVGSVGElement;
+        if (this.options.rotated) {
+            this.boardSVG.setAttribute('transform', 'rotate(180)');
+        }
         boardContainer.prepend(this.boardSVG);
         boardContainer.style.width = `${10 * this.settings.cellSize}px`;
         boardContainer.style.height = `${11 * this.settings.cellSize}px`;
@@ -83,7 +86,7 @@ export class XQRenderChild extends MarkdownRenderChild {
         if (!piecesContainer) return;
         piecesContainer.empty();
         this.pieces.forEach((piece, index) => {
-            const pieceEL = createPieceSvg(piece, this.settings);
+            const pieceEL = createPieceSvg(piece, this.settings, this.options);
             piecesContainer.appendChild(pieceEL!);
             const pieceEl = piecesContainer.lastElementChild;
             if (pieceEl) {
@@ -148,8 +151,13 @@ export class XQRenderChild extends MarkdownRenderChild {
         const boardRect = this.boardSVG.getBoundingClientRect();
         const mouseX = e.clientX - boardRect.left;
         const mouseY = e.clientY - boardRect.top;
-        const gridX = Math.round(mouseX / cellSize) - 1;
-        const gridY = Math.round(mouseY / cellSize) - 1;
+        let gridX = Math.round(mouseX / cellSize) - 1;
+        let gridY = Math.round(mouseY / cellSize) - 1;
+        if (this.options.rotated) {
+            // 如果棋盘是旋转的，调整坐标
+            gridX = 8 - gridX;
+            gridY = 9 - gridY;
+        }
         const gridPos = { x: gridX, y: gridY };
         const clickedPiece = findPieceAt(gridPos, this);
         // 你的后续逻辑

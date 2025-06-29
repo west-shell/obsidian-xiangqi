@@ -1,3 +1,4 @@
+import { IOptions } from './parseSource';
 import { ISettings, IPiece, PIECE_CHARS } from './types';
 
 // 定义主题配置
@@ -15,11 +16,11 @@ const themes = {
         textColor: '#ffffff',
     },
 };
-export function genBoardSVG(settings: ISettings): Element {
-    const boardString = boardSvgString(settings);
+export function genBoardSVG(settings: ISettings, options: IOptions): Element {
+    const boardString = boardSvgString(settings, options);
     return new DOMParser().parseFromString(boardString, 'image/svg+xml').documentElement;
 }
-function boardSvgString(settings: ISettings): string {
+function boardSvgString(settings: ISettings, options: IOptions): string {
     const { theme, cellSize } = settings;
     const { bgColor, lineColor, textColor } = themes[theme];
     const margin = cellSize * 0.1;
@@ -62,8 +63,14 @@ function boardSvgString(settings: ISettings): string {
     <path d="M ${cellSize * 4},${cellSize} l ${cellSize * 2} ${cellSize * 2} m 0,${-2 * cellSize} l ${-2 * cellSize} ${2 * cellSize}"/>
     <path d="M ${cellSize * 4},${8 * cellSize} l ${cellSize * 2} ${cellSize * 2} m 0,${-2 * cellSize} l ${-2 * cellSize} ${2 * cellSize}"/>
   </g>
-  <!-- 楚河汉界 -->
-  <text x="${5 * cellSize}" y="${5 * cellSize + 7 * margin}" font-size="${cellSize * 0.6}" text-anchor="middle" font-family="SimSun" fill="${textColor}">楚　河　　汉　界</text>
+    <!-- 河界 -->
+  <g transform="translate(${5 * cellSize}, ${5.5 * cellSize})">
+  <text x="0" y="0"
+    font-size="${cellSize * 0.6}" font-family="FZLiShu II-S06"
+    text-anchor="middle" dominant-baseline="middle"
+    transform="${options.rotated ? 'rotate(180)' : ''}"
+    fill="${textColor}">楚　河　　汉　界</text>
+  </g>
   <!-- 炮兵位 -->
   <g stroke="${lineColor}" stroke-width="${cellSize * 0.02}" fill="none">
     ${[
@@ -105,14 +112,14 @@ function boardSvgString(settings: ISettings): string {
   <g id="xiangqi-pieces"></g>
 </svg>`;
 }
-export function createPieceSvg(piece: IPiece, settings: ISettings): Element {
-    const gString = pieceString(piece, settings); // 返回 <g>...</g> 字符串
+export function createPieceSvg(piece: IPiece, settings: ISettings, options: IOptions): Element {
+    const gString = pieceString(piece, settings, options); // 返回 <g>...</g> 字符串
     const wrapped = `<svg xmlns="http://www.w3.org/2000/svg">${gString}</svg>`;
     const tempSvg = new DOMParser().parseFromString(wrapped, 'image/svg+xml').documentElement;
     const gNode = tempSvg.querySelector('g');
     return gNode as Element;
 }
-function pieceString(piece: IPiece, settings: ISettings): string {
+function pieceString(piece: IPiece, settings: ISettings, options: IOptions): string {
     const { type, position } = piece;
     const { x, y } = position;
     const { theme, cellSize } = settings;
@@ -131,7 +138,8 @@ function pieceString(piece: IPiece, settings: ISettings): string {
           fill="white" 
           font-size="${cellSize * 0.45}" 
           text-anchor="middle" 
-          dy="0.35em">
+          dy="0.35em"
+          transform="${options.rotated ? 'rotate(180)' : ''}">
       ${PIECE_CHARS[type]}
     </text>
   </g>
