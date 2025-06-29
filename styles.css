@@ -101,7 +101,6 @@
     background: linear-gradient(135deg, #facc15, #fcd34d);
     color: black;
     border-radius: 0;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .XQ-container button.active:hover {
