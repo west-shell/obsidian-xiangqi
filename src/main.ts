@@ -25,7 +25,7 @@ export default class XQPlugin extends Plugin {
                 if (this.settings.autoTheme) {
                     const isDarkMode = () => document.body.classList.contains("theme-dark");
                     this.settings.theme = isDarkMode() ? 'dark' : 'light'; // 自动主题时默认使用深色
-                    this.renderChildren.forEach((child) => { child.refresh(); });
+                    this.refresh();
                 }
             })
         );
@@ -41,5 +41,10 @@ export default class XQPlugin extends Plugin {
     }
     async saveSettings() {
         await this.saveData(this.settings);
+    }
+    refresh() {
+        this.renderChildren.forEach((child) => {
+            child.refresh();
+        });
     }
 }

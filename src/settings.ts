@@ -47,6 +47,7 @@ export class XQSettingTab extends PluginSettingTab {
                         settings.autoTheme = false;
                         settings.theme = theme as 'light' | 'dark';
                     }
+                    this.plugin.refresh();
                 });
             });
 
@@ -61,6 +62,7 @@ export class XQSettingTab extends PluginSettingTab {
 
                 dropdown.setValue(settings.position).onChange((position) => {
                     settings.position = position as 'bottom' | 'right';
+                    this.plugin.refresh();
                 });
             });
 
@@ -73,6 +75,7 @@ export class XQSettingTab extends PluginSettingTab {
                     .setValue(settings.cellSize) // 默认值
                     .onChange((value) => {
                         settings.cellSize = value;
+                        this.plugin.refresh();
                     });
             });
 
@@ -84,6 +87,7 @@ export class XQSettingTab extends PluginSettingTab {
             .addToggle((toggle) =>
                 toggle.setValue(settings.showPGN).onChange((value) => {
                     settings.showPGN = value;
+                    this.plugin.refresh();
                 }),
             );
 
@@ -93,6 +97,7 @@ export class XQSettingTab extends PluginSettingTab {
             .addToggle((toggle) =>
                 toggle.setValue(settings.showPGNtxt).onChange((value) => {
                     settings.showPGNtxt = value;
+                    this.plugin.refresh();
                     this.display();
                 }),
             );
@@ -155,6 +160,7 @@ export class XQSettingTab extends PluginSettingTab {
                             rangeSlider.style.display = 'inline-block';
                             valueLabel.style.display = 'inline-block';
                         }
+                        this.plugin.refresh();
                     });
 
                     // 滑块拖动时更新 settings.fontSize 和显示标签
@@ -195,6 +201,6 @@ export class XQSettingTab extends PluginSettingTab {
     }
     async hide() {
         this.plugin.saveSettings();
-        this.plugin.renderChildren.forEach((child) => child.refresh());
+        this.plugin.refresh();
     }
 }

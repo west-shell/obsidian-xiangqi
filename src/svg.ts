@@ -155,7 +155,22 @@ function pieceString(piece: IPiece, settings: ISettings, options: IOptions): str
 
 export function updateRectStroke(state: XQRenderChild): void {
   if (!state.boardRect) return;
+
   const { red, blue } = themes[state.settings.theme];
   const strokeColor = state.currentTurn === 'red' ? `${red}` : `${blue}`;
+
+  // 设置 SVG 边框颜色
   state.boardRect.setAttribute('stroke', strokeColor);
+  state.boardRect.setAttribute('stroke-width', '4'); // 设置边框宽度，避免太细看不清楚
+
+  // 获取包裹 `SVG` 的父 `div`
+  const boardContainer = state.boardRect.closest('div');  // 获取最外层包裹 `SVG` 的 div
+
+  if (!boardContainer) return; // 如果没有找到父容器，直接返回
+
+  // 设置包裹 `div` 的边框颜色（与 SVG 边框一致）
+  boardContainer.style.borderColor = strokeColor;
+
+  // 给包裹 `div` 添加发光效果
+  boardContainer.style.boxShadow = `0 0 15px ${strokeColor}`; // 添加光晕效果
 }

@@ -10,13 +10,20 @@
     flex-direction: column;
 }
 
-/* .XQ-container .board-container {
-    border: 4px solid red;
-} */
+.XQ-container .board-container {
+    padding: 0;
+    margin: 0;
+    border: 1px solid transparent;
+    height: 100%;
+}
 
 .XQ-container .xq-board {
+    display: block;
     user-select: none;
     cursor: default;
+    margin: 0;
+    padding: 0;
+    border: 0;
 }
 
 .XQ-container .toolbar-container.bottom {
@@ -118,7 +125,7 @@
 } */
 
 .XQ-container .move-btn {
-    border: 1px solid #ddd;
+    border: 1px solid;
     border-radius: 0;
 }
 
@@ -127,5 +134,5 @@
     /* height: 50px; */
     border-radius: 0;
     font-size: 12px;
-    border: 1px solid #ddd;
+    border: 1px solid;
 }
