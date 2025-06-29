@@ -11,6 +11,7 @@ export const DEFAULT_SETTINGS: ISettings = {
     enableSpeech: true,
     showPGN: true,
     showPGNtxt: true,
+    viewOnly: false,
 };
 
 export class XQSettingTab extends PluginSettingTab {

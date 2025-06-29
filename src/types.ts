@@ -7,6 +7,7 @@ export interface ISettings {
     enableSpeech: boolean;
     showPGN: boolean;
     showPGNtxt: boolean;
+    viewOnly?: boolean;
 }
 export type ITurn = 'red' | 'black';
 // prettier-ignore
