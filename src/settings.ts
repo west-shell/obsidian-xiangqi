@@ -12,6 +12,7 @@ export const DEFAULT_SETTINGS: ISettings = {
     showPGN: true,
     showPGNtxt: true,
     viewOnly: false,
+    rotated: false,
 };
 
 export class XQSettingTab extends PluginSettingTab {

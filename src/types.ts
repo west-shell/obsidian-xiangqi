@@ -8,6 +8,7 @@ export interface ISettings {
     showPGN: boolean;
     showPGNtxt: boolean;
     viewOnly?: boolean;
+    rotated?: boolean;
 }
 export type ITurn = 'red' | 'black';
 // prettier-ignore

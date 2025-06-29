@@ -3,6 +3,11 @@ import { IPiece, IBoard, PIECE_CHARS, PieceType, IMove, ITurn } from './types';
 const NUMBERS_RED = ['一', '二', '三', '四', '五', '六', '七', '八', '九'];
 const NUMBERS_BLACK = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
 
+export type IOptions = {
+    protected?: boolean;
+    rotated?: boolean;
+};
+
 // 移动类型描述
 const MOVE_TYPES = {
     horizontal: '平',
@@ -15,7 +20,10 @@ export function parseSource(source: string): {
     board: IBoard;
     PGN: IMove[];
     firstTurn: ITurn;
+    options: IOptions;
 } {
+    const options = parseOption(source);
+    // 解析源字符串，提取FEN、走法和棋盘状态
     // 1. 提取FEN（优先从提示词中提取）
     let haveFEN = false;
     let fen =
@@ -59,8 +67,33 @@ export function parseSource(source: string): {
         board,
         PGN,
         firstTurn,
+        options,
     };
 }
+
+/**
+ * 从字符串中解析预定义的选项（viewOnly/rotated/showPGN）
+ * @param source 输入的字符串
+ * @returns 包含已解析选项的对象（仅包含匹配到的选项）
+ */
+function parseOption(source: string): IOptions {
+    const options: IOptions = {};
+    const optionPatterns = [
+        { key: 'protected', regex: /protected\s*:\s*(true|false)/i },
+        { key: 'rotated', regex: /rotated\s*:\s*(true|false)/i },
+        // { key: 'showPGN', regex: /showPGN\s*:\s*(true|false)/i }
+    ];
+
+    optionPatterns.forEach(({ key, regex }) => {
+        const match = source.match(regex);
+        if (match) {
+            options[key as keyof IOptions] = match[1].toLowerCase() === 'true';
+        }
+    });
+
+    return options;
+}
+
 export function parseICCS(ICCS: string, tmpBoard: IBoard): IMove {
     // 解析 PGN 字符串为 IMove 数组
     // 解析走法，例如 "H2-D2" -> 起点和终点

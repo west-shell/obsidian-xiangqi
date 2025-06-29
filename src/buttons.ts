@@ -49,8 +49,11 @@ export function creatButtons(state: XQRenderChild) {
             state.saveButton = btn;
         }
     }
+    if (state.options.protected && state.saveButton) {
+        state.saveButton.classList.add('protected');
+        state.saveButton.style.pointerEvents = 'none';
+    }
 }
-
 function onResetClick(state: XQRenderChild) {
     while (state.currentStep > 0) {
         undoMove(state); // 撤销上一步

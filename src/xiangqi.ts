@@ -6,11 +6,14 @@ import { isValidMove } from './rules';
 import { showMoveList } from './moveList';
 import { genBoardSVG, createPieceSvg } from './svg';
 import { ISettings, IMove, IBoard, IPiece, ITurn } from './types';
+import { IOptions } from './parseSource';
 import { findPieceAt, markPiece, restorePiece } from './utils';
 import { creatButtons } from './buttons';
 
 export class XQRenderChild extends MarkdownRenderChild {
+    source: string; // 保存源文本
     settings: ISettings;
+    options: IOptions = {};
     haveFEN: boolean = false;
     PGN: IMove[] = [];
     board: IBoard = [];
@@ -29,15 +32,18 @@ export class XQRenderChild extends MarkdownRenderChild {
     ctx: MarkdownPostProcessorContext;
 
     constructor(
-        public containerEl: HTMLElement,
+        containerEl: HTMLElement,
         ctx: MarkdownPostProcessorContext,
-        private source: string,
+        source: string,
         plugin: XQPlugin,
     ) {
         super(containerEl);
         this.plugin = plugin;
-        this.settings = plugin.settings; // 从插件中获取设置
+        this.settings = plugin.settings;
+        this.source = source;
         this.ctx = ctx;
+        this.containerEl = containerEl;
+        parseSource(source); // 解析源文本
     }
 
     // 主函数
@@ -48,14 +54,17 @@ export class XQRenderChild extends MarkdownRenderChild {
     }
     // 解析相关私有方法
     private parseSource() {
-        const { haveFEN, pieces, board, PGN, firstTurn } = parseSource(this.source);
+        const { haveFEN, pieces, board, PGN, firstTurn, options } = parseSource(this.source);
+        this.options = options || {};
         this.haveFEN = haveFEN;
         this.pieces = pieces;
         this.board = board;
         this.PGN = PGN;
         this.currentTurn = firstTurn;
+        this.options = options || {};
     }
     private rend() {
+        this.settings = { ...this.plugin.settings, ...this.options }; // 从插件中获取设置
         this.containerEl.empty();
         this.containerEl.classList.add('XQ-container');
         this.containerEl.classList.toggle('right', this.settings.position === 'right');
