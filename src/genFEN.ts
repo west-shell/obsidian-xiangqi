@@ -3,7 +3,7 @@ import { XQRenderChild } from './xiangqi';
 import { MarkdownRenderChild, MarkdownPostProcessorContext } from 'obsidian';
 import { createPieceSvg, genBoardSVG } from './svg';
 import { IMove, IPiece, ISettings, PIECE_CHARS, PieceType } from './types';
-import { findPieceAt, markPiece, restorePiece } from './utils';
+import { findPieceAt, markPiece, movePiece, restorePiece } from './utils';
 import { parseSource } from './parseSource';
 import { runMove } from './action';
 
@@ -69,17 +69,31 @@ export class GenFENRenderChild extends XQRenderChild {
                 this.markedPiece = clickedPiece;
             }
             return;
+        } else {
+
+            // 有标记棋子时，尝试走子（无论目标是空还是有棋子）
+            const move: IMove = {
+                type: this.markedPiece.type,
+                from: { ...this.markedPiece.position },
+                to: { ...gridPos },
+            };
+            restorePiece(this.markedPiece.pieceEl!);
+            const { from, to } = move;
+            const fromPiece = findPieceAt(from, this);
+            const toPiece = findPieceAt(to, this);
+            if (!fromPiece) return;
+            // 如果目标有棋子，隐藏目标棋子
+            if (toPiece) {
+                toPiece.hidden = true;
+                toPiece.pieceEl?.setAttribute('display', 'none');
+                move.capture = toPiece;
+            }
+            movePiece(fromPiece, from, to, this);
+
+            this.markedPiece = null; // 移动后取消标记
         }
 
-        // 有标记棋子时，尝试走子（无论目标是空还是有棋子）
-        const move: IMove = {
-            type: this.markedPiece.type,
-            from: { ...this.markedPiece.position },
-            to: { ...gridPos },
-        };
-        restorePiece(this.markedPiece.pieceEl!);
-        runMove(move, this);
-        this.markedPiece = null; // 移动后取消标记
+
     }
 
     creatButtons() {
