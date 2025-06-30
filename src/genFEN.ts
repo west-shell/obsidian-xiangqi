@@ -6,6 +6,9 @@ import { IMove, IPiece, ISettings, PIECE_CHARS, PieceType } from './types';
 import { findPieceAt, markPiece, movePiece, restorePiece } from './utils';
 import { parseSource } from './parseSource';
 import { runMove } from './action';
+interface IPieceBTN extends HTMLButtonElement {
+    pieces: IPiece[];
+}
 
 export class GenFENRenderChild extends XQRenderChild {
     // fistTurn: 'red' | 'blue' = 'red'; // 默认红方先手
@@ -86,7 +89,14 @@ export class GenFENRenderChild extends XQRenderChild {
             if (toPiece) {
                 toPiece.hidden = true;
                 toPiece.pieceEl?.setAttribute('display', 'none');
-                move.capture = toPiece;
+                const pieceTBN = this.containerEl.querySelector(`#piece-${toPiece.type}`) as IPieceBTN;
+                console.log(pieceTBN);
+                if (pieceTBN) {
+                    pieceTBN.pieces.push(toPiece); // 将被吃掉的棋子添加到按钮中
+                }
+                if (pieceTBN && pieceTBN.pieces?.length > 0) {
+                    pieceTBN.style.backgroundColor = 'yellow';
+                }
             }
             movePiece(fromPiece, from, to, this);
 
@@ -119,9 +129,11 @@ export class GenFENRenderChild extends XQRenderChild {
             // 创建按钮并设置 id、title、class 等
             const btn = toolbarContainer.createEl('button', {
                 text: title,  // 按钮文本
-                attr: { title, id: `piece-${piece}` },  // 设置 id 方便识别点击对象
+                attr: { id: `piece-${piece}` },  // 设置 id 方便识别点击对象
                 cls: className,  // 设置动态 class
-            });
+            }) as IPieceBTN;
+            btn.pieces = [];  // 初始化 pieces 数组，用于存储被吃掉的棋子
+            console.log(`piece-${piece}`)
             btn.style.backgroundColor = colorClass;  // 设置背景色
             // 绑定点击事件
             btn.addEventListener('click', handler);
