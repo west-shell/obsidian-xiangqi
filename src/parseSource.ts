@@ -1,7 +1,7 @@
 import { IPiece, IBoard, PIECE_CHARS, PieceType, IMove, ITurn } from './types';
 // 数字到中文的映射（红方和黑方视角不同）
 const NUMBERS_RED = ['一', '二', '三', '四', '五', '六', '七', '八', '九'];
-const NUMBERS_BLACK = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
+const NUMBERS_BLUE = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
 
 export type IOptions = {
     protected?: boolean;
@@ -51,7 +51,7 @@ export function parseSource(source: string): {
             }
         }
     });
-    const firstTurn = turn === 'b' ? 'black' : 'red';
+    const firstTurn = turn === 'b' ? 'blue' : 'red';
     // 2. 提取最后一段走法（去掉注释和换行）
     const PGNString = source.match(/\b[A-Z]\d-[A-Z]\d\b/g) || [];
     let tmpBoard: IBoard = board.map((row) => [...row]);
@@ -140,7 +140,7 @@ export function getWXF(move: IMove, tmpBoard: IBoard): string {
     if (!piece) return '';
 
     const isRed = piece === piece.toUpperCase();
-    const numbers = isRed ? NUMBERS_RED : NUMBERS_BLACK;
+    const numbers = isRed ? NUMBERS_RED : NUMBERS_BLUE;
     const BOARD: IBoard = Array.from({ length: 9 }, () => Array(10).fill(null));
     let fromx = from.x;
     let fromy = from.y;

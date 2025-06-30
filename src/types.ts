@@ -11,7 +11,7 @@ export interface ISettings {
     viewOnly?: boolean;
     rotated?: boolean;
 }
-export type ITurn = 'red' | 'black';
+export type ITurn = 'red' | 'blue';
 // prettier-ignore
 export const PIECE_CHARS = {
     // 红方 (大写)

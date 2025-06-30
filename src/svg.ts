@@ -18,7 +18,8 @@ export const themes = {
     lineColor: ' #ffffff',
     textColor: ' #ffffff',
     red: ' #861818',
-    blue: ' #1B38A2',
+    // blue: ' #1B38A2',
+    blue: ' #000080', // 保持蓝色不变
   },
 };
 export function genBoardSVG(settings: ISettings, options: IOptions): Element {

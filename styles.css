@@ -38,6 +38,12 @@
     gap: 4px;
 }
 
+.XQ-container .pieceBTN-container.right {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
 .XQ-container .toolbar-btn {
     border: none;
     padding: 6px 10px;

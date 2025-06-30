@@ -1,5 +1,6 @@
 import { Plugin } from 'obsidian';
 import { XQRenderChild } from './xiangqi';
+import { GenFENRenderChild } from './genFEN';
 import { ISettings } from './types';
 import { XQSettingTab, DEFAULT_SETTINGS } from './settings';
 
@@ -18,7 +19,10 @@ export default class XQPlugin extends Plugin {
                 this.renderChildren.add(renderChild);
             });
         }
-
+        this.registerMarkdownCodeBlockProcessor('xqfen', (source, el, ctx) => {
+            const renderChild = new GenFENRenderChild(el, ctx, source, this);
+            ctx.addChild(renderChild);
+        });
         this.registerEvent(
             this.app.workspace.on('css-change', () => {
                 // 主题已改变

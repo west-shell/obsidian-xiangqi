@@ -54,7 +54,7 @@ export class XQRenderChild extends MarkdownRenderChild {
         this.rend();
     }
     // 解析相关私有方法
-    private parseSource() {
+    parseSource() {
         const { haveFEN, pieces, board, PGN, firstTurn, options } = parseSource(this.source);
         this.options = options || {};
         this.haveFEN = haveFEN;
@@ -64,8 +64,20 @@ export class XQRenderChild extends MarkdownRenderChild {
         this.currentTurn = firstTurn;
         this.options = options || {};
     }
-    private rend() {
+    rend() {
         this.settings = { ...this.plugin.settings, ...this.options }; // 从插件中获取设置
+
+        this.rendBoard();
+
+        this.boardSVG!.addEventListener('click', this.handleBoardClick);
+
+        creatButtons(this);
+
+        this.autoJump();
+
+        this.creatMoveList();
+    }
+    rendBoard() {
         this.containerEl.empty();
         this.containerEl.classList.add('XQ-container');
         this.containerEl.classList.toggle('right', this.settings.position === 'right');
@@ -96,56 +108,8 @@ export class XQRenderChild extends MarkdownRenderChild {
                 }
             }
         });
-
-        this.boardSVG.addEventListener('click', this.handleBoardClick);
-
-        switch (this.settings.autoJump) {
-            case 'never':
-                break;
-            case 'always':
-                if (this.PGN.length > 0) {
-                    for (let i = 0; i < this.PGN.length; i++) {
-                        redoMove(this);
-                    }
-                    break;
-                }
-            case 'auto':
-                if (this.PGN.length > 0 && !this.haveFEN) {
-                    this.PGN.forEach(() => redoMove(this));
-                    break;
-                }
-                break;
-        }
-
-        creatButtons(this);
-
-        if (this.settings.showPGN) {
-            this.moveContainer = this.containerEl.createEl('div', { cls: 'move-container' });
-            if (this.settings.position === 'right') {
-                this.moveContainer.classList.add('right');
-                this.moveContainer.style.height = `${11 * this.settings.cellSize}px`;
-            } else if (this.settings.position === 'bottom') {
-                this.moveContainer.classList.add('bottom');
-                this.moveContainer.style.width = `${10 * this.settings.cellSize}px`;
-            }
-            showMoveList(this);
-            if (
-                (this.settings.autoJump === 'auto' && !this.haveFEN) ||
-                this.settings.autoJump === 'always'
-            ) {
-                requestAnimationFrame(() => {
-                    requestAnimationFrame(() => {
-                        this.moveContainer!.scrollTo({
-                            top: this.moveContainer!.scrollHeight,
-                            behavior: 'smooth',
-                        });
-                    });
-                });
-            }
-        }
     }
-
-    private handleBoardClick = (e: MouseEvent) => {
+    handleBoardClick = (e: MouseEvent) => {
         if (!this.boardSVG) return;
         const cellSize = this.settings.cellSize;
         const boardRect = this.boardSVG.getBoundingClientRect();
@@ -167,7 +131,7 @@ export class XQRenderChild extends MarkdownRenderChild {
                 const clickedIsRed = clickedPiece.type === clickedPiece.type.toUpperCase();
                 if (
                     (this.currentTurn === 'red' && clickedIsRed) ||
-                    (this.currentTurn === 'black' && !clickedIsRed)
+                    (this.currentTurn === 'blue' && !clickedIsRed)
                 ) {
                     markPiece(clickedPiece.pieceEl!);
                     this.markedPiece = clickedPiece;
@@ -201,7 +165,7 @@ export class XQRenderChild extends MarkdownRenderChild {
                 const clickedIsRed = clickedPiece.type === clickedPiece.type.toUpperCase();
                 if (
                     (this.currentTurn === 'red' && clickedIsRed) ||
-                    (this.currentTurn === 'black' && !clickedIsRed)
+                    (this.currentTurn === 'blue' && !clickedIsRed)
                 ) {
                     markPiece(clickedPiece.pieceEl!);
                     this.markedPiece = clickedPiece;
@@ -211,6 +175,51 @@ export class XQRenderChild extends MarkdownRenderChild {
             this.markedPiece = null;
         }
     };
+    autoJump() {
+        switch (this.settings.autoJump) {
+            case 'never':
+                break;
+            case 'always':
+                if (this.PGN.length > 0) {
+                    for (let i = 0; i < this.PGN.length; i++) {
+                        redoMove(this);
+                    }
+                    break;
+                }
+            case 'auto':
+                if (this.PGN.length > 0 && !this.haveFEN) {
+                    this.PGN.forEach(() => redoMove(this));
+                    break;
+                }
+                break;
+        }
+    }
+    creatMoveList() {
+        if (this.settings.showPGN) {
+            this.moveContainer = this.containerEl.createEl('div', { cls: 'move-container' });
+            if (this.settings.position === 'right') {
+                this.moveContainer.classList.add('right');
+                this.moveContainer.style.height = `${11 * this.settings.cellSize}px`;
+            } else if (this.settings.position === 'bottom') {
+                this.moveContainer.classList.add('bottom');
+                this.moveContainer.style.width = `${10 * this.settings.cellSize}px`;
+            }
+            showMoveList(this);
+            if (
+                (this.settings.autoJump === 'auto' && !this.haveFEN) ||
+                this.settings.autoJump === 'always'
+            ) {
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        this.moveContainer!.scrollTo({
+                            top: this.moveContainer!.scrollHeight,
+                            behavior: 'smooth',
+                        });
+                    });
+                });
+            }
+        }
+    }
 
     refresh() {
         this.rend();

@@ -20,7 +20,7 @@ export function runMove(move: IMove, state: XQRenderChild) {
     editHistory(move, state);
     movePiece(fromPiece, from, to, state);
     state.currentStep++;
-    state.currentTurn = state.currentTurn === 'red' ? 'black' : 'red';
+    state.currentTurn = state.currentTurn === 'red' ? 'blue' : 'red';
     updateRectStroke(state);
 }
 export function undoMove(state: XQRenderChild) {
@@ -39,7 +39,7 @@ export function undoMove(state: XQRenderChild) {
         state.board[to.x][to.y] = capture.type;
     }
     state.currentStep--;
-    state.currentTurn = state.currentTurn === 'red' ? 'black' : 'red';
+    state.currentTurn = state.currentTurn === 'red' ? 'blue' : 'red';
     updateRectStroke(state);
 }
 export function redoMove(state: XQRenderChild) {
