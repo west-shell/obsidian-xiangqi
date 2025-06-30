@@ -2,7 +2,7 @@ import XQPlugin from './main';
 import { XQRenderChild } from './xiangqi';
 import { MarkdownRenderChild, MarkdownPostProcessorContext } from 'obsidian';
 import { createPieceSvg, genBoardSVG } from './svg';
-import { IMove, IPiece, ISettings, PIECE_CHARS, PieceType } from './types';
+import { IMove, IPiece, IPosition, ISettings, PIECE_CHARS, PieceType } from './types';
 import { findPieceAt, markPiece, movePiece, restorePiece } from './utils';
 import { parseSource } from './parseSource';
 import { runMove } from './action';
@@ -56,11 +56,6 @@ export class GenFENRenderChild extends XQRenderChild {
         const mouseY = e.clientY - boardRect.top;
         let gridX = Math.round(mouseX / cellSize) - 1;
         let gridY = Math.round(mouseY / cellSize) - 1;
-        if (this.options.rotated) {
-            // 如果棋盘是旋转的，调整坐标
-            gridX = 8 - gridX;
-            gridY = 9 - gridY;
-        }
         const gridPos = { x: gridX, y: gridY };
         const clickedPiece = findPieceAt(gridPos, this);
         // 你的后续逻辑
@@ -73,34 +68,60 @@ export class GenFENRenderChild extends XQRenderChild {
             }
             return;
         } else {
-
-            // 有标记棋子时，尝试走子（无论目标是空还是有棋子）
-            const move: IMove = {
-                type: this.markedPiece.type,
-                from: { ...this.markedPiece.position },
-                to: { ...gridPos },
-            };
-            restorePiece(this.markedPiece.pieceEl!);
-            const { from, to } = move;
-            const fromPiece = findPieceAt(from, this);
-            const toPiece = findPieceAt(to, this);
-            if (!fromPiece) return;
-            // 如果目标有棋子，隐藏目标棋子
-            if (toPiece) {
-                toPiece.hidden = true;
-                toPiece.pieceEl?.setAttribute('display', 'none');
-                const pieceTBN = this.containerEl.querySelector(`#piece-${toPiece.type}`) as IPieceBTN;
-                console.log(pieceTBN);
+            if (clickedPiece) {
+                clickedPiece.hidden = true; // 隐藏目标棋子
+                clickedPiece.pieceEl?.setAttribute('display', 'none');
+                const pieceTBN = this.containerEl.querySelector(`#piece-${clickedPiece.type}`) as IPieceBTN;
                 if (pieceTBN) {
-                    pieceTBN.pieces.push(toPiece); // 将被吃掉的棋子添加到按钮中
+                    pieceTBN.pieces.push(clickedPiece); // 将被吃掉的棋子添加到按钮中
                 }
                 if (pieceTBN && pieceTBN.pieces?.length > 0) {
-                    pieceTBN.style.backgroundColor = 'yellow';
+                    pieceTBN.style.backgroundColor = 'yellow'; // 如果按钮中有被吃掉的棋子，设置背景色
+                }
+                if (clickedPiece.position.x === this.markedPiece.position.x && clickedPiece.position.y === this.markedPiece.position.y) {
+                    this.markedPiece = null;
+                    return;
                 }
             }
-            movePiece(fromPiece, from, to, this);
-
+            if (this.markedPiece.hidden) {
+                this.markedPiece.hidden = false; // 如果标记的棋子被隐藏，恢复显示
+                this.markedPiece.pieceEl!.removeAttribute('display');
+                movePiece(this.markedPiece, { x: -1, y: -1 } as IPosition, gridPos, this); // 移动标记棋子
+            } else {
+                restorePiece(this.markedPiece.pieceEl!); // 恢复标记棋子
+                movePiece(this.markedPiece, this.markedPiece.position, gridPos, this); // 移动标记棋子
+            }
             this.markedPiece = null; // 移动后取消标记
+
+
+            // 清除原位置
+            // // 有标记棋子时，尝试走子（无论目标是空还是有棋子）
+            // const move: IMove = {
+            //     type: this.markedPiece.type,
+            //     from: { ...this.markedPiece.position },
+            //     to: { ...gridPos },
+            // };
+            // restorePiece(this.markedPiece.pieceEl!);
+            // const { from, to } = move;
+            // const fromPiece = findPieceAt(from, this);
+            // const toPiece = findPieceAt(to, this);
+            // if (!fromPiece) return;
+            // // 如果目标有棋子，隐藏目标棋子
+            // if (toPiece) {
+            //     toPiece.hidden = true;
+            //     toPiece.pieceEl?.setAttribute('display', 'none');
+            //     const pieceTBN = this.containerEl.querySelector(`#piece-${toPiece.type}`) as IPieceBTN;
+            //     console.log(pieceTBN);
+            //     if (pieceTBN) {
+            //         pieceTBN.pieces.push(toPiece); // 将被吃掉的棋子添加到按钮中
+            //     }
+            //     if (pieceTBN && pieceTBN.pieces?.length > 0) {
+            //         pieceTBN.style.backgroundColor = 'yellow';
+            //     }
+            // }
+            // movePiece(fromPiece, from, to, this);
+
+            // this.markedPiece = null; // 移动后取消标记
         }
 
 
@@ -118,9 +139,6 @@ export class GenFENRenderChild extends XQRenderChild {
             if (piece === 'K' || piece === 'k') continue;  // 跳过老将
 
             const title = PIECE_CHARS[piece as PieceType];  // 获取棋子的名称
-            const handler = () => {
-                onPieceClick(this, piece as PieceType);  // 处理点击事件
-            };
 
             // 判断是红方（大写字母）还是黑方（小写字母），并设置不同的类名
             const colorClass = piece === piece.toUpperCase() ? 'red' : 'blue';
@@ -133,14 +151,21 @@ export class GenFENRenderChild extends XQRenderChild {
                 cls: className,  // 设置动态 class
             }) as IPieceBTN;
             btn.pieces = [];  // 初始化 pieces 数组，用于存储被吃掉的棋子
-            console.log(`piece-${piece}`)
             btn.style.backgroundColor = colorClass;  // 设置背景色
             // 绑定点击事件
-            btn.addEventListener('click', handler);
+            btn.addEventListener('click', (e) => this.onPieceBTNClick(e));
         }
     }
-
-}
-function onPieceClick(state: XQRenderChild, pieceType: PieceType) {
-
+    onPieceBTNClick(e: MouseEvent) {
+        const btn = e.currentTarget as IPieceBTN;
+        if (btn.pieces.length > 0) {
+            // 如果已经有标记的棋子，先取消标记
+            this.markedPiece = btn.pieces.pop() || null;
+        }
+        if (btn.pieces.length === 0) {
+            btn.style.backgroundColor = 'gray'; // 如果没有被吃掉的棋子，清除背景色
+        }
+        console.log(btn.pieces, 'btn.pieces');
+        console.log(this.markedPiece, 'markedPiece');
+    }
 }
