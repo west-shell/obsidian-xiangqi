@@ -14,10 +14,10 @@ export interface ISettings {
 export type ITurn = 'red' | 'blue';
 // prettier-ignore
 export const PIECE_CHARS = {
-    // 红方 (大写)
-    R: '俥', N: '傌', B: '相', A: '仕', K: '帅', C: '炮', P: '兵',
     // 黑方 (小写)
     r: '车', n: '马', b: '象', a: '士', k: '将', c: '砲', p: '卒',
+    // 红方 (大写)
+    R: '俥', N: '傌', B: '相', A: '仕', K: '帅', C: '炮', P: '兵',
 } as const;
 export type PieceType = keyof typeof PIECE_CHARS;
 export type IBoard = (PieceType | null)[][];

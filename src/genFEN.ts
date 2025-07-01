@@ -1,11 +1,10 @@
 import XQPlugin from './main';
 import { XQRenderChild } from './xiangqi';
-import { MarkdownRenderChild, MarkdownPostProcessorContext } from 'obsidian';
-import { createPieceSvg, genBoardSVG } from './svg';
-import { IMove, IPiece, IPosition, ISettings, PIECE_CHARS, PieceType } from './types';
+import { MarkdownPostProcessorContext } from 'obsidian';
+import { themes } from './svg';
+import { IPiece, PIECE_CHARS, PieceType } from './types';
 import { findPieceAt, markPiece, movePiece, restorePiece } from './utils';
-import { parseSource } from './parseSource';
-import { runMove } from './action';
+
 interface IPieceBTN extends HTMLButtonElement {
     pieces: IPiece[];
     updateStyle?: (state: XQRenderChild) => void; // 可选方法，用于更新按钮样式
@@ -111,26 +110,28 @@ export class GenFENRenderChild extends XQRenderChild {
         toolbarContainer.classList.toggle('bottom', this.settings.position === 'bottom');
         // 遍历 PIECE_CHARS 中的每一个棋子，去掉 'K' 和 'k' 代表的将
         for (const piece in PIECE_CHARS) {
-            if (piece === 'K' || piece === 'k') continue;  // 跳过老将
-
             const title = PIECE_CHARS[piece as PieceType];  // 获取棋子的名称
-
+            const isRed = piece === piece.toUpperCase();
             // 判断是红方（大写字母）还是黑方（小写字母），并设置不同的类名
-            const colorClass = piece === piece.toUpperCase() ? 'red' : 'blue';
+            const colorClass = isRed ? 'red' : 'blue';
             const className = `piece-btn ${colorClass}-piece`;  // 动态类名
 
             // 创建按钮并设置 id、title、class 等
             const btn = toolbarContainer.createEl('button', {
                 text: title,  // 按钮文本
                 attr: { id: `piece-${piece}` },  // 设置 id 方便识别点击对象
-                cls: className,  // 设置动态 class
+                cls: className
             }) as IPieceBTN;
             btn.pieces = [];  // 初始化 pieces 数组，用于存储被吃掉的棋子
+            const { red, blue } = themes[this.settings.theme]
+            btn.style.backgroundColor = isRed ? red : blue;
             btn.updateStyle = function (state: XQRenderChild) {
-                this.style.backgroundColor = this.pieces.length > 0 ? 'yellow' : 'gray';
-                if (state.markedPiece?.hidden && state.markedPiece?.type === piece) {
-                    this.style.backgroundColor = 'red'; // 如果有标记的棋子，设置背景色为红色
-                }
+                this.classList.toggle('empty', (this.pieces.length === 0))
+                const isActive = ((state.markedPiece?.hidden ?? false) && state.markedPiece?.type === piece)
+                console.log(state.markedPiece?.hidden, 'hidden')
+                console.log(state.markedPiece?.type === piece, 'mkdP')
+                console.log(isActive, 'isactive')
+                this.classList.toggle('active', isActive)  // 如果有标记的棋子，设置背景色为红色
             };
             // btn.style.backgroundColor = colorClass;  // 设置背景色
             // 绑定点击事件
@@ -146,7 +147,6 @@ export class GenFENRenderChild extends XQRenderChild {
         if (this.markedPiece?.hidden) {
             const btn = this.getPieceBTN(this.markedPiece.type);
             btn!.pieces.push(this.markedPiece); // 将标记的棋子添加到对应按钮中
-            btn?.updateStyle
             this.markedPiece = null; // 取消标记
         }
         const btn = e.currentTarget as IPieceBTN;
@@ -154,8 +154,7 @@ export class GenFENRenderChild extends XQRenderChild {
             // 如果已经有标记的棋子，先取消标记
             this.markedPiece = btn.pieces.pop() || null;
         }
-        btn.updateStyle?.(this); // 更新按钮样式
-        console.log(btn.pieces, 'btn.pieces');
-        console.log(this.markedPiece, 'markedPiece');
+        // 关键：所有按钮都刷新样式
+        this.pieceBTNs.forEach(b => b.updateStyle?.(this));
     }
 }

@@ -1,5 +1,5 @@
 import { XQRenderChild } from './xiangqi';
-import { IPiece, IPosition, IMove } from './types';
+import { IPiece, IPosition, IMove, PieceType } from './types';
 export function movePiece(piece: IPiece, from: IPosition | null, to: IPosition, state: XQRenderChild) {
     const { cellSize } = state.settings;
     if (from) {
@@ -83,4 +83,8 @@ export function scrollBTN(element: HTMLElement | null, container: HTMLElement | 
         top: targetScrollTop,
         behavior: 'smooth',
     });
+}
+
+export function isRed(Piece: PieceType): boolean {
+    return Piece === Piece.toUpperCase()
 }
