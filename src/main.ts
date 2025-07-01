@@ -11,7 +11,7 @@ export default class XQPlugin extends Plugin {
         await this.loadSettings();
 
         this.addSettingTab(new XQSettingTab(this.app, this));
-        const codeBlockNames = ['xq', 'xiangqi', '象棋'];
+        const codeBlockNames = ['xiangqi', '象棋'];
         for (const name of codeBlockNames) {
             this.registerMarkdownCodeBlockProcessor(name, (source, el, ctx) => {
                 const renderChild = new XQRenderChild(el, ctx, source, this);
@@ -19,7 +19,7 @@ export default class XQPlugin extends Plugin {
                 this.renderChildren.add(renderChild);
             });
         }
-        this.registerMarkdownCodeBlockProcessor('xqfen', (source, el, ctx) => {
+        this.registerMarkdownCodeBlockProcessor('xq', (source, el, ctx) => {
             const renderChild = new GenFENRenderChild(el, ctx, source, this);
             ctx.addChild(renderChild);
         });

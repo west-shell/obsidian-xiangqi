@@ -1,6 +1,6 @@
 import XQPlugin from './main';
 import { XQRenderChild } from './xiangqi';
-import { MarkdownPostProcessorContext, setIcon } from 'obsidian';
+import { MarkdownPostProcessorContext, MarkdownView, Notice, setIcon } from 'obsidian';
 import { themes } from './svg';
 import { IPiece, PIECE_CHARS, PieceType } from './types';
 import { findPieceAt, markPiece, movePiece, restorePiece } from './utils';
@@ -45,59 +45,76 @@ export class GenFENRenderChild extends XQRenderChild {
 
     handleBoardClick = (e: MouseEvent) => {
         const clickedPos = this.getClickedPos(e);
-        if (!clickedPos) return; // 如果没有点击到棋盘或棋盘不存在，直接返回
+        if (!clickedPos) return; // 没点到棋盘
+
         const clickedPiece = findPieceAt(clickedPos, this);
-        // 你的后续逻辑
-        // 无选中则选中
+
+        // 1. 无选中则选中
         if (!this.markedPiece) {
-            // 没有标记棋子时，只能选中当前行棋方的棋子
             if (clickedPiece) {
                 markPiece(clickedPiece.pieceEl!);
                 this.markedPiece = clickedPiece;
             }
             return;
         }
-        // 选中了按钮
+
+        // 2. 选中了按钮（从按钮拖回棋盘）
         if (this.markedPiece.hidden) {
             const markedBTN = this.getPieceBTN(this.markedPiece.type);
+            // 目标格如有棋子，先吃掉
+            if (clickedPiece) {
+                clickedPiece.hidden = true;
+                clickedPiece.pieceEl?.setAttribute('display', 'none');
+                this.board[clickedPiece.position.x][clickedPiece.position.y] = null;
+                const btn = this.getPieceBTN(clickedPiece.type);
+                btn?.pieces.push(clickedPiece);
+                btn?.updateStyle?.(this);
+            }
             this.markedPiece.hidden = false;
             this.markedPiece.pieceEl!.removeAttribute('display');
             movePiece(this.markedPiece, null, clickedPos, this);
-            this.markedPiece = null; // 移动后取消标记
-            markedBTN?.updateStyle?.(this); // 更新按钮样式
-
-            if (clickedPiece) {
-                clickedPiece.hidden = true; // 隐藏目标棋子
-                clickedPiece.pieceEl?.setAttribute('display', 'none');
-                const pieceTBN = this.getPieceBTN(clickedPiece.type);
-                pieceTBN?.pieces.push(clickedPiece); // 将被吃掉的棋子添加到按钮中
-                pieceTBN?.updateStyle?.(this); // 更新按钮样式
-            }
+            this.markedPiece = null;
+            markedBTN?.updateStyle?.(this);
+            this.pieceBTNs.forEach(b => b.updateStyle?.(this));
             return;
-        } else {
-            // 有标记棋子时
-            if (this.markedPiece === clickedPiece) {
-                restorePiece(this.markedPiece.pieceEl!); // 恢复标记棋子
-                this.markedPiece.hidden = true;
-                this.markedPiece.pieceEl!.setAttribute('display', 'none');
-                const btn = this.getPieceBTN(this.markedPiece.type);
-                btn?.pieces.push(this.markedPiece); // 将被吃掉的棋子添加 to按钮中
-                this.markedPiece = null; // 移动后取消标记
-                btn?.updateStyle?.(this); // 更新按钮样式
-                return;
-            }
-            restorePiece(this.markedPiece.pieceEl!); // 恢复标记棋子
-            movePiece(this.markedPiece, this.markedPiece.position, clickedPos, this);
-            if (clickedPiece) {
-                clickedPiece.hidden = true; // 隐藏目标棋子
-                clickedPiece.pieceEl?.setAttribute('display', 'none');
-                const pieceTBN = this.getPieceBTN(clickedPiece.type);
-                pieceTBN?.pieces.push(clickedPiece); // 将被吃掉的棋子添加到按钮中
-                pieceTBN?.updateStyle?.(this); // 更新按钮样式
-            }
-            this.markedPiece = null; // 移动后取消标记
         }
+
+        // 3. 再次点击同一棋子，吃回按钮
+        if (this.markedPiece === clickedPiece) {
+            restorePiece(this.markedPiece.pieceEl!);
+            this.markedPiece.hidden = true;
+            this.markedPiece.pieceEl!.setAttribute('display', 'none');
+            if (this.markedPiece.position) {
+                this.board[this.markedPiece.position.x][this.markedPiece.position.y] = null;
+            }
+            const btn = this.getPieceBTN(this.markedPiece.type);
+            btn?.pieces.push(this.markedPiece);
+            this.markedPiece = null;
+            btn?.updateStyle?.(this);
+            this.pieceBTNs.forEach(b => b.updateStyle?.(this));
+            return;
+        }
+
+        // 4. 移动棋子
+        restorePiece(this.markedPiece.pieceEl!);
+        // 目标有棋子，先吃掉
+        if (clickedPiece) {
+            clickedPiece.hidden = true;
+            clickedPiece.pieceEl?.setAttribute('display', 'none');
+            this.board[clickedPiece.position.x][clickedPiece.position.y] = null;
+            const btn = this.getPieceBTN(clickedPiece.type);
+            btn?.pieces.push(clickedPiece);
+            btn?.updateStyle?.(this);
+        }
+        if (this.markedPiece.position) {
+            movePiece(this.markedPiece, this.markedPiece.position, clickedPos, this);
+        } else {
+            movePiece(this.markedPiece, null, clickedPos, this);
+        }
+        this.markedPiece = null;
+        this.pieceBTNs.forEach(b => b.updateStyle?.(this));
     };
+
 
     creatButtons() {
         // 创建工具栏容器
@@ -137,9 +154,9 @@ export class GenFENRenderChild extends XQRenderChild {
         }
         // 按钮定义，isave 标识保存按钮
         const buttons = [
-            { title: '清空', icon: 'trash-2', handler: () => this.onEmptyBTNClick(this) },
-            { title: '填满', icon: 'package', handler: () => this.onFullBTNClick(this) },
-            { title: '保存', icon: 'save', handler: () => this.onSaveClick(), isave: true },
+            { title: '清空', icon: 'trash', handler: () => this.onEmptyBTNClick(this) },
+            { title: '填满', icon: 'rotate-ccw', handler: () => this.onResetBTNClick(this) },
+            { title: '保存', icon: 'save', handler: () => this.onSaveClick(this), isave: true },
         ];
 
         // 假设 toolbarContainer 是按钮容器，state 是当前状态对象
@@ -210,12 +227,75 @@ export class GenFENRenderChild extends XQRenderChild {
             btn.updateStyle?.(this);
         });
     }
-    onFullBTNClick(state: GenFENRenderChild) {
+    onResetBTNClick(state: GenFENRenderChild) {
         state.pieces = [];
         this.pieceBTNs = [];
         state.parseSource();
         state.rend();
         state.creatButtons();
     }
-    onSaveClick() {}
+
+    async onSaveClick(state: GenFENRenderChild) {
+        // 1. 生成 FEN
+        const fen = this.generateFENFromBoard(this.board);
+
+        // 2. 获取当前 markdown 编辑器视图和文件
+        const view = state.plugin.app.workspace.getActiveViewOfType(MarkdownView);
+        if (!view) return;
+        const file = view.file;
+        if (!file) return;
+
+        // 3. 获取当前代码块的 section 信息
+        const section = state.ctx.getSectionInfo(state.containerEl);
+        if (!section) return;
+        const { lineStart, lineEnd } = section;
+
+        // 4. 读取文件内容并分行
+        const content = await state.plugin.app.vault.read(file);
+        const lines = content.split('\n');
+
+        // 5. 获取代码块内容行
+        let blockLines: string[] = lines.slice(lineStart, lineEnd + 1);
+        if (blockLines.length < 2) return;
+
+        // 6. 判断并替换代码块类型为 xiangqi，内容为 FEN
+        // 只替换代码块首尾行，内容只保留 FEN
+        blockLines[0] = blockLines[0].replace(/^```xq\b.*$/, '```xiangqi');
+        blockLines = [blockLines[0], fen, '```'];
+
+        // 7. 拼接新内容并写回
+        const newContent = [
+            ...lines.slice(0, lineStart),
+            ...blockLines,
+            ...lines.slice(lineEnd + 1),
+        ].join('\n');
+
+        await state.plugin.app.vault.modify(file, newContent);
+        new Notice('FEN已保存到代码块');
+
+    }
+
+    generateFENFromBoard(board: (PieceType | null)[][]): string {
+        // board[x][y]，x为列，y为行
+        const rows: string[] = [];
+        for (let y = 0; y < 10; y++) {
+            let fenRow = '';
+            let empty = 0;
+            for (let x = 0; x < 9; x++) {
+                const cell = board[x][y];
+                if (!cell) {
+                    empty++;
+                } else {
+                    if (empty > 0) {
+                        fenRow += empty;
+                        empty = 0;
+                    }
+                    fenRow += cell;
+                }
+            }
+            if (empty > 0) fenRow += empty;
+            rows.push(fenRow);
+        }
+        return rows.join('/');
+    }
 }
