@@ -94,7 +94,6 @@ function parseOption(source: string): IOptions {
     return options;
 }
 
-
 export function parseICCS(ICCS: string, tmpBoard: IBoard): IMove {
     // 解析 PGN 字符串为 IMove 数组
     // 解析走法，例如 "H2-D2" -> 起点和终点

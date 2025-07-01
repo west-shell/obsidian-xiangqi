@@ -17,7 +17,6 @@ export class GenFENRenderChild extends XQRenderChild {
         empty: '4k4/9/9/9/9/9/9/9/9/4K4',
     } as const; // 默认选项
     startFEN: keyof typeof this.defaultFEN = 'full'; // 默认选项
-    hiddenedPieces: PieceType[] = []; // 隐藏的棋子
     pieceBTNs: IPieceBTN[] = []; // 棋子按钮
     constructor(
         containerEl: HTMLElement,
@@ -30,8 +29,8 @@ export class GenFENRenderChild extends XQRenderChild {
 
     onload() {
         this.parseSource();
-        this.rend()
-        this.creatButtons()
+        this.rend();
+        this.creatButtons();
     }
 
     parseSource() {
@@ -42,11 +41,10 @@ export class GenFENRenderChild extends XQRenderChild {
     rend() {
         this.rendBoard();
         this.boardSVG!.addEventListener('click', this.handleBoardClick);
-
     }
 
     handleBoardClick = (e: MouseEvent) => {
-        const clickedPos = this.getClickedPos(e)
+        const clickedPos = this.getClickedPos(e);
         if (!clickedPos) return; // 如果没有点击到棋盘或棋盘不存在，直接返回
         const clickedPiece = findPieceAt(clickedPos, this);
         // 你的后续逻辑
@@ -75,9 +73,9 @@ export class GenFENRenderChild extends XQRenderChild {
                 pieceTBN?.pieces.push(clickedPiece); // 将被吃掉的棋子添加到按钮中
                 pieceTBN?.updateStyle?.(this); // 更新按钮样式
             }
-            return
-        }
-        else {// 有标记棋子时
+            return;
+        } else {
+            // 有标记棋子时
             if (this.markedPiece === clickedPiece) {
                 restorePiece(this.markedPiece.pieceEl!); // 恢复标记棋子
                 this.markedPiece.hidden = true;
@@ -99,7 +97,7 @@ export class GenFENRenderChild extends XQRenderChild {
             }
             this.markedPiece = null; // 移动后取消标记
         }
-    }
+    };
 
     creatButtons() {
         // 创建工具栏容器
@@ -110,43 +108,44 @@ export class GenFENRenderChild extends XQRenderChild {
         pieceBTNContainer.classList.toggle('bottom', this.settings.position === 'bottom');
         // 遍历 PIECE_CHARS 中的每一个棋子，去掉 'K' 和 'k' 代表的将
         for (const piece in PIECE_CHARS) {
-            const title = PIECE_CHARS[piece as PieceType];  // 获取棋子的名称
+            const title = PIECE_CHARS[piece as PieceType]; // 获取棋子的名称
             const isRed = piece === piece.toUpperCase();
             // 判断是红方（大写字母）还是黑方（小写字母），并设置不同的类名
             const colorClass = isRed ? 'red' : 'blue';
-            const className = `piece-btn ${colorClass}-piece`;  // 动态类名
+            const className = `piece-btn ${colorClass}-piece`; // 动态类名
 
             // 创建按钮并设置 id、title、class 等
             const btn = pieceBTNContainer.createEl('button', {
-                text: title,  // 按钮文本
-                attr: { id: `piece-${piece}` },  // 设置 id 方便识别点击对象
-                cls: className
+                text: title, // 按钮文本
+                attr: { id: `piece-${piece}` }, // 设置 id 方便识别点击对象
+                cls: className,
             }) as IPieceBTN;
-            btn.pieces = [];  // 初始化 pieces 数组，用于存储被吃掉的棋子
-            const { red, blue } = themes[this.settings.theme]
+            btn.pieces = []; // 初始化 pieces 数组，用于存储被吃掉的棋子
+            const { red, blue } = themes[this.settings.theme];
             btn.style.backgroundColor = isRed ? red : blue;
             btn.updateStyle = function (state: XQRenderChild) {
-                this.classList.toggle('empty', (this.pieces.length === 0))
-                const isActive = ((state.markedPiece?.hidden ?? false) && state.markedPiece?.type === piece)
-                this.classList.toggle('active', isActive)  // 如果有标记的棋子，设置背景色为红色
+                this.classList.toggle('empty', this.pieces.length === 0);
+                const isActive =
+                    (state.markedPiece?.hidden ?? false) && state.markedPiece?.type === piece;
+                this.classList.toggle('active', isActive); // 如果有标记的棋子，设置背景色为红色
             };
             // btn.style.backgroundColor = colorClass;  // 设置背景色
             // 绑定点击事件
             btn.addEventListener('click', (e) => this.onPieceBTNClick(e));
-            btn.updateStyle(this);  // 初始化按钮样式
-            this.pieceBTNs.push(btn);  // 将按钮添加到 pieeceBTNs 数组中
+            btn.updateStyle(this); // 初始化按钮样式
+            this.pieceBTNs.push(btn); // 将按钮添加到 pieeceBTNs 数组中
         }
         // 按钮定义，isave 标识保存按钮
         const buttons = [
-            { title: '清空', icon: 'trash-2', handler: () => this.onEmptyBTNClick() },
-            { title: '填满', icon: 'package', handler: () => this.onFullBTNClick() },
+            { title: '清空', icon: 'trash-2', handler: () => this.onEmptyBTNClick(this) },
+            { title: '填满', icon: 'package', handler: () => this.onFullBTNClick(this) },
             { title: '保存', icon: 'save', handler: () => this.onSaveClick(), isave: true },
         ];
 
         // 假设 toolbarContainer 是按钮容器，state 是当前状态对象
         const toolbarContainer = this.containerEl.createEl('div', {
             cls: 'getFENT-toolbar-container',
-        })
+        });
         for (const { title, icon, handler, isave } of buttons) {
             const btn = toolbarContainer.createEl('button', {
                 attr: { title },
@@ -182,10 +181,9 @@ export class GenFENRenderChild extends XQRenderChild {
                 }
             });
         }
-
     }
     getPieceBTN(pieceType: PieceType): IPieceBTN | undefined {
-        return this.pieceBTNs.find(btn => btn.id === `piece-${pieceType}`);
+        return this.pieceBTNs.find((btn) => btn.id === `piece-${pieceType}`);
     }
     onPieceBTNClick(e: MouseEvent) {
         if (this.markedPiece?.hidden) {
@@ -199,15 +197,25 @@ export class GenFENRenderChild extends XQRenderChild {
             this.markedPiece = btn.pieces.pop() || null;
         }
         // 关键：所有按钮都刷新样式
-        this.pieceBTNs.forEach(b => b.updateStyle?.(this));
+        this.pieceBTNs.forEach((b) => b.updateStyle?.(this));
     }
-    onEmptyBTNClick() {
-
+    onEmptyBTNClick(state: GenFENRenderChild) {
+        state.pieces.forEach((piece) => {
+            if (piece.hidden) return;
+            piece.hidden = true;
+            piece.pieceEl?.setAttribute('display', 'none');
+            const btn = state.getPieceBTN(piece.type) as IPieceBTN;
+            if (!btn) return;
+            btn.pieces.push(piece);
+            btn.updateStyle?.(this);
+        });
     }
-    onFullBTNClick() {
-
+    onFullBTNClick(state: GenFENRenderChild) {
+        state.pieces = [];
+        this.pieceBTNs = [];
+        state.parseSource();
+        state.rend();
+        state.creatButtons();
     }
-    onSaveClick() {
-
-    }
+    onSaveClick() {}
 }

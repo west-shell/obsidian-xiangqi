@@ -110,7 +110,7 @@ export class XQRenderChild extends MarkdownRenderChild {
         });
     }
     handleBoardClick = (e: MouseEvent) => {
-        const clickedPos = this.getClickedPos(e)
+        const clickedPos = this.getClickedPos(e);
         if (!clickedPos) return; // 如果没有点击到棋盘或棋盘不存在，直接返回
         const clickedPiece = findPieceAt(clickedPos, this);
         // 你的后续逻辑

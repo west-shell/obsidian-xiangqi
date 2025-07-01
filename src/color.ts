@@ -8,7 +8,7 @@ export const COLOR_MAP = {
     darkSlate: ' #2C3539',
     jetBlack: ' #000000',
     gunmetal: ' #2a3439',
-    indigo: ' #4B0082'
+    indigo: ' #4B0082',
 };
 export const RED_SHADES = {
     red: ' #FF0000',
@@ -25,7 +25,7 @@ export const RED_SHADES = {
     rosyBrown: ' #BC8F8F',
     paleVioletRed: ' #DB7093',
     hotPink: ' #FF69B4',
-    wineRed861818: ' #861818'
+    wineRed861818: ' #861818',
 };
 export const BLACK_SHADES = {
     black: ' #000000',
@@ -37,7 +37,7 @@ export const BLACK_SHADES = {
     slateGray: ' #708090',
     darkSlateGray: ' #2F4F4F',
     jetBlack: ' #343434',
-    charcoal: ' #36454F'
+    charcoal: ' #36454F',
 };
 export const BLUE_SHADES = {
     blue: ' #0000FF',
@@ -72,4 +72,4 @@ export const BLUE_SHADES = {
     darkCyan: ' #008B8B',
     teal: ' #008080',
     darkSlateBlue: ' #483D8B',
-}
+};

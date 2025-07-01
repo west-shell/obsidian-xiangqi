@@ -36,19 +36,21 @@ export class XQSettingTab extends PluginSettingTab {
                 dropdown.addOptions({
                     light: '浅色',
                     dark: '深色',
-                    auto: '跟随'
+                    auto: '跟随',
                 });
-                dropdown.setValue(settings.autoTheme ? 'auto' : settings.theme).onChange((theme) => {
-                    if (theme === 'auto') {
-                        settings.autoTheme = true;
-                        const isDarkMode = () => document.body.classList.contains("theme-dark");
-                        settings.theme = isDarkMode() ? 'dark' : 'light' // 自动主题时默认使用深色
-                    } else {
-                        settings.autoTheme = false;
-                        settings.theme = theme as 'light' | 'dark';
-                    }
-                    this.plugin.refresh();
-                });
+                dropdown
+                    .setValue(settings.autoTheme ? 'auto' : settings.theme)
+                    .onChange((theme) => {
+                        if (theme === 'auto') {
+                            settings.autoTheme = true;
+                            const isDarkMode = () => document.body.classList.contains('theme-dark');
+                            settings.theme = isDarkMode() ? 'dark' : 'light'; // 自动主题时默认使用深色
+                        } else {
+                            settings.autoTheme = false;
+                            settings.theme = theme as 'light' | 'dark';
+                        }
+                        this.plugin.refresh();
+                    });
             });
 
         new Setting(containerEl)
