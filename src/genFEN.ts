@@ -8,6 +8,7 @@ import { parseSource } from './parseSource';
 import { runMove } from './action';
 interface IPieceBTN extends HTMLButtonElement {
     pieces: IPiece[];
+    updateStyle?: (state: XQRenderChild) => void; // 可选方法，用于更新按钮样式
 }
 
 export class GenFENRenderChild extends XQRenderChild {
@@ -18,6 +19,7 @@ export class GenFENRenderChild extends XQRenderChild {
     } as const; // 默认选项
     startFEN: keyof typeof this.defaultFEN = 'full'; // 默认选项
     hiddenedPieces: PieceType[] = []; // 隐藏的棋子
+    pieceBTNs: IPieceBTN[] = []; // 棋子按钮
     constructor(
         containerEl: HTMLElement,
         ctx: MarkdownPostProcessorContext,
@@ -29,10 +31,6 @@ export class GenFENRenderChild extends XQRenderChild {
 
     onload() {
         this.parseSource();
-        // 解析源文本 谁先走
-        // 绘制棋盘 棋子按钮
-        // 绑定事件
-        // 生成按钮
         this.rend()
         this.creatButtons()
     }
@@ -49,17 +47,11 @@ export class GenFENRenderChild extends XQRenderChild {
     }
 
     handleBoardClick = (e: MouseEvent) => {
-        if (!this.boardSVG) return;
-        const cellSize = this.settings.cellSize;
-        const boardRect = this.boardSVG.getBoundingClientRect();
-        const mouseX = e.clientX - boardRect.left;
-        const mouseY = e.clientY - boardRect.top;
-        let gridX = Math.round(mouseX / cellSize) - 1;
-        let gridY = Math.round(mouseY / cellSize) - 1;
-        const gridPos = { x: gridX, y: gridY };
-        const clickedPiece = findPieceAt(gridPos, this);
+        const clickedPos = this.getClickedPos(e)
+        if (!clickedPos) return; // 如果没有点击到棋盘或棋盘不存在，直接返回
+        const clickedPiece = findPieceAt(clickedPos, this);
         // 你的后续逻辑
-
+        // 无选中则选中
         if (!this.markedPiece) {
             // 没有标记棋子时，只能选中当前行棋方的棋子
             if (clickedPiece) {
@@ -67,64 +59,47 @@ export class GenFENRenderChild extends XQRenderChild {
                 this.markedPiece = clickedPiece;
             }
             return;
-        } else {
+        }
+        // 选中了按钮
+        if (this.markedPiece.hidden) {
+            const markedBTN = this.getPieceBTN(this.markedPiece.type);
+            this.markedPiece.hidden = false;
+            this.markedPiece.pieceEl!.removeAttribute('display');
+            movePiece(this.markedPiece, null, clickedPos, this);
+            this.markedPiece = null; // 移动后取消标记
+            markedBTN?.updateStyle?.(this); // 更新按钮样式
+
             if (clickedPiece) {
                 clickedPiece.hidden = true; // 隐藏目标棋子
                 clickedPiece.pieceEl?.setAttribute('display', 'none');
-                const pieceTBN = this.containerEl.querySelector(`#piece-${clickedPiece.type}`) as IPieceBTN;
-                if (pieceTBN) {
-                    pieceTBN.pieces.push(clickedPiece); // 将被吃掉的棋子添加到按钮中
-                }
-                if (pieceTBN && pieceTBN.pieces?.length > 0) {
-                    pieceTBN.style.backgroundColor = 'yellow'; // 如果按钮中有被吃掉的棋子，设置背景色
-                }
-                if (clickedPiece.position.x === this.markedPiece.position.x && clickedPiece.position.y === this.markedPiece.position.y) {
-                    this.markedPiece = null;
-                    return;
-                }
+                const pieceTBN = this.getPieceBTN(clickedPiece.type);
+                pieceTBN?.pieces.push(clickedPiece); // 将被吃掉的棋子添加到按钮中
+                pieceTBN?.updateStyle?.(this); // 更新按钮样式
             }
-            if (this.markedPiece.hidden) {
-                this.markedPiece.hidden = false; // 如果标记的棋子被隐藏，恢复显示
-                this.markedPiece.pieceEl!.removeAttribute('display');
-                movePiece(this.markedPiece, { x: -1, y: -1 } as IPosition, gridPos, this); // 移动标记棋子
-            } else {
+            return
+        }
+        else {// 有标记棋子时
+            if (this.markedPiece === clickedPiece) {
                 restorePiece(this.markedPiece.pieceEl!); // 恢复标记棋子
-                movePiece(this.markedPiece, this.markedPiece.position, gridPos, this); // 移动标记棋子
+                this.markedPiece.hidden = true;
+                this.markedPiece.pieceEl!.setAttribute('display', 'none');
+                const btn = this.getPieceBTN(this.markedPiece.type);
+                btn?.pieces.push(this.markedPiece); // 将被吃掉的棋子添加 to按钮中
+                this.markedPiece = null; // 移动后取消标记
+                btn?.updateStyle?.(this); // 更新按钮样式
+                return;
+            }
+            restorePiece(this.markedPiece.pieceEl!); // 恢复标记棋子
+            movePiece(this.markedPiece, this.markedPiece.position, clickedPos, this);
+            if (clickedPiece) {
+                clickedPiece.hidden = true; // 隐藏目标棋子
+                clickedPiece.pieceEl?.setAttribute('display', 'none');
+                const pieceTBN = this.getPieceBTN(clickedPiece.type);
+                pieceTBN?.pieces.push(clickedPiece); // 将被吃掉的棋子添加到按钮中
+                pieceTBN?.updateStyle?.(this); // 更新按钮样式
             }
             this.markedPiece = null; // 移动后取消标记
-
-
-            // 清除原位置
-            // // 有标记棋子时，尝试走子（无论目标是空还是有棋子）
-            // const move: IMove = {
-            //     type: this.markedPiece.type,
-            //     from: { ...this.markedPiece.position },
-            //     to: { ...gridPos },
-            // };
-            // restorePiece(this.markedPiece.pieceEl!);
-            // const { from, to } = move;
-            // const fromPiece = findPieceAt(from, this);
-            // const toPiece = findPieceAt(to, this);
-            // if (!fromPiece) return;
-            // // 如果目标有棋子，隐藏目标棋子
-            // if (toPiece) {
-            //     toPiece.hidden = true;
-            //     toPiece.pieceEl?.setAttribute('display', 'none');
-            //     const pieceTBN = this.containerEl.querySelector(`#piece-${toPiece.type}`) as IPieceBTN;
-            //     console.log(pieceTBN);
-            //     if (pieceTBN) {
-            //         pieceTBN.pieces.push(toPiece); // 将被吃掉的棋子添加到按钮中
-            //     }
-            //     if (pieceTBN && pieceTBN.pieces?.length > 0) {
-            //         pieceTBN.style.backgroundColor = 'yellow';
-            //     }
-            // }
-            // movePiece(fromPiece, from, to, this);
-
-            // this.markedPiece = null; // 移动后取消标记
         }
-
-
     }
 
     creatButtons() {
@@ -151,20 +126,35 @@ export class GenFENRenderChild extends XQRenderChild {
                 cls: className,  // 设置动态 class
             }) as IPieceBTN;
             btn.pieces = [];  // 初始化 pieces 数组，用于存储被吃掉的棋子
-            btn.style.backgroundColor = colorClass;  // 设置背景色
+            btn.updateStyle = function (state: XQRenderChild) {
+                this.style.backgroundColor = this.pieces.length > 0 ? 'yellow' : 'gray';
+                if (state.markedPiece?.hidden && state.markedPiece?.type === piece) {
+                    this.style.backgroundColor = 'red'; // 如果有标记的棋子，设置背景色为红色
+                }
+            };
+            // btn.style.backgroundColor = colorClass;  // 设置背景色
             // 绑定点击事件
             btn.addEventListener('click', (e) => this.onPieceBTNClick(e));
+            btn.updateStyle(this);  // 初始化按钮样式
+            this.pieceBTNs.push(btn);  // 将按钮添加到 pieeceBTNs 数组中
         }
     }
+    getPieceBTN(pieceType: PieceType): IPieceBTN | undefined {
+        return this.pieceBTNs.find(btn => btn.id === `piece-${pieceType}`);
+    }
     onPieceBTNClick(e: MouseEvent) {
+        if (this.markedPiece?.hidden) {
+            const btn = this.getPieceBTN(this.markedPiece.type);
+            btn!.pieces.push(this.markedPiece); // 将标记的棋子添加到对应按钮中
+            btn?.updateStyle
+            this.markedPiece = null; // 取消标记
+        }
         const btn = e.currentTarget as IPieceBTN;
         if (btn.pieces.length > 0) {
             // 如果已经有标记的棋子，先取消标记
             this.markedPiece = btn.pieces.pop() || null;
         }
-        if (btn.pieces.length === 0) {
-            btn.style.backgroundColor = 'gray'; // 如果没有被吃掉的棋子，清除背景色
-        }
+        btn.updateStyle?.(this); // 更新按钮样式
         console.log(btn.pieces, 'btn.pieces');
         console.log(this.markedPiece, 'markedPiece');
     }
