@@ -1,6 +1,6 @@
 import XQPlugin from './main';
 import { XQRenderChild } from './xiangqi';
-import { MarkdownPostProcessorContext } from 'obsidian';
+import { MarkdownPostProcessorContext, setIcon } from 'obsidian';
 import { themes } from './svg';
 import { IPiece, PIECE_CHARS, PieceType } from './types';
 import { findPieceAt, markPiece, movePiece, restorePiece } from './utils';
@@ -103,11 +103,11 @@ export class GenFENRenderChild extends XQRenderChild {
 
     creatButtons() {
         // 创建工具栏容器
-        const toolbarContainer = this.containerEl.createEl('div', {
+        const pieceBTNContainer = this.containerEl.createEl('div', {
             cls: 'pieceBTN-container',
         });
-        toolbarContainer.classList.toggle('right', this.settings.position === 'right');
-        toolbarContainer.classList.toggle('bottom', this.settings.position === 'bottom');
+        pieceBTNContainer.classList.toggle('right', this.settings.position === 'right');
+        pieceBTNContainer.classList.toggle('bottom', this.settings.position === 'bottom');
         // 遍历 PIECE_CHARS 中的每一个棋子，去掉 'K' 和 'k' 代表的将
         for (const piece in PIECE_CHARS) {
             const title = PIECE_CHARS[piece as PieceType];  // 获取棋子的名称
@@ -117,7 +117,7 @@ export class GenFENRenderChild extends XQRenderChild {
             const className = `piece-btn ${colorClass}-piece`;  // 动态类名
 
             // 创建按钮并设置 id、title、class 等
-            const btn = toolbarContainer.createEl('button', {
+            const btn = pieceBTNContainer.createEl('button', {
                 text: title,  // 按钮文本
                 attr: { id: `piece-${piece}` },  // 设置 id 方便识别点击对象
                 cls: className
@@ -128,9 +128,6 @@ export class GenFENRenderChild extends XQRenderChild {
             btn.updateStyle = function (state: XQRenderChild) {
                 this.classList.toggle('empty', (this.pieces.length === 0))
                 const isActive = ((state.markedPiece?.hidden ?? false) && state.markedPiece?.type === piece)
-                console.log(state.markedPiece?.hidden, 'hidden')
-                console.log(state.markedPiece?.type === piece, 'mkdP')
-                console.log(isActive, 'isactive')
                 this.classList.toggle('active', isActive)  // 如果有标记的棋子，设置背景色为红色
             };
             // btn.style.backgroundColor = colorClass;  // 设置背景色
@@ -139,6 +136,53 @@ export class GenFENRenderChild extends XQRenderChild {
             btn.updateStyle(this);  // 初始化按钮样式
             this.pieceBTNs.push(btn);  // 将按钮添加到 pieeceBTNs 数组中
         }
+        // 按钮定义，isave 标识保存按钮
+        const buttons = [
+            { title: '清空', icon: 'trash-2', handler: () => this.onEmptyBTNClick() },
+            { title: '填满', icon: 'package', handler: () => this.onFullBTNClick() },
+            { title: '保存', icon: 'save', handler: () => this.onSaveClick(), isave: true },
+        ];
+
+        // 假设 toolbarContainer 是按钮容器，state 是当前状态对象
+        const toolbarContainer = this.containerEl.createEl('div', {
+            cls: 'getFENT-toolbar-container',
+        })
+        for (const { title, icon, handler, isave } of buttons) {
+            const btn = toolbarContainer.createEl('button', {
+                attr: { title },
+                cls: 'toolbar-btn',
+            });
+            setIcon(btn, icon);
+            btn.addEventListener('click', handler);
+        }
+
+        // ==============单选框===============
+        const radioOptions = [
+            { value: 'red', label: '红先', checked: true },
+            { value: 'black', label: '黑先', checked: false },
+        ];
+
+        const radioContainer = toolbarContainer.createDiv({ cls: 'radio-group' });
+
+        for (const { value, label, checked } of radioOptions) {
+            const wrapper = radioContainer.createEl('label', { cls: 'radio-label' });
+            wrapper.style.marginRight = '1rem';
+
+            const input = document.createElement('input');
+            input.type = 'radio';
+            input.name = 'first-move'; // **同名，确保互斥**
+            input.value = value;
+            input.checked = checked;
+
+            wrapper.append(input, ' ' + label);
+
+            input.addEventListener('change', () => {
+                if (input.checked) {
+                    console.log('选中了先手:', value);
+                }
+            });
+        }
+
     }
     getPieceBTN(pieceType: PieceType): IPieceBTN | undefined {
         return this.pieceBTNs.find(btn => btn.id === `piece-${pieceType}`);
@@ -156,5 +200,14 @@ export class GenFENRenderChild extends XQRenderChild {
         }
         // 关键：所有按钮都刷新样式
         this.pieceBTNs.forEach(b => b.updateStyle?.(this));
+    }
+    onEmptyBTNClick() {
+
+    }
+    onFullBTNClick() {
+
+    }
+    onSaveClick() {
+
     }
 }

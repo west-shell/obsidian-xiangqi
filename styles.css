@@ -144,6 +144,16 @@
 /***********************************************/
 /************getFEN按钮*************************/
 /***********************************************/
+.XQ-container .pieceBTN-container.right {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-content: start;
+    height: 100%;
+    row-gap: 1px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+}
+
 .XQ-container .piece-btn.empty {
     filter: grayscale(0.4) brightness(0.9);
 }
