@@ -110,20 +110,9 @@ export class XQRenderChild extends MarkdownRenderChild {
         });
     }
     handleBoardClick = (e: MouseEvent) => {
-        if (!this.boardSVG) return;
-        const cellSize = this.settings.cellSize;
-        const boardRect = this.boardSVG.getBoundingClientRect();
-        const mouseX = e.clientX - boardRect.left;
-        const mouseY = e.clientY - boardRect.top;
-        let gridX = Math.round(mouseX / cellSize) - 1;
-        let gridY = Math.round(mouseY / cellSize) - 1;
-        if (this.options.rotated) {
-            // 如果棋盘是旋转的，调整坐标
-            gridX = 8 - gridX;
-            gridY = 9 - gridY;
-        }
-        const gridPos = { x: gridX, y: gridY };
-        const clickedPiece = findPieceAt(gridPos, this);
+        const clickedPos = this.getClickedPos(e)
+        if (!clickedPos) return; // 如果没有点击到棋盘或棋盘不存在，直接返回
+        const clickedPiece = findPieceAt(clickedPos, this);
         // 你的后续逻辑
         if (!this.markedPiece) {
             // 没有标记棋子时，只能选中当前行棋方的棋子
@@ -141,13 +130,13 @@ export class XQRenderChild extends MarkdownRenderChild {
         }
 
         // 有标记棋子时，尝试走子（无论目标是空还是有棋子）
-        const moveValid = isValidMove(this.markedPiece.position, gridPos, this.board);
+        const moveValid = isValidMove(this.markedPiece.position, clickedPos, this.board);
 
         if (moveValid) {
             const move: IMove = {
                 type: this.markedPiece.type,
                 from: { ...this.markedPiece.position },
-                to: { ...gridPos },
+                to: { ...clickedPos },
             };
             move.WXF = getWXF(move, this.board);
             restorePiece(this.markedPiece.pieceEl!);
@@ -175,6 +164,21 @@ export class XQRenderChild extends MarkdownRenderChild {
             this.markedPiece = null;
         }
     };
+    getClickedPos(e: MouseEvent): { x: number; y: number } | null {
+        if (!this.boardSVG) return null;
+        const cellSize = this.settings.cellSize;
+        const boardRect = this.boardSVG.getBoundingClientRect();
+        const mouseX = e.clientX - boardRect.left;
+        const mouseY = e.clientY - boardRect.top;
+        let gridX = Math.round(mouseX / cellSize) - 1;
+        let gridY = Math.round(mouseY / cellSize) - 1;
+        if (this.options.rotated) {
+            // 如果棋盘是旋转的，调整坐标
+            gridX = 8 - gridX;
+            gridY = 9 - gridY;
+        }
+        return { x: gridX, y: gridY };
+    }
     autoJump() {
         switch (this.settings.autoJump) {
             case 'never':

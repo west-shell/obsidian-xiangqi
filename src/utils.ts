@@ -1,8 +1,8 @@
 import { XQRenderChild } from './xiangqi';
 import { IPiece, IPosition, IMove } from './types';
-export function movePiece(piece: IPiece, from: IPosition, to: IPosition, state: XQRenderChild) {
+export function movePiece(piece: IPiece, from: IPosition | null, to: IPosition, state: XQRenderChild) {
     const { cellSize } = state.settings;
-    if (from.x >= 0 && from.y >= 0) {
+    if (from) {
         state.board[from.x][from.y] = null;
     }
     state.board[to.x][to.y] = piece.type;
