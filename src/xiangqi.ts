@@ -3,11 +3,11 @@ import { MarkdownRenderChild, MarkdownPostProcessorContext } from 'obsidian';
 import { redoMove, runMove } from './action';
 import { parseSource, getWXF } from './parseSource';
 import { isValidMove } from './rules';
-import { showMoveList } from './moveList';
+import { showActiveBTN, showMoveList } from './moveList';
 import { genBoardSVG, createPieceSvg, updateRectStroke } from './svg';
 import { ISettings, IMove, IBoard, IPiece, ITurn } from './types';
 import { IOptions } from './parseSource';
-import { findPieceAt, markPiece, restorePiece } from './utils';
+import { findPieceAt, markPiece, restorePiece, scrollToBTN } from './utils';
 import { creatButtons } from './buttons';
 
 export class XQRenderChild extends MarkdownRenderChild {
@@ -155,6 +155,7 @@ export class XQRenderChild extends MarkdownRenderChild {
             this.markedPiece = null; // 移动后取消标记
             this.saveButton?.classList.add('unsaved');
             showMoveList(this);
+            showActiveBTN(this);
         } else {
             // 不能走，取消标记
             restorePiece(this.markedPiece.pieceEl!);

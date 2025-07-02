@@ -1,7 +1,7 @@
 import { XQRenderChild } from './xiangqi';
 import { IMove } from './types';
 import { redoMove, undoMove } from './action';
-import { scrollBTN } from './utils';
+import { scrollToBTN } from './utils';
 import { speak } from './speaker';
 
 export function showMoveList(state: XQRenderChild) {
@@ -56,7 +56,7 @@ export function showMoveList(state: XQRenderChild) {
             if (state.settings.enableSpeech) {
                 speak(toShow[state.currentStep - 1]);
             }
-            scrollBTN(btn, moveContainer);
+            scrollToBTN(btn, moveContainer);
         });
     });
 }
@@ -70,10 +70,10 @@ export function showActiveBTN(state: XQRenderChild): void {
     activeButtons.forEach((btn) => btn.classList.remove('active'));
 
     // 激活当前按钮
-    const btnId = `move-btn-${state.currentStep}`;
-    const currentBTN = container.querySelector<HTMLElement>(`#${btnId}`);
+    const btn = `move-btn-${state.currentStep}`;
+    const currentBTN = container.querySelector<HTMLElement>(`#${btn}`);
     if (!currentBTN) return;
 
     currentBTN.classList.add('active');
-    scrollBTN(currentBTN, container);
+    scrollToBTN(currentBTN, container);
 }

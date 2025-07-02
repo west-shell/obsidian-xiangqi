@@ -36,7 +36,6 @@ Two code block names are supported:
 `xq` : to generate a `xiangqi` code block with a FEN string.
 `xq` content will be replaced with the FEN.
 
-
 ````markdown
 ```xq
 
@@ -50,47 +49,26 @@ Two code block names are supported:
 ## Features
 
 - **Board Display**: Show and review Chinese chess games in notes
-    
 - **Custom Opening**:
-    
     - Visual editor
-        
     - Clear/Fill board
-        
     - Set first player
-        
     - Save as FEN
-        
 - **PGN Saving**:
-    
     - Save move history as PGN
-        
     - Button colors: **gray** (empty), **green** (has PGN), **orange** (edited)
-        
     - Confirm before saving
-        
     - If no moves, saving clears PGN
-        
 - **Settings**:
-    
     - Theme: light / dark / system
-        
     - Button position: right / bottom
-        
     - Board size
-        
     - Show/hide move list and move text
-        
     - Auto-scroll to latest move
-        
     - Optional move narration (not on mobile)
-        
 - **Mobile Friendly**: Manual layout adjustment for small screens
-    
 - **Move Narration**: Optional voice readout of moves
-    
 - **Format Support**: Supports ICCS-style PGN
-
 
 ## Usage
 
@@ -103,19 +81,14 @@ Two code block names are supported:
 ### `xiangqi` Code Block
 
 1. Write the moves inside a code block marked with `xiangqi`.
-    
 2. FEN is optional — defaults to the standard starting position.
-    
 3. Behavior:
-    
+
     - If no manual moves, the move list shows the PGN.
-        
     - After manual moves, it shows the updated sequence.
-        
     - Click **Reset** to go back to before manual edits.
-        
     - Click **Reset** again to return to the initial state.
-        
+
 4. Click **Save** to overwrite the original PGN with current moves.
 
 ### Optional Parameters
@@ -139,12 +112,10 @@ p:true
 4. A6-A8 E8-E9
 ```
 ````
+
 - Colons can be either Chinese or English.
-    
 - `r` and `p` can be uppercase or lowercase.
-    
 - The `fen` value can be with or without quotes, either is fine.
-    
 - PGN moves can be numbered together, not numbered, or written one by one—any format works.
 
 ## Installation

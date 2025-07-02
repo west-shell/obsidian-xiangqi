@@ -72,7 +72,7 @@ export function findPieceAt(position: IPosition, state: XQRenderChild): IPiece |
  * @param element 目标元素
  * @param container 可滚动容器
  */
-export function scrollBTN(element: HTMLElement | null, container: HTMLElement | null): void {
+export function scrollToBTN(element: HTMLElement | null, container: HTMLElement | null): void {
     if (!element || !container) return;
     const hasVerticalScrollbar = container.scrollHeight > container.clientHeight;
     if (!hasVerticalScrollbar) return;
