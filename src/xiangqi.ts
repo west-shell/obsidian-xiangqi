@@ -83,14 +83,14 @@ export class XQRenderChild extends MarkdownRenderChild {
         const position = this.settings.position;
         this.containerEl.classList.toggle('right', this.settings.position === 'right');
         this.containerEl.classList.toggle('bottom', this.settings.position === 'bottom');
-        if (position === 'bottom') {
-            this.containerEl.style.width = `${10 * this.settings.cellSize}px`;
-            this.containerEl.style.height = '';
-        }
-        if (position === 'right') {
-            this.containerEl.style.width = '';
-            this.containerEl.style.height = `${11 * this.settings.cellSize}px`;
-        }
+        // if (position === 'bottom') {
+        //     this.containerEl.style.width = `${10* this.settings.cellSize}px`;
+        //     this.containerEl.style.height = '';
+        // }
+        // if (position === 'right') {
+        //     this.containerEl.style.width = '';
+        //     this.containerEl.style.height = `${11 * this.settings.cellSize}px`;
+        // }
         // 创建棋盘容器
         const boardContainer = this.containerEl.createDiv({
             cls: `board-container ${this.settings.position}`, // 直接拼接

@@ -3,6 +3,7 @@
     display: flex;
     flex-direction: row;
     align-items: stretch;
+    margin: 10px;
 }
 
 .XQ-container.bottom {
@@ -121,6 +122,7 @@
     height: 100%;
     row-gap: 1px;
     overflow-y: auto;
+    overflow-x: hidden;
     border: 1px solid #ddd;
 }
 
