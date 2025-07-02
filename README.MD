@@ -13,9 +13,9 @@
 
 Two code block names are supported:
 
-----
+---
 
-`xiangqi` is used to display a game. Leave it empty for the default opening.
+`xiangqi` : to display a game. Leave it empty for the default opening.
 
 ````markdown
 ```xiangqi
@@ -26,18 +26,22 @@ Two code block names are supported:
 30. B2-B9 D9-D8
 31. B9-G9 C2-C7
 32. G7-E7  *
-`````
+```
+````
 
 ![PGN Display](./IMAGE/PGN测试.png)
 
-----
+---
 
-`xq` is used to generate a `xiangqi` code block with a FEN string.
+`xq` : to generate a `xiangqi` code block with a FEN string.
+`xq` content will be replaced with the FEN.
+
 
 ````markdown
 ```xq
+
 ```
-`````
+````
 
 ![FEN Generator](./IMAGE/FEN生成.png)
 
@@ -45,31 +49,48 @@ Two code block names are supported:
 
 ## Features
 
-* **Board Rendering**: Display and replay Chinese chess games in notes
+- **Board Display**: Show and review Chinese chess games in notes
+    
+- **Custom Opening**:
+    
+    - Visual editor
+        
+    - Clear/Fill board
+        
+    - Set first player
+        
+    - Save as FEN
+        
+- **PGN Saving**:
+    
+    - Save move history as PGN
+        
+    - Button colors: **gray** (empty), **green** (has PGN), **orange** (edited)
+        
+    - Confirm before saving
+        
+    - If no moves, saving clears PGN
+        
+- **Settings**:
+    
+    - Theme: light / dark / system
+        
+    - Button position: right / bottom
+        
+    - Board size
+        
+    - Show/hide move list and move text
+        
+    - Auto-scroll to latest move
+        
+    - Optional move narration (not on mobile)
+        
+- **Mobile Friendly**: Manual layout adjustment for small screens
+    
+- **Move Narration**: Optional voice readout of moves
+    
+- **Format Support**: Supports ICCS-style PGN
 
-* **Opening Editor**: Visually edit custom openings
-
-* **Custom Settings**:
-
-  * Light/dark/system themes
-  * Button position (right/bottom)
-  * Board size
-  * Toggle move list display
-  * Toggle move notation display and font customization
-  * Optional move narration (not supported on mobile)
-
-* **Game Saving**:
-
-  * Save move history in PGN format
-  * Save button is **gray** when no PGN, **green** when PGN exists, **orange** after custom moves
-  * Confirmation dialog before saving
-  * If no moves are present, saving will clear previous PGN
-
-* **Mobile Support**: Adaptable for small screens via board size and button position settings
-
-* **Narration**: Optional speech for moves (can be toggled in settings)
-
-* **Format Support**: Supports ICCS PGN format
 
 ## Usage
 
@@ -81,21 +102,50 @@ Two code block names are supported:
 
 ### `xiangqi` Code Block
 
-1. Add PGN moves to a code block tagged with `xiangqi`
+1. Write the moves inside a code block marked with `xiangqi`.
+    
+2. FEN is optional — defaults to the standard starting position.
+    
+3. Behavior:
+    
+    - If no manual moves, the move list shows the PGN.
+        
+    - After manual moves, it shows the updated sequence.
+        
+    - Click **Reset** to go back to before manual edits.
+        
+    - Click **Reset** again to return to the initial state.
+        
+4. Click **Save** to overwrite the original PGN with current moves.
 
-2. FEN is optional — defaults to the standard opening
+### Optional Parameters
 
-3. Use `xq` to edit openings and generate a `xiangqi` block
+| Name              | Value        | Description                                                       |
+| ----------------- | ------------ | ----------------------------------------------------------------- |
+| `fen`             | valid FEN    | Custom starting position; empty = default                         |
+| `protected` / `p` | true / false | When true, the Save button is disabled; default is false          |
+| `rotated` / `r`   | true / false | When true, the board is flipped (Red on bottom); default is false |
 
-4. Controls:
+#### DEMO
 
-   - If no manual moves are made, the move list will display the original PGN.
-   - After manual moves, the move list will show the updated sequence.
-   - Clicking "Reset" will revert to the state before manual exploration.
-   - Clicking "Reset" again will return to the initial setup.
-
-
-5. "Save" will overwrite the original PGN with current moves
+````markdown
+```xiangqi
+r:true
+p:true
+2bk1a3/5n3/3Pb4/R7p/2p6/C3p2N1/PR2c3P/1nr1B1C2/4A4/1rB1KA3 w
+1. G2-G9 F9-E8
+2. D7-D8 D9-E9
+3. D8-E8 E9-E8
+4. A6-A8 E8-E9
+```
+````
+- Colons can be either Chinese or English.
+    
+- `r` and `p` can be uppercase or lowercase.
+    
+- The `fen` value can be with or without quotes, either is fine.
+    
+- PGN moves can be numbered together, not numbered, or written one by one—any format works.
 
 ## Installation
 
@@ -103,15 +153,15 @@ Two code block names are supported:
 
 2. In Obsidian:
 
-   * Open **Settings → Community Plugins**
-   * Turn off **Safe Mode**
+    - Open **Settings → Community Plugins**
+    - Turn off **Safe Mode**
 
 3. Open the plugin folder:
 
-   * On desktop, click the 📂 icon
-   * On mobile, open `your-vault/.obsidian/plugins` manually
-   * Create a new folder and place plugin files inside
+    - On desktop, click the 📂 icon
+    - On mobile, open `your-vault/.obsidian/plugins` manually
+    - Create a new folder and place plugin files inside
 
 4. Enable the plugin
 
-*Note: Will be available soon on the Obsidian plugin marketplace (search "Chinese chess")*
+_Note: Will be available soon on the Obsidian plugin marketplace (search "Chinese chess")_

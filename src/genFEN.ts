@@ -28,7 +28,7 @@ export class GenFENRenderChild extends XQRenderChild {
     }
 
     onload() {
-        this.plugin.renderChildren.add(this)
+        this.plugin.renderChildren.add(this);
         this.parseSource();
         this.rend();
         this.creatButtons();
@@ -47,7 +47,7 @@ export class GenFENRenderChild extends XQRenderChild {
     handleBoardClick = (e: MouseEvent) => {
         const clickedPos = this.getClickedPos(e);
         if (!clickedPos) return;
-        if (clickedPos.x > 8 || clickedPos.y > 9) return
+        if (clickedPos.x > 8 || clickedPos.y > 9) return;
         const clickedPiece = findPieceAt(clickedPos, this);
 
         // 1. 无选中则选中
@@ -76,7 +76,7 @@ export class GenFENRenderChild extends XQRenderChild {
             movePiece(this.markedPiece, null, clickedPos, this);
             this.markedPiece = null;
             markedBTN?.updateStyle?.(this);
-            this.pieceBTNs.forEach(b => b.updateStyle?.(this));
+            this.pieceBTNs.forEach((b) => b.updateStyle?.(this));
             return;
         }
 
@@ -92,7 +92,7 @@ export class GenFENRenderChild extends XQRenderChild {
             btn?.pieces.push(this.markedPiece);
             this.markedPiece = null;
             btn?.updateStyle?.(this);
-            this.pieceBTNs.forEach(b => b.updateStyle?.(this));
+            this.pieceBTNs.forEach((b) => b.updateStyle?.(this));
             return;
         }
 
@@ -113,9 +113,8 @@ export class GenFENRenderChild extends XQRenderChild {
             movePiece(this.markedPiece, null, clickedPos, this);
         }
         this.markedPiece = null;
-        this.pieceBTNs.forEach(b => b.updateStyle?.(this));
+        this.pieceBTNs.forEach((b) => b.updateStyle?.(this));
     };
-
 
     creatButtons() {
         // 创建工具栏容器
@@ -139,9 +138,10 @@ export class GenFENRenderChild extends XQRenderChild {
                 cls: className,
             }) as IPieceBTN;
             if (this.settings.position === 'right') {
-                btn.style.height = `${0.76 * this.settings.cellSize}px`
-            } if (this.settings.position === 'bottom') {
-                btn.style.height = ''
+                btn.style.height = `${0.76 * this.settings.cellSize}px`;
+            }
+            if (this.settings.position === 'bottom') {
+                btn.style.height = '';
             }
             btn.pieces = []; // 初始化 pieces 数组，用于存储被吃掉的棋子
             const { red, blue } = themes[this.settings.theme];
@@ -160,12 +160,17 @@ export class GenFENRenderChild extends XQRenderChild {
         }
         // 按钮定义，isave 标识保存按钮
         const buttons = [
+            {
+                title: '先手',
+                text: '先',
+                handler: (e: MouseEvent) => this.onTurnBTNClick(e, this),
+                color: true,
+            },
             { title: '清空', text: '空', handler: () => this.onEmptyBTNClick(this) },
             { title: '填满', text: '满', handler: () => this.onResetBTNClick(this) },
             { title: '保存', text: '存', handler: () => this.onSaveBTNClick(this) },
-            { title: '先手', text: '先', handler: (e: MouseEvent) => this.onTurnBTNClick(e, this), color: true },
         ];
-        const position = this.settings.position
+        const position = this.settings.position;
         const toolbarContainer = this.containerEl.createEl('div', {
             cls: `getFENT-toolbar-container ${position}`,
         });
@@ -176,8 +181,8 @@ export class GenFENRenderChild extends XQRenderChild {
                 cls: 'toolbar-btn',
             });
             if (color) {
-                btn.textContent = text;
-                const { red, blue } = themes[this.settings.theme]
+                btn.style.color = '#ddd';
+                const { red, blue } = themes[this.settings.theme];
                 btn.style.backgroundColor = this.currentTurn === 'red' ? red : blue;
             }
             btn.addEventListener('click', handler);
@@ -211,26 +216,25 @@ export class GenFENRenderChild extends XQRenderChild {
             btn.updateStyle?.(this);
         });
         ['k', 'K'].forEach((key) => {
-            const btn = state.getPieceBTN(key as PieceType) as IPieceBTN
-            const piece = btn.pieces.pop()
-            if (!piece) return
-            piece.hidden = false
-            piece.pieceEl?.removeAttribute('display')
+            const btn = state.getPieceBTN(key as PieceType) as IPieceBTN;
+            const piece = btn.pieces.pop();
+            if (!piece) return;
+            piece.hidden = false;
+            piece.pieceEl?.removeAttribute('display');
 
-            const position = key === key.toUpperCase() ? { x: 4, y: 9 } : { x: 4, y: 0 }
-            movePiece(piece, null, position, this)
-            btn!.updateStyle!(this)
-        })
-
+            const position = key === key.toUpperCase() ? { x: 4, y: 9 } : { x: 4, y: 0 };
+            movePiece(piece, null, position, this);
+            btn!.updateStyle!(this);
+        });
     }
     onResetBTNClick(state: GenFENRenderChild) {
-        state.refresh()
+        state.refresh();
     }
 
     async onSaveBTNClick(state: GenFENRenderChild) {
         // 1. 生成 FEN
         const fen = this.genFENFromBoard(this.board, this.currentTurn);
-        console.log(fen, 'fen')
+        console.log(fen, 'fen');
         // 2. 获取当前 markdown 编辑器视图和文件
         const view = state.plugin.app.workspace.getActiveViewOfType(MarkdownView);
         if (!view) return;
@@ -264,20 +268,19 @@ export class GenFENRenderChild extends XQRenderChild {
 
         await state.plugin.app.vault.modify(file, newContent);
         new Notice('FEN已保存到代码块');
-
     }
     onTurnBTNClick(e: MouseEvent, state: GenFENRenderChild) {
-        const btn = e.target as HTMLButtonElement
-        this.currentTurn = state.currentTurn === 'red' ? 'blue' : 'red'
-        const { red, blue } = themes[state.settings.theme]
-        const color = state.currentTurn === 'red' ? red : blue
-        btn.style.backgroundColor = color
+        const btn = e.target as HTMLButtonElement;
+        this.currentTurn = state.currentTurn === 'red' ? 'blue' : 'red';
+        const { red, blue } = themes[state.settings.theme];
+        const color = state.currentTurn === 'red' ? red : blue;
+        btn.style.backgroundColor = color;
         const svg = btn.querySelector('svg');
         if (svg) {
             svg.style.backgroundColor = color; // 有些主题需要
             // svg.style.fill = '#fff'; // 或你想要的图标颜色
         }
-        updateRectStroke(state)
+        updateRectStroke(state);
     }
 
     genFENFromBoard(board: IBoard, turn: ITurn): string {
@@ -302,7 +305,7 @@ export class GenFENRenderChild extends XQRenderChild {
             rows.push(fenRow);
         }
         const fen = rows.join('/');
-        return `${fen} ${turn === 'red' ? 'w' : 'b'}`
+        return `${fen} ${turn === 'red' ? 'w' : 'b'}`;
     }
     refresh() {
         this.pieces = [];

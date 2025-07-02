@@ -181,19 +181,18 @@
     color: #ddd;
 }
 
-
 .XQ-container .getFENT-toolbar-container.right {
     display: grid;
     grid-template-columns: 1fr;
     align-content: start;
     row-gap: 1px;
     height: 100%;
-    border: 1px solid #ddd;
+    /* border: 1px solid #ddd; */
 }
 
 .XQ-container .getFENT-toolbar-container.bottom {
     display: flex;
     width: 100%;
     row-gap: 1px;
-    border: 1px solid #ddd;
+    /* border: 1px solid #ddd; */
 }
