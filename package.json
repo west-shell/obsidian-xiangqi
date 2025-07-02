@@ -6,8 +6,7 @@
     "main": "main.js",
     "type": "module",
     "scripts": {
-        "build": "rollup --config rollup.config.js --environment BUILD:production",
-        "tag": "node ./scripts/tag.js"
+        "build": "rollup --config rollup.config.js --environment BUILD:production"
     },
     "keywords": [
         "obsidian",
