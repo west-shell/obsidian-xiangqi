@@ -158,18 +158,18 @@ export class GenFENRenderChild extends XQRenderChild {
             { title: '清空', icon: 'trash', handler: () => this.onEmptyBTNClick(this) },
             { title: '填满', icon: 'rotate-ccw', handler: () => this.onResetBTNClick(this) },
             { title: '保存', icon: 'save', handler: () => this.onSaveBTNClick(this) },
-            { title: '先手', text: '先', handler: (e: MouseEvent) => this.onTurnBTNClick(e, this) },
+            { title: '先手', icon: 'crown', handler: (e: MouseEvent) => this.onTurnBTNClick(e, this), text: '先' },
         ];
-
+        const position = this.settings.position
         const toolbarContainer = this.containerEl.createEl('div', {
-            cls: 'getFENT-toolbar-container',
+            cls: `getFENT-toolbar-container ${position}`,
         });
         for (const { title, icon, handler, text } of buttons) {
             const btn = toolbarContainer.createEl('button', {
                 attr: { title },
                 cls: 'toolbar-btn',
             });
-            if (icon) setIcon(btn, icon);
+            setIcon(btn, icon);
             if (text) {
                 btn.textContent = text;
                 const { red, blue } = themes[this.settings.theme]
@@ -253,7 +253,13 @@ export class GenFENRenderChild extends XQRenderChild {
         const btn = e.target as HTMLButtonElement
         this.currentTurn = state.currentTurn === 'red' ? 'blue' : 'red'
         const { red, blue } = themes[state.settings.theme]
-        btn.style.backgroundColor = state.currentTurn === 'red' ? red : blue
+        const color = state.currentTurn === 'red' ? red : blue
+        btn.style.backgroundColor = color
+        const svg = btn.querySelector('svg');
+        if (svg) {
+            svg.style.backgroundColor = color; // 有些主题需要
+            // svg.style.fill = '#fff'; // 或你想要的图标颜色
+        }
         updateRectStroke(state)
     }
 

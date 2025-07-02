@@ -155,8 +155,8 @@
 }
 
 .XQ-container .pieceBTN-container.bottom {
-    display: flex;
-    /* grid-template-columns: 1fr; */
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
     align-content: start;
     height: 100%;
     row-gap: 1px;
@@ -179,12 +179,19 @@
     color: #ddd;
 }
 
-.XQ-container .getFENT-toolbar-container {
+
+.XQ-container .getFENT-toolbar-container.right {
     display: grid;
     grid-template-columns: 1fr;
     align-content: start;
-    height: 100%;
     row-gap: 1px;
-    overflow-y: auto;
+    height: 100%;
+    border: 1px solid #ddd;
+}
+
+.XQ-container .getFENT-toolbar-container.bottom {
+    display: flex;
+    width: 100%;
+    row-gap: 1px;
     border: 1px solid #ddd;
 }
