@@ -45,15 +45,17 @@ export function showMoveList(state: XQRenderChild) {
         }
         btn.addEventListener('click', () => {
             const diff = index - state.currentStep + 1;
-            const moveFunc = diff > 0 ? redoMove : undoMove;
+            const move = diff > 0 ? redoMove : undoMove;
             moveContainer
                 .querySelector(`#move-btn-${state.currentStep}`)
                 ?.classList.remove('active');
             moveContainer.querySelector(`#move-btn-${index + 1}`)!.classList.add('active');
             for (let i = 0; i < Math.abs(diff); i++) {
-                moveFunc(state);
+                move(state);
             }
-            speak(toShow[state.currentStep - 1]);
+            if (state.settings.enableSpeech) {
+                speak(toShow[state.currentStep - 1]);
+            }
             scrollBTN(btn, moveContainer);
         });
     });

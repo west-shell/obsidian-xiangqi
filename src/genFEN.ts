@@ -234,7 +234,6 @@ export class GenFENRenderChild extends XQRenderChild {
     async onSaveBTNClick(state: GenFENRenderChild) {
         // 1. 生成 FEN
         const fen = this.genFENFromBoard(this.board, this.currentTurn);
-        console.log(fen, 'fen');
         // 2. 获取当前 markdown 编辑器视图和文件
         const view = state.plugin.app.workspace.getActiveViewOfType(MarkdownView);
         if (!view) return;
