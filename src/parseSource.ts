@@ -27,8 +27,8 @@ export function parseSource(source: string): {
     // 1. 提取FEN（优先从提示词中提取）
     let haveFEN = false;
     let fen =
-        source.match(/\[fen\s+"([^"]*)"\]/i)?.[1] || // 先尝试匹配[fen "xxx"]格式
-        source.match(/([rnbakcpRNBAKCP1-9]+\/){9}[rnbakcpRNBAKCP1-9]+/)?.[0]; // 再尝试匹配纯FEN+回合格式
+        // 标准FEN，带b/w
+        source.match(/([rnbakcpRNBAKCP1-9]+\/){9}[rnbakcpRNBAKCP1-9]+\s+[wb]/)?.[0]
     if (!fen) {
         fen = 'rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR';
     } else {

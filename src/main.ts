@@ -16,7 +16,6 @@ export default class XQPlugin extends Plugin {
             this.registerMarkdownCodeBlockProcessor(name, (source, el, ctx) => {
                 const renderChild = new XQRenderChild(el, ctx, source, this);
                 ctx.addChild(renderChild);
-                this.renderChildren.add(renderChild);
             });
         }
         this.registerMarkdownCodeBlockProcessor('xq', (source, el, ctx) => {

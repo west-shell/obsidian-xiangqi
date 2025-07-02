@@ -146,7 +146,7 @@
 /***********************************************/
 .XQ-container .pieceBTN-container.right {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     align-content: start;
     height: 100%;
     row-gap: 1px;
@@ -154,10 +154,37 @@
     border: 1px solid #ddd;
 }
 
+.XQ-container .pieceBTN-container.bottom {
+    display: flex;
+    /* grid-template-columns: 1fr; */
+    align-content: start;
+    height: 100%;
+    row-gap: 1px;
+    overflow-y: auto;
+    border: 1px solid red;
+}
+
+.XQ-container .piece-btn {
+    /* filter: grayscale(1.1) brightness(1); */
+    color: #ddd;
+}
+
 .XQ-container .piece-btn.empty {
-    filter: grayscale(0.4) brightness(0.9);
+    filter: grayscale(0.4) brightness(0.8);
+    color: #ddd;
 }
 
 .XQ-container .piece-btn.active {
-    filter: brightness(1.3) saturate(1.4) drop-shadow(0 0 6px rgba(255, 255, 255, 0.6));
+    filter: brightness(1.5) saturate(1.4) drop-shadow(0 0 6px rgba(255, 255, 255, 0.6));
+    color: #ddd;
+}
+
+.XQ-container .getFENT-toolbar-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    align-content: start;
+    height: 100%;
+    row-gap: 1px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
 }

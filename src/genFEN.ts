@@ -1,8 +1,8 @@
 import XQPlugin from './main';
 import { XQRenderChild } from './xiangqi';
 import { MarkdownPostProcessorContext, MarkdownView, Notice, setIcon } from 'obsidian';
-import { themes } from './svg';
-import { IPiece, PIECE_CHARS, PieceType } from './types';
+import { themes, updateRectStroke } from './svg';
+import { IBoard, IPiece, ITurn, PIECE_CHARS, PieceType } from './types';
 import { findPieceAt, markPiece, movePiece, restorePiece } from './utils';
 
 interface IPieceBTN extends HTMLButtonElement {
@@ -28,6 +28,7 @@ export class GenFENRenderChild extends XQRenderChild {
     }
 
     onload() {
+        this.plugin.renderChildren.add(this)
         this.parseSource();
         this.rend();
         this.creatButtons();
@@ -156,47 +157,25 @@ export class GenFENRenderChild extends XQRenderChild {
         const buttons = [
             { title: '清空', icon: 'trash', handler: () => this.onEmptyBTNClick(this) },
             { title: '填满', icon: 'rotate-ccw', handler: () => this.onResetBTNClick(this) },
-            { title: '保存', icon: 'save', handler: () => this.onSaveClick(this), isave: true },
+            { title: '保存', icon: 'save', handler: () => this.onSaveBTNClick(this) },
+            { title: '先手', text: '先', handler: (e: MouseEvent) => this.onTurnBTNClick(e, this) },
         ];
 
-        // 假设 toolbarContainer 是按钮容器，state 是当前状态对象
         const toolbarContainer = this.containerEl.createEl('div', {
             cls: 'getFENT-toolbar-container',
         });
-        for (const { title, icon, handler, isave } of buttons) {
+        for (const { title, icon, handler, text } of buttons) {
             const btn = toolbarContainer.createEl('button', {
                 attr: { title },
                 cls: 'toolbar-btn',
             });
-            setIcon(btn, icon);
+            if (icon) setIcon(btn, icon);
+            if (text) {
+                btn.textContent = text;
+                const { red, blue } = themes[this.settings.theme]
+                btn.style.backgroundColor = this.currentTurn === 'red' ? red : blue;
+            }
             btn.addEventListener('click', handler);
-        }
-
-        // ==============单选框===============
-        const radioOptions = [
-            { value: 'red', label: '红先', checked: true },
-            { value: 'black', label: '黑先', checked: false },
-        ];
-
-        const radioContainer = toolbarContainer.createDiv({ cls: 'radio-group' });
-
-        for (const { value, label, checked } of radioOptions) {
-            const wrapper = radioContainer.createEl('label', { cls: 'radio-label' });
-            wrapper.style.marginRight = '1rem';
-
-            const input = document.createElement('input');
-            input.type = 'radio';
-            input.name = 'first-move'; // **同名，确保互斥**
-            input.value = value;
-            input.checked = checked;
-
-            wrapper.append(input, ' ' + label);
-
-            input.addEventListener('change', () => {
-                if (input.checked) {
-                    console.log('选中了先手:', value);
-                }
-            });
         }
     }
     getPieceBTN(pieceType: PieceType): IPieceBTN | undefined {
@@ -228,17 +207,13 @@ export class GenFENRenderChild extends XQRenderChild {
         });
     }
     onResetBTNClick(state: GenFENRenderChild) {
-        state.pieces = [];
-        this.pieceBTNs = [];
-        state.parseSource();
-        state.rend();
-        state.creatButtons();
+        state.refresh()
     }
 
-    async onSaveClick(state: GenFENRenderChild) {
+    async onSaveBTNClick(state: GenFENRenderChild) {
         // 1. 生成 FEN
-        const fen = this.generateFENFromBoard(this.board);
-
+        const fen = this.genFENFromBoard(this.board, this.currentTurn);
+        console.log(fen, 'fen')
         // 2. 获取当前 markdown 编辑器视图和文件
         const view = state.plugin.app.workspace.getActiveViewOfType(MarkdownView);
         if (!view) return;
@@ -261,7 +236,7 @@ export class GenFENRenderChild extends XQRenderChild {
         // 6. 判断并替换代码块类型为 xiangqi，内容为 FEN
         // 只替换代码块首尾行，内容只保留 FEN
         blockLines[0] = blockLines[0].replace(/^```xq\b.*$/, '```xiangqi');
-        blockLines = [blockLines[0], fen, '```'];
+        blockLines = [blockLines[0], `[FEN "${fen}"]`, '```'];
 
         // 7. 拼接新内容并写回
         const newContent = [
@@ -274,8 +249,15 @@ export class GenFENRenderChild extends XQRenderChild {
         new Notice('FEN已保存到代码块');
 
     }
+    onTurnBTNClick(e: MouseEvent, state: GenFENRenderChild) {
+        const btn = e.target as HTMLButtonElement
+        this.currentTurn = state.currentTurn === 'red' ? 'blue' : 'red'
+        const { red, blue } = themes[state.settings.theme]
+        btn.style.backgroundColor = state.currentTurn === 'red' ? red : blue
+        updateRectStroke(state)
+    }
 
-    generateFENFromBoard(board: (PieceType | null)[][]): string {
+    genFENFromBoard(board: IBoard, turn: ITurn): string {
         // board[x][y]，x为列，y为行
         const rows: string[] = [];
         for (let y = 0; y < 10; y++) {
@@ -296,6 +278,14 @@ export class GenFENRenderChild extends XQRenderChild {
             if (empty > 0) fenRow += empty;
             rows.push(fenRow);
         }
-        return rows.join('/');
+        const fen = rows.join('/');
+        return `${fen} ${turn === 'red' ? 'w' : 'b'}`
+    }
+    refresh() {
+        this.pieces = [];
+        this.pieceBTNs = [];
+        this.parseSource();
+        this.rend();
+        this.creatButtons();
     }
 }
