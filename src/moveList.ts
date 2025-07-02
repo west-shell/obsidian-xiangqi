@@ -32,8 +32,11 @@ export function showMoveList(state: XQRenderChild) {
         if (state.settings.fontSize > 0) {
             btn.style.fontSize = `${state.settings.fontSize}px`;
         }
-        if (state.settings.position === 'bottom') {
-            btn.style.width = `${0.8 * state.settings.cellSize}px`;
+        if (state.settings.position === 'bottom' && !state.settings.showPGNtxt) {
+            btn.style.width = `${0.83 * state.settings.cellSize}px`;
+        }
+        if (state.settings.position === 'bottom' && state.settings.showPGNtxt) {
+            btn.style.width = `${2.4 * state.settings.cellSize}px`;
             btn.style.height = `${0.8 * state.settings.cellSize}px`;
         }
 

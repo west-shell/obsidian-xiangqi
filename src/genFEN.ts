@@ -46,8 +46,8 @@ export class GenFENRenderChild extends XQRenderChild {
 
     handleBoardClick = (e: MouseEvent) => {
         const clickedPos = this.getClickedPos(e);
-        if (!clickedPos) return; // 没点到棋盘
-
+        if (!clickedPos) return;
+        if (clickedPos.x > 8 || clickedPos.y > 9) return
         const clickedPiece = findPieceAt(clickedPos, this);
 
         // 1. 无选中则选中
@@ -138,6 +138,11 @@ export class GenFENRenderChild extends XQRenderChild {
                 attr: { id: `piece-${piece}` }, // 设置 id 方便识别点击对象
                 cls: className,
             }) as IPieceBTN;
+            if (this.settings.position === 'right') {
+                btn.style.height = `${0.76 * this.settings.cellSize}px`
+            } if (this.settings.position === 'bottom') {
+                btn.style.height = ''
+            }
             btn.pieces = []; // 初始化 pieces 数组，用于存储被吃掉的棋子
             const { red, blue } = themes[this.settings.theme];
             btn.style.backgroundColor = isRed ? red : blue;
@@ -155,22 +160,22 @@ export class GenFENRenderChild extends XQRenderChild {
         }
         // 按钮定义，isave 标识保存按钮
         const buttons = [
-            { title: '清空', icon: 'trash', handler: () => this.onEmptyBTNClick(this) },
-            { title: '填满', icon: 'rotate-ccw', handler: () => this.onResetBTNClick(this) },
-            { title: '保存', icon: 'save', handler: () => this.onSaveBTNClick(this) },
-            { title: '先手', icon: 'crown', handler: (e: MouseEvent) => this.onTurnBTNClick(e, this), text: '先' },
+            { title: '清空', text: '空', handler: () => this.onEmptyBTNClick(this) },
+            { title: '填满', text: '满', handler: () => this.onResetBTNClick(this) },
+            { title: '保存', text: '存', handler: () => this.onSaveBTNClick(this) },
+            { title: '先手', text: '先', handler: (e: MouseEvent) => this.onTurnBTNClick(e, this), color: true },
         ];
         const position = this.settings.position
         const toolbarContainer = this.containerEl.createEl('div', {
             cls: `getFENT-toolbar-container ${position}`,
         });
-        for (const { title, icon, handler, text } of buttons) {
+        for (const { title, text, handler, color } of buttons) {
             const btn = toolbarContainer.createEl('button', {
+                text,
                 attr: { title },
                 cls: 'toolbar-btn',
             });
-            setIcon(btn, icon);
-            if (text) {
+            if (color) {
                 btn.textContent = text;
                 const { red, blue } = themes[this.settings.theme]
                 btn.style.backgroundColor = this.currentTurn === 'red' ? red : blue;
@@ -205,6 +210,18 @@ export class GenFENRenderChild extends XQRenderChild {
             btn.pieces.push(piece);
             btn.updateStyle?.(this);
         });
+        ['k', 'K'].forEach((key) => {
+            const btn = state.getPieceBTN(key as PieceType) as IPieceBTN
+            const piece = btn.pieces.pop()
+            if (!piece) return
+            piece.hidden = false
+            piece.pieceEl?.removeAttribute('display')
+
+            const position = key === key.toUpperCase() ? { x: 4, y: 9 } : { x: 4, y: 0 }
+            movePiece(piece, null, position, this)
+            btn!.updateStyle!(this)
+        })
+
     }
     onResetBTNClick(state: GenFENRenderChild) {
         state.refresh()

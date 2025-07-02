@@ -124,9 +124,9 @@
     border: 1px solid #ddd;
 }
 
-/* .XQ-container .move-container.bottom {
-    border: 1px solid #ddd;
-} */
+.XQ-container .move-container.bottom {
+    gap: 0;
+}
 
 .XQ-container .move-btn {
     border: 1px solid;
@@ -151,6 +151,8 @@
     height: 100%;
     row-gap: 1px;
     overflow-y: auto;
+    overflow-y: hidden;
+    overflow-x: hidden;
     border: 1px solid #ddd;
 }
 
