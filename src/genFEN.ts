@@ -3,7 +3,7 @@ import { XQRenderChild } from './xiangqi';
 import { MarkdownPostProcessorContext, MarkdownView, Notice, setIcon } from 'obsidian';
 import { themes, updateRectStroke } from './svg';
 import { IBoard, IPiece, ITurn, PIECE_CHARS, PieceType } from './types';
-import { findPieceAt, markPiece, movePiece, restorePiece } from './utils';
+import { findPieceAt, hidePiece, markPiece, movePiece, restorePiece } from './utils';
 
 interface IPieceBTN extends HTMLButtonElement {
     pieces: IPiece[];
@@ -207,9 +207,7 @@ export class GenFENRenderChild extends XQRenderChild {
     }
     onEmptyBTNClick(state: GenFENRenderChild) {
         state.pieces.forEach((piece) => {
-            if (piece.hidden) return;
-            piece.hidden = true;
-            piece.pieceEl?.setAttribute('display', 'none');
+            hidePiece(piece, this);
             const btn = state.getPieceBTN(piece.type) as IPieceBTN;
             if (!btn) return;
             btn.pieces.push(piece);

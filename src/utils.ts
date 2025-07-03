@@ -17,6 +17,13 @@ export function movePiece(
         `translate(${(to.x + 1) * cellSize},${(to.y + 1) * cellSize})`,
     );
 }
+export function hidePiece(piece: IPiece, state: XQRenderChild) {
+    if (piece.hidden) return;
+    piece.hidden = true;
+    piece.pieceEl?.setAttribute('display', 'none');
+    const { x, y } = piece.position;
+    state.board[x][y] = null;
+}
 export function editHistory(move: IMove, state: XQRenderChild) {
     let { currentStep, history } = state;
     const currentMove = move;
