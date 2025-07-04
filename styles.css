@@ -115,32 +115,56 @@
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
 }
 
-.XQ-container .move-container.right {
+
+.XQ-container .move-container {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    align-content: start;
-    height: 100%;
-    row-gap: 1px;
-    overflow-y: auto;
+    grid-template-columns: 1fr;
     overflow-x: hidden;
-    border: 1px solid #ddd;
+    overflow-y: scroll;
+    border: solid 1px #888888;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    list-style-position: inside;
+    /* 可选：将项目符号对齐到内容流内 */
 }
 
-.XQ-container .move-container.bottom {
-    gap: 0;
+
+.XQ-container .move-container li.round {
+    float: left;
+    list-style: none;
 }
 
-.XQ-container .move-btn {
-    border: 1px solid;
-    border-radius: 0;
+.XQ-container .move-container span.roundnum {
+    width: 20px;
+    height: 20px;
+    line-height: 20px !important;
+    text-align: left;
+    font-size: 10px;
+    display: block;
+    float: left;
 }
 
-.XQ-container .move-btn.circle {
-    /* width: 50px; */
-    /* height: 50px; */
-    border-radius: 0;
+.XQ-container .move-container span.move {
+    width: 60px;
+    height: 20px;
+    line-height: 20px !important;
+    text-align: center;
+    cursor: pointer;
     font-size: 12px;
-    border: 1px solid;
+    padding-right: 10px;
+}
+
+.XQ-container .move-containert li span a.active {
+    color: red;
+}
+
+.XQ-container .move-container li span.move {
+    color: #337ab7;
+}
+
+.XQ-container .move-container li span.active {
+    color: red;
 }
 
 /***********************************************/
@@ -184,12 +208,12 @@
 }
 
 .XQ-container .getFENT-toolbar-container.right {
-    display: grid;
+    /* display: grid;
     grid-template-columns: 1fr;
-    align-content: start;
+    align-content: start; */
     row-gap: 1px;
     height: 100%;
-    /* border: 1px solid #ddd; */
+    border: 1px solid #ddd;
 }
 
 .XQ-container .getFENT-toolbar-container.bottom {
