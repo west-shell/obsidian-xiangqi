@@ -6,6 +6,22 @@
     margin: 10px;
 }
 
+.XQ-container .pieceBTN-container.right.match-board-height,
+.XQ-container .getFENT-toolbar-container.right.match-board-height {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    /* 让容器高度与棋盘一致 */
+}
+
+.XQ-container .pieceBTN-container.right.match-board-height .piece-btn,
+.XQ-container .getFENT-toolbar-container.right.match-board-height .toolbar-btn {
+    flex: 1;
+    /* 让按钮平均分配容器高度 */
+    margin: 1px 0;
+    /* 添加上下边距，模拟间隙 */
+}
+
 .XQ-container.bottom {
     display: flex;
     flex-direction: column;
@@ -169,4 +185,99 @@
     width: 100%;
     row-gap: 1px;
     /* border: 1px solid #ddd; */
+}
+
+.slider-value-label {
+    min-width: 2.5em;
+}
+
+.font-size-slider {
+    flex: 1;
+}
+
+.font-size-value-label {
+    min-width: 2.5em;
+}
+
+/* 滑块值标签样式 */
+.slider-value-label,
+.font-size-value-label {
+    min-width: 2.5em;
+}
+
+/* 字体大小控制容器样式 */
+.font-size-control {
+    display: flex;
+    align-items: center;
+    gap: 1em;
+}
+
+/* 字体大小滑块样式 */
+.font-size-slider {
+    flex: 1;
+}
+
+/* 隐藏类样式 */
+.hidden {
+    display: none;
+}
+
+
+.XQ-container .toolbar-btn.disabled {
+    pointer-events: none;
+    /* 可以添加其他样式，如透明度，让按钮看起来是禁用状态 */
+    opacity: 0.5;
+}
+
+
+/* 右侧位置按钮样式 */
+.pieceBTN-container.right .right-position-btn {
+    /* 原本 style 里的高度设置 */
+    height: calc(0.76 * var(--cell-size));
+}
+
+/* 底部位置按钮样式 */
+/* .pieceBTN-container.bottom .bottom-position-btn {
+    /* 原本 style 里清空高度，CSS 中不设置 height 即可 */
+/* } */
+
+/* 棋子按钮颜色样式 */
+.red-piece-btn {
+    background-color: var(--red-color);
+}
+
+.blue-piece-btn {
+    background-color: var(--blue-color);
+}
+
+/* 带颜色的工具栏按钮通用样式 */
+.colored-toolbar-btn {
+    color: #ddd;
+}
+
+/* 红色工具栏按钮样式 */
+.red-toolbar-btn {
+    background-color: var(--red-color);
+}
+
+/* 蓝色工具栏按钮样式 */
+.blue-toolbar-btn {
+    background-color: var(--blue-color);
+}
+
+/* SVG 背景颜色样式 */
+.red-svg-bg {
+    background-color: var(--red-color);
+}
+
+.blue-svg-bg {
+    background-color: var(--blue-color);
+}
+
+/* 定义颜色变量 */
+:root {
+    --red-color: hsl(0, 70%, 50%);
+    /* 可根据实际主题调整 */
+    --blue-color: hsl(210, 70%, 50%);
+    /* 可根据实际主题调整 */
 }

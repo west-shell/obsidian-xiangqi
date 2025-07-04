@@ -53,8 +53,8 @@ export function creatButtons(state: XQRenderChild) {
         }
     }
     if (state.options.protected && state.saveButton) {
-        state.saveButton.classList.add('protected');
-        state.saveButton.style.pointerEvents = 'none';
+        // state.saveButton.style.pointerEvents = 'none';
+        state.saveButton.classList.add('disabled');
     }
 }
 function onResetClick(state: XQRenderChild) {

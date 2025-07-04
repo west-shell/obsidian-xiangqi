@@ -76,8 +76,8 @@ export class XQSettingTab extends PluginSettingTab {
                 // 创建显示滑块值的标签
                 const valueLabel = createEl('span', {
                     text: Math.abs(settings.cellSize).toString(),
+                    cls: 'slider-value-label'
                 });
-                valueLabel.style.minWidth = '2.5em'; // 防止数字宽度抖动
                 controlEl.prepend(valueLabel);
                 slider
                     .setLimits(15, 100, 1)
@@ -121,9 +121,7 @@ export class XQSettingTab extends PluginSettingTab {
                     toggle.setValue(settings.fontSize < 0);
 
                     const controlEl = toggle.toggleEl.parentElement!;
-                    controlEl.style.display = 'flex';
-                    controlEl.style.alignItems = 'center';
-                    controlEl.style.gap = '1em';
+                    controlEl.addClass('font-size-control'); // 添加类名
 
                     // 创建滑块
                     const rangeSlider = createEl('input', {
@@ -133,24 +131,24 @@ export class XQSettingTab extends PluginSettingTab {
                             max: '25',
                             value: Math.abs(settings.fontSize).toString(),
                         },
+                        cls: 'font-size-slider'
                     });
                     rangeSlider.addClass('slider');
                     rangeSlider.addClass('mod-range');
-                    rangeSlider.style.flex = '1';
 
                     // 创建显示滑块值的标签
                     const valueLabel = createEl('span', {
                         text: Math.abs(settings.fontSize).toString(),
+                        cls: 'font-size-value-label'
                     });
-                    valueLabel.style.minWidth = '2.5em'; // 防止数字宽度抖动
 
-                    // 根据 toggle 初始值显示或隐藏滑块和数字
+                    // 根据 toggle 初始值添加或移除 hidden 类
                     if (settings.fontSize < 0) {
-                        rangeSlider.style.display = 'none';
-                        valueLabel.style.display = 'none';
+                        rangeSlider.addClass('hidden');
+                        valueLabel.addClass('hidden');
                     } else {
-                        rangeSlider.style.display = 'inline-block';
-                        valueLabel.style.display = 'inline-block';
+                        rangeSlider.removeClass('hidden');
+                        valueLabel.removeClass('hidden');
                     }
 
                     // 插入滑块和标签到 toggle 左侧
@@ -162,13 +160,13 @@ export class XQSettingTab extends PluginSettingTab {
                         if (value) {
                             // 自动模式，字体大小为负数
                             settings.fontSize = -Math.abs(settings.fontSize);
-                            rangeSlider.style.display = 'none';
-                            valueLabel.style.display = 'none';
+                            rangeSlider.addClass('hidden');
+                            valueLabel.addClass('hidden');
                         } else {
                             // 手动模式，字体大小为正数
                             settings.fontSize = Math.abs(settings.fontSize);
-                            rangeSlider.style.display = 'inline-block';
-                            valueLabel.style.display = 'inline-block';
+                            rangeSlider.removeClass('hidden');
+                            valueLabel.removeClass('hidden');
                         }
                         this.plugin.refresh();
                     });
