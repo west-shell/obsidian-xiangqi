@@ -136,23 +136,32 @@
 }
 
 .XQ-container .move-container span.roundnum {
-    width: 20px;
-    height: 20px;
+    /* width: 15px;
+    height: 20px; */
     line-height: 20px !important;
+    vertical-align: middle;
+    /* 垂直居中对齐 */
     text-align: left;
     font-size: 10px;
-    display: block;
-    float: left;
+    /* display: inline-block; */
+    /* 改为行内块元素 */
+    float: none;
+    /* 移除浮动 */
+    padding-left: 2px;
 }
 
 .XQ-container .move-container span.move {
     width: 60px;
     height: 20px;
     line-height: 20px !important;
+    vertical-align: middle;
+    /* 垂直居中对齐 */
     text-align: center;
     cursor: pointer;
     font-size: 12px;
     padding-right: 10px;
+    display: inline-block;
+    /* 改为行内块元素 */
 }
 
 .XQ-container .move-containert li span a.active {

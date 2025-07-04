@@ -30,9 +30,10 @@ export function showMoveList(state: XQRenderChild) {
         });
 
         // 处理黑方走法
+        let blackMoveSpan: HTMLElement | null = null;
         if (i + 1 < toShow.length) {
             const blackMove = toShow[i + 1];
-            const blackMoveSpan = li.createEl('span', {
+            blackMoveSpan = li.createEl('span', {
                 cls: 'move',
                 text: blackMove.WXF,
                 attr: { name: `${i + 2}` }
@@ -40,14 +41,16 @@ export function showMoveList(state: XQRenderChild) {
         }
 
         // 为当前步骤添加 active 类
-        if (i < state.currentStep - 1 && state.currentStep - 1 <= i + 1) {
+        if (state.currentStep >= i + 1 && state.currentStep <= i + 2) {
             const stepIndex = state.currentStep - 1 - i;
-            const targetSpan = stepIndex === 0 ? redMoveSpan : li.children[2] as HTMLElement;
-            targetSpan.classList.add('active');
+            const targetSpan = stepIndex === 0 ? redMoveSpan : blackMoveSpan;
+            if (targetSpan) {
+                targetSpan.classList.add('active');
+            }
         }
 
         // 为每个走法添加点击事件
-        [redMoveSpan, li.children[2] as HTMLElement | null].forEach((span, index) => {
+        [redMoveSpan, blackMoveSpan].forEach((span, index) => {
             if (span) {
                 span.addEventListener('click', () => {
                     const targetStep = i + index + 1;
@@ -81,15 +84,15 @@ export function showActiveBTN(state: XQRenderChild): void {
     const container = state.moveContainer;
     if (!container) return;
 
-    // 移除所有已激活的按钮
-    const activeButtons = container.querySelectorAll<HTMLElement>('.active');
-    activeButtons.forEach((btn) => btn.classList.remove('active'));
+    // 移除所有已激活的按钮和 span
+    const activeElements = container.querySelectorAll<HTMLElement>('.active');
+    activeElements.forEach((el) => el.classList.remove('active'));
 
-    // 激活当前按钮
-    const btn = `move-btn-${state.currentStep}`;
-    const currentBTN = container.querySelector<HTMLElement>(`#${btn}`);
-    if (!currentBTN) return;
-
-    currentBTN.classList.add('active');
-    scrollToBTN(currentBTN, container);
+    // 激活当前 moveList 里的 span
+    const targetSpan = container.querySelector<HTMLElement>(`span.move[name="${state.currentStep}"]`);
+    if (targetSpan) {
+        targetSpan.classList.add('active');
+        // 滚动到激活的元素
+        scrollToBTN(targetSpan.closest('li')!, container);
+    }
 }

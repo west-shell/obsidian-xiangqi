@@ -19,6 +19,7 @@ export function runMove(move: IMove, state: XQRenderChild) {
     }
     editHistory(move, state);
     movePiece(fromPiece, from, to, state);
+    // 更新 currentStep
     state.currentStep++;
     state.currentTurn = state.currentTurn === 'red' ? 'blue' : 'red';
     updateRectStroke(state);
