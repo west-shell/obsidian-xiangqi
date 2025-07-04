@@ -15,13 +15,8 @@ export function showMoveList(state: XQRenderChild) {
         toShow = state.PGN;
     }
     for (let i = 0; i < toShow.length; i += 2) {
-        const roundNumber = Math.floor(i / 2) + 1;
         const li = moveContaine.createEl('li', { cls: 'round' });
 
-        // 直接创建元素，不声明变量
-        // li.createEl('span', { cls: 'roundnum', text: `${roundNumber}. ` });
-
-        // 处理红方走法
         const redMove = toShow[i];
         const redMoveSpan = li.createEl('span', {
             cls: 'move',

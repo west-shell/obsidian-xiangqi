@@ -68,64 +68,25 @@
     background-color: hsl(35, 100%, 50%);
 }
 
-/* === 浅色模式下 hover（变暗） === */
-@media (prefers-color-scheme: light) {
-    .XQ-container .toolbar-btn.empty:hover {
-        background-color: hsl(33, 5%, 50%);
-    }
-
-    .XQ-container .toolbar-btn.saved:hover {
-        background-color: hsl(122, 39%, 38%);
-    }
-
-    .XQ-container .toolbar-btn.unsaved:hover {
-        background-color: hsl(35, 100%, 45%);
-    }
-}
-
-/* === 暗色模式下 hover（变亮） === */
-@media (prefers-color-scheme: dark) {
-    .XQ-container .toolbar-btn.empty:hover {
-        background-color: hsl(33, 5%, 65%);
-    }
-
-    .XQ-container .toolbar-btn.saved:hover {
-        background-color: hsl(122, 39%, 60%);
-    }
-
-    .XQ-container .toolbar-btn.unsaved:hover {
-        background-color: hsl(35, 100%, 60%);
-    }
-}
-
-/* === 通用点击效果 === */
-.XQ-container .toolbar-btn:active {
-    transform: translateY(2px);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-}
-
-.XQ-container .move-btn.active {
-    background: linear-gradient(135deg, #facc15, #fcd34d);
-    color: black;
-    border-radius: 0;
-}
-
-.XQ-container .move-btn.active:hover {
-    background: linear-gradient(135deg, #fde047, #facc15);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
-}
-
-.XQ-container .move-container {
+.XQ-container .move-container.right {
     display: grid;
     grid-template-columns: 1fr;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    align-content: start;
+    border: solid 1px #888888;
+    margin: 0;
+    padding: 0;
+}
+
+.XQ-container .move-container.bottom {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
     overflow-x: hidden;
     overflow-y: scroll;
     border: solid 1px #888888;
     margin: 0;
     padding: 0;
-    /* list-style: none; */
-    /* list-style-position: inside; */
-    /* 可选：将项目符号对齐到内容流内 */
 }
 
 .XQ-container .move-container li.round {
@@ -133,33 +94,13 @@
     /* list-style: none; */
 }
 
-.XQ-container .move-container span.roundnum {
-    /* width: 15px;
-    height: 20px; */
-    line-height: 20px !important;
-    vertical-align: middle;
-    /* 垂直居中对齐 */
-    text-align: left;
-    font-size: 10px;
-    /* display: inline-block; */
-    /* 改为行内块元素 */
-    float: none;
-    /* 移除浮动 */
-    padding-left: 2px;
-}
-
 .XQ-container .move-container span.move {
-    width: 60px;
-    height: 20px;
     line-height: 20px !important;
     vertical-align: middle;
-    /* 垂直居中对齐 */
     text-align: center;
     cursor: pointer;
-    font-size: 12px;
     padding-right: 10px;
     display: inline-block;
-    /* 改为行内块元素 */
 }
 
 .XQ-container .move-containert li span a.active {
