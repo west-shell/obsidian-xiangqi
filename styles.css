@@ -115,7 +115,6 @@
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
 }
 
-
 .XQ-container .move-container {
     display: grid;
     grid-template-columns: 1fr;
@@ -124,15 +123,14 @@
     border: solid 1px #888888;
     margin: 0;
     padding: 0;
-    list-style: none;
-    list-style-position: inside;
+    /* list-style: none; */
+    /* list-style-position: inside; */
     /* 可选：将项目符号对齐到内容流内 */
 }
 
-
 .XQ-container .move-container li.round {
     float: left;
-    list-style: none;
+    /* list-style: none; */
 }
 
 .XQ-container .move-container span.roundnum {

@@ -5,9 +5,9 @@ import { scrollToBTN } from './utils';
 import { speak } from './speaker';
 
 export function showMoveList(state: XQRenderChild) {
-    const ul = state.moveContainer;
-    if (!ul) return;
-    ul.empty();
+    const moveContaine = state.moveContainer;
+    if (!moveContaine) return;
+    moveContaine.empty();
     let toShow: IMove[] = [];
     if (state.modified) {
         toShow = state.history;
@@ -16,17 +16,17 @@ export function showMoveList(state: XQRenderChild) {
     }
     for (let i = 0; i < toShow.length; i += 2) {
         const roundNumber = Math.floor(i / 2) + 1;
-        const li = ul.createEl('li', { cls: 'round' });
+        const li = moveContaine.createEl('li', { cls: 'round' });
 
         // 直接创建元素，不声明变量
-        li.createEl('span', { cls: 'roundnum', text: `${roundNumber}. ` });
+        // li.createEl('span', { cls: 'roundnum', text: `${roundNumber}. ` });
 
         // 处理红方走法
         const redMove = toShow[i];
         const redMoveSpan = li.createEl('span', {
             cls: 'move',
             text: redMove.WXF,
-            attr: { name: `${i + 1}` }
+            attr: { name: `${i + 1}` },
         });
 
         // 处理黑方走法
@@ -36,7 +36,7 @@ export function showMoveList(state: XQRenderChild) {
             blackMoveSpan = li.createEl('span', {
                 cls: 'move',
                 text: blackMove.WXF,
-                attr: { name: `${i + 2}` }
+                attr: { name: `${i + 2}` },
             });
         }
 
@@ -58,7 +58,7 @@ export function showMoveList(state: XQRenderChild) {
                     const move = diff > 0 ? redoMove : undoMove;
 
                     // 移除所有 active 类
-                    ul.querySelectorAll('li span.move.active').forEach((el) => {
+                    moveContaine.querySelectorAll('li span.move.active').forEach((el) => {
                         el.classList.remove('active');
                     });
 
@@ -73,7 +73,7 @@ export function showMoveList(state: XQRenderChild) {
                         speak(toShow[state.currentStep - 1]);
                     }
 
-                    scrollToBTN(li, ul);
+                    scrollToBTN(li, moveContaine);
                 });
             }
         });
@@ -89,7 +89,9 @@ export function showActiveBTN(state: XQRenderChild): void {
     activeElements.forEach((el) => el.classList.remove('active'));
 
     // 激活当前 moveList 里的 span
-    const targetSpan = container.querySelector<HTMLElement>(`span.move[name="${state.currentStep}"]`);
+    const targetSpan = container.querySelector<HTMLElement>(
+        `span.move[name="${state.currentStep}"]`,
+    );
     if (targetSpan) {
         targetSpan.classList.add('active');
         // 滚动到激活的元素

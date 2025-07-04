@@ -27,7 +27,7 @@ export class XQRenderChild extends MarkdownRenderChild {
     modified: boolean = false;
     modifiedStep: number = 0;
     toolbarContainer: HTMLDivElement | null = null;
-    moveContainer: HTMLUListElement | null = null;
+    moveContainer: HTMLOListElement | null = null;
     saveButton: HTMLButtonElement | null = null;
     plugin: XQPlugin;
     ctx: MarkdownPostProcessorContext;
@@ -210,7 +210,7 @@ export class XQRenderChild extends MarkdownRenderChild {
     }
     creatMoveList() {
         if (this.settings.showPGN) {
-            this.moveContainer = this.containerEl.createEl('ul', { cls: 'move-container' });
+            this.moveContainer = this.containerEl.createEl('ol', { cls: 'move-container' });
             if (this.settings.position === 'right') {
                 this.moveContainer.classList.add('right');
                 this.moveContainer.style.height = `${11 * this.settings.cellSize}px`;
