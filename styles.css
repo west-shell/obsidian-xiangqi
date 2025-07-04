@@ -1,3 +1,29 @@
+/* 定义基础变量 */
+:root {
+    --cell-size: 50px;
+    /* 共用尺寸 */
+}
+
+/* 浅色主题 */
+[data-theme="light"] {
+    --bg-color: #E8C887;
+    --line-color: #000000;
+    --text-color: #000000;
+    --red: #861818;
+    --blue: #1B38A2;
+}
+
+/* 深色主题 */
+[data-theme="dark"] {
+    --bg-color: #2d2d2d;
+    --line-color: #ffffff;
+    --text-color: #ffffff;
+    --red: #861818;
+    /* 红色保持相同 */
+    --blue: #000080;
+    /* 蓝色变深 */
+}
+
 .XQ-container.right {
     gap: 1px;
     display: flex;

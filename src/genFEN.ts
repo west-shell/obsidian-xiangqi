@@ -116,28 +116,78 @@ export class GenFENRenderChild extends XQRenderChild {
         this.pieceBTNs.forEach((b) => b.updateStyle?.(this));
     };
 
-    rendBoard() {
-        super.rendBoard();
-        if (this.boardSVG && this.settings.position === 'right') {
-            const pieceBTNContainer = this.containerEl.querySelector('.pieceBTN-container.right');
-            const toolbarContainer = this.containerEl.querySelector('.getFENT-toolbar-container.right');
-            if (pieceBTNContainer && toolbarContainer) {
-                pieceBTNContainer.classList.add('match-board-height');
-                toolbarContainer.classList.add('match-board-height');
+    creatButtons() {
+        // 创建工具栏容器
+        const pieceBTNContainer = this.containerEl.createEl('div', {
+            cls: 'pieceBTN-container',
+        });
+        pieceBTNContainer.classList.toggle('right', this.settings.position === 'right');
+        pieceBTNContainer.classList.toggle('bottom', this.settings.position === 'bottom');
+        // 遍历 PIECE_CHARS 中的每一个棋子，去掉 'K' 和 'k' 代表的将
+        for (const piece in PIECE_CHARS) {
+            const title = PIECE_CHARS[piece as PieceType]; // 获取棋子的名称
+            const isRed = piece === piece.toUpperCase();
+            // 判断是红方（大写字母）还是黑方（小写字母），并设置不同的类名
+            const colorClass = isRed ? 'red' : 'blue';
+            const className = `piece-btn ${colorClass}-piece`; // 动态类名
+
+            // 创建按钮并设置 id、title、class 等
+            const btn = pieceBTNContainer.createEl('button', {
+                text: title, // 按钮文本
+                attr: { id: `piece-${piece}` }, // 设置 id 方便识别点击对象
+                cls: className,
+            }) as IPieceBTN;
+            // if (this.settings.position === 'right') {
+            //     btn.style.height = `${0.76 * this.settings.cellSize}px`;
+            // }
+            // if (this.settings.position === 'bottom') {
+            //     btn.style.height = '';
+            // }
+            btn.pieces = []; // 初始化 pieces 数组，用于存储被吃掉的棋子
+            const { red, blue } = themes[this.settings.theme];
+            // btn.style.backgroundColor = isRed ? red : blue;
+            btn.updateStyle = function (state: XQRenderChild) {
+                this.classList.toggle('empty', this.pieces.length === 0);
+                const isActive =
+                    (state.markedPiece?.hidden ?? false) && state.markedPiece?.type === piece;
+                this.classList.toggle('active', isActive); // 如果有标记的棋子，设置背景色为红色
+            };
+            // btn.style.backgroundColor = colorClass;  // 设置背景色
+            // 绑定点击事件
+            btn.addEventListener('click', (e) => this.onPieceBTNClick(e));
+            btn.updateStyle(this); // 初始化按钮样式
+            this.pieceBTNs.push(btn); // 将按钮添加到 pieeceBTNs 数组中
+        }
+        // 按钮定义，isave 标识保存按钮
+        const buttons = [
+            {
+                title: '先手',
+                text: '先',
+                handler: (e: MouseEvent) => this.onTurnBTNClick(e, this),
+                color: true,
+            },
+            { title: '清空', text: '空', handler: () => this.onEmptyBTNClick(this) },
+            { title: '填满', text: '满', handler: () => this.onResetBTNClick(this) },
+            { title: '保存', text: '存', handler: () => this.onSaveBTNClick(this) },
+        ];
+        const position = this.settings.position;
+        const toolbarContainer = this.containerEl.createEl('div', {
+            cls: `getFENT-toolbar-container ${position}`,
+        });
+        for (const { title, text, handler, color } of buttons) {
+            const btn = toolbarContainer.createEl('button', {
+                text,
+                attr: { title },
+                cls: 'toolbar-btn',
+            });
+            if (color) {
+                btn.style.color = '#ddd';
+                const { red, blue } = themes[this.settings.theme];
+                btn.style.backgroundColor = this.currentTurn === 'red' ? red : blue;
             }
+            btn.addEventListener('click', handler);
         }
     }
-
-    updateToolbarBtnColor(btn: HTMLButtonElement) {
-        const { red, blue } = themes[this.settings.theme];
-        btn.classList.remove('red-toolbar-btn', 'blue-toolbar-btn');
-        if (this.currentTurn === 'red') {
-            btn.classList.add('red-toolbar-btn');
-        } else {
-            btn.classList.add('blue-toolbar-btn');
-        }
-    }
-
     getPieceBTN(pieceType: PieceType): IPieceBTN | undefined {
         return this.pieceBTNs.find((btn) => btn.id === `piece-${pieceType}`);
     }
@@ -219,19 +269,9 @@ export class GenFENRenderChild extends XQRenderChild {
     onTurnBTNClick(e: MouseEvent, state: GenFENRenderChild) {
         const btn = e.target as HTMLButtonElement;
         this.currentTurn = state.currentTurn === 'red' ? 'blue' : 'red';
-        this.updateToolbarBtnColor(btn);
-        const svg = btn.querySelector('svg');
-        if (svg) {
-            // 移除直接设置 style 的代码
-            // svg.style.backgroundColor = color; // 有些主题需要
-            svg.classList.remove('red-svg-bg', 'blue-svg-bg');
-            const { red, blue } = themes[state.settings.theme];
-            if (this.currentTurn === 'red') {
-                svg.classList.add('red-svg-bg');
-            } else {
-                svg.classList.add('blue-svg-bg');
-            }
-        }
+        const { red, blue } = themes[state.settings.theme];
+        const color = state.currentTurn === 'red' ? red : blue;
+        btn.style.backgroundColor = color;
         updateRectStroke(state);
     }
 
