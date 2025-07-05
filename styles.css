@@ -89,11 +89,6 @@
     padding: 0;
 }
 
-.XQ-container .move-container li.round {
-    float: left;
-    /* list-style: none; */
-}
-
 .XQ-container .move-container span.move {
     line-height: 20px !important;
     vertical-align: middle;
@@ -113,6 +108,98 @@
 
 .XQ-container .move-container li span.active {
     color: red;
+}
+
+.XQ-container .move-container li::marker,
+.XQ-container .move-container li {
+    font-size: var(--font-size, 12px);
+    line-height: 1;
+    /* 默认字体大小为12px */
+}
+
+/* 通过添加类名来调整字体大小 */
+.XQ-container .move-container li.fs-5 {
+    --font-size: 5px;
+}
+
+.XQ-container .move-container li.fs-6 {
+    --font-size: 6px;
+}
+
+.XQ-container .move-container li.fs-7 {
+    --font-size: 7px;
+}
+
+.XQ-container .move-container li.fs-8 {
+    --font-size: 8px;
+}
+
+.XQ-container .move-container li.fs-9 {
+    --font-size: 9px;
+}
+
+.XQ-container .move-container li.fs-10 {
+    --font-size: 10px;
+}
+
+.XQ-container .move-container li.fs-11 {
+    --font-size: 11px;
+}
+
+.XQ-container .move-container li.fs-12 {
+    --font-size: 12px;
+}
+
+.XQ-container .move-container li.fs-13 {
+    --font-size: 13px;
+}
+
+.XQ-container .move-container li.fs-14 {
+    --font-size: 14px;
+}
+
+.XQ-container .move-container li.fs-15 {
+    --font-size: 15px;
+}
+
+.XQ-container .move-container li.fs-16 {
+    --font-size: 16px;
+}
+
+.XQ-container .move-container li.fs-17 {
+    --font-size: 17px;
+}
+
+.XQ-container .move-container li.fs-18 {
+    --font-size: 18px;
+}
+
+.XQ-container .move-container li.fs-19 {
+    --font-size: 19px;
+}
+
+.XQ-container .move-container li.fs-20 {
+    --font-size: 20px;
+}
+
+.XQ-container .move-container li.fs-21 {
+    --font-size: 21px;
+}
+
+.XQ-container .move-container li.fs-22 {
+    --font-size: 22px;
+}
+
+.XQ-container .move-container li.fs-23 {
+    --font-size: 23px;
+}
+
+.XQ-container .move-container li.fs-24 {
+    --font-size: 24px;
+}
+
+.XQ-container .move-container li.fs-25 {
+    --font-size: 25px;
 }
 
 /***********************************************/

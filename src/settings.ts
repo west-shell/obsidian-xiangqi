@@ -7,7 +7,7 @@ export const DEFAULT_SETTINGS: ISettings = {
     theme: 'dark',
     autoTheme: true,
     cellSize: 50,
-    fontSize: -15,
+    fontSize: 12,
     autoJump: 'auto',
     enableSpeech: true,
     showPGN: true,
@@ -117,6 +117,32 @@ export class XQSettingTab extends PluginSettingTab {
                     this.display();
                 }),
             );
+        new Setting(containerEl)
+            .setName('着法文字大小')
+            .setDesc('调整着法文字大小')
+            .addSlider((slider) => {
+                const controlEl = slider.sliderEl.parentElement!;
+                // 创建显示滑块值的标签
+                const valueLabel = createEl('span', {
+                    text: Math.abs(settings.fontSize).toString(),
+                    cls: 'slider-value-label',
+                });
+                controlEl.prepend(valueLabel);
+                slider
+                    .setLimits(5, 25, 1)
+                    .setValue(settings.fontSize) // 默认值
+                    .onChange((value) => {
+                        settings.fontSize = value;
+                        valueLabel.textContent = value.toString(); // 确保实时更新显示值
+                        this.plugin.refresh();
+                    });
+                // 监听 input 事件，实现拖动时实时更新
+                slider.sliderEl.addEventListener('input', () => {
+                    const value = slider.getValue();
+                    settings.fontSize = value;
+                    valueLabel.textContent = value.toString();
+                });
+            });
 
         new Setting(containerEl)
             .setName('开局跳转')

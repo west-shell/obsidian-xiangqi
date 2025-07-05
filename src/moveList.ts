@@ -16,7 +16,7 @@ export function showMoveList(state: XQRenderChild) {
     }
     for (let i = 0; i < toShow.length; i += 2) {
         const li = moveContaine.createEl('li', { cls: 'round' });
-
+        li.classList.add(`fs-${state.settings.fontSize}`);
         const redMove = toShow[i];
         const redMoveSpan = li.createEl('span', {
             cls: 'move',
