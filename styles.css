@@ -1,39 +1,26 @@
-/* 定义基础变量 */
-:root {
-    --cell-size: 50px;
-    /* 共用尺寸 */
-}
-
-/* 浅色主题 */
-[data-theme="light"] {
-    --bg-color: #E8C887;
-    --line-color: #000000;
-    --text-color: #000000;
-    --red: #861818;
-    --blue: #1B38A2;
-}
-
-/* 深色主题 */
-[data-theme="dark"] {
-    --bg-color: #2d2d2d;
-    --line-color: #ffffff;
-    --text-color: #ffffff;
+.XQ-container {
     --red: #861818;
     /* 红色保持相同 */
     --blue: #000080;
     /* 蓝色变深 */
-}
-
-.XQ-container.right {
-    gap: 1px;
-    display: flex;
-    flex-direction: row;
-    align-items: stretch;
     margin: 10px;
 }
 
-.XQ-container .pieceBTN-container.right.match-board-height,
-.XQ-container .getFENT-toolbar-container.right.match-board-height {
+.XQ-container.right {
+    display: flex;
+    flex-direction: row;
+    /* align-items: flex-end; */
+    gap: 2px;
+}
+
+.XQ-container.bottom {
+    display: flex;
+    flex-direction: column;
+}
+
+.XQ-container .pieceBTN-container.right,
+.XQ-container .getFENT-toolbar-container {
+    background-color: var(--bg-color);
     display: flex;
     flex-direction: column;
     height: 100%;
@@ -48,12 +35,9 @@
     /* 添加上下边距，模拟间隙 */
 }
 
-.XQ-container.bottom {
-    display: flex;
-    flex-direction: column;
-}
 
 .XQ-container .board-container {
+
     padding: 0;
     margin: 0;
     border: 1px solid transparent;
@@ -110,9 +94,10 @@
     background-color: hsl(35, 100%, 50%);
 }
 
-.XQ-container .move-container.right {
+.XQ-container ol.move-container.right {
     display: grid;
     grid-template-columns: 1fr;
+    height: 100%;
     overflow-x: hidden;
     overflow-y: scroll;
     align-content: start;
@@ -182,9 +167,16 @@
     border: 1px solid red;
 }
 
-.XQ-container .piece-btn {
+.XQ-container .piece-btn.red-piece {
     /* filter: grayscale(1.1) brightness(1); */
     color: #ddd;
+    background-color: var(--red);
+}
+
+.XQ-container .piece-btn.blue-piece {
+    /* filter: grayscale(1.1) brightness(1); */
+    color: #ddd;
+    background-color: var(--blue);
 }
 
 .XQ-container .piece-btn.empty {
@@ -262,48 +254,23 @@
     height: calc(0.76 * var(--cell-size));
 }
 
-/* 底部位置按钮样式 */
-/* .pieceBTN-container.bottom .bottom-position-btn {
-    /* 原本 style 里清空高度，CSS 中不设置 height 即可 */
-/* } */
-
-/* 棋子按钮颜色样式 */
-.red-piece-btn {
-    background-color: var(--red-color);
-}
-
-.blue-piece-btn {
-    background-color: var(--blue-color);
-}
-
-/* 带颜色的工具栏按钮通用样式 */
-.colored-toolbar-btn {
-    color: #ddd;
-}
-
 /* 红色工具栏按钮样式 */
-.red-toolbar-btn {
-    background-color: var(--red-color);
+.toolbar-btn.red {
+    background-color: var(--red);
 }
 
 /* 蓝色工具栏按钮样式 */
-.blue-toolbar-btn {
-    background-color: var(--blue-color);
+.toolbar-btn.blue {
+    background-color: var(--blue);
+    /* background-color: var(--blue-color); */
 }
 
-/* SVG 背景颜色样式 */
-.red-svg-bg {
-    background-color: var(--red-color);
+.red-piece {
+    background-color: red;
+    /* background-color: var(--red-color); */
 }
 
-.blue-svg-bg {
-    background-color: var(--blue-color);
-}
-
-/* 定义颜色变量 */
-:root {
-    --red-color: hsl(0, 70%, 50%);
-    /* 可根据实际主题调整 */
-    --blue-color: hsl(210, 70%, 50%);
-    /* 可根据实际主题调整 */
+.blue-piece {
+    background-color: blue;
+    /* background-color: var(--blue-color); */
 }

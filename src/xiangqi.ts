@@ -80,9 +80,11 @@ export class XQRenderChild extends MarkdownRenderChild {
     rendBoard() {
         this.containerEl.empty();
         this.containerEl.classList.add('XQ-container');
+        this.containerEl.setAttribute('data-theme', `this.settings.theme`);
         const position = this.settings.position;
-        this.containerEl.classList.toggle('right', this.settings.position === 'right');
-        this.containerEl.classList.toggle('bottom', this.settings.position === 'bottom');
+        this.containerEl.classList.toggle('right', position === 'right');
+        this.containerEl.classList.toggle('bottom', position === 'bottom');
+
         // if (position === 'bottom') {
         //     this.containerEl.style.width = `${10* this.settings.cellSize}px`;
         //     this.containerEl.style.height = '';
@@ -91,6 +93,7 @@ export class XQRenderChild extends MarkdownRenderChild {
         //     this.containerEl.style.width = '';
         //     this.containerEl.style.height = `${11 * this.settings.cellSize}px`;
         // }
+
         // 创建棋盘容器
         const boardContainer = this.containerEl.createDiv({
             cls: `board-container ${this.settings.position}`, // 直接拼接
@@ -216,7 +219,7 @@ export class XQRenderChild extends MarkdownRenderChild {
                 this.moveContainer.style.height = `${11 * this.settings.cellSize}px`;
             } else if (this.settings.position === 'bottom') {
                 this.moveContainer.classList.add('bottom');
-                this.moveContainer.style.width = `${10 * this.settings.cellSize}px`;
+                // this.moveContainer.style.width = `${10 * this.settings.cellSize}px`;
             }
             showMoveList(this);
             if (

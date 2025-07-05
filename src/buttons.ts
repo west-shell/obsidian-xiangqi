@@ -42,9 +42,6 @@ export function creatButtons(state: XQRenderChild) {
             cls: 'toolbar-btn',
         });
         setIcon(btn, icon);
-        // btn.style.width = `${state.settings.cellSize * 1}px`;
-        // btn.style.height = `${state.settings.cellSize * 0.8}px`;
-        // btn.style.fontSize = `${state.settings.cellSize * 0.8}px`;
         btn.addEventListener('click', handler);
         if (isave) {
             btn.classList.toggle('saved', state.PGN.length > 0);
@@ -53,7 +50,6 @@ export function creatButtons(state: XQRenderChild) {
         }
     }
     if (state.options.protected && state.saveButton) {
-        // state.saveButton.style.pointerEvents = 'none';
         state.saveButton.classList.add('disabled');
     }
 }

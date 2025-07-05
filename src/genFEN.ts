@@ -137,15 +137,10 @@ export class GenFENRenderChild extends XQRenderChild {
                 attr: { id: `piece-${piece}` }, // 设置 id 方便识别点击对象
                 cls: className,
             }) as IPieceBTN;
-            // if (this.settings.position === 'right') {
-            //     btn.style.height = `${0.76 * this.settings.cellSize}px`;
-            // }
-            // if (this.settings.position === 'bottom') {
-            //     btn.style.height = '';
-            // }
+
             btn.pieces = []; // 初始化 pieces 数组，用于存储被吃掉的棋子
             const { red, blue } = themes[this.settings.theme];
-            // btn.style.backgroundColor = isRed ? red : blue;
+
             btn.updateStyle = function (state: XQRenderChild) {
                 this.classList.toggle('empty', this.pieces.length === 0);
                 const isActive =
@@ -182,8 +177,9 @@ export class GenFENRenderChild extends XQRenderChild {
             });
             if (color) {
                 btn.style.color = '#ddd';
-                const { red, blue } = themes[this.settings.theme];
-                btn.style.backgroundColor = this.currentTurn === 'red' ? red : blue;
+                // const { red, blue } = themes[this.settings.theme];
+                btn.classList.add(this.currentTurn);
+                // btn.style.backgroundColor = this.currentTurn === 'red' ? red : blue;
             }
             btn.addEventListener('click', handler);
         }
@@ -269,9 +265,8 @@ export class GenFENRenderChild extends XQRenderChild {
     onTurnBTNClick(e: MouseEvent, state: GenFENRenderChild) {
         const btn = e.target as HTMLButtonElement;
         this.currentTurn = state.currentTurn === 'red' ? 'blue' : 'red';
-        const { red, blue } = themes[state.settings.theme];
-        const color = state.currentTurn === 'red' ? red : blue;
-        btn.style.backgroundColor = color;
+        btn.classList.remove('red', 'blue');
+        btn.classList.add(this.currentTurn);
         updateRectStroke(state);
     }
 
