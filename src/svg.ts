@@ -41,28 +41,28 @@ function boardSvgString(settings: ISettings, options: IOptions): string {
   <path d="M ${cellSize - margin},${cellSize - margin} h ${8 * cellSize + 2 * margin} v ${9 * cellSize + 2 * margin} h -${8 * cellSize + 2 * margin} Z" stroke="${lineColor}" stroke-width="${cellSize * 0.08}" fill="none"/>
   <g stroke="${lineColor}" stroke-width="${cellSize * 0.04}" fill="none">
     ${Array(10)
-        .fill(0)
-        .map(
-            (_, i) => `
+            .fill(0)
+            .map(
+                (_, i) => `
     <path d="M ${cellSize},${cellSize * (i + 1)} h ${cellSize * 8}"/> `,
-        )
-        .join('')}
+            )
+            .join('')}
     ${Array(9)
-        .fill(0)
-        .map(
-            (_, i) => `
+            .fill(0)
+            .map(
+                (_, i) => `
     <path d="M ${cellSize * (i + 1)},${cellSize} v ${cellSize * 4}"/> `,
-        )
-        .join('')}
+            )
+            .join('')}
     ${Array(9)
-        .fill(0)
-        .map(
-            (_, i) => `
+            .fill(0)
+            .map(
+                (_, i) => `
     <path d="M ${cellSize * (i + 1)},${cellSize * 6} v ${cellSize * 4}"/>`,
-        )
-        .join('')}
-    <line x1="${cellSize}" y1="${cellSize}" x2="${cellSize}" y2="${10 * cellSize}" stroke="${lineColor}" stroke-width="2"/>
-    <line x1="${9 * cellSize}" y1="${cellSize}" x2="${9 * cellSize}" y2="${cellSize * 10}" stroke="${lineColor}" stroke-width="2"/>
+            )
+            .join('')}
+    <line x1="${cellSize}" y1="${cellSize}" x2="${cellSize}" y2="${10 * cellSize}" stroke="${lineColor}" stroke-width="${cellSize * 0.04}"/>
+    <line x1="${9 * cellSize}" y1="${cellSize}" x2="${9 * cellSize}" y2="${cellSize * 10}" stroke="${lineColor}" stroke-width="${cellSize * 0.04}" />
   </g>
   <!-- 九宫 -->
   <g stroke="${lineColor}" stroke-width="${cellSize * 0.03}" fill="none">
@@ -80,40 +80,40 @@ function boardSvgString(settings: ISettings, options: IOptions): string {
   <!-- 炮兵位 -->
   <g stroke="${lineColor}" stroke-width="${cellSize * 0.02}" fill="none">
     ${[
-        [2, 3],
-        [8, 3],
-        [2, 8],
-        [8, 8],
-        [3, 4],
-        [5, 4],
-        [7, 4],
-        [3, 7],
-        [7, 7],
-        [5, 7],
-    ]
-        .map(
-            (i) => `
+            [2, 3],
+            [8, 3],
+            [2, 8],
+            [8, 8],
+            [3, 4],
+            [5, 4],
+            [7, 4],
+            [3, 7],
+            [7, 7],
+            [5, 7],
+        ]
+            .map(
+                (i) => `
     <path d="M ${i[0] * cellSize},${i[1] * cellSize} m -${3 * margin},-${margin} h ${2 * margin} v -${2 * margin} m ${2 * margin},0 v ${2 * margin} h ${2 * margin} m 0,${2 * margin} h -${2 * margin} v ${2 * margin} m -${2 * margin},0 v -${2 * margin} h -${2 * margin}" />`,
-        )
-        .join('')}
+            )
+            .join('')}
     ${[
-        [1, 4],
-        [1, 7],
-    ]
-        .map(
-            (i) => `
+            [1, 4],
+            [1, 7],
+        ]
+            .map(
+                (i) => `
     <path d="M ${i[0] * cellSize},${i[1] * cellSize} m ${margin},-${3 * margin} v ${2 * margin} h ${2 * margin} m 0,${2 * margin} h -${2 * margin} v ${2 * margin}"/>`,
-        )
-        .join('')}
+            )
+            .join('')}
     ${[
-        [9, 4],
-        [9, 7],
-    ]
-        .map(
-            (i) => `
+            [9, 4],
+            [9, 7],
+        ]
+            .map(
+                (i) => `
     <path d="M ${i[0] * cellSize},${i[1] * cellSize} m -${3 * margin},-${margin} h ${2 * margin} v -${2 * margin} m 0,${6 * margin} v -${2 * margin} h -${2 * margin}" />`,
-        )
-        .join('')}
+            )
+            .join('')}
   </g>
   <g id="xiangqi-pieces"></g>
 </svg>`;
