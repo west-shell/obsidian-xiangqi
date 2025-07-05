@@ -35,9 +35,7 @@
     /* 添加上下边距，模拟间隙 */
 }
 
-
 .XQ-container .board-container {
-
     padding: 0;
     margin: 0;
     border: 1px solid transparent;
@@ -240,13 +238,11 @@
     display: none;
 }
 
-
 .XQ-container .toolbar-btn.disabled {
     pointer-events: none;
     /* 可以添加其他样式，如透明度，让按钮看起来是禁用状态 */
     opacity: 0.5;
 }
-
 
 /* 右侧位置按钮样式 */
 .pieceBTN-container.right .right-position-btn {

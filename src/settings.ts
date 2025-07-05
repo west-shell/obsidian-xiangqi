@@ -76,7 +76,7 @@ export class XQSettingTab extends PluginSettingTab {
                 // 创建显示滑块值的标签
                 const valueLabel = createEl('span', {
                     text: Math.abs(settings.cellSize).toString(),
-                    cls: 'slider-value-label'
+                    cls: 'slider-value-label',
                 });
                 controlEl.prepend(valueLabel);
                 slider
@@ -131,7 +131,7 @@ export class XQSettingTab extends PluginSettingTab {
                             max: '25',
                             value: Math.abs(settings.fontSize).toString(),
                         },
-                        cls: 'font-size-slider'
+                        cls: 'font-size-slider',
                     });
                     rangeSlider.addClass('slider');
                     rangeSlider.addClass('mod-range');
@@ -139,7 +139,7 @@ export class XQSettingTab extends PluginSettingTab {
                     // 创建显示滑块值的标签
                     const valueLabel = createEl('span', {
                         text: Math.abs(settings.fontSize).toString(),
-                        cls: 'font-size-value-label'
+                        cls: 'font-size-value-label',
                     });
 
                     // 根据 toggle 初始值添加或移除 hidden 类
