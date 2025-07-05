@@ -116,27 +116,6 @@
     /* 默认字体大小为12px */
 }
 
-/* 通过添加类名来调整字体大小 */
-.XQ-container .move-container li.fs-5 {
-    --font-size: 5px;
-}
-
-.XQ-container .move-container li.fs-6 {
-    --font-size: 6px;
-}
-
-.XQ-container .move-container li.fs-7 {
-    --font-size: 7px;
-}
-
-.XQ-container .move-container li.fs-8 {
-    --font-size: 8px;
-}
-
-.XQ-container .move-container li.fs-9 {
-    --font-size: 9px;
-}
-
 .XQ-container .move-container li.fs-10 {
     --font-size: 10px;
 }

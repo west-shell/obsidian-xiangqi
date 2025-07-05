@@ -129,7 +129,7 @@ export class XQSettingTab extends PluginSettingTab {
                 });
                 controlEl.prepend(valueLabel);
                 slider
-                    .setLimits(5, 25, 1)
+                    .setLimits(10, 25, 1)
                     .setValue(settings.fontSize) // 默认值
                     .onChange((value) => {
                         settings.fontSize = value;

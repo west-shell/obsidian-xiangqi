@@ -87,10 +87,10 @@ export class XQRenderChild extends MarkdownRenderChild {
 
         if (position === 'bottom') {
             this.containerEl.style.width = `${10 * this.settings.cellSize}px`;
-            // this.containerEl.style.height = '';
+            this.containerEl.style.height = '';
         }
         if (position === 'right') {
-            // this.containerEl.style.width = '';
+            this.containerEl.style.width = '';
             this.containerEl.style.height = `${11 * this.settings.cellSize}px`;
         }
 
