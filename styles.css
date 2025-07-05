@@ -9,7 +9,6 @@
 .XQ-container.right {
     display: flex;
     flex-direction: row;
-    /* align-items: flex-end; */
     gap: 2px;
 }
 
@@ -46,7 +45,6 @@
     gap: 4px;
 }
 
-
 .XQ-container .toolbar-btn {
     border: none;
     padding: 6px 10px;
@@ -73,7 +71,6 @@
 .XQ-container ol.move-container.right {
     display: grid;
     grid-template-columns: 1fr;
-    height: 100%;
     overflow-x: hidden;
     overflow-y: scroll;
     align-content: start;
@@ -83,12 +80,11 @@
 }
 
 .XQ-container .move-container.bottom {
-    /* display: flex; */
     /* display: grid; */
     /* grid-template-columns: repeat(2, 1fr); */
     overflow-x: hidden;
     overflow-y: scroll;
-    border: solid 1px #888888;
+    width: 100%;
     margin: 0;
     padding: 0;
 }
@@ -125,37 +121,23 @@
 .XQ-container .pieceBTN-container.right {
     display: grid;
     grid-template-columns: 1fr;
-    /* width: 100%; */
-    /* display: flex; */
-    /* flex-direction: column; */
-    /* gap: 4px; */
-    /* align-content: start; */
-    /* height: 100%; */
-    /* row-gap: 1px; */
-    /* overflow-y: auto;
-    overflow-y: hidden;
-    overflow-x: hidden; */
-    border: 1px solid #ddd;
 }
 
 .XQ-container .pieceBTN-container.bottom {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
     flex-wrap: wrap;
+    width: 100%;
     justify-content: flex-start;
     row-gap: 1px;
-    /* border: 1px solid red; */
 }
 
 .XQ-container .piece-btn.red-piece {
-    /* width: calc(100% /7); */
-    /* filter: grayscale(1.1) brightness(1); */
     color: #ddd;
     background-color: var(--red);
 }
 
 .XQ-container .piece-btn.blue-piece {
-    /* width: calc(100% / 7); */
-    /* filter: grayscale(1.1) brightness(1); */
     color: #ddd;
     background-color: var(--blue);
 }
@@ -176,7 +158,6 @@
     align-content: start;
     row-gap: 1px;
     height: 100%;
-    border: 1px solid #ddd;
 }
 
 .XQ-container .getFENT-toolbar-container.bottom {
@@ -184,7 +165,6 @@
     flex-direction: row;
     width: 100%;
     row-gap: 1px;
-    /* border: 1px solid #ddd; */
 }
 
 /* 隐藏类样式 */
@@ -194,7 +174,6 @@
 
 .XQ-container .toolbar-btn.disabled {
     pointer-events: none;
-    /* 可以添加其他样式，如透明度，让按钮看起来是禁用状态 */
     opacity: 0.5;
 }
 
@@ -206,15 +185,12 @@
 /* 蓝色工具栏按钮样式 */
 .toolbar-btn.blue {
     background-color: var(--blue);
-    /* background-color: var(--blue-color); */
 }
 
 .red-piece {
     background-color: red;
-    /* background-color: var(--red-color); */
 }
 
 .blue-piece {
     background-color: blue;
-    /* background-color: var(--blue-color); */
 }

@@ -12,7 +12,7 @@ interface IPieceBTN extends HTMLButtonElement {
 
 export class GenFENRenderChild extends XQRenderChild {
     // fistTurn: 'red' | 'blue' = 'red'; // 默认红方先手
-    source: string = 'rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR'
+    source: string = 'rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR';
     pieceBTNs: IPieceBTN[] = []; // 棋子按钮
     constructor(
         containerEl: HTMLElement,
@@ -132,7 +132,12 @@ export class GenFENRenderChild extends XQRenderChild {
                 attr: { id: `piece-${piece}` }, // 设置 id 方便识别点击对象
                 cls: className,
             }) as IPieceBTN;
-
+            if (this.settings.position === 'right') {
+                btn.style.height = `${this.settings.cellSize * 0.7}px`;
+            }
+            if (this.settings.position === 'bottom') {
+                btn.style.width = `${this.settings.cellSize * 1.4}px`;
+            }
             btn.pieces = []; // 初始化 pieces 数组，用于存储被吃掉的棋子
 
             btn.updateStyle = function (state: XQRenderChild) {
@@ -141,7 +146,6 @@ export class GenFENRenderChild extends XQRenderChild {
                     (state.markedPiece?.hidden ?? false) && state.markedPiece?.type === piece;
                 this.classList.toggle('active', isActive); // 如果有标记的棋子，设置背景色为红色
             };
-            // btn.style.backgroundColor = colorClass;  // 设置背景色
             // 绑定点击事件
             btn.addEventListener('click', (e) => this.onPieceBTNClick(e));
             btn.updateStyle(this); // 初始化按钮样式
@@ -170,10 +174,7 @@ export class GenFENRenderChild extends XQRenderChild {
                 cls: 'toolbar-btn',
             });
             if (color) {
-                btn.style.color = '#ddd';
-                // const { red, blue } = themes[this.settings.theme];
                 btn.classList.add(this.currentTurn);
-                // btn.style.backgroundColor = this.currentTurn === 'red' ? red : blue;
             }
             btn.addEventListener('click', handler);
         }

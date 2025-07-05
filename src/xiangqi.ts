@@ -85,14 +85,14 @@ export class XQRenderChild extends MarkdownRenderChild {
         this.containerEl.classList.toggle('right', position === 'right');
         this.containerEl.classList.toggle('bottom', position === 'bottom');
 
-        // if (position === 'bottom') {
-        //     this.containerEl.style.width = `${10* this.settings.cellSize}px`;
-        //     this.containerEl.style.height = '';
-        // }
-        // if (position === 'right') {
-        //     this.containerEl.style.width = '';
-        //     this.containerEl.style.height = `${11 * this.settings.cellSize}px`;
-        // }
+        if (position === 'bottom') {
+            this.containerEl.style.width = `${10 * this.settings.cellSize}px`;
+            // this.containerEl.style.height = '';
+        }
+        if (position === 'right') {
+            // this.containerEl.style.width = '';
+            this.containerEl.style.height = `${11 * this.settings.cellSize}px`;
+        }
 
         // 创建棋盘容器
         const boardContainer = this.containerEl.createDiv({
@@ -216,10 +216,8 @@ export class XQRenderChild extends MarkdownRenderChild {
             this.moveContainer = this.containerEl.createEl('ol', { cls: 'move-container' });
             if (this.settings.position === 'right') {
                 this.moveContainer.classList.add('right');
-                this.moveContainer.style.height = `${11 * this.settings.cellSize}px`;
             } else if (this.settings.position === 'bottom') {
                 this.moveContainer.classList.add('bottom');
-                this.moveContainer.style.width = `${10 * this.settings.cellSize}px`;
             }
             showMoveList(this);
             if (
