@@ -80,9 +80,8 @@
 }
 
 .XQ-container .move-container.bottom {
-    /* display: grid; */
-    /* grid-template-columns: repeat(2, 1fr); */
-    overflow-x: hidden;
+    display: flex;
+    flex-wrap: wrap;
     overflow-y: scroll;
     width: 100%;
     margin: 0;
