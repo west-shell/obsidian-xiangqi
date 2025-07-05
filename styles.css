@@ -18,23 +18,6 @@
     flex-direction: column;
 }
 
-.XQ-container .pieceBTN-container.right,
-.XQ-container .getFENT-toolbar-container {
-    background-color: var(--bg-color);
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    /* 让容器高度与棋盘一致 */
-}
-
-.XQ-container .pieceBTN-container.right.match-board-height .piece-btn,
-.XQ-container .getFENT-toolbar-container.right.match-board-height .toolbar-btn {
-    flex: 1;
-    /* 让按钮平均分配容器高度 */
-    margin: 1px 0;
-    /* 添加上下边距，模拟间隙 */
-}
-
 .XQ-container .board-container {
     padding: 0;
     margin: 0;
@@ -63,11 +46,6 @@
     gap: 4px;
 }
 
-.XQ-container .pieceBTN-container.right {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
 
 .XQ-container .toolbar-btn {
     border: none;
@@ -105,8 +83,9 @@
 }
 
 .XQ-container .move-container.bottom {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    /* display: flex; */
+    /* display: grid; */
+    /* grid-template-columns: repeat(2, 1fr); */
     overflow-x: hidden;
     overflow-y: scroll;
     border: solid 1px #888888;
@@ -146,32 +125,36 @@
 .XQ-container .pieceBTN-container.right {
     display: grid;
     grid-template-columns: 1fr;
-    align-content: start;
-    height: 100%;
-    row-gap: 1px;
-    overflow-y: auto;
+    /* width: 100%; */
+    /* display: flex; */
+    /* flex-direction: column; */
+    /* gap: 4px; */
+    /* align-content: start; */
+    /* height: 100%; */
+    /* row-gap: 1px; */
+    /* overflow-y: auto;
     overflow-y: hidden;
-    overflow-x: hidden;
+    overflow-x: hidden; */
     border: 1px solid #ddd;
 }
 
 .XQ-container .pieceBTN-container.bottom {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    align-content: start;
-    height: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
     row-gap: 1px;
-    overflow-y: auto;
-    border: 1px solid red;
+    /* border: 1px solid red; */
 }
 
 .XQ-container .piece-btn.red-piece {
+    /* width: calc(100% /7); */
     /* filter: grayscale(1.1) brightness(1); */
     color: #ddd;
     background-color: var(--red);
 }
 
 .XQ-container .piece-btn.blue-piece {
+    /* width: calc(100% / 7); */
     /* filter: grayscale(1.1) brightness(1); */
     color: #ddd;
     background-color: var(--blue);
@@ -188,9 +171,9 @@
 }
 
 .XQ-container .getFENT-toolbar-container.right {
-    /* display: grid;
+    display: grid;
     grid-template-columns: 1fr;
-    align-content: start; */
+    align-content: start;
     row-gap: 1px;
     height: 100%;
     border: 1px solid #ddd;
@@ -198,39 +181,10 @@
 
 .XQ-container .getFENT-toolbar-container.bottom {
     display: flex;
+    flex-direction: row;
     width: 100%;
     row-gap: 1px;
     /* border: 1px solid #ddd; */
-}
-
-.slider-value-label {
-    min-width: 2.5em;
-}
-
-.font-size-slider {
-    flex: 1;
-}
-
-.font-size-value-label {
-    min-width: 2.5em;
-}
-
-/* 滑块值标签样式 */
-.slider-value-label,
-.font-size-value-label {
-    min-width: 2.5em;
-}
-
-/* 字体大小控制容器样式 */
-.font-size-control {
-    display: flex;
-    align-items: center;
-    gap: 1em;
-}
-
-/* 字体大小滑块样式 */
-.font-size-slider {
-    flex: 1;
 }
 
 /* 隐藏类样式 */
@@ -242,12 +196,6 @@
     pointer-events: none;
     /* 可以添加其他样式，如透明度，让按钮看起来是禁用状态 */
     opacity: 0.5;
-}
-
-/* 右侧位置按钮样式 */
-.pieceBTN-container.right .right-position-btn {
-    /* 原本 style 里的高度设置 */
-    height: calc(0.76 * var(--cell-size));
 }
 
 /* 红色工具栏按钮样式 */

@@ -1,7 +1,7 @@
 import XQPlugin from './main';
 import { XQRenderChild } from './xiangqi';
 import { MarkdownPostProcessorContext, MarkdownView, Notice, setIcon } from 'obsidian';
-import { themes, updateRectStroke } from './svg';
+import { updateRectStroke } from './svg';
 import { IBoard, IPiece, ITurn, PIECE_CHARS, PieceType } from './types';
 import { findPieceAt, hidePiece, markPiece, movePiece, restorePiece } from './utils';
 
@@ -12,11 +12,7 @@ interface IPieceBTN extends HTMLButtonElement {
 
 export class GenFENRenderChild extends XQRenderChild {
     // fistTurn: 'red' | 'blue' = 'red'; // 默认红方先手
-    defaultFEN = {
-        full: 'rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR',
-        empty: '4k4/9/9/9/9/9/9/9/9/4K4',
-    } as const; // 默认选项
-    startFEN: keyof typeof this.defaultFEN = 'full'; // 默认选项
+    source: string = 'rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR'
     pieceBTNs: IPieceBTN[] = []; // 棋子按钮
     constructor(
         containerEl: HTMLElement,
@@ -35,7 +31,6 @@ export class GenFENRenderChild extends XQRenderChild {
     }
 
     parseSource() {
-        this.source = this.defaultFEN[this.startFEN];
         super.parseSource();
     }
 
@@ -139,7 +134,6 @@ export class GenFENRenderChild extends XQRenderChild {
             }) as IPieceBTN;
 
             btn.pieces = []; // 初始化 pieces 数组，用于存储被吃掉的棋子
-            const { red, blue } = themes[this.settings.theme];
 
             btn.updateStyle = function (state: XQRenderChild) {
                 this.classList.toggle('empty', this.pieces.length === 0);

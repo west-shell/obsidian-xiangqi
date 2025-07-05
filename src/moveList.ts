@@ -20,7 +20,7 @@ export function showMoveList(state: XQRenderChild) {
         const redMove = toShow[i];
         const redMoveSpan = li.createEl('span', {
             cls: 'move',
-            text: redMove.WXF,
+            text: state.settings.showPGNtxt ? redMove.WXF : '红',
             attr: { name: `${i + 1}` },
         });
 
@@ -30,7 +30,7 @@ export function showMoveList(state: XQRenderChild) {
             const blackMove = toShow[i + 1];
             blackMoveSpan = li.createEl('span', {
                 cls: 'move',
-                text: blackMove.WXF,
+                text: state.settings.showPGNtxt ? blackMove.WXF : '黑',
                 attr: { name: `${i + 2}` },
             });
         }

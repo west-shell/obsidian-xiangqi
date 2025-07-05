@@ -219,7 +219,7 @@ export class XQRenderChild extends MarkdownRenderChild {
                 this.moveContainer.style.height = `${11 * this.settings.cellSize}px`;
             } else if (this.settings.position === 'bottom') {
                 this.moveContainer.classList.add('bottom');
-                // this.moveContainer.style.width = `${10 * this.settings.cellSize}px`;
+                this.moveContainer.style.width = `${10 * this.settings.cellSize}px`;
             }
             showMoveList(this);
             if (
