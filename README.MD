@@ -1,21 +1,21 @@
-# Obsidian Chinese Chess Plugin
+# Obsidian 中国象棋插件
 
-![Version](https://img.shields.io/badge/Version-1.0.0-blue.svg)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](./LICENSE)
-[![EN](https://img.shields.io/badge/Language-English-blue)](./README.MD)
-[![ZH](https://img.shields.io/badge/Language-Chinese-green)](./README.zh-CN.MD)
+![版本](https://img.shields.io/badge/版本-1.0.0-blue.svg)
+[![许可证](https://img.shields.io/badge/许可证-MIT-green.svg)](./LICENSE)
+[![英文](https://img.shields.io/badge/语言-英文-blue)](./README.en.MDMD)
+[![中文](https://img.shields.io/badge/语言-简体中文-green)](./README.MD)
 
-## Plugin Overview
+## 插件简介
 
-**Obsidian Chinese Chess Plugin** is a Chinese chess rendering engine tailor-made for Obsidian. It supports displaying chess games in FEN and PGN formats and allows move exploration. The plugin offers rich customization options, move navigation, saving functionality, and more.
+**Obsidian 中国象棋插件** 是一款为 Obsidian 笔记软件量身打造的中国象棋渲染引擎，支持以 FEN 和 PGN 格式展示棋局，并可进行推演。插件提供丰富的自定义设置、棋谱导航、保存等功能。
 
-## Demo
+## 示例演示
 
-Two code block names are supported:
+提供两种代码块名
 
 ---
 
-`xiangqi` : to display a game. Leave it empty for the default opening.
+`xiangqi`: 用于展示棋谱,留空为默认开局
 
 ````markdown
 ```xiangqi
@@ -29,12 +29,12 @@ Two code block names are supported:
 ```
 ````
 
-![PGN Display](./IMAGE/PGN测试.png)
+![PGN 展示](./IMAGE/PGN测试.png)
 
 ---
 
-`xq` : to generate a `xiangqi` code block with a FEN string.
-`xq` content will be replaced with the FEN.
+`xq`: 用于生成生成带fEN的`xiangqi`代码段  
+`xq`代码块内的内容会被清空换成`FEN`
 
 ````markdown
 ```xq
@@ -42,64 +42,67 @@ Two code block names are supported:
 ```
 ````
 
-![FEN Generator](./IMAGE/FEN生成.png)
+![FEN 生成](./IMAGE/FEN生成.png)
 
 ---
 
-## Features
+## 功能特点
 
-- **Board Display**: Show and review Chinese chess games in notes
-- **Custom Opening**:
-    - Visual editor
-    - Clear/Fill board
-    - Set first player
-    - Save as FEN
-- **PGN Saving**:
-    - Save move history as PGN
-    - Button colors: **gray** (empty), **green** (has PGN), **orange** (edited)
-    - Confirm before saving
-    - If no moves, saving clears PGN
-- **Settings**:
-    - Theme: light / dark / system
-    - Button position: right / bottom
-    - Board size
-    - Show/hide move list and move text
-    - Auto-scroll to latest move
-    - Optional move narration (not on mobile)
-- **Mobile Friendly**: Manual layout adjustment for small screens
-- **Move Narration**: Optional voice readout of moves
-- **Format Support**: Supports ICCS-style PGN
+- **棋盘渲染**：可在笔记中展示并复盘中国象棋棋局
+- **定制开局**:
+    - 可视化编辑开局
+    - 清空\填满辅助摆放
+    - 先后手设置
+    - 保存为fen
+- **棋谱保存**：
+    - 支持将走棋历史保存为 PGN 格式
+    - 无 PGN 时保存按钮为**灰色**，有 PGN 时为**绿色**,推演后为**橙色**
+    - 点击保存时弹出确认提示
+    - 若当前无任何走棋记录，保存操作将清空原有 PGN
+- **自定义设置**：
 
-## Usage
+    - 主题支持深色/浅色/跟随系统
+    - 按钮位置调整（右侧 / 底部）
+    - 棋盘大小
+    - 着法列表是否显示
+    - 着法文字是否显示,及文字调整
+    - 着法列表是否自动跳转到结尾
+    - 可选是否朗读着法,移动端不支持
 
-### `xq` Code Block
+- **移动端适配**：通过手动调整棋盘大小和按钮位置，可适配手机等小屏设备
+- **朗读功能**：可选的语音播报走棋内容（可在设置中启用/关闭）
+- **格式支持**：支持 ICCS 格式的 PGN 棋谱,
 
-1. Add the `xq` code block tag
-2. Manually edit the board; use the buttons to clear, fill, or switch first player
-3. Click "Save" to generate a `xiangqi` block with the corresponding FEN
+## 使用方法
 
-### `xiangqi` Code Block
+### `xq`代码块
 
-1. Write the moves inside a code block marked with `xiangqi`.
-2. FEN is optional — defaults to the standard starting position.
-3. Behavior:
+1. 输入xq代码块标记即可
+2. 可手动编辑局面,右侧按钮可以清空填满棋盘,切换先手
+3. 编辑好后点击保存,会生成相应的带fen的`xiangqi`代码块
 
-    - If no manual moves, the move list shows the PGN.
-    - After manual moves, it shows the updated sequence.
-    - Click **Reset** to go back to before manual edits.
-    - Click **Reset** again to return to the initial state.
+### `xiangqi`代码块
 
-4. Click **Save** to overwrite the original PGN with current moves.
+1. 将棋谱写入以 `xiangqi` 标记的代码块中
+2. FEN 格式可省略，默认从标准开局开始
+3. 操作说明：
 
-### Optional Parameters
+    - 若未手动走棋，着法列表会展示PGN
+    - 手动走棋后，着法列表将展示手动后的记录
+    - 点击“重置”恢复到手动推演前的着法
+    - 再次点击"重置"回到最初状态
 
-| Name              | Value        | Description                                                       |
-| ----------------- | ------------ | ----------------------------------------------------------------- |
-| `fen`             | valid FEN    | Custom starting position; empty = default                         |
-| `protected` / `p` | true / false | When true, the Save button is disabled; default is false          |
-| `rotated` / `r`   | true / false | When true, the board is flipped (Red on bottom); default is false |
+4. 点击“保存”将用当前走法覆盖原 PGN 内容
 
-#### DEMO
+### 可选参数
+
+| 名称            | 值         | 描述                                |
+| --------------- | ---------- | ----------------------------------- |
+| `fen`           | 可用的fen  | 特殊开局的fen代码,留空为默认开局    |
+| `protected`/`p` | true/false | ture时保存按钮将失效,留空为false    |
+| `rotated`/`r`   | true/flase | true时倒转棋盘,留空为false,红方在下 |
+
+#### 示例
 
 ````markdown
 ```xiangqi
@@ -113,26 +116,25 @@ p:true
 ```
 ````
 
-- Colons can be either Chinese or English.
-- `r` and `p` can be uppercase or lowercase.
-- The `fen` value can be with or without quotes, either is fine.
-- PGN moves can be numbered together, not numbered, or written one by one—any format works.
+- 冒号中英文皆可,rp大小写皆可
+- fen 两边带不带引号都行,随意
+- PGN 两个个一起编号也行,不编号也行
+- 一个一个的写也行,怎么都行
 
-## Installation
+## 安装说明
 
-1. Download the plugin files
+1. 下载插件文件
+2. 在 Obsidian 中：
 
-2. In Obsidian:
+    - 打开 **设置 → 第三方插件**
+    - 关闭 **安全模式**
 
-    - Open **Settings → Community Plugins**
-    - Turn off **Safe Mode**
+3. 打开插件目录：
 
-3. Open the plugin folder:
+    - 电脑端点击 📂 按钮
+    - 移动端需手动打开 `你的仓库/.obsidian/plugins`
+    - 新建一个文件夹并放入插件文件
 
-    - On desktop, click the 📂 icon
-    - On mobile, open `your-vault/.obsidian/plugins` manually
-    - Create a new folder and place plugin files inside
+4. 启用插件
 
-4. Enable the plugin
-
-_Note: Will be available soon on the Obsidian plugin marketplace (search "Chinese chess")_
+_注：即将上线 Obsidian 官方插件市场（搜索“Chinese chess”）_
