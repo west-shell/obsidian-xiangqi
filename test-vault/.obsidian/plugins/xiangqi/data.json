@@ -1,8 +1,8 @@
 {
-  "position": "bottom",
+  "position": "right",
   "theme": "dark",
   "autoTheme": true,
-  "cellSize": 44,
+  "cellSize": 33,
   "fontSize": 12,
   "autoJump": "auto",
   "enableSpeech": true,
