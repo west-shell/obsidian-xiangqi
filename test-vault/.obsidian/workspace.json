@@ -4,11 +4,11 @@
     "type": "split",
     "children": [
       {
-        "id": "1b8068cc0800c512",
+        "id": "17948c63ff1ff925",
         "type": "tabs",
         "children": [
           {
-            "id": "85e7552c5db8d944",
+            "id": "32780e6026485a74",
             "type": "leaf",
             "state": {
               "type": "markdown",
@@ -66,7 +66,7 @@
   "left-ribbon": {
     "hiddenItems": {}
   },
-  "active": "85e7552c5db8d944",
+  "active": "32780e6026485a74",
   "lastOpenFiles": [
     "PGN正常开局.md",
     "PGN残局.md",
