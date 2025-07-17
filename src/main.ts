@@ -1,52 +1,57 @@
-import { Plugin } from 'obsidian';
-import { XQRenderChild } from './xiangqi';
-import { GenFENRenderChild } from './genFEN';
-import { ISettings } from './types';
-import { XQSettingTab, DEFAULT_SETTINGS } from './settings';
+import { Plugin } from "obsidian";
+import { ChessRenderChild } from "./renderChild/ChessRenderChild";
+import { GenFENRenderChild } from './renderChild/GenFENRenderChild';
+import type { ISettings } from "./types";
+import { XQSettingTab, DEFAULT_SETTINGS } from "./settings";
 
 export default class XQPlugin extends Plugin {
-    settings: ISettings = DEFAULT_SETTINGS;
-    renderChildren = new Set<XQRenderChild>();
-    async onload() {
-        await this.loadSettings();
+	settings: ISettings = DEFAULT_SETTINGS;
+	renderChildren = new Set<ChessRenderChild>();
+	async onload() {
+		await this.loadSettings();
 
-        this.addSettingTab(new XQSettingTab(this.app, this));
-        const codeBlockNames = ['xiangqi', '象棋'];
-        for (const name of codeBlockNames) {
-            this.registerMarkdownCodeBlockProcessor(name, (source, el, ctx) => {
-                const renderChild = new XQRenderChild(el, ctx, source, this);
-                ctx.addChild(renderChild);
-            });
-        }
-        this.registerMarkdownCodeBlockProcessor('xq', (source, el, ctx) => {
-            const renderChild = new GenFENRenderChild(el, ctx, source, this);
-            ctx.addChild(renderChild);
-        });
-        this.registerEvent(
-            this.app.workspace.on('css-change', () => {
-                // 主题已改变
-                if (this.settings.autoTheme) {
-                    const isDarkMode = () => document.body.classList.contains('theme-dark');
-                    this.settings.theme = isDarkMode() ? 'dark' : 'light'; // 自动主题时默认使用深色
-                    this.refresh();
-                }
-            }),
-        );
-    }
+		this.addSettingTab(new XQSettingTab(this.app, this));
 
-    async loadSettings() {
-        const savedData = await this.loadData();
-        this.settings = {
-            ...DEFAULT_SETTINGS,
-            ...savedData,
-        };
-    }
-    async saveSettings() {
-        await this.saveData(this.settings);
-    }
-    refresh() {
-        this.renderChildren.forEach((child) => {
-            child.refresh();
-        });
-    }
+		this.registerMarkdownCodeBlockProcessor('xiangqi', (source, el, ctx) => {
+			const renderChild = new ChessRenderChild(el, ctx, source, this);
+			ctx.addChild(renderChild);
+		});
+
+		this.registerMarkdownCodeBlockProcessor('xq', (source, el, ctx) => {
+			const renderChild = new GenFENRenderChild(el, ctx, source, this);
+			ctx.addChild(renderChild);
+		});
+
+		this.registerEvent(
+			this.app.workspace.on("css-change", () => {
+				// 主题已改变
+				if (this.settings.autoTheme) {
+					const isDarkMode = () =>
+						document.body.classList.contains("theme-dark");
+					this.settings.theme = isDarkMode() ? "dark" : "light"; // 自动主题时默认使用深色
+					this.refresh();
+				}
+			}),
+		);
+	}
+
+	refresh() {
+		this.renderChildren.forEach((child) => {
+			child.refresh();
+		});
+	}
+
+	async loadSettings() {
+		const savedData = await this.loadData();
+		this.settings = {
+			...DEFAULT_SETTINGS,
+			...savedData,
+		};
+	}
+
+	async saveSettings() {
+		await this.saveData(this.settings);
+	}
+
+
 }

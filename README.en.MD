@@ -1,6 +1,6 @@
 # Obsidian Chinese Chess Plugin
 
-![Version](https://img.shields.io/badge/Version-1.0.0-blue.svg)
+![Version](https://img.shields.io/badge/Version-2.0.0-blue.svg)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](./LICENSE)
 [![EN](https://img.shields.io/badge/Language-English-blue)](./README.en.MD)
 [![ZH](https://img.shields.io/badge/Language-Chinese-green)](./README.MD)

@@ -1,0 +1,13 @@
+{
+  "position": "bottom",
+  "theme": "dark",
+  "autoTheme": true,
+  "cellSize": 44,
+  "fontSize": 12,
+  "autoJump": "auto",
+  "enableSpeech": true,
+  "showPGN": true,
+  "showPGNtxt": true,
+  "viewOnly": false,
+  "rotated": false
+}
