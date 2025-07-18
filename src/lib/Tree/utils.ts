@@ -1,11 +1,24 @@
 import type { Node } from "./types";
 
+export function calcArr(node: Node) {
+    let nodeArr = [node];
+    function inner(node: Node) {
+        const parent = findFirstMultiChildDescendant(node);
+        if (!parent) return;
+        parent.children[0].main = true;
+        insertBySide(nodeArr, parent.children, node);
+        parent.children.forEach((n) => inner(n));
+    }
+    inner(node);
+    return nodeArr;
+}
+
 export function insertBySide(arr: Node[], nodes: Node | Node[], target: Node): void {
     const index = arr.indexOf(target);
     if (index === -1) return;
 
     const insertNodes = Array.isArray(nodes) ? nodes : [nodes];
-    const insertPos = insertNodes[0].side === 'red' ? index + 1 : index;
+    const insertPos = insertNodes[0].side === 'red' ? index + 1 : index - 1;
 
     // 过滤掉已存在的节点
     const nodesToInsert = insertNodes.filter(n => !arr.includes(n));
