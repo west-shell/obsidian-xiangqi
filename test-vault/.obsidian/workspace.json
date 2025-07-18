@@ -52,8 +52,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 200,
-    "collapsed": true
+    "width": 200
   },
   "right": {
     "id": "d33444cf2538e71f",
@@ -68,9 +67,11 @@
   },
   "active": "32780e6026485a74",
   "lastOpenFiles": [
-    "PGN正常开局.md",
+    "treeXY坐标计算.md",
+    "getMatrixDict.md",
     "PGN残局.md",
     "fen测试.md",
+    "PGN正常开局.md",
     "svelte官方文档.md"
   ]
 }

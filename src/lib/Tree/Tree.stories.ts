@@ -2,7 +2,7 @@
 // src/Tree.stories.ts
 import type { Meta, StoryObj } from '@storybook/svelte';
 import Tree from './Tree.svelte';
-import type { XiangqiMoveNode } from './types';
+import type { Node } from './types';
 
 const meta = {
     title: 'Components/Tree',
@@ -263,6 +263,8 @@ const moveTree = {
         }
     ]
 };
+
+
 export const Default: Story = {
     args: {
         root: moveTree

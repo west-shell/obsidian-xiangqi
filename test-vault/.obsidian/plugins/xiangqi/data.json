@@ -5,7 +5,7 @@
   "cellSize": 33,
   "fontSize": 12,
   "autoJump": "auto",
-  "enableSpeech": true,
+  "enableSpeech": false,
   "showPGN": true,
   "showPGNtxt": true,
   "viewOnly": false,
