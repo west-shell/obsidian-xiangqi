@@ -1,57 +1,32 @@
 <script lang="ts">
-  import type { XiangqiMoveNode as Node } from "./types";
-
+  import type { Node as Node } from "./types";
+  import {
+    insertBySide,
+    setIndexForChildren,
+    findFirstMultiChildDescendant,
+    assignY,
+  } from "./utils";
   export let root: Node;
 
   const spacingX = 30;
   const spacingY = 30;
   const padding = 40;
-
-  function assignXY(root: Node): (Node | null)[][] {
-    const matrix: (Node | null)[][] = [];
-
-    // 生成器：获取从节点开始的单链序列
-    function* getSequence(node: Node): Generator<Node> {
-      yield node;
-      while (node.children.length === 1) {
-        node = node.children[0];
-        yield node;
-      }
-    }
-
-    function placeNode(node: Node, x: number, y: number): void {
-      // 确保行存在
-      matrix[y] = matrix[y] || [];
-      matrix[y][x] = node;
-      node.x = x;
-      node.y = y;
-    }
-
-    function layout(node: Node, x: number, y: number): number {
-      const sequence = Array.from(getSequence(node));
-
-      // 垂直放置整个序列（共享同一x坐标）
-      for (let dy = 0; dy < sequence.length; dy++) {
-        placeNode(sequence[dy], x, y + dy);
-      }
-
-      const lastNode = sequence[sequence.length - 1];
-      if (lastNode.children.length > 0) {
-        // 分叉处理：子节点水平排列
-        let childX = x;
-        lastNode.children.forEach((child) => {
-          childX = layout(child, childX, y + sequence.length);
-        });
-        return childX; // 返回下一个可用的x位置
-      }
-      return x + 1; // 无分叉时，右侧留空
-    }
-
-    layout(root, 0, 0);
-    return matrix;
+  let nodeArr = [root];
+  function calcArr(node: Node) {
+    const parent = findFirstMultiChildDescendant(node);
+    if (!parent) return;
+    parent.children[0].main = true;
+    insertBySide(nodeArr, parent.children, node);
+    parent.children.forEach((n) => calcArr(n));
   }
+  calcArr(root);
+  nodeArr = nodeArr.filter((n) => !n.main);
+  console.log(nodeArr);
+  nodeArr.forEach((node, i) => {
+    setIndexForChildren(node, i); // 从每个节点开始递归
+  });
 
-  assignXY(root);
+  assignY(root);
 
   // 收集所有节点
   const nodes: Node[] = [];

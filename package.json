@@ -9,6 +9,8 @@
     "dev": "vite build --mode development",
     "build": "vite build --mode production",
     "check": "svelte-check --tsconfig ./tsconfig.json",
+    "test": "vitest",
+    "test:watch": "vitest watch",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },
