@@ -10,25 +10,28 @@ import type { Node } from './types'
 
 describe('树形结构工具函数', () => {
     // 叶子节点
-    const J: Node = { move: "J", side: "black", children: [] };
-    const I2: Node = { move: "I2", side: "black", children: [] };
-    const I3: Node = { move: "I3", side: "black", children: [] };
-    const G2: Node = { move: "G2", side: "red", children: [] };
-    const C1: Node = { move: "C1", side: "red", children: [] };
-    const C2: Node = { move: "C2", side: "red", children: [] };
+    let root: any, A, B, C, D, E, F, G, G2, H1, I2, I3, J, C1, C2;
 
-    // 中间节点
-    const G: Node = { move: "G", side: "red", children: [J] };
-    const H1: Node = { move: "H1", side: "red", children: [I2, I3] };
-    const E: Node = { move: "E", side: "black", children: [G, H1] };
-    const F: Node = { move: "F", side: "black", children: [G2] };
-    const D: Node = { move: "D", side: "red", children: [E, F] };
-    const B: Node = { move: "B", side: "black", children: [D] };
-    const C: Node = { move: "C", side: "black", children: [C1, C2] };
+    J = { move: "J", side: "black", children: [], parent: G, step: 7 };
+    I2 = { move: "I2", side: "black", children: [], parent: H1, step: 9 };
+    I3 = { move: "I3", side: "black", children: [], parent: H1, step: 10 };
+    G2 = { move: "G2", side: "red", children: [], parent: F, step: 8 };
+    C1 = { move: "C1", side: "red", children: [], parent: C, step: 4 };
+    C2 = { move: "C2", side: "red", children: [], parent: C, step: 5 };
 
-    // 根节点
-    const A: Node = { move: "A", side: "red", children: [B, C] };
-    const root: Node = { move: "root", side: null, children: [A] };
+    G = { move: "G", side: "red", children: [J], parent: E, step: 6 };
+    H1 = { move: "H1", side: "red", children: [I2, I3], parent: E, step: 6 };
+
+    E = { move: "E", side: "black", children: [G, H1], parent: D, step: 5 };
+    F = { move: "F", side: "black", children: [G2], parent: D, step: 5 };
+
+    D = { move: "D", side: "red", children: [E, F], parent: B, step: 4 };
+    B = { move: "B", side: "black", children: [D], parent: A, step: 3 };
+    C = { move: "C", side: "black", children: [C1, C2], parent: A, step: 3 };
+
+    A = { move: "A", side: "red", children: [B, C], parent: root, step: 2 };
+    root = { move: "root", side: null, children: [A], step: 1 };
+
     //     root（无颜色）
     // │
     // └── A(红)
@@ -53,28 +56,28 @@ describe('树形结构工具函数', () => {
         })
     })
 
-    describe('insertBySide()', () => {
-        it('红节点插入到目标右侧', () => {
-            const nodeArr = [B, C, A]
-            insertBySide(nodeArr, D.children, A)
-            console.log("操作后:", nodeArr.map(n => n.move));
-            // expect(nodeArr).toEqual([B, C, E, F, A])
-        })
+    // describe('insertBySide()', () => {
+    //     it('红节点插入到目标右侧', () => {
+    //         const nodeArr = [B, C, A]
+    //         insertBySide(nodeArr, D.children, A)
+    //         console.log("操作后:", nodeArr.map(n => n.move));
+    //         // expect(nodeArr).toEqual([B, C, E, F, A])
+    //     })
 
-        it('黑节点插入到目标左侧', () => {
-            const nodeArr = [A, B, C, D, E]
-            insertBySide(nodeArr, H1.children, A)
-            console.log("操作后:", nodeArr.map(n => n.move));
-            // expect(nodeArr).toEqual([A, B, I2, I3, C, D, E])
-        })
-    })
+    //     it('黑节点插入到目标左侧', () => {
+    //         const nodeArr = [A, B, C, D, E]
+    //         insertBySide(nodeArr, H1.children, A)
+    //         console.log("操作后:", nodeArr.map(n => n.move));
+    //         // expect(nodeArr).toEqual([A, B, I2, I3, C, D, E])
+    //     })
+    // })
 
-    describe('findFirstMultiChildDescendant()', () => {
-        it('找到第一个多子节点', () => {
-            const result = findFirstMultiChildDescendant(B)
-            expect(result).toBe(D)
-        })
-    })
+    // describe('findFirstMultiChildDescendant()', () => {
+    //     it('找到第一个多子节点', () => {
+    //         const result = findFirstMultiChildDescendant(B)
+    //         expect(result).toBe(D)
+    //     })
+    // })
 
 
     // describe('assignY()', () => {

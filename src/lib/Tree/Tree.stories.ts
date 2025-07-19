@@ -15,26 +15,29 @@ const meta = {
 export default meta;
 
 type Story = StoryObj<typeof meta>;
-const J: Node = { move: "J", side: "black", children: [] };
-const I2: Node = { move: "I2", side: "black", children: [] };
-const I3: Node = { move: "I3", side: "black", children: [] };
-const G2: Node = { move: "G2", side: "red", children: [] };
-const C1: Node = { move: "C1", side: "red", children: [] };
-const C2: Node = { move: "C2", side: "red", children: [] };
+let root: any, A, B, C, D, E, F, G, G2, H1, I2, I3, J, C1, C2;
 
-// 中间节点
-const G: Node = { move: "G", side: "red", children: [J] };
-const H1: Node = { move: "H1", side: "red", children: [I2, I3] };
-const E: Node = { move: "E", side: "black", children: [G, H1] };
-const F: Node = { move: "F", side: "black", children: [G2] };
-const D: Node = { move: "D", side: "red", children: [E, F] };
-const B: Node = { move: "B", side: "black", children: [D] };
-const C: Node = { move: "C", side: "black", children: [C1, C2] };
+J = { move: "J", side: "black", children: [], parent: G };
+I2 = { move: "I2", side: "black", children: [], parent: H1 };
+I3 = { move: "I3", side: "black", children: [], parent: H1 };
+G2 = { move: "G2", side: "red", children: [], parent: F };
+C1 = { move: "C1", side: "red", children: [], parent: C };
+C2 = { move: "C2", side: "red", children: [], parent: C };
 
-// 根节点
-const A: Node = { move: "A", side: "red", children: [B, C] };
-const root: Node = { move: "root", side: null, children: [A] };
+G = { move: "G", side: "red", children: [J], parent: E };
+H1 = { move: "H1", side: "red", children: [I2, I3], parent: E };
 
+E = { move: "E", side: "black", children: [G, H1], parent: D };
+F = { move: "F", side: "black", children: [G2], parent: D };
+
+D = { move: "D", side: "red", children: [E, F], parent: B };
+
+B = { move: "B", side: "black", children: [D], parent: A };
+C = { move: "C", side: "black", children: [C1, C2], parent: A };
+
+A = { move: "A", side: "red", children: [B, C], parent: root };
+
+root = { move: "root", side: null, children: [A] };
 
 export const Default: Story = {
     args: {

@@ -6,5 +6,6 @@ export type Node = {
     x?: number;
     y?: number;
     children: Node[];
+    parent: Node;
     main?: boolean;
 };
