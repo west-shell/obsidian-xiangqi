@@ -18,11 +18,19 @@ export function insertBySide(arr: Node[], nodes: Node | Node[], target: Node): v
     if (index === -1) return;
 
     const insertNodes = Array.isArray(nodes) ? nodes : [nodes];
-    const insertPos = insertNodes[0].side === 'red' ? index + 1 : index - 1;
+
+    // 如果是黑方节点，先反转子节点顺序
+    const orderedNodes = insertNodes[0].side === 'black'
+        ? [...insertNodes].reverse()
+        : insertNodes;
+
+    const insertPos = insertNodes[0].side === 'red' ? index + 1 : index;
 
     // 过滤掉已存在的节点
-    const nodesToInsert = insertNodes.filter(n => !arr.includes(n));
+    const nodesToInsert = orderedNodes.filter(n => !arr.includes(n));
     arr.splice(insertPos, 0, ...nodesToInsert);
+
+    console.log("插入后:", arr.map(n => n.move));
 }
 
 export function findFirstMultiChildDescendant(node: Node): Node | null {

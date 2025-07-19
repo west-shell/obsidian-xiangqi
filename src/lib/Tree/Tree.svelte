@@ -73,11 +73,19 @@
 
   <!-- 绘制节点 -->
   {#each nodes as node}
-    <circle
-      cx={node.x! * spacingX - viewBoxX}
-      cy={node.y! * spacingY - viewBoxY}
-      r="10"
-      fill={node.side === "red" ? "red" : node.side === "black" ? "black" : "gray"}
-    />
+    <g transform="translate({node.x! * spacingX - viewBoxX} {node.y! * spacingY - viewBoxY})">
+      <circle
+        r="10"
+        fill={node.side === "red" ? "red" : node.side === "black" ? "black" : "gray"}
+      />
+      <text
+        dy="5"
+        text-anchor="middle"
+        fill={node.side === "red" ? "black" : node.side === "black" ? "red" : "gray"}
+        font-size="12px"
+      >
+        {node.move}
+      </text>
+    </g>
   {/each}
 </svg>
