@@ -43,14 +43,7 @@ export function insertBySide(arr: Node[], nodes: Node | Node[], target: Node): v
         nonMainAncestor = findFirstNonMainAncestorInArr(target, arr);
     }
 
-    // const nonMainAncestor = findFirstNonMainAncestorInArr(target, arr);
-    // const nonMainAncestor = target
-    // if (!nonMainAncestor) {
-    //     console.warn("目标节点没有非主祖先");
-    //     return;
-    // }
-
-    const index = arr.indexOf(nonMainAncestor);
+    const index = arr.indexOf(nonMainAncestor!);
     if (index === -1) return;
 
     const insertNodes = Array.isArray(nodes) ? nodes : [nodes];
@@ -78,12 +71,13 @@ export function findFirstMultiChildDescendant(node: Node): Node | null {
 }
 
 export function assignY(node: Node, depth = 0) {
-    node.y = depth;
+    // node.y = depth;
+    node.y = Math.floor((depth + 1) / 2);
     node.children.map((child) => assignY(child, depth + 1));
-}
+};
 export function setIndexForChildren(node: any, i: number) {
     if (node) {
-        node.x = i; // 设置当前节点的 x 属性
+        node.x = node.side === 'red' ? i - 0.2 : node.side === 'black' ? i + 0.2 : i; // 设置当前节点的 x 属性
         // 递归处理子节点的 children[0]，不改变 i
         if (node.children && node.children[0]) {
             setIndexForChildren(node.children[0], i); // 递归处理下一个子节点的 children[0]，i 不变

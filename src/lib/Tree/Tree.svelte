@@ -8,7 +8,7 @@
   } from "./utils";
   export let root: Node;
 
-  const spacingX = 30;
+  const spacingX = 50;
   const spacingY = 30;
   const padding = 40;
   let nodeArr = [root];
