@@ -1,6 +1,10 @@
 type EventType = string | symbol;
 type Handler<T = any> = (payload?: T) => void;
-import { registerXQModule, registerGenFENModule } from './module-system';
+import {
+    registerXQModule,
+    registerGenFENModule,
+    registerPGNViewModule
+} from './module-system';
 
 export class EventBus {
     private handlers = new Map<EventType, Set<Handler<any>>>();
@@ -42,3 +46,4 @@ export class EventBus {
 
 registerXQModule('eventBus', EventBus);
 registerGenFENModule('eventBus', EventBus);
+registerPGNViewModule('eventBus', EventBus)

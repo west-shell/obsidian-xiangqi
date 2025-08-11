@@ -1,5 +1,5 @@
 import Xiangqi from "../../lib/XIangqi/Xiangqi.svelte";
-import { registerGenFENModule, registerXQModule } from "../../core/module-system";
+import { registerXQModule } from "../../core/module-system";
 
 export class BoardModule {
     static init(host: Record<string, any>) {
@@ -29,7 +29,6 @@ export class BoardModule {
         })
 
         eventBus.on('ready', () => {
-            console.log(host.settings.autoJump);
             if (!host.settings.autoJump) return
             switch (host.settings.autoJump) {
                 case "never":

@@ -49,7 +49,7 @@
     background-color: var(--red);
   }
 
-  .blue {
-    background-color: var(--blue);
+  .black {
+    background-color: var(--black);
   }
 </style>

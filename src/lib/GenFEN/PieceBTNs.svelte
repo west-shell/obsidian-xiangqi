@@ -51,7 +51,7 @@
 >
   {#each Object.entries(PIECE_CHARS) as [piece, name]}
     <button
-      class={`piece-btn ${position} ${isRed(piece) ? "red-piece" : "blue-piece"}`}
+      class={`piece-btn ${position} ${isRed(piece) ? "red-piece" : "black-piece"}`}
       class:empty={count[piece] === 0}
       class:active={selectedPiece === piece}
       on:click={() => eventBus.emit("clickPieceBTN", piece)}
@@ -108,8 +108,8 @@
     color: white;
   }
 
-  .blue-piece {
-    background-color: var(--blue);
+  .black-piece {
+    background-color: var(--black);
     color: white;
   }
 

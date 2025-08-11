@@ -2,9 +2,9 @@ import { registerXQModule } from "../../core/module-system";
 import { getWXF } from "../../utils/parse";
 import type { IMove } from "../../types";
 
-export class HistoryModule {
+export const HistoryModule = {
 
-    static init(host: Record<string, any>) {
+    init(host: Record<string, any>) {
         const eventBus = host.eventBus;
 
         eventBus.on("load", () => {

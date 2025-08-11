@@ -1,13 +1,15 @@
 import { Plugin } from "obsidian";
+import type { ISettings } from "./types";
 import { ChessRenderChild } from "./renderChild/ChessRenderChild";
 import { GenFENRenderChild } from './renderChild/GenFENRenderChild';
-import type { ISettings } from "./types";
+import { PGNView } from './view/pgn';
 import { XQSettingTab, DEFAULT_SETTINGS } from "./settings";
 
 export default class XQPlugin extends Plugin {
 	settings: ISettings = DEFAULT_SETTINGS;
-	renderChildren = new Set<ChessRenderChild>();
+	renderChildren: Set<{ refresh(): void }> = new Set();
 	async onload() {
+
 		await this.loadSettings();
 
 		this.addSettingTab(new XQSettingTab(this.app, this));
@@ -21,6 +23,13 @@ export default class XQPlugin extends Plugin {
 			const renderChild = new GenFENRenderChild(el, ctx, source, this);
 			ctx.addChild(renderChild);
 		});
+
+		this.registerView(
+			PGNView.VIEW_TYPE,
+			(leaf) => new PGNView(leaf, this)
+		);
+
+		this.registerExtensions(["pgn"], PGNView.VIEW_TYPE);
 
 		this.registerEvent(
 			this.app.workspace.on("css-change", () => {
@@ -51,6 +60,10 @@ export default class XQPlugin extends Plugin {
 
 	async saveSettings() {
 		await this.saveData(this.settings);
+	}
+
+	async onunload() {
+		this.app.workspace.detachLeavesOfType(PGNView.VIEW_TYPE);
 	}
 
 

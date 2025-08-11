@@ -11,13 +11,13 @@
   export let eventBus: EventBus;
   export let rotated: boolean;
 
-  let bgColor: string, lineColor: string, textColor: string, red: string, blue: string;
+  let bgColor: string, lineColor: string, textColor: string, red: string, black: string;
   let cellSize: number, margin: number, width: number, height: number;
 
   let renderedBoard: IBoard;
   let renderedMarkedPos: IPosition | null;
 
-  $: ({ bgColor, lineColor, textColor, red, blue } = themes[settings.theme]);
+  $: ({ bgColor, lineColor, textColor, red, black } = themes[settings.theme]);
   $: cellSize = settings.cellSize;
   $: margin = cellSize * 0.1;
   $: width = cellSize * 10;
@@ -73,7 +73,7 @@
       {height}
       fill={bgColor}
       rx="5"
-      stroke={currentTurn === "red" ? red : blue}
+      stroke={currentTurn === "red" ? red : black}
       stroke-width={cellSize * 0.2}
     />
 
@@ -179,7 +179,7 @@
             <g transform="translate({(x + 1) * cellSize}, {(y + 1) * cellSize})">
               <circle
                 r={cellSize * 0.4}
-                fill={piece === piece.toUpperCase() ? red : blue}
+                fill={piece === piece.toUpperCase() ? red : black}
                 stroke="#fff"
                 stroke-width={cellSize * 0.02}
               />

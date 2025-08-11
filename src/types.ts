@@ -1,3 +1,4 @@
+export const DEFAULT_FEN = 'rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w'
 export interface ISettings {
 	position: "bottom" | "right";
 	theme: "light" | "dark";
@@ -15,7 +16,7 @@ export type IOptions = {
 	protected?: boolean;
 	rotated?: boolean;
 };
-export type ITurn = "red" | "blue";
+export type ITurn = "red" | "black";
 
 export const PIECE_CHARS = {
 	// 黑方 (小写)
@@ -38,18 +39,26 @@ export const PIECE_CHARS = {
 export type PieceType = keyof typeof PIECE_CHARS;
 export type IBoard = (PieceType | null)[][];
 export type IPosition = { x: number; y: number };
-export interface IPiece {
-	type: PieceType;
-	position: IPosition;
-	pieceEl?: Element;
-	hidden?: boolean;
-}
 export interface IMove {
 	type?: PieceType;
 	from: IPosition;
 	to: IPosition;
-	captured?: IPiece | null;
+	captured?: string | null;
 	ICCS?: string;
 	WXF?: string;
 }
+export type ChessNode = {
+	id: string;
+	data: IMove | null;
+	step?: number;
+	x?: number;
+	y?: number;
+	side: string | null;
+	parentID?: string | null;
+	mainID?: string | null;
+	children: ChessNode[];
+	board?: IBoard;
+	comments?: string[];
+};
+export type NodeMap = Map<string, ChessNode>;
 export type IHistory = IMove[];

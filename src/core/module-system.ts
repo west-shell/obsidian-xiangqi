@@ -78,3 +78,15 @@ export function createGenFENModuleRegistry(host: object) {
 export function destroyGenFENModuleRegistry(host: object) {
     GenFENModules.destroyRegistry(host);
 }
+
+// 导出 PGNView 模块系统
+const PGNViewModules = createModuleSystem();
+export function registerPGNViewModule(name: string, module: ChessModule) {
+    PGNViewModules.register(name, module);
+}
+export function createPGNViewModuleRegistry(host: object) {
+    return PGNViewModules.createRegistry(host);
+}
+export function destroyPGNViewModuleRegistry(host: object) {
+    PGNViewModules.destroyRegistry(host);
+}

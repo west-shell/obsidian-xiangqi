@@ -15,15 +15,19 @@ export class ActionsModule {
         eventBus.on("btn-click", (action: string) => {
             switch (action) {
                 case 'turn':
-                    host.currentTurn = host.currentTurn === 'red' ? 'blue' : 'red';
+                    host.currentTurn = host.currentTurn === 'red' ? 'black' : 'red';
                     break
                 case 'empty':
                     host.board = Array.from({ length: 10 }, () => Array(9).fill(null));
                     host.board[4][0] = 'k';
                     host.board[4][9] = 'K'
+                    host.selectedPiece = null
+                    host.markedPos = null;
                     break
                 case 'full':
                     host.eventBus.emit('full');
+                    host.selectedPiece = null
+                    host.markedPos = null;
                     break
                 case 'save':
                     onSaveBTNClick(host);

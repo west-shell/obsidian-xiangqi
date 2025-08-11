@@ -1,6 +1,6 @@
 import type { ChessNode, NodeMap } from "../../types";
 
-export function findFirstMultiChildDescendant(node: ChessNode): ChessNode | null {
+function findFirstMultiChildDescendant(node: ChessNode): ChessNode | null {
     if (node.children.length > 1) return node;
     // 只检查第一个子节点（因为其他子节点会在上层处理）
     return node.children.length > 0 ? findFirstMultiChildDescendant(node.children[0]) : null;
@@ -19,7 +19,7 @@ function findFirstNonMainAncestorInArr(node: ChessNode, nodemap: Map<string, Che
 }
 
 
-export function insertBySide(arr: ChessNode[], nodes: ChessNode | ChessNode[], target: ChessNode, nodemap: NodeMap): void {
+function insertBySide(arr: ChessNode[], nodes: ChessNode | ChessNode[], target: ChessNode, nodemap: NodeMap): void {
     let nonMainAncestor
     if (!target.mainID) {
         nonMainAncestor = target
@@ -44,11 +44,11 @@ export function insertBySide(arr: ChessNode[], nodes: ChessNode | ChessNode[], t
     arr.splice(insertPos, 0, ...nodesToInsert);
 }
 
-export function assignY(node: ChessNode, depth = 0) {
+function assignY(node: ChessNode, depth = 0) {
     node.y = depth;
     node.children.map((child) => assignY(child, depth + 1));
 }
-export function setIndexForChildren(node: any, i: number) {
+function setIndexForChildren(node: any, i: number) {
     if (node) {
         node.x = i; // 设置当前节点的 x 属性
         // 递归处理子节点的 children[0]，不改变 i
@@ -56,4 +56,29 @@ export function setIndexForChildren(node: any, i: number) {
             setIndexForChildren(node.children[0], i); // 递归处理下一个子节点的 children[0]，i 不变
         }
     }
+}
+
+function calcArr(node: ChessNode, nodeArr: ChessNode[], nodeMap: NodeMap) {
+    const parent = findFirstMultiChildDescendant(node);
+    if (!parent) return;
+    parent.children[0].mainID = node.id;
+    insertBySide(nodeArr, parent.children, node, nodeMap);
+    parent.children.forEach((n) => calcArr(n, nodeArr, nodeMap));
+}
+
+export function calculateTreeLayout(nodeMap: NodeMap): ChessNode[] {
+    const root = nodeMap.get("node-root");
+    if (!root) return [];
+
+    const nodeArr: ChessNode[] = [root];
+    calcArr(root, nodeArr, nodeMap);
+
+    const filteredNodeArr = nodeArr.filter((n) => !n.mainID);
+    filteredNodeArr.forEach((node, i) => setIndexForChildren(node, i));
+
+    assignY(root);
+
+    return Array.from(nodeMap.values()).filter(
+        (n) => n.x !== undefined && n.y !== undefined,
+    );
 }

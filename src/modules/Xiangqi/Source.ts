@@ -25,7 +25,6 @@ export const SourceModule = {
 
 		eventBus.on('full', () => {
 			host.board = parseSource('').board;
-			eventBus.emit('updateUI');
 		})
 	}
 }

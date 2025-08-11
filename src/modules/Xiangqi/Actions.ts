@@ -111,7 +111,7 @@ function runmove(host: Record<string, any>, move: IMove) {
     host.board[to.x][to.y] = host.board[from.x][from.y];
     host.board[from.x][from.y] = '';
     host.currentStep++;
-    host.currentTurn = host.currentTurn === 'red' ? 'blue' : 'red';
+    host.currentTurn = host.currentTurn === 'red' ? 'black' : 'red';
 }
 
 function undo(host: Record<string, any>) {
@@ -130,7 +130,7 @@ function undo(host: Record<string, any>) {
         host.board[to.x][to.y] = captured;
     }
     host.currentStep--;
-    host.currentTurn = host.currentTurn === "red" ? "blue" : "red";
+    host.currentTurn = host.currentTurn === "red" ? "black" : "red";
 }
 
 function redo(host: Record<string, any>) {

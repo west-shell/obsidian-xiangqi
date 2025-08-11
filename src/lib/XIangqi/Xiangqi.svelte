@@ -34,7 +34,7 @@
 <style>
   .XQ-container {
     --red: #861818;
-    --blue: #000080;
+    --black: #000080;
     margin: 10px;
   }
 
