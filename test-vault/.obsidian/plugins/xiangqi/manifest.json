@@ -1,9 +1,0 @@
-{
-    "id": "xiangqi",
-    "version": "2.0.0",
-    "name": "Chinese chess",
-    "description": "Render xiangqi(Chinese chess) positions diagrams in a note.",
-    "author": "weshell",
-    "minAppVersion": "1.5.0",
-    "isDesktopOnly": false
-}
