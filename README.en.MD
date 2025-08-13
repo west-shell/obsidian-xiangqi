@@ -9,13 +9,21 @@
 
 **Obsidian Chinese Chess Plugin** is a Chinese chess rendering engine tailor-made for Obsidian. It supports displaying chess games in FEN and PGN formats and allows move exploration. The plugin offers rich customization options, move navigation, saving functionality, and more.
 
-## Demo
+## PGN File Support
 
+This plugin registers a custom view for `.pgn` files. Simply open a `.pgn` file in Obsidian to see the rendered board interface instead of plain text.
+
+- **Real-time Read/Write**: Any changes to the game (like making moves, adding variations, or comments) are saved back to the original `.pgn` file instantly and automatically.
+- **Full-featured**: Supports variations, NAGs (Numeric Annotation Glyphs), comments, and annotations.
+
+![PGN File](./IMAGE/PGN文件.png)
+
+## Code Block Demo
 Two code block names are supported:
 
 ---
 
-`xiangqi` : to display a game. Leave it empty for the default opening.
+`xiangqi` : to display a game in a Markdown file. Leave it empty for the default opening.
 
 ````markdown
 ```xiangqi
