@@ -8,7 +8,7 @@
 
   export let settings: ISettings;
   export let board: IBoard;
-  export let markedPos: IPosition;
+  export let markedPos: IPosition | null;
   export let currentTurn: string;
   export let currentStep: number;
   export let eventBus: EventBus;

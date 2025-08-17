@@ -1,4 +1,4 @@
-# Obsidian 中国象棋插件
+# 中国象棋插件 for Obsidian
 
 ![版本](https://img.shields.io/badge/版本-2.0.0-blue.svg)
 [![许可证](https://img.shields.io/badge/许可证-MIT-green.svg)](./LICENSE)
@@ -7,7 +7,7 @@
 
 ## 插件简介
 
-**Obsidian 中国象棋插件** 是一款为 Obsidian 笔记软件量身打造的中国象棋渲染引擎，支持以 FEN 和 PGN 格式展示棋局，并可进行推演。插件提供丰富的自定义设置、棋谱导航、保存等功能。
+**中国象棋插件(Obsidian)** 是一款为 Obsidian 笔记软件量身打造的中国象棋渲染引擎，支持以 FEN 和 PGN 格式展示棋局，并可进行推演。插件提供丰富的自定义设置、棋谱导航、保存等功能。
 
 ## PGN 文件支持
 

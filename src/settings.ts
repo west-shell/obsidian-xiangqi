@@ -50,6 +50,7 @@ export class XQSettingTab extends PluginSettingTab {
 							settings.autoTheme = false;
 							settings.theme = theme as "light" | "dark";
 						}
+						this.plugin.saveSettings();
 						this.plugin.refresh();
 					});
 			});
@@ -65,6 +66,7 @@ export class XQSettingTab extends PluginSettingTab {
 
 				dropdown.setValue(settings.position).onChange((position) => {
 					settings.position = position as "bottom" | "right";
+					this.plugin.saveSettings();
 					this.plugin.refresh();
 				});
 			});
@@ -86,6 +88,7 @@ export class XQSettingTab extends PluginSettingTab {
 					.onChange((value) => {
 						settings.cellSize = value;
 						valueLabel.textContent = value.toString(); // 确保实时更新显示值
+						this.plugin.saveSettings();
 						this.plugin.refresh();
 					});
 				// 监听 input 事件，实现拖动时实时更新
@@ -96,7 +99,7 @@ export class XQSettingTab extends PluginSettingTab {
 				});
 			});
 
-		containerEl.createEl("h2", { text: "着法列表" });
+		new Setting(containerEl).setName("着法列表").setHeading();
 
 		new Setting(containerEl)
 			.setName("启用着法列表")
@@ -104,6 +107,7 @@ export class XQSettingTab extends PluginSettingTab {
 			.addToggle((toggle) =>
 				toggle.setValue(settings.showPGN).onChange((value) => {
 					settings.showPGN = value;
+					this.plugin.saveSettings();
 					this.plugin.refresh();
 				}),
 			);
@@ -114,6 +118,7 @@ export class XQSettingTab extends PluginSettingTab {
 			.addToggle((toggle) =>
 				toggle.setValue(settings.showPGNtxt).onChange((value) => {
 					settings.showPGNtxt = value;
+					this.plugin.saveSettings();
 					this.plugin.refresh();
 					this.display();
 				}),
@@ -135,6 +140,7 @@ export class XQSettingTab extends PluginSettingTab {
 					.onChange((value) => {
 						settings.fontSize = value;
 						valueLabel.textContent = value.toString(); // 确保实时更新显示值
+						this.plugin.saveSettings();
 						this.plugin.refresh();
 					});
 				// 监听 input 事件，实现拖动时实时更新
@@ -158,6 +164,7 @@ export class XQSettingTab extends PluginSettingTab {
 					.setValue(settings.autoJump)
 					.onChange(async (value) => {
 						settings.autoJump = value as "never" | "always" | "auto";
+						this.plugin.saveSettings();
 					});
 			});
 
@@ -168,13 +175,13 @@ export class XQSettingTab extends PluginSettingTab {
 				.addToggle((toggle) =>
 					toggle.setValue(settings.enableSpeech).onChange((value) => {
 						settings.enableSpeech = value;
+						this.plugin.saveSettings();
 					}),
 				);
 		}
 	}
 	async hide() {
 		this.plugin.refresh();
-		this.plugin.saveSettings();
 
 	}
 }

@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest'
-import { PGNParser } from './Parser'
+import { PGNParser } from './parser'
 
 describe('中国象棋PGN解析器', () => {
   test('解析简单着法序列', () => {

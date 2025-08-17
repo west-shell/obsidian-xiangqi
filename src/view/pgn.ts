@@ -59,7 +59,7 @@ export class PGNView extends TextFileView {
         if (this.file) {
             return this.file!.basename
         }
-        return "PGN View";
+        return "Pgn view";
     }
 
     getIcon() {

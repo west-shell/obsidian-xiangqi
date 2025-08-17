@@ -1,14 +1,15 @@
 import { MarkdownView, Notice } from "obsidian";
 import { registerXQModule } from "../../core/module-system";
-import type { IMove } from "../../types";
+import type { IMove, IXQHost, PieceType } from "../../types";
 import { getICCS } from "../../utils/parse";
 import { ConfirmModal } from "../../utils/confirmModal";
 
 export class ActionsModule {
-    static init(host: Record<string, any>) {
+    static init(host: IXQHost) {
         const eventBus = host.eventBus;
 
-        eventBus.on('runmove', (move: IMove) => {
+        eventBus.on('runmove', (move) => {
+            if (!move) return;
             eventBus.emit('edithistory', move);
             runmove(host, move);
             eventBus.emit('updateUI', 'runmove');
@@ -47,8 +48,10 @@ export class ActionsModule {
                 }
                 host.modified = false;
                 host.history = [];
-                for (let i = 0; i < host.modifiedStep; i++) {
-                    redo(host);
+                if (host.modifiedStep) {
+                    for (let i = 0; i < host.modifiedStep; i++) {
+                        redo(host);
+                    }
                 }
                 host.modifiedStep = null;
                 eventBus.emit('updateUI', 'reset');
@@ -87,7 +90,8 @@ export class ActionsModule {
             eventBus.emit('updateUI', 'save');
         })
 
-        eventBus.on('clickstep', (step: number) => {
+        eventBus.on('clickstep', (step) => {
+            if (step === undefined) return;
             const dif = step - host.currentStep;
             if (dif === 0) return;
             if (dif > 0) {
@@ -106,15 +110,15 @@ export class ActionsModule {
 
 registerXQModule('actions', ActionsModule);
 
-function runmove(host: Record<string, any>, move: IMove) {
+function runmove(host: IXQHost, move: IMove) {
     const { from, to } = move;
     host.board[to.x][to.y] = host.board[from.x][from.y];
-    host.board[from.x][from.y] = '';
+    host.board[from.x][from.y] = null;
     host.currentStep++;
     host.currentTurn = host.currentTurn === 'red' ? 'black' : 'red';
 }
 
-function undo(host: Record<string, any>) {
+function undo(host: IXQHost) {
     host.markedPos = null
     if (host.history.length === 0) return;
     const move = host.history[host.currentStep - 1];
@@ -127,13 +131,13 @@ function undo(host: Record<string, any>) {
 
     // 恢复被吃掉的棋子
     if (captured) {
-        host.board[to.x][to.y] = captured;
+        host.board[to.x][to.y] = captured as PieceType;
     }
     host.currentStep--;
     host.currentTurn = host.currentTurn === "red" ? "black" : "red";
 }
 
-function redo(host: Record<string, any>) {
+function redo(host: IXQHost) {
     host.markedPos = null;
     const eventBus = host.eventBus;
     if (!host.modified && host.PGN.length > 0) {
@@ -152,7 +156,7 @@ function redo(host: Record<string, any>) {
     }
 }
 
-async function savePGN(host: Record<string, any>) {
+async function savePGN(host: IXQHost) {
     const view = host.plugin.app.workspace.getActiveViewOfType(MarkdownView);
     if (!view) return;
     const file = view.file;

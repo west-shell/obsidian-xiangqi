@@ -1,5 +1,15 @@
 import type { ChessNode, NodeMap } from "../../types";
 
+export function calcArr(node: ChessNode): ChessNode[] {
+    let result: ChessNode[] = [node];
+    if (node.children) {
+        for (const child of node.children) {
+            result = result.concat(calcArr(child));
+        }
+    }
+    return result;
+}
+
 export function findFirstMultiChildDescendant(node: ChessNode): ChessNode | null {
     if (node.children.length > 1) return node;
     // 只检查第一个子节点（因为其他子节点会在上层处理）

@@ -61,4 +61,57 @@ export type ChessNode = {
 	comments?: string[];
 };
 export type NodeMap = Map<string, ChessNode>;
+import type { SvelteComponent } from "svelte";
+import type { MarkdownPostProcessorContext, MarkdownSectionInformation } from "obsidian";
+import type XQPlugin from "./main";
+import type { EventBus } from "./core/event-bus";
+import type { BoardModule } from "./modules/Xiangqi/ChessBoard";
+
 export type IHistory = IMove[];
+
+export interface IHost {
+	plugin: XQPlugin;
+	eventBus: EventBus;
+}
+
+export interface IXQHost extends IHost {
+	containerEl: HTMLElement;
+	ctx: MarkdownPostProcessorContext & {
+		getSectionInfo(el: HTMLElement): MarkdownSectionInformation;
+	};
+	board: IBoard;
+	currentTurn: ITurn;
+	history: IHistory;
+	PGN: IMove[];
+	currentStep: number;
+	modified: boolean;
+	modifiedStep: number | null;
+	markedPos: IPosition | null;
+	settings: ISettings;
+	rotated: boolean;
+	options?: IOptions;
+	haveFEN?: boolean;
+	// Dynamically added modules
+	BoardModule?: BoardModule;
+	Xiangqi?: SvelteComponent;
+}
+
+export interface IGenFENHost extends IHost {
+	containerEl: HTMLElement;
+	ctx: MarkdownPostProcessorContext & {
+		getSectionInfo(el: HTMLElement): MarkdownSectionInformation;
+	};
+	board: IBoard;
+	currentTurn: ITurn;
+	markedPos: IPosition | null;
+	selectedPiece: string | null;
+	settings: ISettings;
+	file: { path: string };
+}
+
+export interface IPGNViewHost extends IHost {
+	nodeMap: NodeMap;
+	currentNode: ChessNode | null;
+	currentPath: string[];
+	settings: ISettings;
+}

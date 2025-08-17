@@ -1,18 +1,20 @@
 import { MarkdownView, Notice } from "obsidian";
 import { registerGenFENModule } from "../../core/module-system";
-import type { IBoard, ITurn } from "../../types";
+import type { IBoard, IGenFENHost, ITurn } from "../../types";
 
 export class ActionsModule {
-    static init(host: Record<string, any>) {
+    static init(host: IGenFENHost) {
         const eventBus = host.eventBus;
 
-        eventBus.on("clickPieceBTN", (piece: string) => {
+        eventBus.on("clickPieceBTN", (piece) => {
+            if (!piece) return;
             host.markedPos = null;
             host.selectedPiece = piece;
             host.eventBus.emit('updateUI');
         })
 
-        eventBus.on("btn-click", (action: string) => {
+        eventBus.on("btn-click", (action) => {
+            if (!action) return;
             switch (action) {
                 case 'turn':
                     host.currentTurn = host.currentTurn === 'red' ? 'black' : 'red';
@@ -40,7 +42,7 @@ export class ActionsModule {
 
 registerGenFENModule('actions', ActionsModule)
 
-async function onSaveBTNClick(host: Record<string, any>) {
+async function onSaveBTNClick(host: IGenFENHost) {
     // 1. 生成 FEN
     const fen = genFENFromBoard(host.board, host.currentTurn);
     // 2. 获取当前 markdown 编辑器视图和文件

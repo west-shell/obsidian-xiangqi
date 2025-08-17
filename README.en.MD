@@ -1,4 +1,4 @@
-# Obsidian Chinese Chess Plugin
+# Chinese Chess Plugin for Obsidian
 
 ![Version](https://img.shields.io/badge/Version-2.0.0-blue.svg)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](./LICENSE)
@@ -7,7 +7,7 @@
 
 ## Plugin Overview
 
-**Obsidian Chinese Chess Plugin** is a Chinese chess rendering engine tailor-made for Obsidian. It supports displaying chess games in FEN and PGN formats and allows move exploration. The plugin offers rich customization options, move navigation, saving functionality, and more.
+**Chinese Chess Plugin for Obsidian** is a Chinese chess rendering engine tailor-made for Obsidian. It supports displaying chess games in FEN and PGN formats and allows move exploration. The plugin offers rich customization options, move navigation, saving functionality, and more.
 
 ## PGN File Support
 

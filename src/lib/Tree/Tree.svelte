@@ -192,7 +192,8 @@
       bind:this={svgEl}
       width="100%"
       height="100%"
-      style="user-select: none; touch-action: none; background-color:{bgColor}; display: block;"
+      class="tree-svg"
+      style="background-color:{bgColor};"
       on:mousedown={handleEvent}
       on:mousemove={handleEvent}
       on:mouseup={handleEvent}
@@ -250,8 +251,8 @@
           {@const gameEnd = getAnnotation(node, "gameEnd")}
           <!-- svelte-ignore a11y_click_events_have_key_events -->
           <g
+            class="node-group"
             transform="translate({node.x! * spacingX} {node.y! * spacingY})"
-            style="cursor: pointer;"
             on:click={() => eventBus.emit("node-click", node.id)}
             on:dblclick={() => eventBus.emit("node-dblclick", node.id)}
           >
@@ -270,7 +271,7 @@
               fill={node.side === "red" ? red : node.side === "black" ? black : "gray"}
               stroke={lineColor}
               stroke-width={node === currentNode ? 1.5 : 0.5}
-              style={node === currentNode ? "filter: url(#shadow);" : ""}
+              class:current-node-shadow={node === currentNode}
             />
             <text dy="3.5" text-anchor="middle" fill="#FFFFFF" font-size="9px">
               {node.data && node.data.type ? PIECE_CHARS[node.data.type] : "开局"}
@@ -350,7 +351,6 @@
         on:input={adjustTextareaHeight}
         on:blur={saveComments}
         rows="1"
-        style="resize: none;"
       ></textarea>
     </div>
   {/if}
@@ -372,6 +372,20 @@
     min-height: 0;
     padding: 0;
     box-sizing: border-box;
+  }
+
+  .tree-svg {
+    user-select: none;
+    touch-action: none;
+    display: block;
+  }
+
+  .node-group {
+    cursor: pointer;
+  }
+
+  .current-node-shadow {
+    filter: url(#shadow);
   }
 
   .comment-editor {

@@ -1,4 +1,4 @@
-import { PGNParser } from './Parser';
+import { PGNParser } from './parser';
 import { registerPGNViewModule } from '../../core/module-system';
 import type { ChessNode } from '../../types';
 

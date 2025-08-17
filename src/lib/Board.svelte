@@ -65,7 +65,6 @@
     xmlns="http://www.w3.org/2000/svg"
     class="xq-board"
     on:click={handleClick}
-    style="user-select:none;"
   >
     <!-- 背景 -->
     <rect
@@ -217,3 +216,9 @@
     {/if}
   </svg>
 </div>
+
+<style>
+  .xq-board {
+    user-select: none;
+  }
+</style>

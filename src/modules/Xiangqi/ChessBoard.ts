@@ -1,12 +1,14 @@
 import Xiangqi from "../../lib/XIangqi/Xiangqi.svelte";
 import { registerXQModule } from "../../core/module-system";
+import type { IXQHost } from "../../types";
 
 export class BoardModule {
-    static init(host: Record<string, any>) {
+    static init(host: IXQHost) {
+        // @ts-ignore
         host.BoardModule = new BoardModule(host);
     }
 
-    constructor(host: Record<string, any>) {
+    constructor(host: IXQHost) {
         const eventBus = host.eventBus;
         eventBus.on("load", () => {
             host.modified = false
@@ -23,7 +25,7 @@ export class BoardModule {
                     modified: host.modified,
                     PGN: host.PGN,
                     history: host.history,
-                    options: host.options
+                    options: host.options || {}
                 },
             });
         })
@@ -44,8 +46,10 @@ export class BoardModule {
             }
         })
 
-        eventBus.on('updateUI', (type: string) => {
-            host.Xiangqi.$set({
+        eventBus.on('updateUI', (type: string | undefined) => {
+            if (type === undefined) return;
+            // @ts-ignore
+            host.Xiangqi?.$set({
                 settings: { ...host.settings },
                 board: host.board,
                 markedPos: host.markedPos,
@@ -53,12 +57,14 @@ export class BoardModule {
                 currentStep: host.currentStep,
                 modified: host.modified,
                 history: [...host.history],
-                options: { ...host.options }
+                options: { ...(host.options || {}) }
             });
         })
 
         eventBus.on("unload", () => {
-            host.Xiangqi.$destroy();
+            // @ts-ignore
+            host.Xiangqi?.$destroy();
+            // @ts-ignore
             host.Xiangqi = null;
         })
     }
