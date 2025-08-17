@@ -200,5 +200,5 @@ async function savePGN(host: Record<string, any>) {
         ...lines.slice(lineEnd + 1),
     ].join("\n");
 
-    await host.plugin.app.vault.modify(file, newContent);
+    host.plugin.app.vault.process(file, () => newContent);
 }

@@ -74,7 +74,7 @@ async function onSaveBTNClick(host: Record<string, any>) {
         ...lines.slice(lineEnd + 1),
     ].join("\n");
 
-    await host.plugin.app.vault.modify(file, newContent);
+    host.plugin.app.vault.process(file, () => newContent);
     new Notice("FEN已保存到代码块");
 }
 function genFENFromBoard(board: IBoard, turn: ITurn): string {

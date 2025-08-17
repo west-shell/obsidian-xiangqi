@@ -30,9 +30,9 @@ export class PGNView extends TextFileView {
         this.eventBus.emit('createUI');
     }
 
-    async saveFile() {
+    saveFile() {
         if (this.file) {
-            await this.app.vault.modify(this.file, this.data);
+            this.app.vault.process(this.file, () => this.data);
         }
     }
 

@@ -62,9 +62,4 @@ export default class XQPlugin extends Plugin {
 		await this.saveData(this.settings);
 	}
 
-	async onunload() {
-		this.app.workspace.detachLeavesOfType(PGNView.VIEW_TYPE);
-	}
-
-
 }
