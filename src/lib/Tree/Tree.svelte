@@ -107,20 +107,11 @@
     }
   });
 
+  /** 自动调整 textarea 高度 */
   function adjustTextareaHeight(event: Event) {
     const textarea = event.target as HTMLTextAreaElement;
-    textarea.style.height = "auto";
-    const lineHeight = 20;
-    const maxRows = 4;
-    const maxHeight = lineHeight * maxRows;
-
-    if (textarea.scrollHeight > maxHeight) {
-      textarea.style.height = maxHeight + "px";
-      textarea.style.overflowY = "auto";
-    } else {
-      textarea.style.height = textarea.scrollHeight + "px";
-      textarea.style.overflowY = "hidden";
-    }
+    textarea.style.height = "auto"; // 先重置
+    textarea.style.height = Math.min(textarea.scrollHeight, 80) + "px";
   }
 
   function centerAndFit() {
@@ -185,7 +176,10 @@
   }
 </script>
 
-<div class="container" style="--theme-text-color: {textColor}">
+<div
+  class="container"
+  style="--theme-text-color:{textColor}; --tree-bg:{bgColor}; --line-color:{lineColor}; --red-color:{red}; --black-color:{black};"
+>
   <div class="svg-wrapper">
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     <svg
@@ -193,7 +187,6 @@
       width="100%"
       height="100%"
       class="tree-svg"
-      style="background-color:{bgColor};"
       on:mousedown={handleEvent}
       on:mousemove={handleEvent}
       on:mouseup={handleEvent}
@@ -212,7 +205,7 @@
                 y1={node.y! * spacingY}
                 x2={(child.x! - Math.sign(child.x! - node.x!)) * spacingX}
                 y2={node.y! * spacingY}
-                stroke={lineColor}
+                stroke="var(--line-color)"
                 stroke-width={currentPath.includes(node.id) && currentPath.includes(child.id)
                   ? 2
                   : 0.7}
@@ -223,7 +216,7 @@
                 y1={node.y! * spacingY}
                 x2={child.x! * spacingX}
                 y2={child.y! * spacingY}
-                stroke={lineColor}
+                stroke="var(--line-color)"
                 stroke-width={currentPath.includes(node.id) && currentPath.includes(child.id)
                   ? 2
                   : 0.7}
@@ -235,7 +228,7 @@
                 y1={node.y! * spacingY}
                 x2={child.x! * spacingX}
                 y2={child.y! * spacingY}
-                stroke={lineColor}
+                stroke="var(--line-color)"
                 stroke-width={currentPath.includes(node.id) && currentPath.includes(child.id)
                   ? 2
                   : 0.7}
@@ -268,8 +261,12 @@
               height="12"
               rx="3"
               ry="3"
-              fill={node.side === "red" ? red : node.side === "black" ? black : "gray"}
-              stroke={lineColor}
+              fill={node.side === "red"
+                ? "var(--red-color)"
+                : node.side === "black"
+                  ? "var(--black-color)"
+                  : "gray"}
+              stroke="var(--line-color)"
               stroke-width={node === currentNode ? 1.5 : 0.5}
               class:current-node-shadow={node === currentNode}
             />
@@ -281,7 +278,7 @@
               <circle cx="10" cy="-7" r="3" fill="royalblue" />
             {/if}
 
-            <!-- Top-left: Evaluation (Advantage/Balance) -->
+            <!-- Top-left: Evaluation -->
             {#if evaluation}
               {@const def = ANNOTATION_DEFINITIONS[evaluation]}
               <g transform="translate(-13, -7)">
@@ -363,6 +360,8 @@
     height: 100%;
     max-height: 100vh;
     overflow: hidden;
+    --tree-bg: var(--background-primary);
+    --theme-text-color: var(--text-normal);
   }
 
   .svg-wrapper {
@@ -378,6 +377,7 @@
     user-select: none;
     touch-action: none;
     display: block;
+    background-color: var(--tree-bg);
   }
 
   .node-group {
@@ -411,7 +411,7 @@
     box-sizing: border-box;
     padding: 0px;
     outline: none;
-    overflow-y: hidden;
+    overflow-y: auto;
   }
 
   .comment-editor textarea:focus {
