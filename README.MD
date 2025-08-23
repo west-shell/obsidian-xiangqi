@@ -1,6 +1,6 @@
 # 中国象棋插件 for Obsidian
 
-![版本](https://img.shields.io/badge/版本-2.2.0-blue.svg)
+![版本](https://img.shields.io/badge/版本-2.3.0-blue.svg)
 [![许可证](https://img.shields.io/badge/许可证-MIT-green.svg)](./LICENSE)
 [![英文](https://img.shields.io/badge/语言-英文-blue)](./README.en.MDMD)
 [![中文](https://img.shields.io/badge/语言-简体中文-green)](./README.MD)

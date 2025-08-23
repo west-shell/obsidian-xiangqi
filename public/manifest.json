@@ -1,6 +1,6 @@
 {
     "id": "xiangqi",
-    "version": "2.2.0",
+    "version": "2.3.0",
     "name": "Chinese chess",
     "description": "Render xiangqi(Chinese chess) positions diagrams in a note.",
     "author": "weshell",
