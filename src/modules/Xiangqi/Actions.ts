@@ -164,45 +164,46 @@ async function savePGN(host: IXQHost) {
 
     // 这里 this.containerEl 可能指当前实例的属性，确保 this 指向正确
     // 如果 savePGN 是类方法，建议改写为箭头函数或 bind this
-    const section = host.ctx.getSectionInfo(host.containerEl);
-    if (!section) return;
 
-    const { lineStart, lineEnd } = section;
-    const content = await host.plugin.app.vault.read(file);
-    const lines = content.split("\n");
+    host.plugin.app.vault.process(file, fileContent => {
+        const section = host.ctx.getSectionInfo(host.containerEl);
+        if (!section) return fileContent;
 
-    // 明确标注类型，初始赋值时用slice保证是string[]
-    let blockLines: string[] = lines.slice(lineStart, lineEnd + 1);
+        const { lineStart, lineEnd } = section;
+        const lines = fileContent.split("\n");
 
-    if (blockLines.length < 2) return;
+        // 明确标注类型，初始赋值时用slice保证是string[]
+        let blockLines: string[] = lines.slice(lineStart, lineEnd + 1);
 
-    // 1. 删除所有符合 PGN 格式的行（无论 currentStep 是多少）
-    blockLines = blockLines.filter((line) => !/[A-Z]\d-[A-Z]\d/.test(line));
+        if (blockLines.length < 2) return fileContent;
 
-    // 2. 仅当 currentStep > 0 时生成并插入新的 PGN
-    if (host.currentStep > 0) {
-        const moves = host.history
-            .slice(0, host.currentStep)
-            .map((move: IMove) => getICCS(move));
+        // 1. 删除所有符合 PGN 格式的行（无论 currentStep 是多少）
+        blockLines = blockLines.filter((line) => !/[A-Z]\d-[A-Z]\d/.test(line));
 
-        const pgnLines: string[] = [];
-        for (let i = 0; i < moves.length; i += 2) {
-            const line =
-                `${Math.ceil((i + 1) / 2)}. ${moves[i]} ${moves[i + 1] || ""}`.trim();
-            pgnLines.push(line);
+        // 2. 仅当 currentStep > 0 时生成并插入新的 PGN
+        if (host.currentStep > 0) {
+            const moves = host.history
+                .slice(0, host.currentStep)
+                .map((move: IMove) => getICCS(move));
+
+            const pgnLines: string[] = [];
+            for (let i = 0; i < moves.length; i += 2) {
+                const line =
+                    `${Math.ceil((i + 1) / 2)}. ${moves[i]} ${moves[i + 1] || ""}`.trim();
+                pgnLines.push(line);
+            }
+            const PGN = pgnLines.join("\n");
+
+            // 插入PGN字符串
+            blockLines.splice(blockLines.length - 1, 0, PGN);
         }
-        const PGN = pgnLines.join("\n");
 
-        // 插入PGN字符串
-        blockLines.splice(blockLines.length - 1, 0, PGN);
-    }
-
-    // 3. 更新文件内容（无论是否插入 PGN，都会执行清理）
-    const newContent = [
-        ...lines.slice(0, lineStart),
-        ...blockLines,
-        ...lines.slice(lineEnd + 1),
-    ].join("\n");
-
-    host.plugin.app.vault.process(file, () => newContent);
+        // 3. 更新文件内容（无论是否插入 PGN，都会执行清理）
+        const newContent = [
+            ...lines.slice(0, lineStart),
+            ...blockLines,
+            ...lines.slice(lineEnd + 1),
+        ].join("\n");
+        return newContent;
+    });
 }

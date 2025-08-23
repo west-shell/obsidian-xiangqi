@@ -51,32 +51,33 @@ async function onSaveBTNClick(host: IGenFENHost) {
     const file = view.file;
     if (!file) return;
 
-    // 3. 获取当前代码块的 section 信息
-    const section = host.ctx.getSectionInfo(host.containerEl);
-    if (!section) return;
-    const { lineStart, lineEnd } = section;
+    host.plugin.app.vault.process(file, fileContent => {
+        // 3. 获取当前代码块的 section 信息
+        const section = host.ctx.getSectionInfo(host.containerEl);
+        if (!section) return fileContent;
+        const { lineStart, lineEnd } = section;
 
-    // 4. 读取文件内容并分行
-    const content = await host.plugin.app.vault.read(file);
-    const lines = content.split("\n");
+        // 4. 读取文件内容并分行
+        const lines = fileContent.split("\n");
 
-    // 5. 获取代码块内容行
-    let blockLines: string[] = lines.slice(lineStart, lineEnd + 1);
-    if (blockLines.length < 2) return;
+        // 5. 获取代码块内容行
+        let blockLines: string[] = lines.slice(lineStart, lineEnd + 1);
+        if (blockLines.length < 2) return fileContent;
 
-    // 6. 判断并替换代码块类型为 xiangqi，内容为 FEN
-    // 只替换代码块首尾行，内容只保留 FEN
-    blockLines[0] = blockLines[0].replace(/^```xq\b.*$/, "```xiangqi");
-    blockLines = [blockLines[0], `[FEN "${fen}"]`, "```"];
+        // 6. 判断并替换代码块类型为 xiangqi，内容为 FEN
+        // 只替换代码块首尾行，内容只保留 FEN
+        blockLines[0] = blockLines[0].replace(/^```xq\b.*$/, "```xiangqi");
+        blockLines = [blockLines[0], `[FEN "${fen}"]`, "```"];
 
-    // 7. 拼接新内容并写回
-    const newContent = [
-        ...lines.slice(0, lineStart),
-        ...blockLines,
-        ...lines.slice(lineEnd + 1),
-    ].join("\n");
+        // 7. 拼接新内容并写回
+        const newContent = [
+            ...lines.slice(0, lineStart),
+            ...blockLines,
+            ...lines.slice(lineEnd + 1),
+        ].join("\n");
 
-    host.plugin.app.vault.process(file, () => newContent);
+        return newContent;
+    });
     new Notice("FEN已保存到代码块");
 }
 function genFENFromBoard(board: IBoard, turn: ITurn): string {

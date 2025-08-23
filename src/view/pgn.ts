@@ -32,7 +32,7 @@ export class PGNView extends TextFileView {
 
     saveFile() {
         if (this.file) {
-            this.app.vault.process(this.file, () => this.data);
+            this.app.vault.process(this.file, fileContent => this.data);
         }
     }
 
