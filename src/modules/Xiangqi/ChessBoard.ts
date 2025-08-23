@@ -4,7 +4,6 @@ import type { IXQHost } from "../../types";
 
 export class BoardModule {
     static init(host: IXQHost) {
-        // @ts-ignore
         host.BoardModule = new BoardModule(host);
     }
 
@@ -47,8 +46,7 @@ export class BoardModule {
         })
 
         eventBus.on('updateUI', (type: string | undefined) => {
-            if (type === undefined) return;
-            // @ts-ignore
+            // if (type === undefined) return;
             host.Xiangqi?.$set({
                 settings: { ...host.settings },
                 board: host.board,
@@ -62,10 +60,7 @@ export class BoardModule {
         })
 
         eventBus.on("unload", () => {
-            // @ts-ignore
             host.Xiangqi?.$destroy();
-            // @ts-ignore
-            host.Xiangqi = null;
         })
     }
 }
