@@ -268,7 +268,6 @@
                   : "gray"}
               stroke="var(--line-color)"
               stroke-width={node === currentNode ? 1.5 : 0.5}
-              class:current-node-shadow={node === currentNode}
             />
             <text dy="3.5" text-anchor="middle" fill="#FFFFFF" font-size="9px">
               {node.data && node.data.type ? PIECE_CHARS[node.data.type] : "开局"}
@@ -382,10 +381,6 @@
 
   .node-group {
     cursor: pointer;
-  }
-
-  .current-node-shadow {
-    filter: url(#shadow);
   }
 
   .comment-editor {
