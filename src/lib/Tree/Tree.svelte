@@ -12,7 +12,27 @@
   export let currentPath: string[];
 
   let commentsText = "";
+  let textareaEl: HTMLTextAreaElement;
 
+  $: if (currentNode) {
+    const node = currentNode;
+    commentsText = getRegularComments(node).join("\n");
+    tick().then(() => panToNodeIfNeeded(node));
+  } else {
+    commentsText = "";
+  }
+  $: if (currentNode) {
+    const node = currentNode;
+    commentsText = getRegularComments(node).join("\n");
+    tick().then(() => {
+      if (textareaEl) {
+        adjustTextareaHeight({ target: textareaEl } as unknown as Event);
+      }
+      panToNodeIfNeeded(node);
+    });
+  } else {
+    commentsText = "";
+  }
   const ANNOTATION_DEFINITIONS: Record<string, { symbol: string; color: string }> = {
     "R+": { symbol: "优", color: "red" },
     "B+": { symbol: "优", color: "black" },
@@ -339,17 +359,14 @@
     </svg>
   </div>
 
-  {#if currentNode}
-    <div class="comment-editor">
-      <textarea
-        bind:value={commentsText}
-        placeholder="添加注释"
-        on:input={adjustTextareaHeight}
-        on:blur={saveComments}
-        rows="1"
-      ></textarea>
-    </div>
-  {/if}
+  <textarea
+    bind:value={commentsText}
+    placeholder="添加注释"
+    bind:this={textareaEl}
+    on:input={adjustTextareaHeight}
+    on:blur={saveComments}
+    rows="1"
+  ></textarea>
 </div>
 
 <style>
@@ -383,16 +400,7 @@
     cursor: pointer;
   }
 
-  .comment-editor {
-    border-top: 1px solid var(--background-modifier-border);
-    background: var(--background-primary);
-    padding: 2px 0px;
-    height: auto;
-    max-height: 80px;
-    overflow-y: auto;
-  }
-
-  .comment-editor textarea {
+  textarea {
     width: 100%;
     height: auto;
     max-height: 80px;
@@ -409,7 +417,7 @@
     overflow-y: auto;
   }
 
-  .comment-editor textarea:focus {
+  textarea:focus {
     border-color: var(--interactive-accent);
     box-shadow: 0 0 5px var(--interactive-accent);
   }
