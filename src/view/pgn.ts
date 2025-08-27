@@ -11,6 +11,7 @@ import '../modules/Tree/TreeMap'
 import '../modules/Tree/TreeView'
 import '../modules/Xiangqi/BoardClick'
 import '../modules/Tree/Actions'
+import '../modules/Tree/Mode'
 
 
 export class PGNView extends TextFileView {
@@ -32,7 +33,7 @@ export class PGNView extends TextFileView {
 
     saveFile() {
         if (this.file) {
-            this.app.vault.process(this.file, fileContent => this.data);
+            this.app.vault.modify(this.file, this.data);
         }
     }
 
@@ -63,7 +64,7 @@ export class PGNView extends TextFileView {
     }
 
     getIcon() {
-        return "dice"; // 换成你喜欢的 Obsidian 图标
+        return "waypoints"; // 换成你喜欢的 Obsidian 图标
     }
 
     clear(): void {
