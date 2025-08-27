@@ -11,7 +11,7 @@ import '../modules/Tree/TreeMap'
 import '../modules/Tree/TreeView'
 import '../modules/Xiangqi/BoardClick'
 import '../modules/Tree/Actions'
-import '../modules/Tree/Mode'
+// import '../modules/Tree/Mode'
 
 
 export class PGNView extends TextFileView {
