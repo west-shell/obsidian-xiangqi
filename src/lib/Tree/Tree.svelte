@@ -26,7 +26,7 @@
     commentsText = getRegularComments(node).join("\n");
     tick().then(() => {
       if (textareaEl) {
-        adjustTextareaHeight({ target: textareaEl } as unknown as Event);
+        adjustTextareaHeight();
       }
       panToNodeIfNeeded(node);
     });
@@ -128,10 +128,11 @@
   });
 
   /** 自动调整 textarea 高度 */
-  function adjustTextareaHeight(event: Event) {
-    const textarea = event.target as HTMLTextAreaElement;
-    textarea.style.height = "auto"; // 先重置
-    textarea.style.height = Math.min(textarea.scrollHeight, 80) + "px";
+  function adjustTextareaHeight() {
+    const textarea = textareaEl;
+    textarea.classList.add("auto-height");
+    textarea.style.setProperty("--textarea-height", `${textarea.scrollHeight}px`);
+    textarea.classList.remove("auto-height");
   }
 
   function centerAndFit() {
@@ -361,6 +362,7 @@
 
   <textarea
     bind:value={commentsText}
+    class="auto-height"
     placeholder="添加注释"
     bind:this={textareaEl}
     on:input={adjustTextareaHeight}
@@ -402,7 +404,7 @@
 
   textarea {
     width: 100%;
-    height: auto;
+    height: var(--textarea-height, 20px);
     max-height: 80px;
     resize: none;
     font-family: var(--font-family);
@@ -415,6 +417,10 @@
     padding: 0px;
     outline: none;
     overflow-y: auto;
+  }
+  /* @css-ignore */
+  textarea.auto-height {
+    height: auto;
   }
 
   textarea:focus {
