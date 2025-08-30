@@ -3,4 +3,4 @@
 3. 添加文本打开pgn
 4. 添加md格式pgn文件元数据格式
 5. 整体缩放自适应横竖屏
-6. 
+6.  textarea.style.setProperty("--textarea-height", `${textarea.scrollHeight}px`);改写项目

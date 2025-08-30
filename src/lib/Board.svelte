@@ -138,7 +138,7 @@
       dominant-baseline="middle"
       fill={textColor}
     >
-      楚　河　　汉　界
+      <tspan dy="0.15em">楚　河　　汉　界</tspan>
     </text>
 
     <!-- 九宫 -->
