@@ -6,8 +6,8 @@
   "main": "main.js",
   "type": "module",
   "scripts": {
-    "dev": "vite build --mode development",
-    "build": "vite build --mode production",
+    "dev": "vite build --mode development && node -e \"require('fs').copyFileSync('manifest.json', './test-vault/.obsidian/plugins/xiangqi/manifest.json')\"",
+    "build": "vite build --mode production && node -e \"require('fs').copyFileSync('manifest.json', 'build/manifest.json')\"",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "test": "vitest",
     "test:watch": "vitest watch",
