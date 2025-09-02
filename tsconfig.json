@@ -12,7 +12,8 @@
 		"moduleResolution": "bundler",
 		"target": "ES2022",
 		"types": [
-			"svelte"
+			"svelte",
+			"node"
 		]
 	},
 	"include": [
