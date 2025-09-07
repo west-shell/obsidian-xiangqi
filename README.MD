@@ -2,8 +2,8 @@
 
 ![版本](https://img.shields.io/badge/版本-2.3.5-blue.svg)
 [![许可证](https://img.shields.io/badge/许可证-MIT-green.svg)](./LICENSE)
-[![英文](https://img.shields.io/badge/Language-English-blue)](./README.en.MD)
-[![中文](https://img.shields.io/badge/语言-简体中文-green)](./README.MD)
+[![英文](https://img.shields.io/badge/Language-English-blue)](./readme.en.md)
+[![中文](https://img.shields.io/badge/语言-简体中文-green)](./readme.md)
 
 ## 插件简介
 
@@ -14,7 +14,7 @@
 本插件注册了 `.pgn` 文件的专属视图。在 Obsidian 中直接打开 `.pgn` 文件，即可看到渲染后的棋盘界面，而非纯文本。
 
 - **实时读写**：对棋谱的任何操作（如走子、添加变招或评论）都会被实时、自动地保存回原始 `.pgn` 文件。
-- **功能完备**：支持分支变招、NAGs（数字注释符号）、评论和标注。
+- **功能完备**：支持分支变招、评论和标注。
 
 ![PGN 文件](./IMAGE/PGN文件.png)
 
@@ -131,18 +131,13 @@ p:true
 
 ## 安装说明
 
-1. 下载插件文件
-2. 在 Obsidian 中：
+本插件已在 Obsidian 官方插件市场上线，搜索“Chinese chess”或者"xiangqi"即可安装。
 
-    - 打开 **设置 → 第三方插件**
-    - 关闭 **安全模式**
-
-3. 打开插件目录：
-
-    - 电脑端点击 📂 按钮
-    - 移动端需手动打开 `你的仓库/.obsidian/plugins`
-    - 新建一个文件夹并放入插件文件
-
-4. 启用插件
-
-_注：即将上线 Obsidian 官方插件市场（搜索“Chinese chess”）_
+1. 打开 Obsidian。
+2. 进入 **设置** (Settings)。
+3. 点击 **第三方插件** (Community plugins)。
+4. 确保 **安全模式** (Restricted mode) 已关闭。
+5. 点击 **浏览** (Browse) 按钮。
+6. 在搜索框中输入 “Chinese chess”。
+7. 找到本插件并点击 **安装** (Install)。
+8. 安装完成后，点击 **启用** (Enable)。

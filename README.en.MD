@@ -2,8 +2,8 @@
 
 ![Version](https://img.shields.io/badge/Version-2.3.5-blue.svg)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](./LICENSE)
-[![EN](https://img.shields.io/badge/Language-English-blue)](./README.en.MD)
-[![ZH](https://img.shields.io/badge/Language-Chinese-green)](./README.MD)
+[![EN](https://img.shields.io/badge/Language-English-blue)](./readme.en.md)
+[![ZH](https://img.shields.io/badge/Language-Chinese-green)](./readme.md)
 
 ## Plugin Overview
 
@@ -14,7 +14,7 @@
 This plugin registers a custom view for `.pgn` files. Simply open a `.pgn` file in Obsidian to see the rendered board interface instead of plain text.
 
 - **Real-time Read/Write**: Any changes to the game (like making moves, adding variations, or comments) are saved back to the original `.pgn` file instantly and automatically.
-- **Full-featured**: Supports variations, NAGs (Numeric Annotation Glyphs), comments, and annotations.
+- **Full-featured**: Supports variations, comments, and annotations.
 
 ![PGN File](./IMAGE/PGN文件.png)
 
@@ -128,19 +128,13 @@ p:true
 
 ## Installation
 
-1. Download the plugin files
+This plugin is now available on the official Obsidian plugin marketplace. Search for "Chinese chess" or "xiangqi" to install it.
 
-2. In Obsidian:
-
-    - Open **Settings → Community Plugins**
-    - Turn off **Safe Mode**
-
-3. Open the plugin folder:
-
-    - On desktop, click the 📂 icon
-    - On mobile, open `your-vault/.obsidian/plugins` manually
-    - Create a new folder and place plugin files inside
-
-4. Enable the plugin
-
-_Note: Will be available soon on the Obsidian plugin marketplace (search "Chinese chess")_
+1. Open Obsidian.
+2. Go to **Settings**.
+3. Click on **Community plugins**.
+4. Make sure **Restricted mode** is turned off.
+5. Click the **Browse** button.
+6. Search for "Chinese chess" or "xiangqi" in the search bar.
+7. Find this plugin and click **Install**.
+8. After installation, click **Enable**.
