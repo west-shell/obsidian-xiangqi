@@ -2,8 +2,8 @@
 
 ![Version](https://img.shields.io/badge/Version-2.3.5-blue.svg)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](./LICENSE)
-[![EN](https://img.shields.io/badge/Language-English-blue)](./readme.en.md)
-[![ZH](https://img.shields.io/badge/Language-Chinese-green)](./readme.md)
+[![EN](https://img.shields.io/badge/Language-English-blue)](./READMEen.md)
+[![ZH](https://img.shields.io/badge/Language-Chinese-green)](./README.md)
 
 ## Plugin Overview
 
