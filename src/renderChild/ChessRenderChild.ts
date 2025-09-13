@@ -4,7 +4,6 @@ import {
     MarkdownRenderChild,
 } from 'obsidian';
 import {
-    type ModuleRegistry,
     createXQModuleRegistry,
     destroyXQModuleRegistry
 } from '../core/module-system';
@@ -20,7 +19,6 @@ import '../modules/Xiangqi/Speaker';
 
 export class ChessRenderChild extends MarkdownRenderChild {
     settings: ISettings;
-    moduleRegistry: ModuleRegistry | undefined;
     eventBus!: EventBus;
     constructor(
         public containerEl: HTMLElement,
@@ -34,7 +32,7 @@ export class ChessRenderChild extends MarkdownRenderChild {
 
     onload(): void {
         this.plugin.renderChildren.add(this);
-        this.moduleRegistry = createXQModuleRegistry(this);
+        createXQModuleRegistry(this);
         this.eventBus.emit('load', 'xq');
     }
 

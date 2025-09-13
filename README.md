@@ -1,9 +1,9 @@
 # 中国象棋插件 for Obsidian
 
-![版本](https://img.shields.io/badge/版本-2.3.5-blue.svg)
-[![许可证](https://img.shields.io/badge/许可证-MIT-green.svg)](./LICENSE)
-[![英文](https://img.shields.io/badge/Language-English-blue)](./README.en.md)
-[![中文](https://img.shields.io/badge/语言-简体中文-green)](./README.md)
+![版本](https://img.shields.io/github/v/release/west-shell/obsidian-xiangqi)
+[![许可证](https://img.shields.io/github/license/west-shell/obsidian-xiangqi)](./LICENSE)
+[![英文](https://img.shields.io/badge/Lang-En-yellow)](./README.en.md)
+[![中文](https://img.shields.io/badge/语言-中文-red)](./README.md)
 
 ## 插件简介
 

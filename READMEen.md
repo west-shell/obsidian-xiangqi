@@ -1,9 +1,9 @@
 # Chinese Chess Plugin for Obsidian
 
-![Version](https://img.shields.io/badge/Version-2.3.5-blue.svg)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](./LICENSE)
-[![EN](https://img.shields.io/badge/Language-English-blue)](./READMEen.md)
-[![ZH](https://img.shields.io/badge/Language-Chinese-green)](./README.md)
+![Version](https://img.shields.io/github/v/release/west-shell/obsidian-xiangqi)
+[![License](https://img.shields.io/github/license/west-shell/obsidian-xiangqi)](./LICENSE)
+[![EN](https://img.shields.io/badge/Lang-En-yellow)](./READMEen.md)
+[![ZH](https://img.shields.io/badge/语言-中文-red)](./README.md)
 
 ## Plugin Overview
 
