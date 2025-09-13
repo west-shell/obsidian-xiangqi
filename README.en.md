@@ -2,7 +2,7 @@
 
 ![Version](https://img.shields.io/github/v/release/west-shell/obsidian-xiangqi)
 [![License](https://img.shields.io/github/license/west-shell/obsidian-xiangqi)](./LICENSE)
-[![EN](https://img.shields.io/badge/Lang-En-yellow)](./READMEen.md)
+[![EN](https://img.shields.io/badge/Lang-En-yellow)](./README.en.md)
 [![ZH](https://img.shields.io/badge/语言-中文-red)](./README.md)
 
 ## Plugin Overview
