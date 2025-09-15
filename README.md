@@ -2,8 +2,8 @@
 
 ![版本](https://img.shields.io/github/v/release/west-shell/obsidian-xiangqi)
 [![许可证](https://img.shields.io/github/license/west-shell/obsidian-xiangqi)](./LICENSE)
-[![英文](https://img.shields.io/badge/Lang-En-yellow)](./README.en.md)
-[![中文](https://img.shields.io/badge/语言-中文-red)](./README.md)
+[![EN](https://img.shields.io/badge/README-English-yellow)](./README.en.md)
+[![ZH](https://img.shields.io/badge/README-中文-red)](./README.md)
 
 ## 插件简介
 
