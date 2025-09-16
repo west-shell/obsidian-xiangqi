@@ -82,6 +82,7 @@
 
   .move-list.right {
     display: flex;
+    flex-wrap: nowrap;
     flex-direction: column;
     align-items: flex-start;
     overflow-y: auto;
@@ -97,7 +98,7 @@
 
   .move-list.bottom {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     overflow-y: auto;
     width: var(--width);
     max-height: calc(var(--width) / 2);
