@@ -16,8 +16,8 @@
   const buttons = [
     { title: "重置", icon: "refresh-cw", event: "reset" },
     { title: "开局", icon: "arrow-left-to-line", event: "toStart" },
-    { title: "回退", icon: "undo-dot", event: "undo" },
-    { title: "前进", icon: "redo-dot", event: "redo" },
+    { title: "回退", icon: "arrow-left", event: "undo" },
+    { title: "前进", icon: "arrow-right", event: "redo" },
     { title: "终局", icon: "arrow-right-to-line", event: "toEnd" },
   ];
 
