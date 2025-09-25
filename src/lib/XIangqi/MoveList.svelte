@@ -33,18 +33,14 @@
     --fontsize: {settings.fontSize}px;"
 >
   <ul class="move-list {settings.position}" bind:this={ulRef}>
-    <li
-      class="start"
-      bind:this={itemRefs[0]}
-      style:display={settings.position === "right" ? "flex" : "none"}
-    >
+    <li class="start" bind:this={itemRefs[0]}>
       <span class="roundnum">0</span>
       <span
         class="move"
         class:active={currentStep === 0}
         onclick={() => eventBus.emit("clickstep", 0)}
       >
-        {settings.showPGNtxt ? "=== 开 局 ===" : "开 局"}
+        {settings.showPGNtxt ? "== 开 局 ==" : "开局"}
       </span>
     </li>
     {#each moves as move, i}
@@ -99,9 +95,9 @@
   .move-list.bottom {
     display: flex;
     flex-wrap: nowrap;
-    overflow-y: auto;
+    overflow-x: auto; /* 添加水平滚动条以处理溢出 */
     width: var(--width);
-    max-height: calc(var(--width) / 2);
+    /* max-height: calc(var(--width) / 2); */
     align-content: flex-start;
     padding: 0;
     margin: 0;
@@ -109,25 +105,53 @@
     border-top: 1px solid var(--background-modifier-border);
   }
 
-  li.round,
-  li.start {
-    /* display: flex; */
+  .move-list.right li {
+    display: flex; /* 明确设置为 flex 容器 */
+    flex-wrap: nowrap; /* 确保 li 内部的元素不换行 */
+    flex-shrink: 0; /* 防止 li 元素收缩 */
+    flex-grow: 0; /* 防止 li 元素增长 */
     align-items: center;
     gap: 0.25em;
     padding: 2px;
     margin: 0;
     border-bottom: none;
+    width: 100%; /* 每个 li 元素占据一行 */
+    white-space: nowrap; /* 强制 li 元素本身不换行 */
   }
 
-  span.roundnum {
+  .move-list.bottom li {
+    display: flex; /* 明确设置为 flex 容器 */
+    flex-wrap: nowrap; /* 确保 li 内部的元素不换行 */
+    flex-shrink: 0; /* 防止 li 元素收缩 */
+    flex-grow: 0; /* 防止 li 元素增长 */
+    align-items: center;
+    gap: 0.25em;
+    padding: 2px;
+    margin: 0;
+    border-bottom: none;
+    /* height: 100%; 每个 li 元素占据一行 */
+    white-space: nowrap; /* 强制 li 元素本身不换行 */
+    writing-mode: vertical-rl;
+    text-orientation: upright;
+  }
+
+  .move-list.right .roundnum {
     display: inline-block;
     min-width: 1.5em;
     max-width: 3em;
     text-align: right;
     margin-right: 0.4em;
     white-space: nowrap;
-    flex-shrink: 0;
+    flex-shrink: 0; /* 防止收缩 */
     color: var(--text-muted);
+  }
+
+  .move-list.bottom .roundnum {
+    writing-mode: horizontal-tb; /* 强制水平方向 */
+    text-orientation: mixed; /* 确保数字横排 */
+    display: inline-block;
+    width: 2ch; /* 固定宽度对齐 */
+    text-align: center; /* 右对齐，个位数前会空出 */
   }
 
   span.move {
@@ -141,6 +165,7 @@
     cursor: pointer;
     transition: background-color 0.2s ease;
     white-space: nowrap;
+    flex-shrink: 0; /* 防止收缩 */
   }
 
   span.move:hover {
@@ -149,11 +174,14 @@
 
   span.move {
     color: #337ab7;
+    /* color: var(--text-normal); */
     padding: 2px;
   }
 
   span.move.active {
     /* background-color: var(--interactive-accent); */
     color: red;
+    /* color: var(--text-success); */
+    /* font-weight: bold; */
   }
 </style>
