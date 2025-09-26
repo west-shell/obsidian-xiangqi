@@ -36,11 +36,11 @@
     <li class="start" bind:this={itemRefs[0]}>
       <span class="roundnum">0</span>
       <span
-        class="move"
+        class="move start"
         class:active={currentStep === 0}
         onclick={() => eventBus.emit("clickstep", 0)}
       >
-        {settings.showPGNtxt ? "== 开 局 ==" : "开局"}
+        {settings.showPGNtxt ? "== 开 局 ==" : "开 局"}
       </span>
     </li>
     {#each moves as move, i}
@@ -166,6 +166,10 @@
     transition: background-color 0.2s ease;
     white-space: nowrap;
     flex-shrink: 0; /* 防止收缩 */
+  }
+
+  span.start {
+    flex: 1;
   }
 
   span.move:hover {
