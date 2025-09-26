@@ -26,6 +26,7 @@ export class PGNView extends TextFileView {
     }
 
     setViewData(data: string, clear: boolean = true): void {
+        this.contentEl.empty(); // 清空现有内容
         this.data = data;
         this.eventBus.emit('setViewData');
         this.eventBus.emit('createUI');

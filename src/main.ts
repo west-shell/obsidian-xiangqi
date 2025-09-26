@@ -47,7 +47,7 @@ export default class XQPlugin extends Plugin {
 
 			try {
 				const newFile = await this.app.vault.create(fileName, fileContent);
-				this.app.workspace.getLeaf().openFile(newFile);
+				this.app.workspace.getLeaf(true).openFile(newFile);
 			} catch (error) {
 				console.error("创建 PGN 文件失败:", error);
 			}
