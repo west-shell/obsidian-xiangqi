@@ -7,8 +7,8 @@ export interface ISettings {
 	fontSize: number;
 	autoJump: "never" | "always" | "auto";
 	enableSpeech: boolean;
-	showPGN: boolean;
-	showPGNtxt: boolean;
+	displayMovelist: boolean;
+	displayMovelistText: boolean;
 	viewOnly?: boolean;
 	rotated?: boolean;
 }

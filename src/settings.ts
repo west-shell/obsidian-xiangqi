@@ -10,8 +10,8 @@ export const DEFAULT_SETTINGS: ISettings = {
 	fontSize: 12,
 	autoJump: "auto",
 	enableSpeech: true,
-	showPGN: true,
-	showPGNtxt: true,
+	displayMovelist: true,
+	displayMovelistText: true,
 	viewOnly: false,
 	rotated: false,
 };
@@ -105,8 +105,8 @@ export class XQSettingTab extends PluginSettingTab {
 			.setName("启用着法列表")
 			.setDesc("是否显示棋谱")
 			.addToggle((toggle) =>
-				toggle.setValue(settings.showPGN).onChange((value) => {
-					settings.showPGN = value;
+				toggle.setValue(settings.displayMovelist).onChange((value) => {
+					settings.displayMovelist = value;
 					this.plugin.saveSettings();
 					this.plugin.refresh();
 				}),
@@ -116,8 +116,8 @@ export class XQSettingTab extends PluginSettingTab {
 			.setName("显示着法文字")
 			.setDesc("是否显示棋谱着法文字")
 			.addToggle((toggle) =>
-				toggle.setValue(settings.showPGNtxt).onChange((value) => {
-					settings.showPGNtxt = value;
+				toggle.setValue(settings.displayMovelistText).onChange((value) => {
+					settings.displayMovelistText = value;
 					this.plugin.saveSettings();
 					this.plugin.refresh();
 					this.display();
