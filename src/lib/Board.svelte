@@ -70,16 +70,16 @@
     <rect
       {width}
       {height}
-      fill={bgColor}
+      fill="var(--board-background)"
       rx="5"
-      stroke={currentTurn === "red" ? red : black}
+      stroke={currentTurn === "red" ? "var(--piece-red)" : "var(--piece-black)"}
       stroke-width={cellSize * 0.2}
     />
 
     <!-- 外框 -->
     <path
       d={`M ${cellSize - margin},${cellSize - margin} h ${8 * cellSize + 2 * margin} v ${9 * cellSize + 2 * margin} h -${8 * cellSize + 2 * margin} Z`}
-      stroke={lineColor}
+      stroke="var(--board-line)"
       stroke-width={cellSize * 0.08}
       fill="none"
     />
@@ -88,7 +88,7 @@
     {#each Array(10).fill(0) as _, i}
       <path
         d={`M ${cellSize},${cellSize * (i + 1)} h ${cellSize * 8}`}
-        stroke={lineColor}
+        stroke="var(--board-line)"
         stroke-width={cellSize * 0.04}
         fill="none"
       />
@@ -98,13 +98,13 @@
     {#each Array(9).fill(0) as _, i}
       <path
         d={`M ${cellSize * (i + 1)},${cellSize} v ${cellSize * 4}`}
-        stroke={lineColor}
+        stroke="var(--board-line)"
         stroke-width={cellSize * 0.04}
         fill="none"
       />
       <path
         d={`M ${cellSize * (i + 1)},${cellSize * 6} v ${cellSize * 4}`}
-        stroke={lineColor}
+        stroke="var(--board-line)"
         stroke-width={cellSize * 0.04}
         fill="none"
       />
@@ -116,7 +116,7 @@
       y1={cellSize}
       x2={cellSize}
       y2={10 * cellSize}
-      stroke={lineColor}
+      stroke="var(--board-line)"
       stroke-width={cellSize * 0.04}
     />
     <line
@@ -124,7 +124,7 @@
       y1={cellSize}
       x2={cellSize * 9}
       y2={10 * cellSize}
-      stroke={lineColor}
+      stroke="var(--board-line)"
       stroke-width={cellSize * 0.04}
     />
 
@@ -136,13 +136,13 @@
       font-family="FZLiShu II-S06"
       text-anchor="middle"
       dominant-baseline="middle"
-      fill={textColor}
+      fill="var(--board-line)"
     >
       <tspan dy="0.15em">楚　河　　汉　界</tspan>
     </text>
 
     <!-- 九宫 -->
-    <g stroke={lineColor} stroke-width={cellSize * 0.03} fill="none">
+    <g stroke="var(--board-line)" stroke-width={cellSize * 0.03} fill="none">
       <path
         d={`M ${cellSize * 4},${cellSize} l ${cellSize * 2} ${cellSize * 2} m 0,${-2 * cellSize} l ${-2 * cellSize} ${2 * cellSize}`}
       />
@@ -152,7 +152,7 @@
     </g>
 
     <!-- 炮兵位 -->
-    <g stroke={lineColor} stroke-width={cellSize * 0.02} fill="none">
+    <g stroke="var(--board-line)" stroke-width={cellSize * 0.02} fill="none">
       {#each [[2, 3], [8, 3], [2, 8], [8, 8], [3, 4], [5, 4], [7, 4], [3, 7], [7, 7], [5, 7]] as i}
         <path
           d={`M ${i[0] * cellSize},${i[1] * cellSize} m -${3 * margin},-${margin} h ${2 * margin} v -${2 * margin} m ${2 * margin},0 v ${2 * margin} h ${2 * margin} m 0,${2 * margin} h -${2 * margin} v ${2 * margin} m -${2 * margin},0 v -${2 * margin} h -${2 * margin}`}
@@ -178,9 +178,9 @@
             <g transform="translate({(x + 1) * cellSize}, {(y + 1) * cellSize})">
               <circle
                 r={cellSize * 0.4}
-                fill={piece === piece.toUpperCase() ? red : black}
-                stroke="#fff"
-                stroke-width={cellSize * 0.02}
+                fill={piece === piece.toUpperCase() ? "var(--piece-red)" : "var(--piece-black)"}
+                stroke="var(--board-line)"
+                stroke-width={cellSize * 0.04}
               />
               <text
                 x="0"
@@ -208,9 +208,9 @@
               M ${0.4 * cellSize - margin},${-0.4 * cellSize} h ${margin} v ${margin}
               M ${0.4 * cellSize},${0.4 * cellSize - margin} v ${margin} h ${-margin}
               M ${-0.4 * cellSize + margin},${0.4 * cellSize} h ${-margin} v ${-margin}`}
-          stroke="red"
+          stroke="var(--color-yellow)"
           stroke-width={cellSize * 0.05}
-          fill="red"
+          fill="var(--color-yellow)"
         />
       </g>
     {/if}
@@ -218,6 +218,14 @@
 </div>
 
 <style>
+  .board-container {
+    --board-background: var(--xq-board-background, var(--background-primary-alt));
+    --board-line: var(--xq-board-line, var(--text-normal));
+    --piece-red: var(--xq-piece-red, var(--color-red));
+    --piece-black: var(--xq-poece-black, var(--color-blue));
+    --mark-color: var(--xq-mark-color, var(--color-yellow));
+    --text-color: var(--xq-text-color, var(--text-normal));
+  }
   .xq-board {
     user-select: none;
   }
