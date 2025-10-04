@@ -9,18 +9,37 @@ export function scrollToBTN(
     container: HTMLElement | null,
 ): void {
     if (!element || !container) return;
-    const hasVerticalScrollbar = container.scrollHeight > container.clientHeight;
-    if (!hasVerticalScrollbar) return;
+
     const elementRect = element.getBoundingClientRect();
     const containerRect = container.getBoundingClientRect();
-    const offsetTop = elementRect.top - containerRect.top;
-    const targetScrollTop =
-        container.scrollTop +
-        offsetTop -
-        container.clientHeight / 2 +
-        element.offsetHeight / 2;
-    container.scrollTo({
-        top: targetScrollTop,
-        behavior: "smooth",
-    });
+
+    // 检查垂直滚动条
+    const hasVerticalScrollbar = container.scrollHeight > container.clientHeight;
+    if (hasVerticalScrollbar) {
+        const offsetTop = elementRect.top - containerRect.top;
+        const targetScrollTop =
+            container.scrollTop +
+            offsetTop -
+            container.clientHeight / 2 +
+            element.offsetHeight / 2;
+        container.scrollTo({
+            top: targetScrollTop,
+            behavior: "smooth",
+        });
+    }
+
+    // 检查水平滚动条
+    const hasHorizontalScrollbar = container.scrollWidth > container.clientWidth;
+    if (hasHorizontalScrollbar) {
+        const offsetLeft = elementRect.left - containerRect.left;
+        const targetScrollLeft =
+            container.scrollLeft +
+            offsetLeft -
+            container.clientWidth / 2 +
+            element.offsetWidth / 2;
+        container.scrollTo({
+            left: targetScrollLeft,
+            behavior: "smooth",
+        });
+    }
 }

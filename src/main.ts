@@ -64,7 +64,7 @@ export default class XQPlugin extends Plugin {
 						document.body.classList.contains("theme-dark");
 					this.settings.theme = isDarkMode() ? "dark" : "light"; // 自动主题时默认使用深色
 					applyThemes(this.settings.theme)
-					this.refresh();
+					// this.refresh();
 				}
 			}),
 		);
