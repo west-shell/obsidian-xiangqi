@@ -20,7 +20,7 @@
 <div class="tree-view {settings.position}">
   <Board {settings} {board} {lastMove} {markedPos} {currentTurn} {eventBus} rotated={false} />
   <Toolbar {eventBus} />
-  <Tree theme={settings.theme} {nodeMap} {eventBus} {currentNode} {currentPath} />
+  <Tree {nodeMap} {eventBus} {currentNode} {currentPath} />
 </div>
 
 <style>

@@ -15,7 +15,7 @@ export default class XQPlugin extends Plugin {
 
 		this.addSettingTab(new XQSettingTab(this.app, this));
 
-		applyThemes(this.settings.theme, this.settings.autoTheme);
+		applyThemes(this.settings.theme);
 
 		this.registerMarkdownCodeBlockProcessor('xiangqi', (source, el, ctx) => {
 			const renderChild = new ChessRenderChild(el, ctx, source, this);
@@ -59,12 +59,8 @@ export default class XQPlugin extends Plugin {
 		this.registerEvent(
 			this.app.workspace.on("css-change", () => {
 				// 主题已改变
-				if (this.settings.autoTheme) {
-					const isDarkMode = () =>
-						document.body.classList.contains("theme-dark");
-					this.settings.theme = isDarkMode() ? "dark" : "light"; // 自动主题时默认使用深色
+				if (this.settings.theme === "auto") {
 					applyThemes(this.settings.theme)
-					// this.refresh();
 				}
 			}),
 		);
@@ -86,7 +82,7 @@ export default class XQPlugin extends Plugin {
 
 	async saveSettings() {
 		await this.saveData(this.settings);
-		applyThemes(this.settings.theme, this.settings.autoTheme);
+		applyThemes(this.settings.theme);
 	}
 
 }

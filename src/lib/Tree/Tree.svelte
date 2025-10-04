@@ -1,11 +1,9 @@
 <script lang="ts">
   import { onMount, tick } from "svelte";
   import { PIECE_CHARS, type ChessNode, type NodeMap } from "../../types";
-  import { themes } from "../../themes";
   import { createInteractionHandlers } from "./interact";
   import { calculateTreeLayout } from "./layout";
 
-  export let theme: keyof typeof themes;
   export let nodeMap: NodeMap;
   export let eventBus: { emit: (event: string, payload: any) => void };
   export let currentNode: ChessNode | null;
@@ -86,7 +84,6 @@
 
   $: currentNode;
 
-  $: ({ bgColor, red, black, lineColor, textColor } = themes[theme]);
   const spacingX = 30;
   const spacingY = 17;
 

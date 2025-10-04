@@ -4,8 +4,7 @@ import { type App, PluginSettingTab, Setting } from "obsidian";
 
 export const DEFAULT_SETTINGS: ISettings = {
 	position: "right",
-	theme: "dark",
-	autoTheme: true,
+	theme: "auto",
 	cellSize: 50,
 	fontSize: 12,
 	showLastMove: true,
@@ -41,17 +40,9 @@ export class XQSettingTab extends PluginSettingTab {
 					auto: "跟随",
 				});
 				dropdown
-					.setValue(settings.autoTheme ? "auto" : settings.theme)
+					.setValue(settings.theme)
 					.onChange((theme) => {
-						if (theme === "auto") {
-							settings.autoTheme = true;
-							const isDarkMode = () =>
-								document.body.classList.contains("theme-dark");
-							settings.theme = isDarkMode() ? "dark" : "light"; // 自动主题时默认使用深色
-						} else {
-							settings.autoTheme = false;
-							settings.theme = theme as "light" | "dark";
-						}
+						settings.theme = theme as "auto" | "light" | "dark";
 						this.plugin.saveSettings();
 						this.plugin.refresh();
 					});

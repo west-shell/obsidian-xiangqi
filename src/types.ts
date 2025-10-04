@@ -1,8 +1,7 @@
 export const DEFAULT_FEN = 'rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w'
 export interface ISettings {
 	position: "bottom" | "right";
-	theme: "light" | "dark";
-	autoTheme: boolean;
+	theme: "light" | "dark" | "auto";
 	cellSize: number;
 	fontSize: number;
 	showLastMove: boolean;
