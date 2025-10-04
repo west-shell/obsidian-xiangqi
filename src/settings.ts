@@ -8,6 +8,8 @@ export const DEFAULT_SETTINGS: ISettings = {
 	autoTheme: true,
 	cellSize: 50,
 	fontSize: 12,
+	showLastMove: true,
+	showTurnBorder: true,
 	autoJump: "auto",
 	enableSpeech: true,
 	displayMovelist: true,

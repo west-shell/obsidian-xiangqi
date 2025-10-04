@@ -115,12 +115,10 @@
 
   .active {
     filter: brightness(1.5) saturate(1.4) drop-shadow(0 0 6px rgba(255, 255, 255, 0.6));
-    color: #ddd;
   }
 
   .empty {
     pointer-events: none;
     filter: grayscale(0.4) brightness(0.8);
-    color: #ddd;
   }
 </style>

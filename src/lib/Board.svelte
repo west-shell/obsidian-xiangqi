@@ -1,24 +1,22 @@
 <script lang="ts">
   import type { EventBus } from "../core/event-bus";
-  import type { IBoard, IPosition, ISettings } from "../types";
+  import type { IBoard, IMove, IPosition, ISettings } from "../types";
   import { PIECE_CHARS } from "../types";
-  import { themes } from "./themes";
 
   export let settings: ISettings;
   export let board: IBoard;
+  export let lastMove: IMove | null = null;
   export let markedPos: IPosition | null = null;
   export let currentTurn: string;
   export let eventBus: EventBus;
   export let rotated: boolean;
 
-  let bgColor: string, lineColor: string, textColor: string, red: string, black: string;
   let cellSize: number, margin: number, width: number, height: number;
 
   let renderedBoard: IBoard;
   let renderedMarkedPos: IPosition | null;
 
-  $: ({ bgColor, lineColor, textColor, red, black } = themes[settings.theme]);
-  $: cellSize = settings.cellSize;
+  $: ({ cellSize, showLastMove, showTurnBorder } = settings);
   $: margin = cellSize * 0.1;
   $: width = cellSize * 10;
   $: height = cellSize * 11;
@@ -39,6 +37,8 @@
 
   $: renderedBoard = rotated ? rotateBoard(board) : board;
   $: renderedMarkedPos = rotated && markedPos ? rotatePos(markedPos) : markedPos;
+  $: renderedLastMove =
+    rotated && lastMove ? { from: rotatePos(lastMove.from), to: rotatePos(lastMove.to) } : lastMove;
 
   function handleClick(e: MouseEvent) {
     const svg = e.currentTarget as SVGSVGElement;
@@ -72,7 +72,11 @@
       {height}
       fill="var(--board-background)"
       rx="5"
-      stroke={currentTurn === "red" ? "var(--piece-red)" : "var(--piece-black)"}
+      stroke={showTurnBorder
+        ? currentTurn === "red"
+          ? "var(--piece-red)"
+          : "var(--piece-black)"
+        : "var(--background-modifier-border)"}
       stroke-width={cellSize * 0.2}
     />
 
@@ -202,6 +206,34 @@
     {#if renderedMarkedPos}
       <g
         transform={`translate(${(renderedMarkedPos.x + 1) * cellSize}, ${(renderedMarkedPos.y + 1) * cellSize})`}
+      >
+        <path
+          d={`M ${-0.4 * cellSize},${-0.4 * cellSize + margin} v ${-margin} h ${margin}
+              M ${0.4 * cellSize - margin},${-0.4 * cellSize} h ${margin} v ${margin}
+              M ${0.4 * cellSize},${0.4 * cellSize - margin} v ${margin} h ${-margin}
+              M ${-0.4 * cellSize + margin},${0.4 * cellSize} h ${-margin} v ${-margin}`}
+          stroke="var(--color-yellow)"
+          stroke-width={cellSize * 0.05}
+          fill="var(--color-yellow)"
+        />
+      </g>
+    {/if}
+    <!-- 上次走子标记 -->
+    {#if showLastMove && renderedLastMove && !renderedMarkedPos}
+      <g
+        transform={`translate(${(renderedLastMove.from.x + 1) * cellSize}, ${(renderedLastMove.from.y + 1) * cellSize})`}
+      >
+        <rect
+          x={-cellSize * 0.2}
+          y={-cellSize * 0.2}
+          width={cellSize * 0.4}
+          height={cellSize * 0.4}
+          fill="yellow"
+          opacity="0.8"
+        />
+      </g>
+      <g
+        transform={`translate(${(renderedLastMove.to.x + 1) * cellSize}, ${(renderedLastMove.to.y + 1) * cellSize})`}
       >
         <path
           d={`M ${-0.4 * cellSize},${-0.4 * cellSize + margin} v ${-margin} h ${margin}

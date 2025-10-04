@@ -17,6 +17,7 @@
   export let history: IMove[];
   export let options: IOptions;
   $: moves = modified ? history : PGN;
+  $: lastMove = moves[currentStep - 1] || null;
   $: isprotected = options.protected || false;
   $: rotated = options.rotated || false;
   onMount(async () => {
@@ -26,7 +27,7 @@
 </script>
 
 <div class="XQ-container {settings.position}">
-  <Board {settings} {board} {markedPos} {currentTurn} {eventBus} {rotated} />
+  <Board {settings} {board} {lastMove} {markedPos} {currentTurn} {eventBus} {rotated} />
   <Toolbar {settings} {eventBus} {modified} {PGN} {isprotected} />
   {#if settings.displayMovelist}
     <MoveList {settings} {currentStep} {moves} {eventBus} />

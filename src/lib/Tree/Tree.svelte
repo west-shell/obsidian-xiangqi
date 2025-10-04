@@ -197,10 +197,7 @@
   }
 </script>
 
-<div
-  class="container"
-  style="--theme-text-color:{textColor}; --tree-bg:{bgColor}; --line-color:{lineColor}; --red-color:{red}; --black-color:{black};"
->
+<div class="container">
   <div class="svg-wrapper">
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     <svg
@@ -226,7 +223,7 @@
                 y1={node.y! * spacingY}
                 x2={(child.x! - Math.sign(child.x! - node.x!)) * spacingX}
                 y2={node.y! * spacingY}
-                stroke="var(--line-color)"
+                stroke="var(--text-normal)"
                 stroke-width={currentPath.includes(node.id) && currentPath.includes(child.id)
                   ? 2
                   : 0.7}
@@ -237,7 +234,7 @@
                 y1={node.y! * spacingY}
                 x2={child.x! * spacingX}
                 y2={child.y! * spacingY}
-                stroke="var(--line-color)"
+                stroke="var(--text-normal)"
                 stroke-width={currentPath.includes(node.id) && currentPath.includes(child.id)
                   ? 2
                   : 0.7}
@@ -249,7 +246,7 @@
                 y1={node.y! * spacingY}
                 x2={child.x! * spacingX}
                 y2={child.y! * spacingY}
-                stroke="var(--line-color)"
+                stroke="var(--text-normal)"
                 stroke-width={currentPath.includes(node.id) && currentPath.includes(child.id)
                   ? 2
                   : 0.7}
@@ -283,11 +280,11 @@
               rx="3"
               ry="3"
               fill={node.side === "red"
-                ? "var(--red-color)"
+                ? "var(--color-red)"
                 : node.side === "black"
-                  ? "var(--black-color)"
+                  ? "var(--color-blue)"
                   : "gray"}
-              stroke="var(--line-color)"
+              stroke="var(--text-normal)"
               stroke-width={node === currentNode ? 1.5 : 0.5}
             />
             <text dy="3.5" text-anchor="middle" fill="#FFFFFF" font-size="9px">
@@ -371,6 +368,7 @@
   ></textarea>
 </div>
 
+<!-- style="--theme-text-color:{textColor}; --tree-bg:{bgColor}; --text-normal:{lineColor}; --color-red:{red}; --color-blue:{black};" -->
 <style>
   .container {
     display: flex;
@@ -378,14 +376,12 @@
     height: 100%;
     max-height: 100vh;
     overflow: hidden;
-    --tree-bg: var(--background-primary);
-    --theme-text-color: var(--text-normal);
   }
 
   .svg-wrapper {
     flex: 1 1 auto;
     overflow: hidden;
-    background-color: var(--background-primary);
+    background-color: var(--background-secondary);
     min-height: 0;
     padding: 0;
     box-sizing: border-box;
@@ -395,7 +391,6 @@
     user-select: none;
     touch-action: none;
     display: block;
-    background-color: var(--tree-bg);
   }
 
   .node-group {
@@ -409,8 +404,8 @@
     resize: none;
     font-family: var(--font-family);
     font-size: var(--font-size-normal);
-    color: var(--theme-text-color);
-    background: var(--background-primary);
+    color: var(--text-normal);
+    background: var(--background-secondary);
     border: 1px solid var(--background-modifier-border);
     border-radius: 3px;
     box-sizing: border-box;

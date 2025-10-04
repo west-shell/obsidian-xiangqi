@@ -5,6 +5,8 @@ export interface ISettings {
 	autoTheme: boolean;
 	cellSize: number;
 	fontSize: number;
+	showLastMove: boolean;
+	showTurnBorder: boolean;
 	autoJump: "never" | "always" | "auto";
 	enableSpeech: boolean;
 	displayMovelist: boolean;

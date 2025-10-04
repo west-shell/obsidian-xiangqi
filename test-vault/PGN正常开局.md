@@ -1,6 +1,6 @@
 ```xiangqi
 p:true
-r:true
+r:fasle
 [Game "Chinese Chess"]
 [Title "曹岩磊 先胜 何文哲"]
 [Event "2025年“高新高港杯”全国象棋公开赛"]

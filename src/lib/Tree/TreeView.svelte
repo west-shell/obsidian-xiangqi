@@ -13,10 +13,12 @@
   export let nodeMap: NodeMap;
   export let currentNode: ChessNode;
   export let currentPath: string[];
+
+  $: lastMove = currentNode.data;
 </script>
 
 <div class="tree-view">
-  <Board {settings} {board} {markedPos} {currentTurn} {eventBus} rotated={false} />
+  <Board {settings} {board} {lastMove} {markedPos} {currentTurn} {eventBus} rotated={false} />
   <Toolbar {eventBus} />
   <Tree theme={settings.theme} {nodeMap} {eventBus} {currentNode} {currentPath} />
 </div>
