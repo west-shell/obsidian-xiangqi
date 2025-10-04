@@ -33,7 +33,7 @@ export class XQSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName("主题")
-			.setDesc("设置棋盘主题.")
+			// .setDesc("设置棋盘主题.")
 			.addDropdown((dropdown) => {
 				dropdown.addOptions({
 					light: "浅色",
@@ -58,12 +58,12 @@ export class XQSettingTab extends PluginSettingTab {
 			});
 
 		new Setting(containerEl)
-			.setName("按钮布局")
-			.setDesc("设置按钮的位置.")
+			.setName("布局")
+			// .setDesc("设置按钮的位置.")
 			.addDropdown((dropdown) => {
 				dropdown.addOptions({
-					right: "右侧",
-					bottom: "底部",
+					right: "横向",
+					bottom: "纵向",
 				});
 
 				dropdown.setValue(settings.position).onChange((position) => {
@@ -72,27 +72,6 @@ export class XQSettingTab extends PluginSettingTab {
 					this.plugin.refresh();
 				});
 			});
-
-		new Setting(containerEl)
-			.setName("是否显示走后着法")
-			// .setDesc("是否显示棋谱")
-			.addToggle((toggle) =>
-				toggle.setValue(settings.showLastMove).onChange((value) => {
-					settings.showLastMove = value;
-					this.plugin.saveSettings();
-					this.plugin.refresh();
-				}),
-			);
-		new Setting(containerEl)
-			.setName("是否显示当前该谁行棋的边框")
-			// .setDesc("是否显示棋谱")
-			.addToggle((toggle) =>
-				toggle.setValue(settings.showTurnBorder).onChange((value) => {
-					settings.showTurnBorder = value;
-					this.plugin.saveSettings();
-					this.plugin.refresh();
-				}),
-			);
 
 		new Setting(containerEl)
 			.setName("界面大小")
@@ -122,11 +101,34 @@ export class XQSettingTab extends PluginSettingTab {
 				});
 			});
 
+		new Setting(containerEl).setName("轮次提示").setHeading();
+
+		new Setting(containerEl)
+			// .setName("是否显示当前着法")
+			.setDesc("是否显示当前着法")
+			.addToggle((toggle) =>
+				toggle.setValue(settings.showLastMove).onChange((value) => {
+					settings.showLastMove = value;
+					this.plugin.saveSettings();
+					this.plugin.refresh();
+				}),
+			);
+		new Setting(containerEl)
+			// .setName("是否显示当前该谁行棋的边框")
+			.setDesc("是否显示当前该谁行棋的边框")
+			.addToggle((toggle) =>
+				toggle.setValue(settings.showTurnBorder).onChange((value) => {
+					settings.showTurnBorder = value;
+					this.plugin.saveSettings();
+					this.plugin.refresh();
+				}),
+			);
+
 		new Setting(containerEl).setName("着法列表").setHeading();
 
 		new Setting(containerEl)
-			.setName("是否启用着法列表")
-			// .setDesc("是否显示棋谱")
+			// .setName("是否启用着法列表")
+			.setDesc("是否显示棋谱着法列表")
 			.addToggle((toggle) =>
 				toggle.setValue(settings.displayMovelist).onChange((value) => {
 					settings.displayMovelist = value;
@@ -136,8 +138,8 @@ export class XQSettingTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("是否显示着法文字")
-			// .setDesc("是否显示棋谱着法文字")
+			// .setName("是否显示着法文字")
+			.setDesc("是否显示棋谱着法文字")
 			.addToggle((toggle) =>
 				toggle.setValue(settings.displayMovelistText).onChange((value) => {
 					settings.displayMovelistText = value;
@@ -147,8 +149,8 @@ export class XQSettingTab extends PluginSettingTab {
 				}),
 			);
 		new Setting(containerEl)
-			.setName("着法文字大小")
-			// .setDesc("调整着法文字大小")
+			// .setName("着法文字大小")
+			.setDesc("调整着法文字大小")
 			.addSlider((slider) => {
 				const controlEl = slider.sliderEl.parentElement!;
 				// 创建显示滑块值的标签
@@ -176,7 +178,7 @@ export class XQSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName("开局跳转")
-			.setDesc("初始渲染时默认跳转至终局")
+			.setDesc("初始渲染时是否直接跳转至终局")
 			.addDropdown((dropdown) => {
 				dropdown
 					.addOptions({

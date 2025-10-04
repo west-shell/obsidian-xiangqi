@@ -17,7 +17,7 @@
   $: lastMove = currentNode.data;
 </script>
 
-<div class="tree-view">
+<div class="tree-view {settings.position}">
   <Board {settings} {board} {lastMove} {markedPos} {currentTurn} {eventBus} rotated={false} />
   <Toolbar {eventBus} />
   <Tree theme={settings.theme} {nodeMap} {eventBus} {currentNode} {currentPath} />
@@ -26,8 +26,15 @@
 <style>
   .tree-view {
     display: flex;
-    flex-direction: row;
+    justify-content: center;
     height: 100%;
     gap: 4px;
   }
+
+  /* .tree-view.right {
+    flex-direction: row;
+  }
+  .tree-view.bottom {
+    flex-direction: column;
+  } */
 </style>
