@@ -1,5 +1,6 @@
 import { Plugin } from "obsidian";
 import type { ISettings } from "./types";
+import { applyThemes } from "./themes";
 import { ChessRenderChild } from "./renderChild/ChessRenderChild";
 import { GenFENRenderChild } from './renderChild/GenFENRenderChild';
 import { PGNView } from './view/pgn';
@@ -13,6 +14,8 @@ export default class XQPlugin extends Plugin {
 		await this.loadSettings();
 
 		this.addSettingTab(new XQSettingTab(this.app, this));
+
+		applyThemes(this.settings.theme, this.settings.autoTheme);
 
 		this.registerMarkdownCodeBlockProcessor('xiangqi', (source, el, ctx) => {
 			const renderChild = new ChessRenderChild(el, ctx, source, this);
@@ -60,6 +63,7 @@ export default class XQPlugin extends Plugin {
 					const isDarkMode = () =>
 						document.body.classList.contains("theme-dark");
 					this.settings.theme = isDarkMode() ? "dark" : "light"; // 自动主题时默认使用深色
+					applyThemes(this.settings.theme)
 					this.refresh();
 				}
 			}),
@@ -82,6 +86,7 @@ export default class XQPlugin extends Plugin {
 
 	async saveSettings() {
 		await this.saveData(this.settings);
+		applyThemes(this.settings.theme, this.settings.autoTheme);
 	}
 
 }

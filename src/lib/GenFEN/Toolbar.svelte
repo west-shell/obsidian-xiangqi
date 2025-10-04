@@ -46,10 +46,12 @@
   }
 
   .red {
-    background-color: var(--red);
+    background-color: var(--xq-piece-red);
+    color: white;
   }
 
   .black {
-    background-color: var(--black);
+    background-color: var(--xq-piece-black);
+    color: white;
   }
 </style>

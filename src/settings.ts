@@ -74,8 +74,29 @@ export class XQSettingTab extends PluginSettingTab {
 			});
 
 		new Setting(containerEl)
+			.setName("是否显示走后着法")
+			// .setDesc("是否显示棋谱")
+			.addToggle((toggle) =>
+				toggle.setValue(settings.showLastMove).onChange((value) => {
+					settings.showLastMove = value;
+					this.plugin.saveSettings();
+					this.plugin.refresh();
+				}),
+			);
+		new Setting(containerEl)
+			.setName("是否显示当前该谁行棋的边框")
+			// .setDesc("是否显示棋谱")
+			.addToggle((toggle) =>
+				toggle.setValue(settings.showTurnBorder).onChange((value) => {
+					settings.showTurnBorder = value;
+					this.plugin.saveSettings();
+					this.plugin.refresh();
+				}),
+			);
+
+		new Setting(containerEl)
 			.setName("界面大小")
-			.setDesc("调整棋盘大小")
+			// .setDesc("调整棋盘大小")
 			.addSlider((slider) => {
 				const controlEl = slider.sliderEl.parentElement!;
 				// 创建显示滑块值的标签
@@ -104,8 +125,8 @@ export class XQSettingTab extends PluginSettingTab {
 		new Setting(containerEl).setName("着法列表").setHeading();
 
 		new Setting(containerEl)
-			.setName("启用着法列表")
-			.setDesc("是否显示棋谱")
+			.setName("是否启用着法列表")
+			// .setDesc("是否显示棋谱")
 			.addToggle((toggle) =>
 				toggle.setValue(settings.displayMovelist).onChange((value) => {
 					settings.displayMovelist = value;
@@ -115,8 +136,8 @@ export class XQSettingTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("显示着法文字")
-			.setDesc("是否显示棋谱着法文字")
+			.setName("是否显示着法文字")
+			// .setDesc("是否显示棋谱着法文字")
 			.addToggle((toggle) =>
 				toggle.setValue(settings.displayMovelistText).onChange((value) => {
 					settings.displayMovelistText = value;
@@ -127,7 +148,7 @@ export class XQSettingTab extends PluginSettingTab {
 			);
 		new Setting(containerEl)
 			.setName("着法文字大小")
-			.setDesc("调整着法文字大小")
+			// .setDesc("调整着法文字大小")
 			.addSlider((slider) => {
 				const controlEl = slider.sliderEl.parentElement!;
 				// 创建显示滑块值的标签
@@ -173,7 +194,7 @@ export class XQSettingTab extends PluginSettingTab {
 		if (window.speechSynthesis) {
 			new Setting(containerEl)
 				.setName("朗读着法")
-				.setDesc("是否朗读棋谱走法")
+				// .setDesc("是否朗读棋谱走法")
 				.addToggle((toggle) =>
 					toggle.setValue(settings.enableSpeech).onChange((value) => {
 						settings.enableSpeech = value;

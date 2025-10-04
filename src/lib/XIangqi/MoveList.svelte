@@ -177,15 +177,15 @@
   }
 
   span.move {
-    color: #337ab7;
-    /* color: var(--text-normal); */
+    /* color: #337ab7; */
+    color: var(--text-normal);
     padding: 2px;
   }
 
   span.move.active {
     /* background-color: var(--interactive-accent); */
-    color: red;
-    /* color: var(--text-success); */
+    /* color: red; */
+    color: var(--text-error);
     /* font-weight: bold; */
   }
 </style>

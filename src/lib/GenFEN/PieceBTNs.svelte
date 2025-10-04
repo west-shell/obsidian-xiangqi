@@ -62,6 +62,10 @@
 </div>
 
 <style>
+  .piece-btn-container {
+    --piece-red: var(--xq-piece-red, var(--color-red));
+    --piece-black: var(--xq-piece-black, var(--color-blue));
+  }
   .piece-btn-container.right {
     display: grid;
     grid-template-columns: 1fr;
@@ -104,12 +108,12 @@
   }
 
   .red-piece {
-    background-color: var(--red);
+    background-color: var(--piece-red);
     color: white;
   }
 
   .black-piece {
-    background-color: var(--black);
+    background-color: var(--piece-black);
     color: white;
   }
 

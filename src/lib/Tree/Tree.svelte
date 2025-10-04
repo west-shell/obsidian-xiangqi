@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount, tick } from "svelte";
   import { PIECE_CHARS, type ChessNode, type NodeMap } from "../../types";
-  import { themes } from "../themes";
+  import { themes } from "../../themes";
   import { createInteractionHandlers } from "./interact";
   import { calculateTreeLayout } from "./layout";
 
@@ -223,7 +223,7 @@
                 y1={node.y! * spacingY}
                 x2={(child.x! - Math.sign(child.x! - node.x!)) * spacingX}
                 y2={node.y! * spacingY}
-                stroke="var(--text-normal)"
+                stroke="var(--board-line)"
                 stroke-width={currentPath.includes(node.id) && currentPath.includes(child.id)
                   ? 2
                   : 0.7}
@@ -234,7 +234,7 @@
                 y1={node.y! * spacingY}
                 x2={child.x! * spacingX}
                 y2={child.y! * spacingY}
-                stroke="var(--text-normal)"
+                stroke="var(--board-line)"
                 stroke-width={currentPath.includes(node.id) && currentPath.includes(child.id)
                   ? 2
                   : 0.7}
@@ -246,7 +246,7 @@
                 y1={node.y! * spacingY}
                 x2={child.x! * spacingX}
                 y2={child.y! * spacingY}
-                stroke="var(--text-normal)"
+                stroke="var(--board-line)"
                 stroke-width={currentPath.includes(node.id) && currentPath.includes(child.id)
                   ? 2
                   : 0.7}
@@ -280,14 +280,14 @@
               rx="3"
               ry="3"
               fill={node.side === "red"
-                ? "var(--color-red)"
+                ? "var(--piece-red)"
                 : node.side === "black"
-                  ? "var(--color-blue)"
+                  ? "var(--piece-black)"
                   : "gray"}
-              stroke="var(--text-normal)"
+              stroke="var(--board-line)"
               stroke-width={node === currentNode ? 1.5 : 0.5}
             />
-            <text dy="3.5" text-anchor="middle" fill="#FFFFFF" font-size="9px">
+            <text dy="3.5" text-anchor="middle" fill="white" font-size="9px">
               {node.data && node.data.type ? PIECE_CHARS[node.data.type] : "开局"}
             </text>
             <!-- Top-right: Has comments -->
@@ -368,7 +368,6 @@
   ></textarea>
 </div>
 
-<!-- style="--theme-text-color:{textColor}; --tree-bg:{bgColor}; --text-normal:{lineColor}; --color-red:{red}; --color-blue:{black};" -->
 <style>
   .container {
     display: flex;
@@ -376,12 +375,17 @@
     height: 100%;
     max-height: 100vh;
     overflow: hidden;
+    --board-background: var(--background-primary-alt);
+    --board-line: var(--text-normal);
+    --piece-red: var(--xq-piece-red, var(--color-red));
+    --piece-black: var(--xq-piece-black, var(--color-blue));
+    --text-color: var(--text-normal);
   }
 
   .svg-wrapper {
     flex: 1 1 auto;
     overflow: hidden;
-    background-color: var(--background-secondary);
+    background-color: var(--board-background);
     min-height: 0;
     padding: 0;
     box-sizing: border-box;

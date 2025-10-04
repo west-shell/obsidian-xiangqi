@@ -16,7 +16,7 @@
   let renderedBoard: IBoard;
   let renderedMarkedPos: IPosition | null;
 
-  $: ({ cellSize, showLastMove, showTurnBorder } = settings);
+  $: ({ cellSize, showLastMove, showTurnBorder, autoTheme } = settings);
   $: margin = cellSize * 0.1;
   $: width = cellSize * 10;
   $: height = cellSize * 11;
@@ -58,14 +58,7 @@
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div class="board-container">
-  <svg
-    {width}
-    {height}
-    viewBox={`0 0 ${width} ${height}`}
-    xmlns="http://www.w3.org/2000/svg"
-    class="xq-board"
-    on:click={handleClick}
-  >
+  <svg {width} {height} viewBox={`0 0 ${width} ${height}`} class="xq-board" on:click={handleClick}>
     <!-- 背景 -->
     <rect
       {width}
@@ -184,7 +177,7 @@
                 r={cellSize * 0.4}
                 fill={piece === piece.toUpperCase() ? "var(--piece-red)" : "var(--piece-black)"}
                 stroke="var(--board-line)"
-                stroke-width={cellSize * 0.04}
+                stroke-width={cellSize * 0.02}
               />
               <text
                 x="0"
@@ -202,9 +195,10 @@
       {/each}
     </g>
 
-    <!-- 标记 -->
+    <!-- 单个位置标记 -->
     {#if renderedMarkedPos}
       <g
+        class="marked-position"
         transform={`translate(${(renderedMarkedPos.x + 1) * cellSize}, ${(renderedMarkedPos.y + 1) * cellSize})`}
       >
         <path
@@ -212,38 +206,45 @@
               M ${0.4 * cellSize - margin},${-0.4 * cellSize} h ${margin} v ${margin}
               M ${0.4 * cellSize},${0.4 * cellSize - margin} v ${margin} h ${-margin}
               M ${-0.4 * cellSize + margin},${0.4 * cellSize} h ${-margin} v ${-margin}`}
-          stroke="var(--color-yellow)"
-          stroke-width={cellSize * 0.05}
-          fill="var(--color-yellow)"
+          stroke="var(--board-line)"
+          stroke-width={cellSize * 0.04}
+          fill="none"
         />
       </g>
     {/if}
+
     <!-- 上次走子标记 -->
     {#if showLastMove && renderedLastMove && !renderedMarkedPos}
-      <g
-        transform={`translate(${(renderedLastMove.from.x + 1) * cellSize}, ${(renderedLastMove.from.y + 1) * cellSize})`}
-      >
-        <rect
-          x={-cellSize * 0.2}
-          y={-cellSize * 0.2}
-          width={cellSize * 0.4}
-          height={cellSize * 0.4}
-          fill="yellow"
-          opacity="0.8"
-        />
-      </g>
-      <g
-        transform={`translate(${(renderedLastMove.to.x + 1) * cellSize}, ${(renderedLastMove.to.y + 1) * cellSize})`}
-      >
-        <path
-          d={`M ${-0.4 * cellSize},${-0.4 * cellSize + margin} v ${-margin} h ${margin}
+      <g class="last-move-marker">
+        <!-- 起始位置标记 -->
+        <g
+          transform={`translate(${(renderedLastMove.from.x + 1) * cellSize}, ${(renderedLastMove.from.y + 1) * cellSize})`}
+        >
+          <rect
+            x={-cellSize * 0.2}
+            y={-cellSize * 0.2}
+            width={cellSize * 0.4}
+            height={cellSize * 0.4}
+            fill={currentTurn === "red" ? "var(--piece-black)" : "var(--piece-red)"}
+            stroke="var(--board-line)"
+            stroke-width={cellSize * 0.02}
+            opacity="0.7"
+          />
+        </g>
+        <!-- 结束位置标记 -->
+        <g
+          transform={`translate(${(renderedLastMove.to.x + 1) * cellSize}, ${(renderedLastMove.to.y + 1) * cellSize})`}
+        >
+          <path
+            d={`M ${-0.4 * cellSize},${-0.4 * cellSize + margin} v ${-margin} h ${margin}
               M ${0.4 * cellSize - margin},${-0.4 * cellSize} h ${margin} v ${margin}
               M ${0.4 * cellSize},${0.4 * cellSize - margin} v ${margin} h ${-margin}
               M ${-0.4 * cellSize + margin},${0.4 * cellSize} h ${-margin} v ${-margin}`}
-          stroke="var(--color-yellow)"
-          stroke-width={cellSize * 0.05}
-          fill="var(--color-yellow)"
-        />
+            stroke="var(--board-line)"
+            stroke-width={cellSize * 0.04}
+            fill="none"
+          />
+        </g>
       </g>
     {/if}
   </svg>
@@ -254,8 +255,7 @@
     --board-background: var(--xq-board-background, var(--background-primary-alt));
     --board-line: var(--xq-board-line, var(--text-normal));
     --piece-red: var(--xq-piece-red, var(--color-red));
-    --piece-black: var(--xq-poece-black, var(--color-blue));
-    --mark-color: var(--xq-mark-color, var(--color-yellow));
+    --piece-black: var(--xq-piece-black, var(--color-blue));
     --text-color: var(--xq-text-color, var(--text-normal));
   }
   .xq-board {
