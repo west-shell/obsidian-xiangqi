@@ -14,7 +14,7 @@
     (async () => {
       await tick();
 
-      const index = Math.floor(currentStep / 2) + 1;
+      const index = currentStep === 0 ? 0 : Math.ceil(currentStep / 2);
       const targetEl = itemRefs[index];
 
       if (targetEl) {
@@ -40,7 +40,7 @@
         class:active={currentStep === 0}
         onclick={() => eventBus.emit("clickstep", 0)}
       >
-        {settings.showPGNtxt ? "== 开 局 ==" : "开 局"}
+        {settings.showPGNtxt ? "= 开 局 =" : "开 局"}
       </span>
     </li>
     {#each moves as move, i}
