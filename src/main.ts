@@ -1,7 +1,7 @@
 import { Plugin } from "obsidian";
 import type { ISettings } from "./types";
 import { applyThemes } from "./themes";
-import { ChessRenderChild } from "./renderChild/ChessRenderChild";
+import { ChessRenderChild } from "./renderChild/MoveListRenderChild";
 import { GenFENRenderChild } from './renderChild/GenFENRenderChild';
 import { PGNView } from './view/pgn';
 import { XQSettingTab, DEFAULT_SETTINGS } from "./settings";

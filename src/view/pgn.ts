@@ -9,10 +9,8 @@ import { EventBus } from '../core/event-bus';
 import '../core/event-bus';
 import '../modules/Tree/TreeMap'
 import '../modules/Tree/TreeView'
-import '../modules/Xiangqi/BoardClick'
+import '../modules/BoardClick'
 import '../modules/Tree/Actions'
-// import '../modules/Tree/Mode'
-
 
 export class PGNView extends TextFileView {
     static readonly VIEW_TYPE = "PGN_FILE_TYPE";
@@ -26,7 +24,7 @@ export class PGNView extends TextFileView {
     }
 
     setViewData(data: string, clear: boolean = true): void {
-        this.contentEl.empty(); // 清空现有内容
+        this.contentEl.empty();
         this.data = data;
         this.eventBus.emit('setViewData');
         this.eventBus.emit('createUI');
@@ -65,7 +63,7 @@ export class PGNView extends TextFileView {
     }
 
     getIcon() {
-        return "waypoints"; // 换成你喜欢的 Obsidian 图标
+        return "waypoints";
     }
 
     clear(): void {

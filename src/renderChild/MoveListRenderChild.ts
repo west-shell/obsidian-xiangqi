@@ -12,7 +12,7 @@ import type { ISettings } from '../types';
 import '../core/event-bus';
 import '../modules/Xiangqi/Source';
 import '../modules/Xiangqi/ChessBoard';
-import '../modules/Xiangqi/BoardClick';
+import '../modules/BoardClick';
 import '../modules/Xiangqi/History';
 import '../modules/Xiangqi/Actions';
 import '../modules/Xiangqi/Speaker';

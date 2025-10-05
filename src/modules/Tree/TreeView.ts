@@ -1,5 +1,5 @@
 import { registerPGNViewModule } from '../../core/module-system';
-import TreeView from '../../lib/Tree/TreeView.svelte';
+import TreeView from '../../lib/Tree/Xiangqi.svelte';
 
 class TreeViewModule {
     static init(host: Record<string, any>) {

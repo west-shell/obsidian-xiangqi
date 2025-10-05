@@ -1,6 +1,6 @@
-import type { IMove, IPosition } from "../../types";
-import { isValidMove } from "../../utils/rules";
-import { registerXQModule, registerPGNViewModule } from "../../core/module-system";
+import type { IMove, IPosition } from "../types";
+import { isValidMove } from "../utils/rules";
+import { registerXQModule, registerPGNViewModule } from "../core/module-system";
 
 export class BoardClickModule {
 

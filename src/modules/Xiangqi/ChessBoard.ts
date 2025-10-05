@@ -1,4 +1,4 @@
-import Xiangqi from "../../lib/XIangqi/Xiangqi.svelte";
+import Xiangqi from "../../lib/Movelist/Xiangqi.svelte";
 import { registerXQModule } from "../../core/module-system";
 import type { IXQHost } from "../../types";
 
