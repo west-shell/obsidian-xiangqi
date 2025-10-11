@@ -53,9 +53,23 @@
 </div>
 
 <style>
-  .toolbar-container {
+  :global(.tree-view.right) .toolbar-container {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+  }
+
+  :global(.tree-view.bottom) .toolbar-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+  }
+
+  :global(.tree-view.bottom) .toolbar-container hr {
+    flex-basis: 100%;
+    height: 0;
+    border: none;
+    margin: 0;
   }
 </style>

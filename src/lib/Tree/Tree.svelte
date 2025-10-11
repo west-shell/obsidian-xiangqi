@@ -264,11 +264,6 @@
             on:click={() => eventBus.emit("node-click", node.id)}
             on:dblclick={() => eventBus.emit("node-dblclick", node.id)}
           >
-            <defs>
-              <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
-                <feDropShadow dx="1" dy="1" stdDeviation="1.5" flood-color="#00000044" />
-              </filter>
-            </defs>
             <rect
               x="-10"
               y="-6"

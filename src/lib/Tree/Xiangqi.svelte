@@ -15,6 +15,7 @@
   export let currentPath: string[];
 
   $: lastMove = currentNode.data;
+  $: settings.position;
 </script>
 
 <div class="tree-view {settings.position}">
@@ -28,13 +29,15 @@
     display: flex;
     justify-content: center;
     height: 100%;
-    gap: 4px;
+    /* gap: 2px; */
   }
 
-  /* .tree-view.right {
+  .tree-view.right {
     flex-direction: row;
   }
   .tree-view.bottom {
     flex-direction: column;
-  } */
+    justify-content: center;
+    align-items: center;
+  }
 </style>
