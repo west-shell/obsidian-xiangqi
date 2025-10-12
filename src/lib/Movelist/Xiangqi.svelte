@@ -29,7 +29,7 @@
 <div class="XQ-container {settings.position}">
   <Board {settings} {board} {lastMove} {markedPos} {currentTurn} {eventBus} {rotated} />
   <Toolbar {settings} {eventBus} {modified} {PGN} {isprotected} />
-  {#if settings.displayMovelist}
+  {#if settings.showMovelist}
     <MoveList {settings} {currentStep} {moves} {eventBus} />
   {/if}
 </div>

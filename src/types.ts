@@ -8,8 +8,8 @@ export interface ISettings {
 	showTurnBorder: boolean;
 	autoJump: "never" | "always" | "auto";
 	enableSpeech: boolean;
-	displayMovelist: boolean;
-	displayMovelistText: boolean;
+	showMovelist: boolean;
+	showMovelistText: boolean;
 	viewOnly?: boolean;
 	rotated?: boolean;
 }

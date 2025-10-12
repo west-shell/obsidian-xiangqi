@@ -1,17 +1,11 @@
 <script lang="ts">
   import { setIcon } from "obsidian";
-  import type { IMove, ISettings } from "../../types";
-  import type { EventBus } from "../../core/event-bus";
+  let { settings, eventBus, modified, PGN, isprotected } = $props();
+  let buttonClass: string = $state("");
 
-  export let settings: ISettings;
-  export let eventBus: EventBus;
-  export let modified: boolean;
-  export let PGN: IMove[];
-  export let isprotected: boolean;
-  let buttonClass = "";
-  $: {
+  $effect(() => {
     buttonClass = modified ? "unsaved" : PGN.length > 0 ? "saved" : "empty";
-  }
+  });
 
   const buttons = [
     { title: "重置", icon: "refresh-cw", event: "reset" },
@@ -47,7 +41,7 @@
       class="toolbar-btn"
       aria-label={title}
       use:useSetIcon={icon}
-      on:click={() => emitEvent(event)}
+      onclick={() => emitEvent(event)}
     ></button>
   {/each}
 
@@ -57,7 +51,7 @@
     aria-label="保存"
     bind:this={saveBtnEl}
     use:useSetSaveIcon
-    on:click={() => emitEvent("save")}
+    onclick={() => emitEvent("save")}
   ></button>
 </div>
 

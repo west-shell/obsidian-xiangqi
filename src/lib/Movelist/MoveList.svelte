@@ -40,7 +40,7 @@
         class:active={currentStep === 0}
         onclick={() => eventBus.emit("clickstep", 0)}
       >
-        {settings.showPGNtxt ? "= 开 局 =" : "开 局"}
+        {settings.showMovelistText ? "= 开 局 =" : "开 局"}
       </span>
     </li>
     {#each moves as move, i}
@@ -52,7 +52,7 @@
             class:active={currentStep === i + 1}
             onclick={() => eventBus.emit("clickstep", i + 1)}
           >
-            {settings.showPGNtxt ? move.WXF : "红"}
+            {settings.showMovelistText ? move.WXF : "红"}
           </span>
           {#if moves[i + 1]}
             <span
@@ -60,7 +60,7 @@
               class:active={currentStep === i + 2}
               onclick={() => eventBus.emit("clickstep", i + 2)}
             >
-              {settings.showPGNtxt ? moves[i + 1].WXF : "黑"}
+              {settings.showMovelistText ? moves[i + 1].WXF : "黑"}
             </span>
           {/if}
         </li>
