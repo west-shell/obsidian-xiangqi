@@ -11,12 +11,27 @@
   export let eventBus: EventBus;
   export let rotated: boolean;
 
+  let Bnum = ["1", "2", "3", "4", "5", "6", "7", "8", "9"];
+  let Rnum = ["一", "二", "三", "四", "五", "六", "七", "八", "九"];
+  let TopNum: string[];
+  let BotNum: string[];
+
+  $: {
+    if (rotated) {
+      TopNum = Rnum;
+      BotNum = Bnum.reverse();
+    } else {
+      TopNum = Bnum;
+      BotNum = [...Rnum].reverse();
+    }
+  }
+
   let cellSize: number, margin: number, width: number, height: number;
 
   let renderedBoard: IBoard;
   let renderedMarkedPos: IPosition | null;
 
-  $: ({ cellSize, showLastMove, showTurnBorder, autoTheme } = settings);
+  $: ({ cellSize, showLastMove, showTurnBorder } = settings);
   $: margin = cellSize * 0.1;
   $: width = cellSize * 10;
   $: height = cellSize * 11;
@@ -164,6 +179,32 @@
         <path
           d={`M ${i[0] * cellSize},${i[1] * cellSize} m -${3 * margin},-${margin} h ${2 * margin} v -${2 * margin} m 0,${6 * margin} v -${2 * margin} h -${2 * margin}`}
         />
+      {/each}
+    </g>
+    <g>
+      {#each TopNum as num, i}
+        <text
+          x={(i + 1) * cellSize}
+          y={4 * margin}
+          font-size={cellSize * 0.25}
+          text-anchor="middle"
+          dominant-baseline="middle"
+          fill="var(--text-color)"
+        >
+          <tspan dy="0.15em">{num}</tspan>
+        </text>
+      {/each}
+      {#each BotNum as num, i}
+        <text
+          x={(i + 1) * cellSize}
+          y={height - 4 * margin}
+          font-size={cellSize * 0.25}
+          text-anchor="middle"
+          dominant-baseline="middle"
+          fill="var(--text-color)"
+        >
+          <tspan dy="0.15em">{num}</tspan>
+        </text>
       {/each}
     </g>
 
