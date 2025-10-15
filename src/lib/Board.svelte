@@ -183,31 +183,21 @@
     </g>
     <!-- 坐标标签 -->
     {#if showCoordinateLabels}
-      <g>
-        {#each TopNum as num, i}
-          <text
-            x={(i + 1) * cellSize}
-            y={4 * margin}
-            font-size={cellSize * 0.25}
-            text-anchor="middle"
-            dominant-baseline="middle"
-            fill="var(--text-color)"
-          >
-            <tspan dy="0.15em">{num}</tspan>
-          </text>
-        {/each}
-        {#each BotNum as num, i}
-          <text
-            x={(i + 1) * cellSize}
-            y={height - 4 * margin}
-            font-size={cellSize * 0.25}
-            text-anchor="middle"
-            dominant-baseline="middle"
-            fill="var(--text-color)"
-          >
-            <tspan dy="0.15em">{num}</tspan>
-          </text>
-        {/each}
+      <g text-anchor="middle" dominant-baseline="middle" fill="var(--text-color)">
+        <g font-size={rotated === true ? cellSize * 0.25 : cellSize * 0.33}>
+          {#each TopNum as num, i}
+            <text x={(i + 1) * cellSize} y={4 * margin}>
+              <tspan dy="0.15em">{num}</tspan>
+            </text>
+          {/each}
+        </g>
+        <g font-size={rotated === true ? cellSize * 0.33 : cellSize * 0.25}>
+          {#each BotNum as num, i}
+            <text x={(i + 1) * cellSize} y={height - 4 * margin}>
+              <tspan dy="0.15em">{num}</tspan>
+            </text>
+          {/each}</g
+        >
       </g>
     {/if}
 
