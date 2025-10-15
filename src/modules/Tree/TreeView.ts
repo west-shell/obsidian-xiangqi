@@ -1,5 +1,6 @@
 import { registerPGNViewModule } from '../../core/module-system';
 import TreeView from '../../lib/Tree/Xiangqi.svelte';
+import { mount } from "svelte";
 
 class TreeViewModule {
     static init(host: Record<string, any>) {
@@ -10,19 +11,19 @@ class TreeViewModule {
         eventBus.on('createUI', () => {
 
             const Container = host.contentEl;
-            host.Xiangqi = new TreeView({
-                target: Container,
-                props: {
-                    nodeMap: host.nodeMap,
-                    settings: host.settings,
-                    board: host.currentNode.board,
-                    markedPos: host.markedPos,
-                    currentTurn: host.currentTurn,
-                    eventBus: host.eventBus,
-                    currentNode: host.currentNode,
-                    currentPath: host.currentPath,
-                }
-            })
+            host.Xiangqi = mount(TreeView, {
+                            target: Container,
+                            props: {
+                                nodeMap: host.nodeMap,
+                                settings: host.settings,
+                                board: host.currentNode.board,
+                                markedPos: host.markedPos,
+                                currentTurn: host.currentTurn,
+                                eventBus: host.eventBus,
+                                currentNode: host.currentNode,
+                                currentPath: host.currentPath,
+                            }
+                        })
         })
         eventBus.on("updateUI", () => {
 

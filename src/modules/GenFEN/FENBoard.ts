@@ -1,5 +1,6 @@
 import GenFEN from "../../lib/GenFEN/GenFEN.svelte";
 import { registerGenFENModule } from "../../core/module-system";
+import { mount } from "svelte";
 
 export class BoardModule {
     static init(host: Record<string, any>) {
@@ -11,7 +12,7 @@ export class BoardModule {
         eventBus.on("load", () => {
             host.modified = false
             const Container = host.containerEl.createEl('div');
-            host.Xiangqi = new GenFEN({
+            host.Xiangqi = mount(GenFEN, {
                 target: Container,
                 props: {
                     selectedPiece: host.selectedPiece,
@@ -35,7 +36,7 @@ export class BoardModule {
         })
 
         eventBus.on("unload", () => {
-            host.Xiangqi.$destroy();
+            // host.Xiangqi.destroy();
             host.Xiangqi = null;
         })
     }

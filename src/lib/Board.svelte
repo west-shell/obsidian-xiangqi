@@ -3,20 +3,32 @@
   import type { IBoard, IMove, IPosition, ISettings } from "../types";
   import { PIECE_CHARS } from "../types";
 
-  export let settings: ISettings;
-  export let board: IBoard;
-  export let lastMove: IMove | null = null;
-  export let markedPos: IPosition | null = null;
-  export let currentTurn: string;
-  export let eventBus: EventBus;
-  export let rotated: boolean;
+  interface Props {
+    settings: ISettings;
+    board: IBoard;
+    lastMove?: IMove | null;
+    markedPos?: IPosition | null;
+    currentTurn: string;
+    eventBus: EventBus;
+    rotated: boolean;
+  }
+
+  let {
+    settings,
+    board,
+    lastMove = null,
+    markedPos = null,
+    currentTurn,
+    eventBus,
+    rotated,
+  }: Props = $props();
 
   let Bnum = ["1", "2", "3", "4", "5", "6", "7", "8", "9"];
   let Rnum = ["一", "二", "三", "四", "五", "六", "七", "八", "九"];
-  let TopNum: string[];
-  let BotNum: string[];
+  let TopNum: string[] = $state([]);
+  let BotNum: string[] = $state([]);
 
-  $: {
+  $effect(() => {
     if (rotated) {
       TopNum = Rnum;
       BotNum = Bnum.reverse();
@@ -24,17 +36,19 @@
       TopNum = Bnum;
       BotNum = [...Rnum].reverse();
     }
-  }
+  });
 
   // let cellSize: number, margin: number, width: number, height: number;
 
-  let renderedBoard: IBoard;
-  let renderedMarkedPos: IPosition | null;
+  let renderedBoard: IBoard = $derived(rotated ? rotateBoard(board) : board);
+  let renderedMarkedPos: IPosition | null = $derived(
+    rotated && markedPos ? rotatePos(markedPos) : markedPos,
+  );
 
-  $: ({ cellSize, showLastMove, showTurnBorder, showCoordinateLabels } = settings);
-  $: margin = cellSize * 0.1;
-  $: width = cellSize * 10;
-  $: height = cellSize * 11;
+  let { cellSize, showLastMove, showTurnBorder, showCoordinateLabels } = $derived(settings);
+  let margin = $derived(cellSize * 0.1);
+  let width = $derived(cellSize * 10);
+  let height = $derived(cellSize * 11);
 
   function rotatePos(pos: IPosition): IPosition {
     return { x: 8 - pos.x, y: 9 - pos.y };
@@ -50,10 +64,9 @@
     return newBoard;
   }
 
-  $: renderedBoard = rotated ? rotateBoard(board) : board;
-  $: renderedMarkedPos = rotated && markedPos ? rotatePos(markedPos) : markedPos;
-  $: renderedLastMove =
-    rotated && lastMove ? { from: rotatePos(lastMove.from), to: rotatePos(lastMove.to) } : lastMove;
+  let renderedLastMove = $derived(
+    rotated && lastMove ? { from: rotatePos(lastMove.from), to: rotatePos(lastMove.to) } : lastMove,
+  );
 
   function handleClick(e: MouseEvent) {
     const svg = e.currentTarget as SVGSVGElement;
@@ -73,7 +86,7 @@
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div class="board-container">
-  <svg {width} {height} viewBox={`0 0 ${width} ${height}`} class="xq-board" on:click={handleClick}>
+  <svg {width} {height} viewBox={`0 0 ${width} ${height}`} class="xq-board" onclick={handleClick}>
     <!-- 背景 -->
     <rect
       {width}
@@ -186,14 +199,14 @@
       <g text-anchor="middle" dominant-baseline="middle" fill="var(--text-color)">
         <g font-size={rotated === true ? cellSize * 0.25 : cellSize * 0.33}>
           {#each TopNum as num, i}
-            <text x={(i + 1) * cellSize} y={4 * margin}>
+            <text x={(i + 1) * cellSize} y={3.5 * margin}>
               <tspan dy="0.15em">{num}</tspan>
             </text>
           {/each}
         </g>
         <g font-size={rotated === true ? cellSize * 0.33 : cellSize * 0.25}>
           {#each BotNum as num, i}
-            <text x={(i + 1) * cellSize} y={height - 4 * margin}>
+            <text x={(i + 1) * cellSize} y={height - 3.5 * margin}>
               <tspan dy="0.15em">{num}</tspan>
             </text>
           {/each}</g

@@ -6,20 +6,35 @@
   import type { EventBus } from "../../core/event-bus";
   import { onMount, tick } from "svelte";
 
-  export let settings: ISettings;
-  export let board: IBoard;
-  export let markedPos: IPosition | null;
-  export let currentTurn: string;
-  export let currentStep: number;
-  export let eventBus: EventBus;
-  export let modified: boolean;
-  export let PGN: IMove[];
-  export let history: IMove[];
-  export let options: IOptions;
-  $: moves = modified ? history : PGN;
-  $: lastMove = moves[currentStep - 1] || null;
-  $: isprotected = options.protected || false;
-  $: rotated = options.rotated || false;
+  interface Props {
+    settings: ISettings;
+    board: IBoard;
+    markedPos: IPosition | null;
+    currentTurn: string;
+    currentStep: number;
+    eventBus: EventBus;
+    modified: boolean;
+    PGN: IMove[];
+    history: IMove[];
+    options: IOptions;
+  }
+
+  let {
+    settings,
+    board,
+    markedPos,
+    currentTurn,
+    currentStep,
+    eventBus,
+    modified,
+    PGN,
+    history,
+    options
+  }: Props = $props();
+  let moves = $derived(modified ? history : PGN);
+  let lastMove = $derived(moves[currentStep - 1] || null);
+  let isprotected = $derived(options.protected || false);
+  let rotated = $derived(options.rotated || false);
   onMount(async () => {
     await tick();
     eventBus.emit("ready");

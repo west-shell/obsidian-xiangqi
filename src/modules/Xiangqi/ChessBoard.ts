@@ -1,6 +1,7 @@
 import Xiangqi from "../../lib/Movelist/Xiangqi.svelte";
 import { registerXQModule } from "../../core/module-system";
 import type { IXQHost } from "../../types";
+import { mount, SvelteComponent } from "svelte";
 
 export class BoardModule {
     static init(host: IXQHost) {
@@ -12,7 +13,7 @@ export class BoardModule {
         eventBus.on("load", () => {
             host.modified = false
             const Container = host.containerEl.createEl('div');
-            host.Xiangqi = new Xiangqi({
+            host.Xiangqi = mount(Xiangqi, {
                 target: Container,
                 props: {
                     settings: host.settings,
@@ -26,7 +27,7 @@ export class BoardModule {
                     history: host.history,
                     options: host.options || {}
                 },
-            });
+            }) as SvelteComponent;
         })
 
         eventBus.on('ready', () => {
@@ -49,7 +50,7 @@ export class BoardModule {
             // if (type === undefined) return;
             host.Xiangqi?.$set({
                 settings: { ...host.settings },
-                board: host.board,
+                board: [...host.board.map(row => [...row])], // 创建新的 board 数组引用
                 markedPos: host.markedPos,
                 currentTurn: host.currentTurn,
                 currentStep: host.currentStep,
@@ -60,7 +61,7 @@ export class BoardModule {
         })
 
         eventBus.on("unload", () => {
-            host.Xiangqi?.$destroy();
+            // host.Xiangqi?.destroy();
         })
     }
 }

@@ -5,13 +5,24 @@
   import type { EventBus } from "../../core/event-bus";
   import Toolbar from "./Toolbar.svelte";
 
-  export let settings: ISettings;
-  export let board: IBoard;
-  export let markedPos: IPosition;
-  export let selectedPiece: string;
-  export let currentTurn: string;
-  export let eventBus: EventBus;
-  $: position = settings.position;
+  interface Props {
+    settings: ISettings;
+    board: IBoard;
+    markedPos: IPosition;
+    selectedPiece: string;
+    currentTurn: string;
+    eventBus: EventBus;
+  }
+
+  let {
+    settings,
+    board,
+    markedPos,
+    selectedPiece,
+    currentTurn,
+    eventBus
+  }: Props = $props();
+  let position = $derived(settings.position);
 </script>
 
 <div class="XQ-container {settings.position}">

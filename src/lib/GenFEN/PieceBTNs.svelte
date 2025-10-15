@@ -3,11 +3,21 @@
   import type { EventBus } from "../../core/event-bus";
   import type { ISettings } from "../../types";
 
-  export let settings: ISettings;
-  export let board: IBoard;
-  export let eventBus: EventBus;
-  export let position: string = "";
-  export let selectedPiece: string;
+  interface Props {
+    settings: ISettings;
+    board: IBoard;
+    eventBus: EventBus;
+    position?: string;
+    selectedPiece: string;
+  }
+
+  let {
+    settings,
+    board,
+    eventBus,
+    position = "",
+    selectedPiece
+  }: Props = $props();
 
   // 判断是否为红方棋子（大写字母）
   const isRed = (piece: string) => piece === piece.toUpperCase();
@@ -31,17 +41,17 @@
   };
 
   // 实时统计当前棋子数量
-  $: pieceCount = board.flat().reduce(
+  let pieceCount = $derived(board.flat().reduce(
     (acc, piece) => {
       if (piece) acc[piece] = (acc[piece] || 0) + 1;
       return acc;
     },
     {} as Record<string, number>,
-  );
+  ));
 
-  $: count = Object.fromEntries(
+  let count = $derived(Object.fromEntries(
     Object.keys(MAX_COUNT).map((piece) => [piece, MAX_COUNT[piece] - (pieceCount[piece] || 0)]),
-  );
+  ));
 </script>
 
 <div
@@ -54,7 +64,7 @@
       class={`piece-btn ${position} ${isRed(piece) ? "red-piece" : "black-piece"}`}
       class:empty={count[piece] === 0}
       class:active={selectedPiece === piece}
-      on:click={() => eventBus.emit("clickPieceBTN", piece)}
+      onclick={() => eventBus.emit("clickPieceBTN", piece)}
     >
       {name}
     </button>

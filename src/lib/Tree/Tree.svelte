@@ -1,36 +1,28 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import { onMount, tick } from "svelte";
   import { PIECE_CHARS, type ChessNode, type NodeMap } from "../../types";
   import { createInteractionHandlers } from "./interact";
   import { calculateTreeLayout } from "./layout";
 
-  export let nodeMap: NodeMap;
-  export let eventBus: { emit: (event: string, payload: any) => void };
-  export let currentNode: ChessNode | null;
-  export let currentPath: string[];
-
-  let commentsText = "";
-  let textareaEl: HTMLTextAreaElement;
-
-  $: if (currentNode) {
-    const node = currentNode;
-    commentsText = getRegularComments(node).join("\n");
-    tick().then(() => panToNodeIfNeeded(node));
-  } else {
-    commentsText = "";
+  interface Props {
+    nodeMap: NodeMap;
+    eventBus: { emit: (event: string, payload: any) => void };
+    currentNode: ChessNode | null;
+    currentPath: string[];
   }
-  $: if (currentNode) {
-    const node = currentNode;
-    commentsText = getRegularComments(node).join("\n");
-    tick().then(() => {
-      if (textareaEl) {
-        adjustTextareaHeight();
-      }
-      panToNodeIfNeeded(node);
-    });
-  } else {
-    commentsText = "";
-  }
+
+  let {
+    nodeMap,
+    eventBus,
+    currentNode = $bindable(),
+    currentPath
+  }: Props = $props();
+
+  let commentsText = $state("");
+  let textareaEl: HTMLTextAreaElement = $state();
+
   const ANNOTATION_DEFINITIONS: Record<string, { symbol: string; color: string }> = {
     "R+": { symbol: "优", color: "red" },
     "B+": { symbol: "优", color: "black" },
@@ -65,13 +57,6 @@
     return node.comments.filter((c) => !ALL_ANNOTATION_KEYS.includes(c));
   }
 
-  $: if (currentNode) {
-    const node = currentNode;
-    commentsText = getRegularComments(node).join("\n");
-    tick().then(() => panToNodeIfNeeded(node));
-  } else {
-    commentsText = "";
-  }
 
   function saveComments() {
     if (!currentNode) return;
@@ -82,20 +67,19 @@
     eventBus.emit("updatePGN", null);
   }
 
-  $: currentNode;
 
   const spacingX = 30;
   const spacingY = 17;
 
-  let renderedNodes: ChessNode[] = [];
+  let renderedNodes: ChessNode[] = $state([]);
 
-  let svgEl: SVGSVGElement;
+  let svgEl: SVGSVGElement = $state();
 
-  let translateX = 0;
-  let translateY = 0;
-  let scale = 1;
+  let translateX = $state(0);
+  let translateY = $state(0);
+  let scale = $state(1);
 
-  let handleEvent: (e: Event) => void;
+  let handleEvent: (e: Event) => void = $state();
 
   function updateTreeLayout() {
     renderedNodes = calculateTreeLayout(nodeMap);
@@ -115,7 +99,6 @@
     handleEvent = handlers.handleEvent;
   }
 
-  $: nodeMap.size, updateTreeLayout();
 
   onMount(() => {
     if (nodeMap.size > 0) {
@@ -192,6 +175,44 @@
       translateY += dy;
     }
   }
+  run(() => {
+    if (currentNode) {
+      const node = currentNode;
+      commentsText = getRegularComments(node).join("\n");
+      tick().then(() => panToNodeIfNeeded(node));
+    } else {
+      commentsText = "";
+    }
+  });
+  run(() => {
+    if (currentNode) {
+      const node = currentNode;
+      commentsText = getRegularComments(node).join("\n");
+      tick().then(() => {
+        if (textareaEl) {
+          adjustTextareaHeight();
+        }
+        panToNodeIfNeeded(node);
+      });
+    } else {
+      commentsText = "";
+    }
+  });
+  run(() => {
+    if (currentNode) {
+      const node = currentNode;
+      commentsText = getRegularComments(node).join("\n");
+      tick().then(() => panToNodeIfNeeded(node));
+    } else {
+      commentsText = "";
+    }
+  });
+  run(() => {
+    currentNode;
+  });
+  run(() => {
+    nodeMap.size, updateTreeLayout();
+  });
 </script>
 
 <div class="container">
@@ -202,14 +223,14 @@
       width="100%"
       height="100%"
       class="tree-svg"
-      on:mousedown={handleEvent}
-      on:mousemove={handleEvent}
-      on:mouseup={handleEvent}
-      on:mouseleave={handleEvent}
-      on:wheel={handleEvent}
-      on:touchstart={handleEvent}
-      on:touchmove={handleEvent}
-      on:touchend={handleEvent}
+      onmousedown={handleEvent}
+      onmousemove={handleEvent}
+      onmouseup={handleEvent}
+      onmouseleave={handleEvent}
+      onwheel={handleEvent}
+      ontouchstart={handleEvent}
+      ontouchmove={handleEvent}
+      ontouchend={handleEvent}
     >
       <g transform="translate({translateX} {translateY}) scale({scale})">
         {#each renderedNodes as node}
@@ -261,8 +282,8 @@
           <g
             class="node-group"
             transform="translate({node.x! * spacingX} {node.y! * spacingY})"
-            on:click={() => eventBus.emit("node-click", node.id)}
-            on:dblclick={() => eventBus.emit("node-dblclick", node.id)}
+            onclick={() => eventBus.emit("node-click", node.id)}
+            ondblclick={() => eventBus.emit("node-dblclick", node.id)}
           >
             <rect
               x="-10"
@@ -354,8 +375,8 @@
     class="auto-height"
     placeholder="添加注释"
     bind:this={textareaEl}
-    on:input={adjustTextareaHeight}
-    on:blur={saveComments}
+    oninput={adjustTextareaHeight}
+    onblur={saveComments}
     rows="1"
   ></textarea>
 </div>
