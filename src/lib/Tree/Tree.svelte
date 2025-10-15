@@ -4,33 +4,31 @@
   import { createInteractionHandlers } from "./interact";
   import { calculateTreeLayout } from "./layout";
 
-  export let nodeMap: NodeMap;
-  export let eventBus: { emit: (event: string, payload: any) => void };
-  export let currentNode: ChessNode | null;
-  export let currentPath: string[];
-
-  let commentsText = "";
-  let textareaEl: HTMLTextAreaElement;
-
-  $: if (currentNode) {
-    const node = currentNode;
-    commentsText = getRegularComments(node).join("\n");
-    tick().then(() => panToNodeIfNeeded(node));
-  } else {
-    commentsText = "";
+  interface Props {
+    nodeMap: NodeMap;
+    eventBus: { emit: (event: string, payload: any) => void };
+    currentNode: ChessNode | null;
+    currentPath: string[];
   }
-  $: if (currentNode) {
-    const node = currentNode;
-    commentsText = getRegularComments(node).join("\n");
-    tick().then(() => {
-      if (textareaEl) {
-        adjustTextareaHeight();
-      }
-      panToNodeIfNeeded(node);
-    });
-  } else {
-    commentsText = "";
-  }
+
+  let { nodeMap, eventBus, currentNode = $bindable(), currentPath }: Props = $props();
+
+  // ---- 状态 ----
+  let commentsText = $state("");
+  let textareaEl: HTMLTextAreaElement | undefined = $state();
+  let svgEl: SVGSVGElement | undefined = $state();
+  let renderedNodes: ChessNode[] = $state([]);
+  let handleEvent: ((e: Event) => void) | undefined = $state();
+
+  // ---- 平移与缩放 ----
+  let translateX = $state(0);
+  let translateY = $state(0);
+  let scale = $state(1);
+
+  // ---- 常量 ----
+  const spacingX = 30;
+  const spacingY = 17;
+
   const ANNOTATION_DEFINITIONS: Record<string, { symbol: string; color: string }> = {
     "R+": { symbol: "优", color: "red" },
     "B+": { symbol: "优", color: "black" },
@@ -49,28 +47,18 @@
 
   const ALL_ANNOTATION_KEYS = Object.keys(ANNOTATION_DEFINITIONS);
 
+  // ---- 工具函数 ----
   function getAnnotation(node: ChessNode, type: keyof typeof ANNOTATION_TYPES): string | undefined {
     if (!node.comments) return undefined;
-    const keys = ANNOTATION_TYPES[type];
-    return node.comments.find((c) => keys.includes(c));
+    return node.comments.find((c) => ANNOTATION_TYPES[type].includes(c));
   }
 
   function getAllAnnotations(node: ChessNode): string[] {
-    if (!node.comments) return [];
-    return node.comments.filter((c) => ALL_ANNOTATION_KEYS.includes(c));
+    return node.comments?.filter((c) => ALL_ANNOTATION_KEYS.includes(c)) ?? [];
   }
 
   function getRegularComments(node: ChessNode): string[] {
-    if (!node.comments) return [];
-    return node.comments.filter((c) => !ALL_ANNOTATION_KEYS.includes(c));
-  }
-
-  $: if (currentNode) {
-    const node = currentNode;
-    commentsText = getRegularComments(node).join("\n");
-    tick().then(() => panToNodeIfNeeded(node));
-  } else {
-    commentsText = "";
+    return node.comments?.filter((c) => !ALL_ANNOTATION_KEYS.includes(c)) ?? [];
   }
 
   function saveComments() {
@@ -82,23 +70,18 @@
     eventBus.emit("updatePGN", null);
   }
 
-  $: currentNode;
+  // ---- 自动调整文本框高度 ----
+  function adjustTextareaHeight() {
+    if (!textareaEl) return;
+    textareaEl.classList.add("auto-height");
+    textareaEl.style.setProperty("--textarea-height", `${textareaEl.scrollHeight}px`);
+    textareaEl.classList.remove("auto-height");
+  }
 
-  const spacingX = 30;
-  const spacingY = 17;
-
-  let renderedNodes: ChessNode[] = [];
-
-  let svgEl: SVGSVGElement;
-
-  let translateX = 0;
-  let translateY = 0;
-  let scale = 1;
-
-  let handleEvent: (e: Event) => void;
-
+  // ---- 布局计算 ----
   function updateTreeLayout() {
     renderedNodes = calculateTreeLayout(nodeMap);
+    if (!svgEl) return;
 
     const handlers = createInteractionHandlers(svgEl, {
       getState: () => ({ x: translateX, y: translateY, scale }),
@@ -115,23 +98,7 @@
     handleEvent = handlers.handleEvent;
   }
 
-  $: nodeMap.size, updateTreeLayout();
-
-  onMount(() => {
-    if (nodeMap.size > 0) {
-      updateTreeLayout();
-      tick().then(centerAndFit);
-    }
-  });
-
-  /** 自动调整 textarea 高度 */
-  function adjustTextareaHeight() {
-    const textarea = textareaEl;
-    textarea.classList.add("auto-height");
-    textarea.style.setProperty("--textarea-height", `${textarea.scrollHeight}px`);
-    textarea.classList.remove("auto-height");
-  }
-
+  // ---- 自动居中 ----
   function centerAndFit() {
     if (!svgEl || renderedNodes.length === 0) return;
 
@@ -142,6 +109,7 @@
       maxX = -Infinity,
       minY = Infinity,
       maxY = -Infinity;
+
     for (const n of renderedNodes) {
       minX = Math.min(minX, n.x!);
       maxX = Math.max(maxX, n.x!);
@@ -158,42 +126,63 @@
 
     const treeCenterX = minX * spacingX + treeWidth / 2;
     const treeTopY = minY * spacingY;
-
     translateX = clientWidth / 2 - treeCenterX * scale;
     translateY = padding - treeTopY * scale;
   }
 
   function panToNodeIfNeeded(node: ChessNode) {
     if (!node || !svgEl || node.x === undefined || node.y === undefined) return;
-
     const { clientWidth, clientHeight } = svgEl;
-    const padding = 50; // pixels
+    const padding = 50;
 
     const nodeScreenX = node.x * spacingX * scale + translateX;
     const nodeScreenY = node.y * spacingY * scale + translateY;
 
-    let dx = 0;
-    let dy = 0;
+    let dx = 0,
+      dy = 0;
+    if (nodeScreenX < padding) dx = padding - nodeScreenX;
+    else if (nodeScreenX > clientWidth - padding) dx = clientWidth - padding - nodeScreenX;
 
-    if (nodeScreenX < padding) {
-      dx = padding - nodeScreenX;
-    } else if (nodeScreenX > clientWidth - padding) {
-      dx = clientWidth - padding - nodeScreenX;
-    }
+    if (nodeScreenY < padding) dy = padding - nodeScreenY;
+    else if (nodeScreenY > clientHeight - padding) dy = clientHeight - padding - nodeScreenY;
 
-    if (nodeScreenY < padding) {
-      dy = padding - nodeScreenY;
-    } else if (nodeScreenY > clientHeight - padding) {
-      dy = clientHeight - padding - nodeScreenY;
-    }
-
-    if (dx !== 0 || dy !== 0) {
+    if (dx || dy) {
       translateX += dx;
       translateY += dy;
     }
   }
+
+  // ---- 生命周期 ----
+  onMount(() => {
+    if (nodeMap.size > 0) {
+      updateTreeLayout();
+      tick().then(centerAndFit);
+    }
+  });
+
+  // ---- 响应式更新 ----
+  $effect(() => {
+    if (!currentNode) {
+      commentsText = "";
+      return;
+    }
+
+    const node = currentNode;
+    commentsText = getRegularComments(node).join("\n");
+
+    tick().then(() => {
+      if (textareaEl) adjustTextareaHeight();
+      panToNodeIfNeeded(node);
+    });
+  });
+
+  $effect(() => {
+    nodeMap.size;
+    updateTreeLayout();
+  });
 </script>
 
+<!-- ---- 结构 ---- -->
 <div class="container">
   <div class="svg-wrapper">
     <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -202,67 +191,45 @@
       width="100%"
       height="100%"
       class="tree-svg"
-      on:mousedown={handleEvent}
-      on:mousemove={handleEvent}
-      on:mouseup={handleEvent}
-      on:mouseleave={handleEvent}
-      on:wheel={handleEvent}
-      on:touchstart={handleEvent}
-      on:touchmove={handleEvent}
-      on:touchend={handleEvent}
+      onmousedown={handleEvent}
+      onmousemove={handleEvent}
+      onmouseup={handleEvent}
+      onmouseleave={handleEvent}
+      onwheel={handleEvent}
+      ontouchstart={handleEvent}
+      ontouchmove={handleEvent}
+      ontouchend={handleEvent}
     >
       <g transform="translate({translateX} {translateY}) scale({scale})">
-        {#each renderedNodes as node}
+        {#each renderedNodes as node (node.id)}
           {#each node.children as child}
-            {#if Math.abs(node.x! - child.x!) > 1}
-              <line
-                x1={node.x! * spacingX}
-                y1={node.y! * spacingY}
-                x2={(child.x! - Math.sign(child.x! - node.x!)) * spacingX}
-                y2={node.y! * spacingY}
-                stroke="var(--board-line)"
-                stroke-width={currentPath.includes(node.id) && currentPath.includes(child.id)
-                  ? 2
-                  : 0.7}
-                opacity={currentPath.includes(node.id) && currentPath.includes(child.id) ? 1 : 0.7}
-              />
-              <line
-                x1={(child.x! - Math.sign(child.x! - node.x!)) * spacingX}
-                y1={node.y! * spacingY}
-                x2={child.x! * spacingX}
-                y2={child.y! * spacingY}
-                stroke="var(--board-line)"
-                stroke-width={currentPath.includes(node.id) && currentPath.includes(child.id)
-                  ? 2
-                  : 0.7}
-                opacity={currentPath.includes(node.id) && currentPath.includes(child.id) ? 1 : 0.7}
-              />
-            {:else}
-              <line
-                x1={node.x! * spacingX}
-                y1={node.y! * spacingY}
-                x2={child.x! * spacingX}
-                y2={child.y! * spacingY}
-                stroke="var(--board-line)"
-                stroke-width={currentPath.includes(node.id) && currentPath.includes(child.id)
-                  ? 2
-                  : 0.7}
-                opacity={currentPath.includes(node.id) && currentPath.includes(child.id) ? 1 : 0.7}
-              />
-            {/if}
+            {@const x1 = node.x! * spacingX}
+            {@const y1 = node.y! * spacingY}
+            {@const x2 = child.x! * spacingX}
+            {@const y2 = child.y! * spacingY}
+            {@const isPath = currentPath.includes(node.id) && currentPath.includes(child.id)}
+            <line
+              {x1}
+              {y1}
+              {x2}
+              {y2}
+              stroke="var(--board-line)"
+              stroke-width={isPath ? 2 : 0.7}
+              opacity={isPath ? 1 : 0.7}
+            />
           {/each}
         {/each}
 
-        {#each renderedNodes as node}
+        {#each renderedNodes as node (node.id)}
           {@const evaluation = getAnnotation(node, "evaluation")}
           {@const moveQuality = getAnnotation(node, "moveQuality")}
           {@const gameEnd = getAnnotation(node, "gameEnd")}
+
           <!-- svelte-ignore a11y_click_events_have_key_events -->
           <g
             class="node-group"
             transform="translate({node.x! * spacingX} {node.y! * spacingY})"
-            on:click={() => eventBus.emit("node-click", node.id)}
-            on:dblclick={() => eventBus.emit("node-dblclick", node.id)}
+            onclick={() => eventBus.emit("node-click", node.id)}
           >
             <rect
               x="-10"
@@ -277,21 +244,22 @@
                   ? "var(--piece-black)"
                   : "gray"}
               stroke="var(--board-line)"
-              stroke-width={node === currentNode ? 1.5 : 0.5}
+              stroke-width={node.id === currentNode?.id ? 1.5 : 0.5}
             />
             <text dy="3.5" text-anchor="middle" fill="white" font-size="9px">
-              {node.data && node.data.type ? PIECE_CHARS[node.data.type] : "开局"}
+              {node.data?.type ? PIECE_CHARS[node.data.type] : "开局"}
             </text>
-            <!-- Top-right: Has comments -->
-            {#if getRegularComments(node).join("").length > 0}
+
+            <!-- 评论标记 -->
+            {#if getRegularComments(node).length > 0}
               <circle cx="10" cy="-7" r="3" fill="royalblue" />
             {/if}
 
-            <!-- Top-left: Evaluation -->
+            <!-- 各类标注 -->
             {#if evaluation}
               {@const def = ANNOTATION_DEFINITIONS[evaluation]}
               <g transform="translate(-13, -7)">
-                <rect x="0" y="0" width="7" height="7" rx="1.5" fill={def.color}></rect>
+                <rect width="7" height="7" rx="1.5" fill={def.color} />
                 <text
                   x="3.5"
                   y="3.5"
@@ -306,11 +274,10 @@
               </g>
             {/if}
 
-            <!-- Bottom-left: Move Quality -->
             {#if moveQuality}
               {@const def = ANNOTATION_DEFINITIONS[moveQuality]}
               <g transform="translate(-13, 1)">
-                <rect x="0" y="0" width="7" height="7" rx="1.5" fill={def.color}></rect>
+                <rect width="7" height="7" rx="1.5" fill={def.color} />
                 <text
                   x="3.5"
                   y="3.5"
@@ -325,11 +292,10 @@
               </g>
             {/if}
 
-            <!-- Bottom-right: Game End -->
             {#if gameEnd}
               {@const def = ANNOTATION_DEFINITIONS[gameEnd]}
               <g transform="translate(6.5, 3.5)">
-                <rect x="0" y="0" width="7" height="7" rx="1.5" fill={def.color}></rect>
+                <rect width="7" height="7" rx="1.5" fill={def.color} />
                 <text
                   x="3.5"
                   y="3.5"
@@ -354,8 +320,8 @@
     class="auto-height"
     placeholder="添加注释"
     bind:this={textareaEl}
-    on:input={adjustTextareaHeight}
-    on:blur={saveComments}
+    oninput={adjustTextareaHeight}
+    onblur={saveComments}
     rows="1"
   ></textarea>
 </div>
@@ -379,8 +345,6 @@
     overflow: hidden;
     background-color: var(--board-background);
     min-height: 0;
-    padding: 0;
-    box-sizing: border-box;
   }
 
   .tree-svg {
@@ -404,16 +368,13 @@
     background: var(--background-secondary);
     border: 1px solid var(--background-modifier-border);
     border-radius: 3px;
-    box-sizing: border-box;
-    padding: 0px;
+    padding: 0;
     outline: none;
     overflow-y: auto;
   }
-  /* @css-ignore */
   textarea.auto-height {
     height: auto;
   }
-
   textarea:focus {
     border-color: var(--interactive-accent);
     box-shadow: 0 0 5px var(--interactive-accent);

@@ -27,8 +27,8 @@ class TreeViewModule {
         })
         eventBus.on("updateUI", () => {
             host.Xiangqi.$set({
-                settings: host.settings,
-                nodeMap: host.nodeMap,
+                settings: { ...host.settings },
+                nodeMap: new Map(host.nodeMap),
                 board: host.currentNode.board,
                 markedPos: host.markedPos,
                 currentTurn: host.currentTurn,

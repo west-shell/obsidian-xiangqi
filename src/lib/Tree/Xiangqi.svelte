@@ -5,20 +5,33 @@
   import type { ChessNode, IBoard, IPosition, ISettings, NodeMap } from "../../types";
   import type { EventBus } from "../../core/event-bus";
 
-  export let settings: ISettings;
-  export let board: IBoard;
-  export let markedPos: IPosition;
-  export let currentTurn: string;
-  export let eventBus: EventBus;
-  export let nodeMap: NodeMap;
-  export let currentNode: ChessNode;
-  export let currentPath: string[];
+  interface Props {
+    settings: ISettings;
+    board: IBoard;
+    markedPos: IPosition;
+    currentTurn: string;
+    eventBus: EventBus;
+    nodeMap: NodeMap;
+    currentNode: ChessNode;
+    currentPath: string[];
+  }
 
-  $: lastMove = currentNode.data;
-  $: settings.position;
+  let {
+    settings,
+    board,
+    markedPos,
+    currentTurn,
+    eventBus,
+    nodeMap,
+    currentNode,
+    currentPath,
+  }: Props = $props();
+
+  let lastMove = $derived(currentNode.data);
+  let position = $derived(settings.position);
 </script>
 
-<div class="tree-view {settings.position}">
+<div class="tree-view {position}">
   <Board {settings} {board} {lastMove} {markedPos} {currentTurn} {eventBus} rotated={false} />
   <Toolbar {eventBus} />
   <Tree {nodeMap} {eventBus} {currentNode} {currentPath} />
