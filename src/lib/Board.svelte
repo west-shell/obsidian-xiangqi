@@ -26,12 +26,12 @@
     }
   }
 
-  let cellSize: number, margin: number, width: number, height: number;
+  // let cellSize: number, margin: number, width: number, height: number;
 
   let renderedBoard: IBoard;
   let renderedMarkedPos: IPosition | null;
 
-  $: ({ cellSize, showLastMove, showTurnBorder } = settings);
+  $: ({ cellSize, showLastMove, showTurnBorder, showCoordinateLabels } = settings);
   $: margin = cellSize * 0.1;
   $: width = cellSize * 10;
   $: height = cellSize * 11;
@@ -181,32 +181,35 @@
         />
       {/each}
     </g>
-    <g>
-      {#each TopNum as num, i}
-        <text
-          x={(i + 1) * cellSize}
-          y={4 * margin}
-          font-size={cellSize * 0.25}
-          text-anchor="middle"
-          dominant-baseline="middle"
-          fill="var(--text-color)"
-        >
-          <tspan dy="0.15em">{num}</tspan>
-        </text>
-      {/each}
-      {#each BotNum as num, i}
-        <text
-          x={(i + 1) * cellSize}
-          y={height - 4 * margin}
-          font-size={cellSize * 0.25}
-          text-anchor="middle"
-          dominant-baseline="middle"
-          fill="var(--text-color)"
-        >
-          <tspan dy="0.15em">{num}</tspan>
-        </text>
-      {/each}
-    </g>
+    <!-- 坐标标签 -->
+    {#if showCoordinateLabels}
+      <g>
+        {#each TopNum as num, i}
+          <text
+            x={(i + 1) * cellSize}
+            y={4 * margin}
+            font-size={cellSize * 0.25}
+            text-anchor="middle"
+            dominant-baseline="middle"
+            fill="var(--text-color)"
+          >
+            <tspan dy="0.15em">{num}</tspan>
+          </text>
+        {/each}
+        {#each BotNum as num, i}
+          <text
+            x={(i + 1) * cellSize}
+            y={height - 4 * margin}
+            font-size={cellSize * 0.25}
+            text-anchor="middle"
+            dominant-baseline="middle"
+            fill="var(--text-color)"
+          >
+            <tspan dy="0.15em">{num}</tspan>
+          </text>
+        {/each}
+      </g>
+    {/if}
 
     <!-- 棋子 -->
     <g id="xiangqi-pieces">

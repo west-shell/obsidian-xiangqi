@@ -4,6 +4,7 @@ export interface ISettings {
 	theme: "light" | "dark" | "auto";
 	cellSize: number;
 	fontSize: number;
+	showCoordinateLabels: boolean;
 	showLastMove: boolean;
 	showTurnBorder: boolean;
 	autoJump: "never" | "always" | "auto";

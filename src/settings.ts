@@ -7,6 +7,7 @@ export const DEFAULT_SETTINGS: ISettings = {
 	theme: "auto",
 	cellSize: 50,
 	fontSize: 12,
+	showCoordinateLabels: true,
 	showLastMove: true,
 	showTurnBorder: true,
 	autoJump: "auto",
@@ -91,6 +92,16 @@ export class XQSettingTab extends PluginSettingTab {
 					valueLabel.textContent = value.toString();
 				});
 			});
+
+		new Setting(containerEl)
+			.setName("显示坐标标签")
+			// .setDesc("是否朗读棋谱走法")
+			.addToggle((toggle) =>
+				toggle.setValue(settings.showCoordinateLabels).onChange((value) => {
+					settings.showCoordinateLabels = value;
+					this.plugin.saveSettings();
+				}),
+			);
 
 		new Setting(containerEl).setName("轮次提示").setHeading();
 
