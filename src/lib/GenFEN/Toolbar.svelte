@@ -1,9 +1,7 @@
 <script lang="ts">
   import type { EventBus } from "../../core/event-bus";
 
-  export let eventBus: EventBus;
-  export let position: string = "";
-  export let currentTurn: string = "";
+  let { eventBus, position, currentTurn } = $props();
 
   const buttons = [
     { title: "先手", text: "先", action: "turn", color: true },
@@ -18,7 +16,7 @@
     <button
       {title}
       class={`toolbar-btn ${color ? currentTurn : ""}`}
-      on:click={() => eventBus.emit("btn-click", action)}
+      onclick={() => eventBus.emit("btn-click", action)}
     >
       {text}
     </button>

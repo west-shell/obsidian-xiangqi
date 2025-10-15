@@ -1,15 +1,14 @@
 <script lang="ts">
   import { setIcon } from "obsidian";
-  import type { EventBus } from "../../core/event-bus";
 
-  export let eventBus: EventBus;
+  let { eventBus } = $props();
 
   const buttons = [
     { title: "删除", icon: "circle-x", event: "remove" },
     { title: "提升", icon: "arrow-up-wide-narrow", event: "promote" },
     { title: "开局", icon: "arrow-left-to-line", event: "toStart" },
-    { title: "回退", icon: "chevron-left", event: "back" },
-    { title: "前进", icon: "chevron-right", event: "next" },
+    { title: "回退", icon: "arrow-left", event: "back" },
+    { title: "前进", icon: "arrow-right", event: "next" },
     { title: "终局", icon: "arrow-right-to-line", event: "toEnd" },
   ];
 
@@ -27,11 +26,6 @@
 
   function useSetIcon(el: HTMLElement, icon: string) {
     setIcon(el, icon);
-    return {
-      update(newIcon: string) {
-        setIcon(el, newIcon);
-      },
-    };
   }
 </script>
 
@@ -41,12 +35,12 @@
       class="toolbar-btn"
       aria-label={title}
       use:useSetIcon={icon}
-      on:click={() => emitEvent(event)}
+      onclick={() => emitEvent(event)}
     ></button>
   {/each}
   <hr />
   {#each annotations as { title, symbol, event }}
-    <button class="toolbar-btn" aria-label={title} on:click={() => emitEvent(event, symbol)}>
+    <button class="toolbar-btn" aria-label={title} onclick={() => emitEvent(event, symbol)}>
       {symbol}
     </button>
   {/each}
@@ -56,6 +50,7 @@
   :global(.tree-view.right) .toolbar-container {
     display: flex;
     flex-direction: column;
+    gap: 2px;
   }
 
   :global(.tree-view.bottom) .toolbar-container {
