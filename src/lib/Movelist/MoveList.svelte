@@ -1,8 +1,16 @@
 <script lang="ts">
   import { tick } from "svelte";
   import { scrollToBTN } from "../../utils/utils";
+  import type { EventBus } from "../../core/event-bus";
+  import type { ISettings, IBoard, IMove } from "../../types";
 
-  let { settings, currentStep, moves, eventBus } = $props();
+  interface Props {
+    settings: ISettings;
+    currentStep: number;
+    moves: IMove[];
+    eventBus: EventBus;
+  }
+  let { settings, currentStep, moves, eventBus }: Props = $props();
 
   let itemRefs: HTMLLIElement[] = [];
   let ulRef: HTMLUListElement;

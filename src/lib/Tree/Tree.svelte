@@ -27,7 +27,9 @@
 
   // ---- 常量 ----
   const spacingX = 30;
-  const spacingY = 17;
+  const spacingY = 16;
+  const width = 20;
+  const height = 0.7 * spacingY;
 
   const ANNOTATION_DEFINITIONS: Record<string, { symbol: string; color: string }> = {
     "R+": { symbol: "优", color: "red" },
@@ -201,21 +203,25 @@
       ontouchend={handleEvent}
     >
       <g transform="translate({translateX} {translateY}) scale({scale})">
-        {#each renderedNodes as node (node.id)}
+        {#each renderedNodes as node}
           {#each node.children as child}
-            {@const x1 = node.x! * spacingX}
-            {@const y1 = node.y! * spacingY}
-            {@const x2 = child.x! * spacingX}
-            {@const y2 = child.y! * spacingY}
-            {@const isPath = currentPath.includes(node.id) && currentPath.includes(child.id)}
             <line
-              {x1}
-              {y1}
-              {x2}
-              {y2}
+              x1={node.x! * spacingX}
+              y1={node.y! * spacingY}
+              x2={(child.x! - 0.3 * Math.sign(child.x! - node.x!)) * spacingX}
+              y2={node.y! * spacingY}
               stroke="var(--board-line)"
-              stroke-width={isPath ? 2 : 0.7}
-              opacity={isPath ? 1 : 0.7}
+              stroke-width={currentPath.includes(node.id) && currentPath.includes(child.id) ? 2 : 1}
+              opacity={currentPath.includes(node.id) && currentPath.includes(child.id) ? 1 : 0.7}
+            />
+            <line
+              x1={(child.x! - 0.3 * Math.sign(child.x! - node.x!)) * spacingX}
+              y1={node.y! * spacingY}
+              x2={child.x! * spacingX}
+              y2={child.y! * spacingY - 0.5 * height}
+              stroke="var(--board-line)"
+              stroke-width={currentPath.includes(node.id) && currentPath.includes(child.id) ? 2 : 1}
+              opacity={currentPath.includes(node.id) && currentPath.includes(child.id) ? 1 : 0.7}
             />
           {/each}
         {/each}
@@ -234,8 +240,8 @@
             <rect
               x="-10"
               y="-6"
-              width="20"
-              height="12"
+              {width}
+              {height}
               rx="3"
               ry="3"
               fill={node.side === "red"

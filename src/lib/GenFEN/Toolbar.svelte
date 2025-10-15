@@ -1,7 +1,12 @@
 <script lang="ts">
   import type { EventBus } from "../../core/event-bus";
 
-  let { eventBus, position, currentTurn } = $props();
+  interface Props {
+    eventBus: EventBus;
+    position: string;
+    currentTurn: string;
+  }
+  let { eventBus, position, currentTurn }: Props = $props();
 
   const buttons = [
     { title: "先手", text: "先", action: "turn", color: true },

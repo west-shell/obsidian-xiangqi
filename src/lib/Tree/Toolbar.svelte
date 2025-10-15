@@ -1,7 +1,11 @@
 <script lang="ts">
   import { setIcon } from "obsidian";
+  import type { EventBus } from "../../core/event-bus";
 
-  let { eventBus } = $props();
+  interface Props {
+    eventBus: EventBus;
+  }
+  let { eventBus }: Props = $props();
 
   const buttons = [
     { title: "删除", icon: "circle-x", event: "remove" },

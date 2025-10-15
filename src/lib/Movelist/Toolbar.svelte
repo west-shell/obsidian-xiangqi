@@ -1,6 +1,18 @@
 <script lang="ts">
   import { setIcon } from "obsidian";
-  let { settings, eventBus, modified, PGN, isprotected } = $props();
+  import type { EventBus } from "../../core/event-bus";
+  import type { ISettings, IMove } from "../../types";
+
+  interface Props {
+    settings: ISettings;
+    eventBus: EventBus;
+    modified: boolean;
+    PGN: IMove[];
+    isprotected: boolean;
+  }
+
+  let { settings, eventBus, modified, PGN, isprotected }: Props = $props();
+
   let buttonClass: string = $state("");
 
   $effect(() => {
