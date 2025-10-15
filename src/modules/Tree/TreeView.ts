@@ -12,21 +12,20 @@ class TreeViewModule {
 
             const Container = host.contentEl;
             host.Xiangqi = mount(TreeView, {
-                            target: Container,
-                            props: {
-                                nodeMap: host.nodeMap,
-                                settings: host.settings,
-                                board: host.currentNode.board,
-                                markedPos: host.markedPos,
-                                currentTurn: host.currentTurn,
-                                eventBus: host.eventBus,
-                                currentNode: host.currentNode,
-                                currentPath: host.currentPath,
-                            }
-                        })
+                target: Container,
+                props: {
+                    nodeMap: host.nodeMap,
+                    settings: host.settings,
+                    board: host.currentNode.board,
+                    markedPos: host.markedPos,
+                    currentTurn: host.currentTurn,
+                    eventBus: host.eventBus,
+                    currentNode: host.currentNode,
+                    currentPath: host.currentPath,
+                }
+            })
         })
         eventBus.on("updateUI", () => {
-
             host.Xiangqi.$set({
                 settings: host.settings,
                 nodeMap: host.nodeMap,

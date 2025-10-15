@@ -1,38 +1,21 @@
 <script lang="ts">
-  import { run } from 'svelte/legacy';
-
   import Tree from "./Tree.svelte";
   import Board from "../Board.svelte";
   import Toolbar from "./Toolbar.svelte";
   import type { ChessNode, IBoard, IPosition, ISettings, NodeMap } from "../../types";
   import type { EventBus } from "../../core/event-bus";
 
-  interface Props {
-    settings: ISettings;
-    board: IBoard;
-    markedPos: IPosition;
-    currentTurn: string;
-    eventBus: EventBus;
-    nodeMap: NodeMap;
-    currentNode: ChessNode;
-    currentPath: string[];
-  }
+  export let settings: ISettings;
+  export let board: IBoard;
+  export let markedPos: IPosition;
+  export let currentTurn: string;
+  export let eventBus: EventBus;
+  export let nodeMap: NodeMap;
+  export let currentNode: ChessNode;
+  export let currentPath: string[];
 
-  let {
-    settings,
-    board,
-    markedPos,
-    currentTurn,
-    eventBus,
-    nodeMap,
-    currentNode,
-    currentPath
-  }: Props = $props();
-
-  let lastMove = $derived(currentNode.data);
-  run(() => {
-    settings.position;
-  });
+  $: lastMove = currentNode.data;
+  $: settings.position;
 </script>
 
 <div class="tree-view {settings.position}">
