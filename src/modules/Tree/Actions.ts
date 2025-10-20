@@ -3,8 +3,10 @@ import type { ChessNode, IMove } from "../../types";
 import { getICCS } from "../../utils/parse";
 
 const ActionsModule = {
+
     init(host: Record<string, any>) {
         const eventBus = host.eventBus;
+
         eventBus.on('runmove', (move: IMove) => {
             const { from, to } = move
             const currentNode = host.currentNode;
@@ -106,9 +108,7 @@ const ActionsModule = {
                         host.currentNode.children = [];
                         host.nodeMap.clear();
                         host.nodeMap.set(host.currentNode.id, host.currentNode)
-                        host.board = host.currentNode.board;
-                        host.currentTurn = 'red';
-                        host.currentStep = 0;
+                        eventBus.emit("node-click", host.currentNode.id);
                         break;
 
                     }
@@ -131,6 +131,7 @@ const ActionsModule = {
 
                     deleteSubtree(removeNode);
                     host.updateMainPath();
+                    eventBus.emit("node-click", host.currentNode.id);
                     break;
                 }
                 case 'promote': {
