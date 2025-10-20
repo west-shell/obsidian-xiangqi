@@ -50,6 +50,7 @@ const ActionsModule = {
             eventBus.emit('updatePGN')
         })
         eventBus.on('node-click', (id: string) => {
+            host.markedPos = null;
             host.currentNode = host.nodeMap.get(id);
             host.board = host.currentNode.board;
             host.currentTurn = host.currentNode.side === 'red' ? 'black' : 'red';
@@ -65,6 +66,7 @@ const ActionsModule = {
             host.saveFile();
         })
         eventBus.on('btn-click', (payload: { name: string, payload: any }) => {
+            host.markedPos = null;
             const { name, payload: data } = payload;
             switch (name) {
                 case 'annotation': {
