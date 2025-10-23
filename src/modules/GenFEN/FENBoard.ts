@@ -29,8 +29,8 @@ export class BoardModule {
             host.Xiangqi.$set({
                 selectedPiece: host.selectedPiece,
                 settings: { ...host.settings },
-                board: host.board,
-                markedPos: host.markedPos,
+                board: [...host.board],
+                markedPos: { ...host.markedPos },
                 currentTurn: host.currentTurn,
             });
         })

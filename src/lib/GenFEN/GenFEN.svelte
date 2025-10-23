@@ -14,14 +14,8 @@
     eventBus: EventBus;
   }
 
-  let {
-    settings,
-    board,
-    markedPos,
-    selectedPiece,
-    currentTurn,
-    eventBus
-  }: Props = $props();
+  let { settings, board, markedPos, selectedPiece, currentTurn, eventBus }: Props = $props();
+
   let position = $derived(settings.position);
 </script>
 

@@ -7,9 +7,7 @@ export class BoardClickModule {
         const eventBus = host.eventBus;
         eventBus.on('click', (clickedPos: IPosition) => {
             const clickedPiece = host.board[clickedPos.x][clickedPos.y];
-            // 你的后续逻辑
             if (!host.markedPos && !host.selectedPiece) {
-                // 没有标记棋子时，只能选中当前行棋方的棋子
                 if (clickedPiece) {
                     host.markedPos = clickedPos;
                     host.Xiangqi.$set({
@@ -23,14 +21,15 @@ export class BoardClickModule {
                 host.board[from.x][from.y] = '';
                 host.markedPos = null;
                 host.Xiangqi.$set({
-                    board: [...host.board],
+                    board: [...host.board.map((row: any) => [...row])],
                     markedPos: host.markedPos,
                 });
             } else if (host.selectedPiece) {
                 host.board[clickedPos.x][clickedPos.y] = host.selectedPiece;
                 host.selectedPiece = null;
+                host.markedPos = null; // 之前漏掉了这一行，现在补上
                 host.Xiangqi.$set({
-                    board: [...host.board],
+                    board: [...host.board.map((row: any) => [...row])],
                     selectedPiece: host.selectedPiece,
                     markedPos: host.markedPos,
                 });

@@ -59,14 +59,13 @@ const ActionsModule = {
             host.updateMainPath();
             host.eventBus.emit('updateUI')
         })
-        eventBus.on('node-dblclick', (id: string) => {
 
-        })
         eventBus.on('updatePGN', () => {
             const pgn = stringifyPGN(host.root);
             host.data = host.tags + '\n' + pgn
             host.saveFile();
         })
+
         eventBus.on('btn-click', (payload: { name: string, payload: any }) => {
             host.markedPos = null;
             const { name, payload: data } = payload;
