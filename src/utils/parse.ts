@@ -43,7 +43,7 @@ export function parseSource(source: string): {
 }
 
 export function loadBoardFromFEN(fen: string): { board: IBoard; turn: string } {
-    const board: IBoard = Array.from({ length: 10 }, () => Array(9).fill(null));
+    const board: IBoard = Array.from({ length: 9 }, () => Array(10).fill(null));
     const [position, turn] = fen.trim().split(/\s+/);
 
     const rows = position.split("/");

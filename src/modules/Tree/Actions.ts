@@ -92,10 +92,8 @@ const ActionsModule = {
                     }
 
                     if (index === -1) {
-                        // If the annotation was not present, add it back
                         node.comments.push(data);
                     }
-                    // If it was present, it's already removed by the filter, effectively toggling it off.
 
                     break;
                 }
@@ -104,9 +102,7 @@ const ActionsModule = {
                         host.currentNode.children = [];
                         host.nodeMap.clear();
                         host.nodeMap.set(host.currentNode.id, host.currentNode)
-                        host.board = host.currentNode.board;
-                        host.currentTurn = 'red';
-                        host.currentStep = 0;
+                        eventBus.emit("node-click", host.currentNode.id);
                         break;
 
                     }
@@ -129,6 +125,7 @@ const ActionsModule = {
 
                     deleteSubtree(removeNode);
                     host.updateMainPath();
+                    eventBus.emit("node-click", host.currentNode.id);
                     break;
                 }
                 case 'promote': {
