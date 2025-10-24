@@ -16,6 +16,7 @@
     modified: boolean;
     PGN: IMove[];
     history: IMove[];
+    lastMove: IMove | null;
     options: IOptions;
   }
 
@@ -29,11 +30,11 @@
     modified,
     PGN,
     history,
+    lastMove,
     options,
   }: Props = $props();
 
   let moves = $derived(modified ? history : PGN);
-  let lastMove = $derived(moves[currentStep - 1] || null);
   let isprotected = $derived(options.protected || false);
   let rotated = $derived(options.rotated || false);
 

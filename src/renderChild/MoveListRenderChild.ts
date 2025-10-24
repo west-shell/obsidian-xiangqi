@@ -10,12 +10,12 @@ import {
 import type { EventBus } from '../core/event-bus';
 import type { ISettings } from '../types';
 import '../core/event-bus';
-import '../modules/Xiangqi/Source';
-import '../modules/Xiangqi/ChessBoard';
+import '../modules/Source';
+import '../modules/MoveList/ChessBoard';
 import '../modules/BoardClick';
-import '../modules/Xiangqi/History';
-import '../modules/Xiangqi/Actions';
-import '../modules/Xiangqi/Speaker';
+import '../modules/MoveList/History';
+import '../modules/MoveList/Actions';
+import '../modules/MoveList/Speaker';
 
 export class ChessRenderChild extends MarkdownRenderChild {
     settings: ISettings;

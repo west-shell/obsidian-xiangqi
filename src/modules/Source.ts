@@ -1,5 +1,5 @@
-import { registerGenFENModule, registerXQModule } from "../../core/module-system";
-import { parseSource } from "../../utils/parse";
+import { registerGenFENModule, registerXQModule } from "../core/module-system";
+import { parseSource } from "../utils/parse";
 
 export const SourceModule = {
 

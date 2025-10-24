@@ -11,7 +11,7 @@ import {
 import type { EventBus } from '../core/event-bus';
 import type { ISettings } from '../types';
 import '../core/event-bus';
-import '../modules/Xiangqi/Source';
+import '../modules/Source';
 import '../modules/GenFEN/FENBoard';
 import '../modules/GenFEN/BoardClick';
 import '../modules/GenFEN/Actions';

@@ -25,6 +25,7 @@ export class BoardModule {
                     modified: host.modified,
                     PGN: host.PGN,
                     history: host.history,
+                    lastMove: host.modified ? host.history[host.currentStep - 1] || null : host.PGN[host.currentStep - 1] || null,
                     options: host.options || {}
                 },
             }) as SvelteComponent;
@@ -56,6 +57,7 @@ export class BoardModule {
                 currentStep: host.currentStep,
                 modified: host.modified,
                 history: [...host.history],
+                lastMove: host.modified ? host.history[host.currentStep - 1] || null : host.PGN[host.currentStep - 1] || null,
                 options: { ...(host.options || {}) }
             });
         })
