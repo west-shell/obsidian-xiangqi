@@ -95,10 +95,8 @@ const ActionsModule = {
                     }
 
                     if (index === -1) {
-                        // If the annotation was not present, add it back
                         node.comments.push(data);
                     }
-                    // If it was present, it's already removed by the filter, effectively toggling it off.
 
                     break;
                 }
