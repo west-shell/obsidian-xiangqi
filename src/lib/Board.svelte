@@ -120,11 +120,18 @@
       stroke-width={cellSize * 0.08}
       fill="none"
     />
+    <!-- 内框 -->
+    <path
+      d={`M ${cellSize},${cellSize} h ${8 * cellSize} v ${9 * cellSize} h -${8 * cellSize} Z`}
+      stroke="var(--board-line)"
+      stroke-width={cellSize * 0.04}
+      fill="none"
+    />
 
     <!-- 横线 -->
-    {#each Array(10).fill(0) as _, i}
+    {#each Array(8).fill(0) as _, i}
       <path
-        d={`M ${cellSize},${cellSize * (i + 1)} h ${cellSize * 8}`}
+        d={`M ${cellSize},${cellSize * (i + 2)} h ${cellSize * 8}`}
         stroke="var(--board-line)"
         stroke-width={cellSize * 0.04}
         fill="none"
@@ -132,54 +139,35 @@
     {/each}
 
     <!-- 上/下竖线 -->
-    {#each Array(9).fill(0) as _, i}
+    {#each Array(7).fill(0) as _, i}
       <path
-        d={`M ${cellSize * (i + 1)},${cellSize} v ${cellSize * 4}`}
+        d={`M ${cellSize * (i + 2)},${cellSize} v ${cellSize * 4}`}
         stroke="var(--board-line)"
         stroke-width={cellSize * 0.04}
         fill="none"
       />
       <path
-        d={`M ${cellSize * (i + 1)},${cellSize * 6} v ${cellSize * 4}`}
+        d={`M ${cellSize * (i + 2)},${cellSize * 6} v ${cellSize * 4}`}
         stroke="var(--board-line)"
         stroke-width={cellSize * 0.04}
         fill="none"
       />
     {/each}
 
-    <!-- 左右边线 -->
-    <line
-      x1={cellSize}
-      y1={cellSize}
-      x2={cellSize}
-      y2={10 * cellSize}
-      stroke="var(--board-line)"
-      stroke-width={cellSize * 0.04}
-    />
-    <line
-      x1={cellSize * 9}
-      y1={cellSize}
-      x2={cellSize * 9}
-      y2={10 * cellSize}
-      stroke="var(--board-line)"
-      stroke-width={cellSize * 0.04}
-    />
-
     <!-- 楚河汉界 -->
     <text
       x={width / 2}
       y={height / 2}
       font-size={cellSize * 0.6}
-      font-family="FZLiShu II-S06"
       text-anchor="middle"
       dominant-baseline="middle"
       fill="var(--board-line)"
     >
-      <tspan dy="0.15em">楚　河　　汉　界</tspan>
+      <tspan dy="0.15em">楚　河　　　汉　界</tspan>
     </text>
 
     <!-- 九宫 -->
-    <g stroke="var(--board-line)" stroke-width={cellSize * 0.03} fill="none">
+    <g stroke="var(--board-line)" stroke-width={cellSize * 0.02} fill="none">
       <path
         d={`M ${cellSize * 4},${cellSize} l ${cellSize * 2} ${cellSize * 2} m 0,${-2 * cellSize} l ${-2 * cellSize} ${2 * cellSize}`}
       />

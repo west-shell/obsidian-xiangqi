@@ -119,9 +119,10 @@
     flex-shrink: 0; /* 防止 li 元素收缩 */
     flex-grow: 0; /* 防止 li 元素增长 */
     align-items: center;
-    gap: 0.25em;
-    padding: 2px;
+    gap: 0.5em;
+    padding: 0px;
     margin: 0;
+    /* margin-bottom: -22px; */
     border-bottom: none;
     width: 100%; /* 每个 li 元素占据一行 */
     white-space: nowrap; /* 强制 li 元素本身不换行 */
@@ -134,10 +135,9 @@
     flex-grow: 0; /* 防止 li 元素增长 */
     align-items: center;
     gap: 0.25em;
-    padding: 2px;
+    padding: 1px;
     margin: 0;
     border-bottom: none;
-    /* height: 100%; 每个 li 元素占据一行 */
     white-space: nowrap; /* 强制 li 元素本身不换行 */
     writing-mode: vertical-rl;
     text-orientation: upright;
@@ -158,7 +158,7 @@
     writing-mode: horizontal-tb; /* 强制水平方向 */
     text-orientation: mixed; /* 确保数字横排 */
     display: inline-block;
-    width: 2ch; /* 固定宽度对齐 */
+    /* width: 2ch; 固定宽度对齐 */
     text-align: center; /* 右对齐，个位数前会空出 */
   }
 
@@ -187,7 +187,7 @@
   span.move {
     /* color: #337ab7; */
     color: var(--text-normal);
-    padding: 2px;
+    padding: 0;
   }
 
   span.move.active {
