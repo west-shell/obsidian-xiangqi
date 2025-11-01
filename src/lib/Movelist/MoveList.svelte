@@ -193,7 +193,7 @@
   span.move.active {
     /* background-color: var(--interactive-accent); */
     /* color: red; */
-    color: var(--text-error);
+    color: var(--color-accent);
     /* font-weight: bold; */
   }
 </style>

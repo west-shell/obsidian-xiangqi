@@ -71,10 +71,22 @@
   function handleClick(e: MouseEvent) {
     const svg = e.currentTarget as SVGSVGElement;
     const boardRect = svg.getBoundingClientRect();
+
+    // 获取SVG的实际渲染宽度和高度
+    const actualWidth = svg.clientWidth;
+    const actualHeight = svg.clientHeight;
+
+    // 计算实际的单元格大小
+    const actualCellSizeX = actualWidth / 10; // 棋盘有10列（1-9，加上边框）
+    const actualCellSizeY = actualHeight / 11; // 棋盘有11行（1-10，加上边框）
+
+    // 计算鼠标在SVG内部的相对坐标
     const mouseX = e.clientX - boardRect.left;
     const mouseY = e.clientY - boardRect.top;
-    let gridX = Math.round(mouseX / cellSize) - 1;
-    let gridY = Math.round(mouseY / cellSize) - 1;
+
+    // 根据实际单元格大小计算网格坐标
+    let gridX = Math.round(mouseX / actualCellSizeX) - 1;
+    let gridY = Math.round(mouseY / actualCellSizeY) - 1;
 
     if (gridX >= 0 && gridX < 9 && gridY >= 0 && gridY < 10) {
       const pos = rotated ? rotatePos({ x: gridX, y: gridY }) : { x: gridX, y: gridY };

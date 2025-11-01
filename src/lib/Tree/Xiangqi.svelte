@@ -41,16 +41,21 @@
   .tree-view {
     display: flex;
     justify-content: center;
+  }
+
+  .tree-view :global(.xq-board) {
+    width: 100%;
     height: 100%;
-    /* gap: 2px; */
   }
 
   .tree-view.right {
     flex-direction: row;
+    height: 100%;
+    gap: 2px;
   }
   .tree-view.bottom {
     flex-direction: column;
-    justify-content: center;
     align-items: center;
+    /* width: 100%; */
   }
 </style>
