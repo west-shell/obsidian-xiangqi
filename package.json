@@ -1,7 +1,7 @@
 {
   "name": "obsidian-xiangqi",
   "private": true,
-  "version": "2.4.9",
+  "version": "2.4.10",
   "description": "Render xiangqi(Chinese chess) positions diagrams in a note.",
   "main": "main.js",
   "type": "module",
