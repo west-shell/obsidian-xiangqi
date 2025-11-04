@@ -41,6 +41,7 @@
   .tree-view {
     display: flex;
     justify-content: center;
+    margin: 0 auto; /* 添加此行以使 .tree-view 容器本身居中 */
   }
 
   .tree-view :global(.xq-board) {
@@ -53,9 +54,11 @@
     height: 100%;
     gap: 2px;
   }
+
   .tree-view.bottom {
     flex-direction: column;
     align-items: center;
-    /* width: 100%; */
+    height: 100%;
+    max-width: 40vh;
   }
 </style>

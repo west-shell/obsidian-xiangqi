@@ -1,12 +1,13 @@
 <script lang="ts">
   import { onMount, tick } from "svelte";
+  import type { EventBus } from "../../core/event-bus";
   import { PIECE_CHARS, type ChessNode, type NodeMap } from "../../types";
   import { createInteractionHandlers } from "./interact";
   import { calculateTreeLayout } from "./layout";
 
   interface Props {
     nodeMap: NodeMap;
-    eventBus: { emit: (event: string, payload: any) => void };
+    eventBus: EventBus;
     currentNode: ChessNode | null;
     currentPath: string[];
   }
@@ -44,7 +45,7 @@
   const ANNOTATION_TYPES = {
     evaluation: ["R+", "B+", "="],
     moveQuality: ["?", "!"],
-    gameEnd: ["R#", "B#"],
+    gameEnd: ["R#", "B#", "=#"],
   };
 
   const ALL_ANNOTATION_KEYS = Object.keys(ANNOTATION_DEFINITIONS);
@@ -338,6 +339,7 @@
     flex-direction: column;
     height: 100%;
     max-height: 100vh;
+    /* min-height: 30vh; */
     overflow: hidden;
     --board-background: var(--background-primary-alt);
     --board-line: var(--text-normal);

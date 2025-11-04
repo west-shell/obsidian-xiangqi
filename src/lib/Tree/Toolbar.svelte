@@ -20,8 +20,11 @@
     { title: "红优", symbol: "R+", event: "annotation" },
     { title: "黑优", symbol: "B+", event: "annotation" },
     { title: "均势", symbol: "=", event: "annotation" },
-    { title: "问题手", symbol: "?", event: "annotation" },
+    { title: "不明", symbol: "?", event: "annotation" },
     { title: "妙手", symbol: "!", event: "annotation" },
+    // { title: "红胜", symbol: "R>", event: "annotation" },
+    // { title: "黑胜", symbol: "B>", event: "annotation" },
+    // { title: "和棋", symbol: "=/=", event: "annotation" },
   ];
 
   function emitEvent(name: string, payload: any = null) {
