@@ -38,8 +38,6 @@
     }
   });
 
-  // let cellSize: number, margin: number, width: number, height: number;
-
   let renderedBoard: IBoard = $derived(rotated ? rotateBoard(board) : board);
   let renderedMarkedPos: IPosition | null = $derived(
     rotated && markedPos ? rotatePos(markedPos) : markedPos,
@@ -155,16 +153,18 @@
     {/each}
 
     <!-- 楚河汉界 -->
-    <text
-      x={width / 2}
-      y={height / 2}
-      font-size={cellSize * 0.6}
-      text-anchor="middle"
-      dominant-baseline="middle"
-      fill="var(--board-line)"
-    >
-      <tspan dy="0.15em">楚　河　　　汉　界</tspan>
-    </text>
+    {#each [["楚", 1.8], ["河", 3.2], ["汉", 5.8], ["界", 7.2]] as [char, pos]}
+      <text
+        x={(+pos + 0.5) * cellSize}
+        y={height / 2}
+        font-size={cellSize * 0.6}
+        text-anchor="middle"
+        dominant-baseline="middle"
+        fill="var(--board-line)"
+      >
+        <tspan dy="0.15em">{char}</tspan>
+      </text>
+    {/each}
 
     <!-- 九宫 -->
     <g stroke="var(--board-line)" stroke-width={cellSize * 0.02} fill="none">
@@ -194,6 +194,7 @@
         />
       {/each}
     </g>
+
     <!-- 坐标标签 -->
     {#if showCoordinateLabels}
       <g text-anchor="middle" dominant-baseline="middle" fill="var(--text-color)">
