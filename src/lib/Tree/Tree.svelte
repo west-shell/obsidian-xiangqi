@@ -27,10 +27,10 @@
   let scale = $state(1);
 
   // ---- 常量 ----
-  const spacingX = 30;
-  const spacingY = 16;
-  const width = 20;
-  const height = 0.7 * spacingY;
+  const spacingX = 25;
+  const spacingY = 15;
+  const width = 13;
+  const height = 11;
 
   const ANNOTATION_DEFINITIONS: Record<string, { symbol: string; color: string }> = {
     "R+": { symbol: "优", color: "red" },
@@ -206,23 +206,17 @@
       <g transform="translate({translateX} {translateY}) scale({scale})">
         {#each renderedNodes as node}
           {#each node.children as child}
-            <line
-              x1={node.x! * spacingX}
-              y1={node.y! * spacingY}
-              x2={(child.x! - 0.3 * Math.sign(child.x! - node.x!)) * spacingX}
-              y2={node.y! * spacingY}
+            <path
+              d={`
+              M ${node.x! * spacingX} ${node.y! * spacingY}
+              L ${(child.x! - 0.3 * Math.sign(child.x! - node.x!)) * spacingX} ${node.y! * spacingY}
+              L ${child.x! * spacingX} ${child.y! * spacingY - 0.5 * height}
+              `}
               stroke="var(--board-line)"
+              stroke-linejoin="round"
               stroke-width={currentPath.includes(node.id) && currentPath.includes(child.id) ? 2 : 1}
               opacity={currentPath.includes(node.id) && currentPath.includes(child.id) ? 1 : 0.7}
-            />
-            <line
-              x1={(child.x! - 0.3 * Math.sign(child.x! - node.x!)) * spacingX}
-              y1={node.y! * spacingY}
-              x2={child.x! * spacingX}
-              y2={child.y! * spacingY - 0.5 * height}
-              stroke="var(--board-line)"
-              stroke-width={currentPath.includes(node.id) && currentPath.includes(child.id) ? 2 : 1}
-              opacity={currentPath.includes(node.id) && currentPath.includes(child.id) ? 1 : 0.7}
+              fill="none"
             />
           {/each}
         {/each}
@@ -231,36 +225,48 @@
           {@const evaluation = getAnnotation(node, "evaluation")}
           {@const moveQuality = getAnnotation(node, "moveQuality")}
           {@const gameEnd = getAnnotation(node, "gameEnd")}
-
           <!-- svelte-ignore a11y_click_events_have_key_events -->
           <g
             class="node-group"
             transform="translate({node.x! * spacingX} {node.y! * spacingY})"
+            opacity={currentPath.includes(node.id) ? 1 : 0.6}
             onclick={() => eventBus.emit("node-click", node.id)}
           >
             <rect
-              x="-10"
-              y="-6"
+              x={-width / 2}
+              y={-height / 2}
               {width}
               {height}
-              rx="3"
-              ry="3"
+              rx="2.5"
+              ry="2.5"
               fill={node.side === "red"
                 ? "var(--piece-red)"
                 : node.side === "black"
                   ? "var(--piece-black)"
                   : "gray"}
               stroke="var(--board-line)"
-              stroke-width={node.id === currentNode?.id ? 1.5 : 0.5}
+              stroke-width="0.5"
             />
-            <text dy="3.5" text-anchor="middle" fill="white" font-size="9px">
-              {node.data?.type ? PIECE_CHARS[node.data.type] : "开局"}
-            </text>
 
             <!-- 评论标记 -->
+            <!-- stroke="royalblue" -->
             {#if getRegularComments(node).length > 0}
-              <circle cx="10" cy="-7" r="3" fill="royalblue" />
+              <g
+                transform="translate({0.5 * width} {-0.5 * height}) scale(0.25)"
+                fill="royalblue"
+                stroke="currentColor"
+                stroke-width="1"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                ><path
+                  d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z"
+                /><path d="M7 11h10" /><path d="M7 15h6" /><path d="M7 7h8" />
+              </g>
             {/if}
+
+            <text dy="3.5" text-anchor="middle" fill="white" font-size="9px">
+              {node.data?.type ? PIECE_CHARS[node.data.type] : "始"}
+            </text>
 
             <!-- 各类标注 -->
             {#if evaluation}
