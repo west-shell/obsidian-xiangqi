@@ -67,7 +67,6 @@ import type { SvelteComponent } from "svelte";
 import type { MarkdownPostProcessorContext, MarkdownSectionInformation } from "obsidian";
 import type XQPlugin from "./main";
 import type { EventBus } from "./core/event-bus";
-import type { BoardModule } from "./modules/Xiangqi/ChessBoard";
 
 export type IHistory = IMove[];
 
@@ -93,8 +92,6 @@ export interface IXQHost extends IHost {
 	rotated: boolean;
 	options?: IOptions;
 	haveFEN?: boolean;
-	// Dynamically added modules
-	BoardModule?: BoardModule;
 	Xiangqi?: SvelteComponent;
 }
 

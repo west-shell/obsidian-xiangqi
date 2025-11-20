@@ -6,7 +6,7 @@ export type TokenType =
     | 'right-paren' // ")"
     | 'comment'     // 注释
     | 'tag'         // 标签
-    | 'result'
+    | 'result'      // 结果 "1-0","1/2-1/2"
     | 'eof';        // 结束
 
 export interface Token {
