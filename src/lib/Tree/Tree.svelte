@@ -31,15 +31,21 @@
   const spacingY = 15;
   const width = 13;
   const height = 11;
-
-  const ANNOTATION_DEFINITIONS: Record<string, { symbol: string; color: string }> = {
-    "R+": { symbol: "优", color: "red" },
-    "B+": { symbol: "优", color: "black" },
-    "=": { symbol: "均", color: "green" },
-    "?": { symbol: "?", color: "orange" },
-    "!": { symbol: "!", color: "blue" },
-    "R#": { symbol: "胜", color: "red" },
-    "B#": { symbol: "胜", color: "black" },
+  const lucide_message_square_text = `<path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z"/><path d="M7 11h10"/><path d="M7 15h6"/><path d="M7 7h8"/>`;
+  const lucide_smile = `<path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" x2="9.01" y1="9" y2="9"/><line x1="15" x2="15.01" y1="9" y2="9"/>`;
+  const lucide_thumbs_up = `<path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z"/><path d="M7 10v12"/>`;
+  const lucide_scale = `<path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/>`;
+  const lucide_question = `<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="M9.1 9a3 3 0 0 1 5.82 1c0 2-3 3-3 3"/><path d="M12 17h.01"/>`;
+  const lucide_shield_alert = `<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="M12 8v4"/><path d="M12 16h.01"/>`;
+  const ANNOTATION_DEFINITIONS: Record<string, { symbol: string; color: string; icon?: string }> = {
+    "R+": { symbol: "红优", color: "var(--piece-red)", icon: lucide_thumbs_up },
+    "B+": { symbol: "黑优", color: "var(--piece-black)", icon: lucide_thumbs_up },
+    "=": { symbol: "均势", color: "var(--color-green)", icon: lucide_scale },
+    "?": { symbol: "问题", color: "var(--text-warning)", icon: lucide_question },
+    "!": { symbol: "关键", color: "var(--color-blue)", icon: lucide_shield_alert },
+    "R#": { symbol: "红胜", color: "red", icon: lucide_thumbs_up },
+    "B#": { symbol: "黑胜", color: "black", icon: lucide_thumbs_up },
+    "=#": { symbol: "和棋", color: "gray", icon: lucide_scale },
   };
 
   const ANNOTATION_TYPES = {
@@ -230,6 +236,10 @@
             class="node-group"
             transform="translate({node.x! * spacingX} {node.y! * spacingY})"
             opacity={currentPath.includes(node.id) ? 1 : 0.6}
+            filter={node.id === currentNode?.id
+              ? "brightness(1.5) saturate(1.4) drop-shadow(0 0 1px rgba(255, 255, 255, 0.6))"
+              : undefined}
+            stroke-width={node.id === currentNode?.id ? 1 : 0.5}
             onclick={() => eventBus.emit("node-click", node.id)}
           >
             <rect
@@ -245,22 +255,20 @@
                   ? "var(--piece-black)"
                   : "gray"}
               stroke="var(--board-line)"
-              stroke-width="0.5"
             />
 
             <!-- 评论标记 -->
             <!-- stroke="royalblue" -->
             {#if getRegularComments(node).length > 0}
               <g
-                transform="translate({0.5 * width} {-0.5 * height}) scale(0.25)"
+                transform="translate({0.35 * width} {-0.65 * height}) scale(0.35)"
                 fill="royalblue"
                 stroke="currentColor"
-                stroke-width="1"
+                stroke-width="1.5"
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                ><path
-                  d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z"
-                /><path d="M7 11h10" /><path d="M7 15h6" /><path d="M7 7h8" />
+              >
+                {@html lucide_message_square_text}
               </g>
             {/if}
 
@@ -271,55 +279,43 @@
             <!-- 各类标注 -->
             {#if evaluation}
               {@const def = ANNOTATION_DEFINITIONS[evaluation]}
-              <g transform="translate(-13, -7)">
-                <rect width="7" height="7" rx="1.5" fill={def.color} />
-                <text
-                  x="3.5"
-                  y="3.5"
-                  text-anchor="middle"
-                  dominant-baseline="middle"
-                  font-size="5px"
-                  fill="white"
-                  font-weight="bold"
-                >
-                  {def.symbol}
-                </text>
+              <g
+                transform="translate({-0.9 * width} {-0.65 * height}) scale(0.35)"
+                fill={def.color}
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                {@html def.icon}
               </g>
             {/if}
 
             {#if moveQuality}
               {@const def = ANNOTATION_DEFINITIONS[moveQuality]}
-              <g transform="translate(-13, 1)">
-                <rect width="7" height="7" rx="1.5" fill={def.color} />
-                <text
-                  x="3.5"
-                  y="3.5"
-                  text-anchor="middle"
-                  dominant-baseline="middle"
-                  font-size="5px"
-                  fill="white"
-                  font-weight="bold"
-                >
-                  {def.symbol}
-                </text>
+              <g
+                transform="translate({-0.9 * width} {0 * height}) scale(0.35)"
+                fill={def.color}
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                {@html def.icon}
               </g>
             {/if}
 
             {#if gameEnd}
               {@const def = ANNOTATION_DEFINITIONS[gameEnd]}
-              <g transform="translate(6.5, 3.5)">
-                <rect width="7" height="7" rx="1.5" fill={def.color} />
-                <text
-                  x="3.5"
-                  y="3.5"
-                  text-anchor="middle"
-                  dominant-baseline="middle"
-                  font-size="5px"
-                  fill="white"
-                  font-weight="bold"
-                >
-                  {def.symbol}
-                </text>
+              <g
+                transform="translate({-0.85 * width} {-0.65 * height}) scale(0.35)"
+                fill={def.color}
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                {@html def.icon}
               </g>
             {/if}
           </g>
