@@ -1,7 +1,7 @@
 import { MarkdownView, Notice } from "obsidian";
 import { registerXQModule } from "../../core/module-system";
 import type { IMove, IXQHost, PieceType } from "../../types";
-import { getICCS } from "../../utils/parse";
+import { getICCS, genFENFromBoard, parseSource } from "../../utils/parse";
 import { ConfirmModal } from "../../utils/confirmModal";
 
 export class ActionsModule {
@@ -104,6 +104,22 @@ export class ActionsModule {
                 }
             }
             eventBus.emit('updateUI');
+        })
+
+        eventBus.on('openPikafish', () => {
+            // 1. 获取初始局面
+            const { board, firstTurn } = parseSource(host.source);
+            const fen = genFENFromBoard(board, firstTurn);
+
+            // 2. 获取移动记录
+            const moves = host.modified ? host.history : host.PGN;
+
+            // 3. 转换为 UCI 格式字符串
+            const movesStr = moves.map(m => m.ICCS?.replace('-', '').toLowerCase()).join('');
+
+            // 4. 生成 URL
+            const url = `https://xiangqiai.com/#/${fen} moves ${movesStr}`;
+            window.open(url);
         })
     }
 }
