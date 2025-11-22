@@ -19,11 +19,11 @@
 
   // 你的 annotation 项目 —— 会放进菜单
   const annotations = [
-    { title: "红优", icon: "thumbs-up", symbol: "R+", event: "annotation" },
-    { title: "黑优", icon: "thumbs-up", symbol: "B+", event: "annotation" },
-    { title: "均势", icon: "scale", symbol: "=", event: "annotation" },
-    { title: "不明", icon: "shield-question", symbol: "?", event: "annotation" },
-    { title: "妙手", icon: "shield-alert", symbol: "!", event: "annotation" },
+    { title: "优势", icon: "thumbs-up", symbol: "R+", event: "annotation" },
+    { title: "劣势", icon: "thumbs-down", symbol: "B+", event: "annotation" },
+    { title: "均势", icon: "handshake", symbol: "=", event: "annotation" },
+    { title: "关键", icon: "bookmark", symbol: "?", event: "annotation" },
+    { title: "妙手", icon: "star", symbol: "!", event: "annotation" },
   ];
 
   function emitEvent(name: string, payload: any = null) {
