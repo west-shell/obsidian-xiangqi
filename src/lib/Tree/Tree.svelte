@@ -35,7 +35,8 @@
   const lucide_smile = `<path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" x2="9.01" y1="9" y2="9"/><line x1="15" x2="15.01" y1="9" y2="9"/>`;
   const lucide_thumbs_up = `<path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z"/><path d="M7 10v12"/>`;
   const lucide_thumbs_down = `<path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2h13a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22a3.13 3.13 0 0 1-3-3.88Z"/><path d="M17 14V2"/>`;
-  const lucide_handshake = `<circle cx="12" cy="11" r="12"/><path d="m11 17 2 2a1 1 0 1 0 3-3"/><path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4"/><path d="m21 3 1 11h-2"/><path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3"/><path d="M3 4h8"/>`;
+  // const lucide_handshake = `<path d="m11 17 2 2a1 1 0 1 0 3-3"/><path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4"/><path d="m21 3 1 11h-2"/><path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3"/><path d="M3 4h8"/>`;
+  const lucide_handshake = `<path d="M19.414 14.414C21 12.828 22 11.5 22 9.5a5.5 5.5 0 0 0-9.591-3.676.6.6 0 0 1-.818.001A5.5 5.5 0 0 0 2 9.5c0 2.3 1.5 4 3 5.5l5.535 5.362a2 2 0 0 0 2.879.052 2.12 2.12 0 0 0-.004-3 2.124 2.124 0 1 0 3-3 2.124 2.124 0 0 0 3.004 0 2 2 0 0 0 0-2.828l-1.881-1.882a2.41 2.41 0 0 0-3.409 0l-1.71 1.71a2 2 0 0 1-2.828 0 2 2 0 0 1 0-2.828l2.823-2.762"/>`;
   const lucide_scale = `<path fill="red" d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/>`;
   const lucide_question = `<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="M9.1 9a3 3 0 0 1 5.82 1c0 2-3 3-3 3"/><path d="M12 17h.01"/>`;
   const lucide_shield_alert = `<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="M12 8v4"/><path d="M12 16h.01"/>`;
@@ -52,18 +53,12 @@
     "=#": { symbol: "和棋", color: "gray", icon: lucide_handshake },
   };
 
-  const ANNOTATION_TYPES = {
-    evaluation: ["R+", "B+", "="],
-    moveQuality: ["?", "!"],
-    gameEnd: ["R#", "B#", "=#"],
-  };
-
   const ALL_ANNOTATION_KEYS = Object.keys(ANNOTATION_DEFINITIONS);
 
   // ---- 工具函数 ----
-  function getAnnotation(node: ChessNode, type: keyof typeof ANNOTATION_TYPES): string | undefined {
+  function getPrimaryAnnotation(node: ChessNode): string | undefined {
     if (!node.comments) return undefined;
-    return node.comments.find((c) => ANNOTATION_TYPES[type].includes(c));
+    return node.comments.find((c) => ALL_ANNOTATION_KEYS.includes(c));
   }
 
   function getAllAnnotations(node: ChessNode): string[] {
@@ -220,7 +215,7 @@
               d={`
               M ${node.x! * spacingX} ${node.y! * spacingY}
               L ${(child.x! - 0.3 * Math.sign(child.x! - node.x!)) * spacingX} ${node.y! * spacingY}
-              L ${child.x! * spacingX} ${child.y! * spacingY - 0.5 * height}
+              L ${child.x! * spacingX} ${child.y! * spacingY}
               `}
               stroke="var(--board-line)"
               stroke-linejoin="round"
@@ -235,9 +230,7 @@
         {/each}
 
         {#each renderedNodes as node (node.id)}
-          {@const evaluation = getAnnotation(node, "evaluation")}
-          {@const moveQuality = getAnnotation(node, "moveQuality")}
-          {@const gameEnd = getAnnotation(node, "gameEnd")}
+          {@const primaryAnnotation = getPrimaryAnnotation(node)}
           <!-- svelte-ignore a11y_click_events_have_key_events -->
           <g
             class="node-group"
@@ -251,23 +244,39 @@
             stroke-width={node.id === currentNode?.id ? 1 : 0.5}
             onclick={() => eventBus.emit("node-click", node.id)}
           >
-            <rect
-              x={-width / 2}
-              y={-height / 2}
-              {width}
-              {height}
-              rx="2.5"
-              ry="2.5"
-              fill={node.side === "red"
-                ? "var(--piece-red)"
-                : node.side === "black"
-                  ? "var(--piece-black)"
-                  : "gray"}
-              stroke="var(--board-line)"
-            />
+            {#if primaryAnnotation}
+              {@const def = ANNOTATION_DEFINITIONS[primaryAnnotation]}
+              <g
+                transform="translate({-7.2} {-7.2}) scale(0.6)"
+                fill={def.color}
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                {@html def.icon}
+              </g>
+            {:else}
+              <rect
+                x={-width / 2}
+                y={-height / 2}
+                {width}
+                {height}
+                rx="2.5"
+                ry="2.5"
+                fill={node.side === "red"
+                  ? "var(--piece-red)"
+                  : node.side === "black"
+                    ? "var(--piece-black)"
+                    : "gray"}
+                stroke="var(--board-line)"
+              />
+              <text dy="3.5" text-anchor="middle" fill="white" font-size="9px">
+                {node.data?.type ? PIECE_CHARS[node.data.type] : "始"}
+              </text>
+            {/if}
 
             <!-- 评论标记 -->
-            <!-- stroke="royalblue" -->
             {#if getRegularComments(node).length > 0}
               <g
                 transform="translate({0.35 * width} {-0.65 * height}) scale(0.35)"
@@ -278,53 +287,6 @@
                 stroke-linejoin="round"
               >
                 {@html lucide_message_square_text}
-              </g>
-            {/if}
-
-            <text dy="3.5" text-anchor="middle" fill="white" font-size="9px">
-              {node.data?.type ? PIECE_CHARS[node.data.type] : "始"}
-            </text>
-
-            <!-- 各类标注 -->
-            {#if evaluation}
-              {@const def = ANNOTATION_DEFINITIONS[evaluation]}
-              <g
-                transform="translate({-0.9 * width} {-0.65 * height}) scale(0.3)"
-                fill={def.color}
-                stroke="currentColor"
-                stroke-width="1.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                {@html def.icon}
-              </g>
-            {/if}
-
-            {#if moveQuality}
-              {@const def = ANNOTATION_DEFINITIONS[moveQuality]}
-              <g
-                transform="translate({-0.9 * width} {0 * height}) scale(0.3)"
-                fill={def.color}
-                stroke="currentColor"
-                stroke-width="1.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                {@html def.icon}
-              </g>
-            {/if}
-
-            {#if gameEnd}
-              {@const def = ANNOTATION_DEFINITIONS[gameEnd]}
-              <g
-                transform="translate({-0.85 * width} {-0.65 * height}) scale(0.3)"
-                fill={def.color}
-                stroke="currentColor"
-                stroke-width="1.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                {@html def.icon}
               </g>
             {/if}
           </g>

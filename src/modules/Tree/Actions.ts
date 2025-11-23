@@ -77,27 +77,22 @@ const ActionsModule = {
                         node.comments = [];
                     }
 
-                    const ANNOTATION_TYPES = {
-                        evaluation: ["R+", "B+", "="],
-                        moveQuality: ["?", "!"],
-                        gameEnd: ["R#", "B#"],
-                    };
+                    // 定义所有可能的批注符号
+                    const ALL_ANNOTATIONS = ["R+", "B+", "=", "?", "!", "R#", "B#"];
+                    const isClickedDataAnnotation = ALL_ANNOTATIONS.includes(data);
 
-                    const annotationType = (Object.keys(ANNOTATION_TYPES) as (keyof typeof ANNOTATION_TYPES)[]).find(type =>
-                        ANNOTATION_TYPES[type].includes(data)
-                    );
+                    if (isClickedDataAnnotation) {
+                        const existingAnnotationIndex = node.comments.indexOf(data);
 
-                    const index = node.comments.indexOf(data);
-
-                    if (annotationType) {
-                        // Remove all other annotations of the same type
-                        node.comments = node.comments.filter((c: string) => !ANNOTATION_TYPES[annotationType].includes(c));
+                        if (existingAnnotationIndex !== -1) {
+                            // 如果点击的批注已存在，则移除它（取消批注）
+                            node.comments.splice(existingAnnotationIndex, 1);
+                        } else {
+                            // 如果点击的批注不存在，则清除所有其他批注，然后添加新的批注
+                            node.comments = node.comments.filter((comment: string) => !ALL_ANNOTATIONS.includes(comment)); // 清除所有现有批注
+                            node.comments.push(data); // 添加新的批注
+                        }
                     }
-
-                    if (index === -1) {
-                        node.comments.push(data);
-                    }
-
                     break;
                 }
                 case 'remove': {
