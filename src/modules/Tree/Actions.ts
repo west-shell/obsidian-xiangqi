@@ -1,6 +1,6 @@
 import { registerPGNViewModule } from "../../core/module-system";
 import type { ChessNode, IMove } from "../../types";
-import { getICCS } from "../../utils/parse";
+import { getICCS, genFENFromBoard } from "../../utils/parse";
 
 const ActionsModule = {
 
@@ -191,6 +191,27 @@ const ActionsModule = {
                     host.currentNode = host.nodeMap.get(host.currentPath[host.currentPath.length - 1]);
                     host.board = host.currentNode.board;
                     host.currentTurn = host.currentNode.side === 'red' ? 'black' : 'red';
+                    break;
+                }
+                case 'openPikafish': {
+                    // 1. 从 root 节点获取 fen 和 firstturn
+                    const initialFen = genFENFromBoard(host.root.board!, host.root.side === 'red' ? 'red' : 'black');
+
+                    // 2. 根据 currentPath 获取行棋的着法
+                    // host.mainPath 包含 root 节点，但 root 节点没有 move data，所以从第二个节点开始
+                    const movesOnCurrentPath: string[] = [];
+                    for (let i = 1; i < host.currentPath.length; i++) {
+                        const nodeId = host.currentPath[i];
+                        const node = host.nodeMap.get(nodeId);
+                        if (node && node.data && node.data.ICCS) {
+                            movesOnCurrentPath.push(node.data.ICCS.replace('-', '').toLowerCase());
+                        }
+                    }
+                    const movesStr = movesOnCurrentPath.join('');
+
+                    // 3. 完善 URL
+                    const url = `https://xiangqiai.com/#/${initialFen} moves ${movesStr}`;
+                    window.open(url);
                     break;
                 }
             }

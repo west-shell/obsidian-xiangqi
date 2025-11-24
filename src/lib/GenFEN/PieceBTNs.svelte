@@ -11,13 +11,7 @@
     selectedPiece: string;
   }
 
-  let {
-    settings,
-    board,
-    eventBus,
-    position = "",
-    selectedPiece
-  }: Props = $props();
+  let { settings, board, eventBus, position = "", selectedPiece }: Props = $props();
 
   // 判断是否为红方棋子（大写字母）
   const isRed = (piece: string) => piece === piece.toUpperCase();
@@ -41,23 +35,28 @@
   };
 
   // 实时统计当前棋子数量
-  let pieceCount = $derived(board.flat().reduce(
-    (acc, piece) => {
-      if (piece) acc[piece] = (acc[piece] || 0) + 1;
-      return acc;
-    },
-    {} as Record<string, number>,
-  ));
+  let pieceCount = $derived(
+    board.flat().reduce(
+      (acc, piece) => {
+        if (piece) acc[piece] = (acc[piece] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>,
+    ),
+  );
 
-  let count = $derived(Object.fromEntries(
-    Object.keys(MAX_COUNT).map((piece) => [piece, MAX_COUNT[piece] - (pieceCount[piece] || 0)]),
-  ));
+  let count = $derived(
+    Object.fromEntries(
+      Object.keys(MAX_COUNT).map((piece) => [piece, MAX_COUNT[piece] - (pieceCount[piece] || 0)]),
+    ),
+  );
 </script>
 
 <div
   class={`piece-btn-container ${position}`}
   style="--height: {11 * settings.cellSize}px;
-    --width: {10 * settings.cellSize}px;"
+    --width: {10 * settings.cellSize}px;
+    --font-size: {settings.cellSize * 0.3}px;"
 >
   {#each Object.entries(PIECE_CHARS) as [piece, name]}
     <button
@@ -106,6 +105,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    font-size: var(--font-size);
   }
 
   .piece-btn.bottom {
@@ -114,7 +114,7 @@
     width: calc(var(--width) / 7);
     border-radius: 4px;
     cursor: pointer;
-    font-size: 1rem;
+    font-size: var(--font-size);
   }
 
   .red-piece {
