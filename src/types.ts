@@ -93,6 +93,7 @@ export interface IXQHost extends IHost {
 	options?: IOptions;
 	haveFEN?: boolean;
 	Xiangqi?: SvelteComponent;
+	source: string;
 }
 
 export interface IGenFENHost extends IHost {

@@ -1,6 +1,7 @@
 import { MarkdownView, Notice } from "obsidian";
 import { registerGenFENModule } from "../../core/module-system";
 import type { IBoard, IGenFENHost, ITurn } from "../../types";
+import { genFENFromBoard } from "../../utils/parse";
 
 export class ActionsModule {
     static init(host: IGenFENHost) {
@@ -79,28 +80,4 @@ async function onSaveBTNClick(host: IGenFENHost) {
         return newContent;
     });
     new Notice("FEN已保存到代码块");
-}
-function genFENFromBoard(board: IBoard, turn: ITurn): string {
-    // board[x][y]，x为列，y为行
-    const rows: string[] = [];
-    for (let y = 0; y < 10; y++) {
-        let fenRow = "";
-        let empty = 0;
-        for (let x = 0; x < 9; x++) {
-            const cell = board[x][y];
-            if (!cell) {
-                empty++;
-            } else {
-                if (empty > 0) {
-                    fenRow += empty;
-                    empty = 0;
-                }
-                fenRow += cell;
-            }
-        }
-        if (empty > 0) fenRow += empty;
-        rows.push(fenRow);
-    }
-    const fen = rows.join("/");
-    return `${fen} ${turn === "red" ? "w" : "b"}`;
 }

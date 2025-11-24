@@ -8,8 +8,15 @@ export function parseSource(source: string): {
     PGN: IMove[];
     firstTurn: ITurn;
     options: IOptions;
+    isPikafishUrl?: boolean;
 } {
     const options = parseOption(source);
+
+    const pikafishData = parsePikafishUrl(source);
+    if (pikafishData) {
+        return { ...pikafishData, options, isPikafishUrl: true };
+    }
+
     let haveFEN = false;
     let fen =
         source.match(
@@ -39,6 +46,71 @@ export function parseSource(source: string): {
         PGN,
         firstTurn,
         options
+    };
+}
+
+function parsePikafishUrl(source: string): {
+    haveFEN: boolean;
+    board: IBoard;
+    PGN: IMove[];
+    firstTurn: ITurn;
+} | null {
+    // 匹配 https://xiangqiai.com/#/ 之后的所有内容，直到换行或结束
+    const match = source.match(/https:\/\/xiangqiai\.com\/#\/([^\s\n]+)/);
+    if (!match) return null;
+
+    let raw = match[1];
+    try {
+        raw = decodeURIComponent(raw);
+    } catch (e) {
+        // ignore error
+    }
+
+    // 分割 FEN 和 moves
+    // URL 格式通常为: <FEN> w moves <move1><move2>...
+    // 或者 <FEN> w moves <move1> <move2> ...
+    // 使用正则分割更稳健
+    const parts = raw.split(/\s+moves\s+/);
+    let fenPart = parts[0];
+    const movesStr = parts[1] || "";
+
+    const { board, turn } = loadBoardFromFEN(fenPart);
+    const firstTurn = turn === "b" ? "black" : "red";
+
+    let PGN: IMove[] = [];
+    if (movesStr) {
+        let tmpBoard: IBoard = board.map((row) => [...row]);
+
+        // 匹配所有 moves，格式为 [a-i]\d[a-i]\d
+        const moveMatches = movesStr.match(/[a-i]\d[a-i]\d/gi);
+
+        if (moveMatches) {
+            for (const moveStr of moveMatches) {
+                const fromFile = moveStr[0].toUpperCase();
+                const fromRank = moveStr[1];
+                const toFile = moveStr[2].toUpperCase();
+                const toRank = moveStr[3];
+
+                const iccs = `${fromFile}${fromRank}-${toFile}${toRank}`;
+
+                const move = parseICCS(iccs, tmpBoard);
+                move.WXF = getWXF(move, tmpBoard);
+
+                if (tmpBoard[move.to.x] && tmpBoard[move.to.x][move.to.y] !== undefined) {
+                    tmpBoard[move.to.x][move.to.y] = tmpBoard[move.from.x][move.from.y];
+                    tmpBoard[move.from.x][move.from.y] = null;
+                }
+
+                PGN.push(move);
+            }
+        }
+    }
+
+    return {
+        haveFEN: true,
+        board,
+        PGN,
+        firstTurn
     };
 }
 
@@ -314,4 +386,29 @@ export function parseWXF(wxf: string, board: IBoard, isRed: boolean): IMove | nu
     };
 
     return { from: finalFrom, to: finalTo };
+}
+
+export function genFENFromBoard(board: IBoard, turn: ITurn): string {
+    // board[x][y]，x为列，y为行
+    const rows: string[] = [];
+    for (let y = 0; y < 10; y++) {
+        let fenRow = "";
+        let empty = 0;
+        for (let x = 0; x < 9; x++) {
+            const cell = board[x][y];
+            if (!cell) {
+                empty++;
+            } else {
+                if (empty > 0) {
+                    fenRow += empty;
+                    empty = 0;
+                }
+                fenRow += cell;
+            }
+        }
+        if (empty > 0) fenRow += empty;
+        rows.push(fenRow);
+    }
+    const fen = rows.join("/");
+    return `${fen} ${turn === "red" ? "w" : "b"}`;
 }

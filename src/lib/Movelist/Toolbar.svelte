@@ -25,6 +25,7 @@
     { title: "回退", icon: "arrow-left", event: "undo" },
     { title: "前进", icon: "arrow-right", event: "redo" },
     { title: "终局", icon: "arrow-right-to-line", event: "toEnd" },
+    { title: "皮卡鱼Web", icon: "external-link", event: "openPikafish" },
   ];
 
   let saveBtnEl: HTMLButtonElement;
