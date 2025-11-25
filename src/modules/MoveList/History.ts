@@ -1,5 +1,5 @@
 import { registerXQModule } from "../../core/module-system";
-import { getWXF } from "../../utils/parse";
+import { getWXF, getICCS } from "../../utils/parse"; // 导入 getICCS
 import type { IMove } from "../../types";
 
 export const HistoryModule = {
@@ -21,6 +21,7 @@ export const HistoryModule = {
 function editHistory(host: Record<string, any>, move: IMove) {
     move.WXF = getWXF(move, host.board);
     move.captured = host.board[move.to.x][move.to.y];
+    move.ICCS = getICCS(move); // 添加：计算并设置 ICCS
     let { currentStep, history } = host;
     const currentMove = move;
 
@@ -41,6 +42,7 @@ function editHistory(host: Record<string, any>, move: IMove) {
 
     // 2. 添加新 move（直接 push 到原数组）
     host.history.push(currentMove);
+    host.modified = true; // 添加：设置 modified 标志
 }
 
 registerXQModule('history', HistoryModule);
