@@ -42,7 +42,6 @@ function editHistory(host: Record<string, any>, move: IMove) {
 
     // 2. 添加新 move（直接 push 到原数组）
     host.history.push(currentMove);
-    host.modified = true; // 添加：设置 modified 标志
 }
 
 registerXQModule('history', HistoryModule);
