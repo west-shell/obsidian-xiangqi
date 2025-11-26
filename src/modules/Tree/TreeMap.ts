@@ -1,7 +1,7 @@
 import { PGNParser } from './parser';
 import { registerPGNViewModule } from '../../core/module-system';
 
-export const TreeMap = {
+const TreeMap = {
     init(host: any) {
         const eventBus = host.eventBus;
 

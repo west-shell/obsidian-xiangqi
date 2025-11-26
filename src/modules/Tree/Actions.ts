@@ -3,7 +3,6 @@ import type { ChessNode, IMove } from "../../types";
 import { getICCS, genFENFromBoard } from "../../utils/parse";
 
 const ActionsModule = {
-
     init(host: Record<string, any>) {
         const eventBus = host.eventBus;
 

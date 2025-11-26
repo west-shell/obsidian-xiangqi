@@ -1,9 +1,10 @@
 import { registerXQModule } from "../../core/module-system";
 import type { IMove } from "./../../types";
 
-export const SpeakerModule = {
+const SpeakerModule = {
     init(host: any) {
         const eventBus = host.eventBus;
+
         eventBus.on('updateUI', () => {
             if (
                 host.settings.enableSpeech &&

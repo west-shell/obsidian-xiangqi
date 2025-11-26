@@ -3,8 +3,8 @@ import { registerGenFENModule } from "../../core/module-system";
 import type { IBoard, IGenFENHost, ITurn } from "../../types";
 import { genFENFromBoard } from "../../utils/parse";
 
-export class ActionsModule {
-    static init(host: IGenFENHost) {
+const ActionsModule = {
+    init(host: IGenFENHost) {
         const eventBus = host.eventBus;
 
         eventBus.on("clickPieceBTN", (piece) => {

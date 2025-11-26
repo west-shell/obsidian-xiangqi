@@ -2,10 +2,10 @@ import type { IMove, IPosition } from "../types";
 import { isValidMove } from "../utils/rules";
 import { registerXQModule, registerPGNViewModule } from "../core/module-system";
 
-export class BoardClickModule {
-
-    static init(host: Record<string, any>) {
+const BoardClickModule = {
+    init(host: Record<string, any>) {
         const eventBus = host.eventBus;
+
         eventBus.on('click', (clickedPos: IPosition) => {
             const clickedPiece = host.board[clickedPos.x][clickedPos.y];
             // 你的后续逻辑
@@ -67,5 +67,6 @@ export class BoardClickModule {
         })
     }
 }
+
 registerXQModule('BoardClick', BoardClickModule);
 registerPGNViewModule('BoardClick', BoardClickModule);

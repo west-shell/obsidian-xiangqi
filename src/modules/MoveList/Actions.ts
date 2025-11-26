@@ -4,8 +4,8 @@ import type { IMove, IXQHost, PieceType } from "../../types";
 import { getICCS, genFENFromBoard, parseSource } from "../../utils/parse";
 import { ConfirmModal } from "../../utils/confirmModal";
 
-export class ActionsModule {
-    static init(host: IXQHost) {
+const ActionsModule = {
+    init(host: IXQHost) {
         const eventBus = host.eventBus;
 
         eventBus.on('runmove', (move) => {

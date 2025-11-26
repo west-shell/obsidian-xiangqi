@@ -3,13 +3,10 @@ import { registerXQModule } from "../../core/module-system";
 import type { IXQHost } from "../../types";
 import { mount, SvelteComponent } from "svelte";
 
-export class BoardModule {
-    static init(host: IXQHost) {
-        host.BoardModule = new BoardModule(host);
-    }
-
-    constructor(host: IXQHost) {
+const BoardModule = {
+    init(host: IXQHost) {
         const eventBus = host.eventBus;
+
         eventBus.on("load", () => {
             host.modified = false
             const Container = host.containerEl.createEl('div');

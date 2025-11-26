@@ -2,10 +2,10 @@ import { registerGenFENModule, registerXQModule } from "../core/module-system";
 import { parseSource, genFENFromBoard } from "../utils/parse";
 import { MarkdownView } from "obsidian";
 
-export const SourceModule = {
-
+const SourceModule = {
 	init(host: any) {
 		const eventBus = host.eventBus;
+
 		eventBus.on('load', (renderChild: string) => {
 			switch (renderChild) {
 				case 'xq':
@@ -20,7 +20,7 @@ export const SourceModule = {
 					if (isPikafishUrl) {
 						// 自动转换为标准语法
 						const fen = genFENFromBoard(board, firstTurn);
-						
+
 						const pgnLines: string[] = [];
 						for (let i = 0; i < PGN.length; i += 2) {
 							const move1 = PGN[i].ICCS;
@@ -29,7 +29,7 @@ export const SourceModule = {
 							pgnLines.push(line);
 						}
 						const moves = pgnLines.join("\n");
-						
+
 						const newContent = `${fen}\n${moves}`;
 
 						// 触发文件更新
@@ -41,11 +41,11 @@ export const SourceModule = {
 								const { lineStart, lineEnd } = section;
 								const lines = fileContent.split("\n");
 								const blockLines = lines.slice(lineStart, lineEnd + 1);
-								
+
 								// 替换代码块内容
 								// 保留首尾行 (```xiangqi 和 ```)
 								const newBlockLines = [blockLines[0], newContent, blockLines[blockLines.length - 1]];
-								
+
 								return [
 									...lines.slice(0, lineStart),
 									...newBlockLines,

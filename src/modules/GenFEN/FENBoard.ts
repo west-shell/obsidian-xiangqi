@@ -2,13 +2,10 @@ import GenFEN from "../../lib/GenFEN/GenFEN.svelte";
 import { registerGenFENModule } from "../../core/module-system";
 import { mount } from "svelte";
 
-export class BoardModule {
-    static init(host: Record<string, any>) {
-        host.BoardModule = new BoardModule(host);
-    }
-
-    constructor(host: Record<string, any>) {
+const BoardModule = {
+    init(host: Record<string, any>) {
         const eventBus = host.eventBus;
+
         eventBus.on("load", () => {
             host.modified = false
             const Container = host.containerEl.createEl('div');

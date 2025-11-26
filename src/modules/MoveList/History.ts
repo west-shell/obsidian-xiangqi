@@ -2,7 +2,7 @@ import { registerXQModule } from "../../core/module-system";
 import { getWXF, getICCS } from "../../utils/parse"; // 导入 getICCS
 import type { IMove } from "../../types";
 
-export const HistoryModule = {
+const HistoryModule = {
 
     init(host: Record<string, any>) {
         const eventBus = host.eventBus;

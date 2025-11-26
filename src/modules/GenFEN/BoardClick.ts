@@ -1,10 +1,10 @@
 import type { IPosition } from "../../types";
 import { registerGenFENModule } from "../../core/module-system";
 
-export class BoardClickModule {
-
-    static init(host: Record<string, any>) {
+const BoardClickModule = {
+    init(host: Record<string, any>) {
         const eventBus = host.eventBus;
+
         eventBus.on('click', (clickedPos: IPosition) => {
             const clickedPiece = host.board[clickedPos.x][clickedPos.y];
             if (!host.markedPos && !host.selectedPiece) {

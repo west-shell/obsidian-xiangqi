@@ -2,12 +2,10 @@ import { registerPGNViewModule } from '../../core/module-system';
 import TreeView from '../../lib/Tree/Xiangqi.svelte';
 import { mount } from "svelte";
 
-class TreeViewModule {
-    static init(host: Record<string, any>) {
-        host.TreeViewModule = new TreeViewModule(host);
-    }
-    constructor(host: Record<string, any>) {
+const TreeViewModule = {
+    init(host: Record<string, any>) {
         const eventBus = host.eventBus;
+
         eventBus.on('createUI', () => {
 
             const Container = host.contentEl;
