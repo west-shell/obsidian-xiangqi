@@ -233,7 +233,7 @@
                 fill="white"
                 font-size={cellSize * 0.45}
                 text-anchor="middle"
-                dy="0.35em"
+                dy="0.41em"
               >
                 {PIECE_CHARS[piece as keyof typeof PIECE_CHARS]}
               </text>

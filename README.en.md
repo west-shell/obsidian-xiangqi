@@ -15,6 +15,7 @@ This plugin registers a custom view for `.pgn` files. Simply open a `.pgn` file 
 
 - **Real-time Read/Write**: Any changes to the game (like making moves, adding variations, or comments) are saved back to the original `.pgn` file instantly and automatically.
 - **Full-featured**: Supports variations, comments, and annotations.
+- **Jump to AI**: Supports packaging the current branch to Pikafish web version for analysis.
 
 ![PGN File](./IMAGE/PGN文件.png)
 
@@ -77,6 +78,7 @@ Two code block names are supported:
 - **Mobile Friendly**: Manual layout adjustment for small screens
 - **Move Narration**: Optional voice readout of moves
 - **Format Support**: Supports ICCS-style PGN
+- **Jump to AI**: Supports packaging the move list to Pikafish web version for analysis.
 
 ## Usage
 
@@ -89,7 +91,7 @@ Two code block names are supported:
 ### `xiangqi` Code Block
 
 1. Write the moves inside a code block marked with `xiangqi`.
-2. FEN is optional — defaults to the standard starting position.
+2. FEN is optional — defaults to the standard starting position. Supports parsing Pikafish web links.
 3. Behavior:
 
     - If no manual moves, the move list shows the PGN.
