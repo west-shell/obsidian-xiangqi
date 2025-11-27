@@ -67,34 +67,24 @@ export default class XQPlugin extends Plugin {
 
 		this.registerEvent(
 			this.app.workspace.on("file-menu", (menu, file) => {
-				if (file instanceof TFile &&
-					file.extension === "pgn"
-					&& (this.app.workspace.getLeaf().view instanceof PGNView)) {
+				if (!(file instanceof TFile) || file.extension !== "pgn") {
+					return;
+				}
+				if (this.app.workspace.getLeaf().view instanceof PGNView) {
 					menu.addItem((item) =>
 						item
 							.setTitle("用 Markdown 视图打开")
 							.setIcon("file-text")
-							.onClick(() => {
-								this.openAsMarkdown(file);
-							})
+							.onClick(() => this.changeView(file))
 					);
-				}
-			})
-		);
-
-		this.registerEvent(
-			this.app.workspace.on("file-menu", (menu, file) => {
-				// this.app.workspace.getMostRecentLeaf();
-				if (file instanceof TFile &&
-					file.extension === "pgn"
-					&& !(this.app.workspace.getLeaf().view instanceof PGNView)) {
+				} else {
 					menu.addItem((item) =>
 						item.setTitle("用 PGN 视图打开")
 							.setIcon("waypoints")
-							.onClick(() => this.openAsPGN(file))
+							.onClick(() => this.changeView(file))
 					);
 				}
-			})
+			}),
 		);
 	}
 
@@ -104,31 +94,16 @@ export default class XQPlugin extends Plugin {
 		});
 	}
 
-	async openAsMarkdown(file: TFile) {
+	async changeView(file: TFile) {
+		const currentActiveLeaf = this.app.workspace.getLeaf(false);
+		const targetViewType = (currentActiveLeaf.view instanceof PGNView) ? "markdown" : PGNView.VIEW_TYPE;
+
 		const leaf = this.app.workspace.getLeaf(false);
-		await leaf.openFile(file, { active: true });
-
-		// 强制切换到 MarkdownView
-		if (!(leaf.view instanceof MarkdownView)) {
-			await leaf.setViewState({
-				type: "markdown",
-				state: { file: file.path },
-				active: true,
-			});
-		}
-	}
-
-	async openAsPGN(file: TFile) {
-		const leaf = this.app.workspace.getLeaf(false);
-		await leaf.openFile(file, { active: true });
-
-		if (!(leaf.view instanceof PGNView)) {
-			await leaf.setViewState({
-				type: PGNView.VIEW_TYPE,
-				state: { file: file.path },
-				active: true,
-			});
-		}
+		await leaf.setViewState({
+			type: targetViewType,
+			state: { file: file.path },
+			active: true,
+		});
 	}
 
 	async loadSettings() {
