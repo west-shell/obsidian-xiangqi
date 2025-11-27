@@ -13,7 +13,7 @@ import '../modules/BoardClick'
 import '../modules/Tree/Actions'
 
 export class PGNView extends TextFileView {
-    static readonly VIEW_TYPE = "PGN_FILE_TYPE";
+    static readonly VIEW_TYPE = "PGN_VIEW";
     settings: ISettings;
     eventBus!: EventBus;
     constructor(leaf: WorkspaceLeaf, public plugin: XQPlugin) {

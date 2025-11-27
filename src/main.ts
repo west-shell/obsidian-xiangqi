@@ -1,4 +1,4 @@
-import { Plugin } from "obsidian";
+import { MarkdownView, Plugin, TextFileView, TFile } from "obsidian";
 import type { ISettings } from "./types";
 import { applyThemes } from "./themes";
 import { ChessRenderChild } from "./renderChild/MoveListRenderChild";
@@ -64,12 +64,71 @@ export default class XQPlugin extends Plugin {
 				}
 			}),
 		);
+
+		this.registerEvent(
+			this.app.workspace.on("file-menu", (menu, file) => {
+				if (file instanceof TFile &&
+					file.extension === "pgn"
+					&& (this.app.workspace.getLeaf().view instanceof PGNView)) {
+					menu.addItem((item) =>
+						item
+							.setTitle("用 Markdown 视图打开")
+							.setIcon("file-text")
+							.onClick(() => {
+								this.openAsMarkdown(file);
+							})
+					);
+				}
+			})
+		);
+
+		this.registerEvent(
+			this.app.workspace.on("file-menu", (menu, file) => {
+				// this.app.workspace.getMostRecentLeaf();
+				if (file instanceof TFile &&
+					file.extension === "pgn"
+					&& !(this.app.workspace.getLeaf().view instanceof PGNView)) {
+					menu.addItem((item) =>
+						item.setTitle("用 PGN 视图打开")
+							.setIcon("waypoints")
+							.onClick(() => this.openAsPGN(file))
+					);
+				}
+			})
+		);
 	}
 
 	refresh() {
 		this.renderChildren.forEach((child) => {
 			child.refresh();
 		});
+	}
+
+	async openAsMarkdown(file: TFile) {
+		const leaf = this.app.workspace.getLeaf(false);
+		await leaf.openFile(file, { active: true });
+
+		// 强制切换到 MarkdownView
+		if (!(leaf.view instanceof MarkdownView)) {
+			await leaf.setViewState({
+				type: "markdown",
+				state: { file: file.path },
+				active: true,
+			});
+		}
+	}
+
+	async openAsPGN(file: TFile) {
+		const leaf = this.app.workspace.getLeaf(false);
+		await leaf.openFile(file, { active: true });
+
+		if (!(leaf.view instanceof PGNView)) {
+			await leaf.setViewState({
+				type: PGNView.VIEW_TYPE,
+				state: { file: file.path },
+				active: true,
+			});
+		}
 	}
 
 	async loadSettings() {
