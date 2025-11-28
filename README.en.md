@@ -79,6 +79,8 @@ Two code block names are supported:
 - **Move Narration**: Optional voice readout of moves
 - **Format Support**: Supports ICCS-style PGN
 - **Jump to AI**: Supports packaging the move list to Pikafish web version for analysis.
+- **View Toggling**: Supports switching between text view and chess view via the file menu.
+- **Quick Create**: Supports creating new PGN files via a toolbar button.
 
 ## Usage
 
