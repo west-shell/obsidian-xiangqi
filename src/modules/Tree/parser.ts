@@ -49,7 +49,10 @@ export class PGNParser {
                 this.parseVariation();
             } else if (this.match('comment')) {
                 this.parseComment();
-            } else {
+            } else if (this.match('result')) {
+                this.parseResult();
+            }
+            else {
                 this.consume(); // 跳过无法识别的token
             }
         }
@@ -223,5 +226,28 @@ export class PGNParser {
     }
     public getMap(): Map<string, ChessNode> {
         return this.nodeMap;
+    }
+
+    parseResult() {
+        const token = this.consume();
+        let result = '';
+        switch (token.value) {
+            case "1-0":
+                result = "R+";
+                break;
+            case "0-1":
+                result = "B+";
+                break;
+            case "1/2-1/2":
+                result = "=";
+                break;
+            case "*":
+                result = "?";
+                break;
+        }
+        if (!this.currentNode.comments) {
+            this.currentNode.comments = [];
+        }
+        this.currentNode.comments.push(result);
     }
 }
