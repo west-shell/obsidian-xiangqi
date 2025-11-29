@@ -210,24 +210,6 @@ export class PGNParser {
         this.currentNode.comments.push(comment);
     }
 
-    switchSide() {
-        this.currentSide = this.currentSide === 'red' ? 'black' : 'red';
-    }
-
-    public getTags(): string {
-        const lines: string[] = [];
-        for (const [key, value] of this.tags.entries()) {
-            lines.push(`[${key} "${value}"]`);
-        }
-        return lines.join('\n');
-    }
-    public getRoot(): ChessNode {
-        return this.rootNode;
-    }
-    public getMap(): Map<string, ChessNode> {
-        return this.nodeMap;
-    }
-
     parseResult() {
         const token = this.consume();
         let result = '';
@@ -250,4 +232,23 @@ export class PGNParser {
         }
         this.currentNode.comments.push(result);
     }
+
+    switchSide() {
+        this.currentSide = this.currentSide === 'red' ? 'black' : 'red';
+    }
+
+    public getTags(): string {
+        const lines: string[] = [];
+        for (const [key, value] of this.tags.entries()) {
+            lines.push(`[${key} "${value}"]`);
+        }
+        return lines.join('\n');
+    }
+    public getRoot(): ChessNode {
+        return this.rootNode;
+    }
+    public getMap(): Map<string, ChessNode> {
+        return this.nodeMap;
+    }
+
 }
