@@ -71,27 +71,18 @@ export default class XQPlugin extends Plugin {
 					return;
 				}
 				const currentView = this.app.workspace.getLeaf().view;
-				if (currentView instanceof PGNView && currentView.file === file) {
+				if (!(currentView instanceof MarkdownView && currentView.file === file)) {
 					menu.addItem((item) =>
 						item
 							.setTitle("用 Markdown 视图打开")
 							.setIcon("file-text")
-							.onClick(() => this.changeView(file, "MarkdownView"))
+							.onClick(() => this.changeView(file, 'markdown'))
 					);
-				} else if (currentView instanceof MarkdownView && currentView.file === file) {
+				} if (!(currentView instanceof PGNView && currentView.file === file)) {
 					menu.addItem((item) =>
 						item.setTitle("用 PGN 视图打开")
 							.setIcon("waypoints")
 							.onClick(() => this.changeView(file, PGNView.VIEW_TYPE)));
-				} else {
-					menu.addItem((item) =>
-						item.setTitle("用 PGN 视图打开")
-							.setIcon("waypoints")
-							.onClick(() => this.changeView(file, PGNView.VIEW_TYPE)));
-					menu.addItem((item) =>
-						item.setTitle("用 Markdown 视图打开")
-							.setIcon("file-text")
-							.onClick(() => this.changeView(file, "MarkdownView")));
 				}
 			}),
 		);
