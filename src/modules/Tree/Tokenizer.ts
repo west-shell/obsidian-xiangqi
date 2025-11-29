@@ -1,13 +1,12 @@
 export type TokenType =
-    // | 'step'        // 着法序号 "1."
-    | 'iccs-move'   // ICCS着法 "H2-E2"
-    | 'wxf-move'    // 中文着法 "炮二平五"
-    | 'left-paren'  // "("
-    | 'right-paren' // ")"
-    | 'comment'     // 注释
-    | 'tag'         // 标签
-    | 'result'      // 结果 "1-0","1/2-1/2"
-    | 'eof';        // 结束
+    | "iccs-move"
+    | "wxf-move"
+    | "left-paren"
+    | "right-paren"
+    | "comment"
+    | "tag"
+    | "result"
+    | "eof";
 
 export interface Token {
     type: TokenType;
@@ -22,130 +21,95 @@ export function tokenize(pgn: string): Token[] {
     let column = 1;
     let pos = 0;
 
-    const peek = () => pgn[pos];
-    const consume = () => {
-        const char = pgn[pos++];
-        if (char === '\n') {
-            line++;
-            column = 1;
-        } else {
-            column++;
+    const advance = (n: number) => {
+        while (n-- > 0) {
+            const c = pgn[pos++];
+            if (c === "\n") {
+                line++;
+                column = 1;
+            } else {
+                column++;
+            }
         }
-        return char;
+    };
+
+    const matchAndConsume = (regex: RegExp): string | null => {
+        const match = regex.exec(pgn.slice(pos));
+        if (!match) return null;
+        const value = match[0];
+        advance(value.length);
+        return value;
     };
 
     while (pos < pgn.length) {
-        const startPos = pos;
         const startLine = line;
         const startCol = column;
-
-        const char = peek();
+        const rest = pgn.slice(pos);
+        const char = rest[0];
 
         // 跳过空白
-        if (/\s/.test(char)) {
-            consume();
+        if (/^\s/.test(rest)) {
+            advance(1);
             continue;
         }
 
-        // 跳过...
-        if (char === '.') {
-            while (peek() === '.') {
-                consume();
-            }
+        // 跳过着法序号及 ...
+        const step = matchAndConsume(/^\d+\.(\s*\.\.\.)?/);
+        if (step) {
             continue;
         }
 
-        // 着法序号 (1. )
-        if (/\d/.test(char)) {
-            let value = consume();
-            while (peek() === '.') {
-                value += consume();
-            }
-            // tokens.push({ type: "step", value, line: s`tartLine, column: startCol });
+        // ICCS Move: A0-B9
+        const iccs = matchAndConsume(/^[A-Ia-i][0-9][\-x\*][A-Ia-i][0-9]/);
+        if (iccs) {
+            tokens.push({ type: "iccs-move", value: iccs.toUpperCase(), line: startLine, column: startCol });
             continue;
         }
 
-        // ICCS着法 (A1-A2格式)，支持大小写字母
-        if (/[a-iA-I]/.test(char)) {
-            let value = consume().toUpperCase(); // 首字母转大写
-
-            if (/\d/.test(peek())) {
-                value += consume();
-
-                if (peek() === '-') {
-                    value += consume();
-
-                    if (/[a-iA-I]/.test(peek())) {
-                        value += consume().toUpperCase(); // 目标字母也转大写
-
-                        if (/\d/.test(peek())) {
-                            value += consume();
-                            tokens.push({ type: "iccs-move", value, line: startLine, column: startCol });
-                            continue;
-                        }
-                    }
-                }
-            }
-
-            // 回退
-            pos = startPos;
-            line = startLine;
-            column = startCol;
-        }
-
-        // 在tokenize函数中修改中文着法识别逻辑
-        if (/[兵卒车马炮相士帅将]/.test(char)) {
-            let value = consume();
-            // 支持更多中文象棋术语
-            while (/[一二三四五六七八九123456789进退平前后左右]/.test(peek()) && pos < pgn.length) {
-                value += consume();
-            }
-            tokens.push({ type: "wxf-move", value, line: startLine, column: startCol });
-            continue;
-        }
-        // 括号
-        if (char === '(') {
-            tokens.push({ type: "left-paren", value: consume(), line: startLine, column: startCol });
-            continue;
-        }
-        if (char === ')') {
-            tokens.push({ type: "right-paren", value: consume(), line: startLine, column: startCol });
+        // 中文 WXF 着法
+        const wxf = matchAndConsume(/^[兵卒车马炮相士帅将][一二三四五六七八九123456789进退平前后左右]*/);
+        if (wxf) {
+            tokens.push({ type: "wxf-move", value: wxf, line: startLine, column: startCol });
             continue;
         }
 
-        // 注释
-        if (char === '{') {
-            let value = consume();
-            while (peek() !== '}' && pos < pgn.length) {
-                value += consume();
-            }
-            if (peek() === '}') {
-                value += consume();
-                tokens.push({ type: "comment", value, line: startLine, column: startCol });
-                continue;
-            }
-        }
-
-        // 标签
-        if (char === '[') {
-            let value = consume();
-            while (peek() !== ']' && pos < pgn.length) {
-                value += consume();
-            }
-            if (peek() === ']') {
-                value += consume();
-                tokens.push({ type: "tag", value, line: startLine, column: startCol });
-                continue;
-            }
-        }
-
-        if (char === '*') {
-            tokens.push({ type: 'result', value: '*', line: startLine, column: startCol });
-            consume();
+        // 注释 { ... }
+        const comment = matchAndConsume(/^\{[^}]*\}/);
+        if (comment) {
+            tokens.push({ type: "comment", value: comment, line: startLine, column: startCol });
             continue;
         }
-        // 未知字符
-        throw new Error(`无法识别的字符 '${char}' 在行 ${line}, 列 ${column}`);
+
+        // 标签 [ ... ]
+        const tag = matchAndConsume(/^\[[^\]]*\]/);
+        if (tag) {
+            tokens.push({ type: "tag", value: tag, line: startLine, column: startCol });
+            continue;
+        }
+
+        // 结果
+        const result = matchAndConsume(/^(1-0|0-1|1\/2-1\/2|\*)/);
+        if (result) {
+            tokens.push({ type: "result", value: result, line: startLine, column: startCol });
+            continue;
+        }
+
+        // 左括号
+        if (char === "(") {
+            advance(1);
+            tokens.push({ type: "left-paren", value: "(", line: startLine, column: startCol });
+            continue;
+        }
+
+        // 右括号
+        if (char === ")") {
+            advance(1);
+            tokens.push({ type: "right-paren", value: ")", line: startLine, column: startCol });
+            continue;
+        }
+
+        // 其他无法识别的字符 → 报错
+        throw new Error(`无法识别的字符 '${char}' 在行 ${startLine}, 列 ${startCol}`);
     }
 
     tokens.push({ type: "eof", value: "", line, column });
