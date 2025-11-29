@@ -1,4 +1,4 @@
-import { MarkdownView, Plugin, TFile } from "obsidian";
+import { MarkdownView, Plugin, TFile, View } from "obsidian";
 import type { ISettings } from "./types";
 import { applyThemes } from "./themes";
 import { ChessRenderChild } from "./renderChild/MoveListRenderChild";
@@ -70,32 +70,28 @@ export default class XQPlugin extends Plugin {
 				if (!(file instanceof TFile) || file.extension !== "pgn") {
 					return;
 				}
-				if (this.app.workspace.getLeaf().view instanceof PGNView) {
+				const currentView = this.app.workspace.getLeaf().view;
+				if (currentView instanceof PGNView && currentView.file === file) {
 					menu.addItem((item) =>
 						item
 							.setTitle("用 Markdown 视图打开")
 							.setIcon("file-text")
-							.onClick(() => this.changeView(file))
+							.onClick(() => this.changeView(file, "MarkdownView"))
 					);
-				} else if (this.app.workspace.getLeaf().view instanceof MarkdownView) {
+				} else if (currentView instanceof MarkdownView && currentView.file === file) {
 					menu.addItem((item) =>
 						item.setTitle("用 PGN 视图打开")
 							.setIcon("waypoints")
-							.onClick(() => this.changeView(file))
-					);
+							.onClick(() => this.changeView(file, PGNView.VIEW_TYPE)));
 				} else {
 					menu.addItem((item) =>
 						item.setTitle("用 PGN 视图打开")
 							.setIcon("waypoints")
-							.onClick(() => this.changeView(file))
-
-					);
+							.onClick(() => this.changeView(file, PGNView.VIEW_TYPE)));
 					menu.addItem((item) =>
-						item
-							.setTitle("用 Markdown 视图打开")
+						item.setTitle("用 Markdown 视图打开")
 							.setIcon("file-text")
-							.onClick(() => this.changeView(file))
-					);
+							.onClick(() => this.changeView(file, "MarkdownView")));
 				}
 			}),
 		);
@@ -107,17 +103,17 @@ export default class XQPlugin extends Plugin {
 		});
 	}
 
-	async changeView(file: TFile) {
-		const currentActiveLeaf = this.app.workspace.getLeaf(false);
-		const targetViewType = (currentActiveLeaf.view instanceof PGNView) ? "markdown" : PGNView.VIEW_TYPE;
-
+	async changeView(file: TFile, targetViewType: string) {
 		const leaf = this.app.workspace.getLeaf(false);
+		if (!leaf) return;
+
 		await leaf.setViewState({
 			type: targetViewType,
 			state: { file: file.path },
 			active: true,
 		});
 	}
+
 
 	async loadSettings() {
 		const savedData = await this.loadData();
