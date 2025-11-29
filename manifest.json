@@ -1,6 +1,6 @@
 {
     "id": "xiangqi",
-    "version": "2.5.8",
+    "version": "2.5.9",
     "name": "Chinese chess",
     "description": "A Chinese Chess (象棋/xiangqi) plugin designed for Obsidian",
     "author": "weshell",
