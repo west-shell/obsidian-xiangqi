@@ -61,7 +61,10 @@ const ActionsModule = {
 
         eventBus.on('updatePGN', () => {
             const pgn = stringifyPGN(host.root);
-            host.data = host.tags + '\n' + pgn
+            const content = [host.tags?.trim(), pgn]
+                .filter(Boolean)
+                .join('\n');
+            host.data = content;
             host.saveFile();
         })
 
@@ -268,7 +271,7 @@ function stringifyPGN(root: ChessNode): string {
                 if (brother.side === 'red') {
                     result += ` (${walk(brother, stepNum)})`;
                 } else if (brother.side === 'black') {
-                    result += ` (${stepNum}. ... ${walk(brother, stepNum)})\n`;
+                    result += ` (${stepNum}. ... ${walk(brother, stepNum)})`;
                 }
             }
         }
@@ -284,6 +287,7 @@ function stringifyPGN(root: ChessNode): string {
     }
 
     const pgn = walk(root, 0);
+    // console.log(pgn);
     return pgn;
 
 }
