@@ -1,4 +1,4 @@
-import { MarkdownView, Plugin, TextFileView, TFile } from "obsidian";
+import { MarkdownView, Plugin, TFile } from "obsidian";
 import type { ISettings } from "./types";
 import { applyThemes } from "./themes";
 import { ChessRenderChild } from "./renderChild/MoveListRenderChild";
@@ -46,7 +46,7 @@ export default class XQPlugin extends Plugin {
 				fileName = `${baseFileName} ${counter}${fileExtension}`;
 			}
 
-			const fileContent = ""; // 用户要求内容留空白
+			const fileContent = "";
 
 			try {
 				const newFile = await this.app.vault.create(fileName, fileContent);
@@ -77,10 +77,23 @@ export default class XQPlugin extends Plugin {
 							.setIcon("file-text")
 							.onClick(() => this.changeView(file))
 					);
+				} else if (this.app.workspace.getLeaf().view instanceof MarkdownView) {
+					menu.addItem((item) =>
+						item.setTitle("用 PGN 视图打开")
+							.setIcon("waypoints")
+							.onClick(() => this.changeView(file))
+					);
 				} else {
 					menu.addItem((item) =>
 						item.setTitle("用 PGN 视图打开")
 							.setIcon("waypoints")
+							.onClick(() => this.changeView(file))
+
+					);
+					menu.addItem((item) =>
+						item
+							.setTitle("用 Markdown 视图打开")
+							.setIcon("file-text")
 							.onClick(() => this.changeView(file))
 					);
 				}

@@ -268,7 +268,7 @@ function stringifyPGN(root: ChessNode): string {
                 if (brother.side === 'red') {
                     result += ` (${walk(brother, stepNum)})`;
                 } else if (brother.side === 'black') {
-                    result += ` (${stepNum}. ...${walk(brother, stepNum)})`;
+                    result += ` (${stepNum}. ... ${walk(brother, stepNum)})\n`;
                 }
             }
         }
