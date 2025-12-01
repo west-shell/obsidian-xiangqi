@@ -27,7 +27,7 @@
   let scale = $state(1);
 
   // ---- 常量 ----
-  const spacingX = 25;
+  const spacingX = 20;
   const spacingY = 15;
   const width = 13;
   const height = 11;
