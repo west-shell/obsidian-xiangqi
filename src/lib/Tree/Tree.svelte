@@ -27,7 +27,7 @@
   let scale = $state(1);
 
   // ---- 常量 ----
-  const spacingX = 20;
+  const spacingX = 22;
   const spacingY = 15;
   const width = 13;
   const height = 11;
@@ -279,7 +279,7 @@
             <!-- 评论标记 -->
             {#if getRegularComments(node).length > 0}
               <g
-                transform="translate({0.35 * width} {-0.65 * height}) scale(0.35)"
+                transform="translate({0.35 * width} {-0.7 * height}) scale(0.35)"
                 fill="royalblue"
                 stroke="currentColor"
                 stroke-width="1.5"
