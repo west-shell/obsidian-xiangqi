@@ -75,16 +75,15 @@
     const actualHeight = svg.clientHeight;
 
     // 计算实际的单元格大小
-    const actualCellSizeX = actualWidth / 10; // 棋盘有10列（1-9，加上边框）
-    const actualCellSizeY = actualHeight / 11; // 棋盘有11行（1-10，加上边框）
+    const actualCellSize = actualWidth / 10; // 棋盘有10列（1-9，加上边框）
 
     // 计算鼠标在SVG内部的相对坐标
     const mouseX = e.clientX - boardRect.left;
-    const mouseY = e.clientY - boardRect.top;
+    const mouseY = e.clientY - boardRect.top - (actualHeight - (actualWidth * 11) / 10) / 2; // 调整Y坐标以适应宽高比
 
     // 根据实际单元格大小计算网格坐标
-    let gridX = Math.round(mouseX / actualCellSizeX) - 1;
-    let gridY = Math.round(mouseY / actualCellSizeY) - 1;
+    let gridX = Math.round(mouseX / actualCellSize) - 1;
+    let gridY = Math.round(mouseY / actualCellSize) - 1;
 
     if (gridX >= 0 && gridX < 9 && gridY >= 0 && gridY < 10) {
       const pos = rotated ? rotatePos({ x: gridX, y: gridY }) : { x: gridX, y: gridY };
