@@ -38,15 +38,13 @@
 </div>
 
 <style>
+  :global(.view-content.pgn-view) {
+    padding: 4px;
+  }
   .tree-view {
     display: flex;
     justify-content: center;
     margin: 0 auto; /* 添加此行以使 .tree-view 容器本身居中 */
-  }
-
-  .tree-view :global(.xq-board) {
-    width: 100%;
-    height: 100%;
   }
 
   .tree-view.right {

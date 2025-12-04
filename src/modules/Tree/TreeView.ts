@@ -9,6 +9,7 @@ const TreeViewModule = {
         eventBus.on('createUI', () => {
 
             const Container = host.contentEl;
+            Container.classList.add('pgn-view');
             host.Xiangqi = mount(TreeView, {
                 target: Container,
                 props: {

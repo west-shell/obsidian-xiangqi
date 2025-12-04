@@ -176,7 +176,7 @@
     </g>
 
     <!-- 炮兵位 -->
-    <g stroke="var(--board-line)" stroke-width={cellSize * 0.02} fill="none">
+    <g stroke="var(--board-line)" stroke-width={cellSize * 0.03} fill="none">
       {#each [[2, 3], [8, 3], [2, 8], [8, 8], [3, 4], [5, 4], [7, 4], [3, 7], [7, 7], [5, 7]] as i}
         <path
           d={`M ${i[0] * cellSize},${i[1] * cellSize} m -${3 * margin},-${margin} h ${2 * margin} v -${2 * margin} m ${2 * margin},0 v ${2 * margin} h ${2 * margin} m 0,${2 * margin} h -${2 * margin} v ${2 * margin} m -${2 * margin},0 v -${2 * margin} h -${2 * margin}`}
@@ -307,5 +307,7 @@
   }
   .xq-board {
     user-select: none;
+    width: 100%;
+    height: 100%;
   }
 </style>
