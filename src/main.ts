@@ -30,7 +30,6 @@ export default class XQPlugin extends Plugin {
     font-weight="bold">象</text>
 </svg>
 `);
-
 		this.registerMarkdownCodeBlockProcessor('xiangqi', (source, el, ctx) => {
 			const renderChild = new ChessRenderChild(el, ctx, source, this);
 			ctx.addChild(renderChild);
