@@ -1,4 +1,4 @@
-import { MarkdownView, Plugin, TFile, View } from "obsidian";
+import { MarkdownView, Plugin, TFile, addIcon } from "obsidian";
 import type { ISettings } from "./types";
 import { applyThemes } from "./themes";
 import { ChessRenderChild } from "./renderChild/MoveListRenderChild";
@@ -16,6 +16,20 @@ export default class XQPlugin extends Plugin {
 		this.addSettingTab(new XQSettingTab(this.app, this));
 
 		applyThemes(this.settings.theme);
+		addIcon("xiangqi-icon", `
+<svg viewBox="0 0 80 80">
+  <circle cx="40" cy="40" r="38"
+    fill="var(--background-primary-alt)"
+    stroke="var(--text-normal)"
+    stroke-width="4" />
+  <text x="50%" y="58%"
+    dominant-baseline="middle"
+    text-anchor="middle"
+    font-size="60"
+    fill="var(--text-normal)"
+    font-weight="bold">象</text>
+</svg>
+`);
 
 		this.registerMarkdownCodeBlockProcessor('xiangqi', (source, el, ctx) => {
 			const renderChild = new ChessRenderChild(el, ctx, source, this);
@@ -34,7 +48,7 @@ export default class XQPlugin extends Plugin {
 
 		this.registerExtensions(["pgn"], PGNView.VIEW_TYPE);
 
-		this.addRibbonIcon("file-plus", "新建 PGN 文件", async () => {
+		this.addRibbonIcon("xiangqi-icon", "新建 PGN 文件", async () => {
 			let baseFileName = "未命名";
 			let fileExtension = ".pgn";
 			let fileName = baseFileName + fileExtension;
@@ -81,7 +95,7 @@ export default class XQPlugin extends Plugin {
 				} if (!(currentView instanceof PGNView && currentView.file === file)) {
 					menu.addItem((item) =>
 						item.setTitle("用 PGN 视图打开")
-							.setIcon("waypoints")
+							.setIcon("xiangqi-icon")
 							.onClick(() => this.changeView(file, PGNView.VIEW_TYPE)));
 				}
 			}),
