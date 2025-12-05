@@ -26,6 +26,43 @@
   let translateY = $state(0);
   let scale = $state(1);
 
+  // 缩放步长（用于按钮）
+  const ZOOM_STEP = 1.15;
+
+  // 在 SVG 中心处按 factor 缩放，同时保持屏幕中心对应的世界坐标不变
+  function zoomAtCenter(factor: number) {
+    if (!svgEl) {
+      scale = Math.max(0.5, Math.min(scale * factor, 4));
+      return;
+    }
+    const w = svgEl.clientWidth;
+    const h = svgEl.clientHeight;
+    const cx = w / 2;
+    const cy = h / 2;
+    const prev = scale;
+    const next = Math.max(0.5, Math.min(prev * factor, 4));
+    // 计算当前屏幕中心对应的世界坐标（未缩放坐标系）
+    const worldX = (cx - translateX) / prev;
+    const worldY = (cy - translateY) / prev;
+    // 应用新缩放并调整 translate 保持屏幕中心不变
+    scale = next;
+    translateX = cx - worldX * scale;
+    translateY = cy - worldY * scale;
+  }
+
+  function zoomIn() {
+    zoomAtCenter(ZOOM_STEP);
+  }
+  function zoomOut() {
+    zoomAtCenter(1 / ZOOM_STEP);
+  }
+
+  // 重置视图：重新布局并居中（与 centerAndFit 配合）
+  function resetView() {
+    updateTreeLayout();
+    tick().then(centerAndFit);
+  }
+
   // ---- 常量 ----
   const spacingX = 22;
   const spacingY = 15;
@@ -294,9 +331,9 @@
       </g>
     </svg>
     <div class="toolbar">
-      <button class="btn zoom-in">+</button>
-      <button class="btn zoom-out">-</button>
-      <button class="btn reset">⟳</button>
+      <button class="btn zoom-in" onclick={zoomIn}>+</button>
+      <button class="btn zoom-out" onclick={zoomOut}>-</button>
+      <button class="btn reset" onclick={resetView}>⟳</button>
     </div>
   </div>
 
@@ -342,6 +379,17 @@
     left: 0;
     display: flex;
     gap: 0;
+    margin: 0;
+    padding: 0px;
+    /* border: 1px solid var(--background-modifier-border); */
+  }
+  .toolbar .btn {
+    font-size: large;
+    /* all: unset; */
+    width: 25px;
+    height: 25px;
+    padding: 0;
+    margin: 0;
   }
 
   .tree-svg {
