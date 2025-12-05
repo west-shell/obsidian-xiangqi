@@ -63,7 +63,7 @@ export class PGNView extends TextFileView {
     }
 
     getIcon() {
-        return "waypoints";
+        return "xiangqi-icon";
     }
 
     clear(): void {
