@@ -4,6 +4,7 @@
   import { PIECE_CHARS, type ChessNode, type NodeMap } from "../../types";
   import { createInteractionHandlers } from "./interact";
   import { calculateTreeLayout } from "./layout";
+  import { setIcon } from "obsidian";
 
   interface Props {
     nodeMap: NodeMap;
@@ -197,6 +198,15 @@
     }
   }
 
+  const zoomBTN = [
+    { title: "放大", icon: "plus", event: zoomIn },
+    { title: "缩小", icon: "minus", event: zoomOut },
+    { title: "重置", icon: "rotate-ccw", event: resetView },
+  ];
+  function useSetIcon(el: HTMLElement, icon: string) {
+    setIcon(el, icon);
+  }
+
   // ---- 生命周期 ----
   onMount(() => {
     if (nodeMap.size > 0) {
@@ -331,9 +341,10 @@
       </g>
     </svg>
     <div class="toolbar">
-      <button class="btn zoom-in" onclick={zoomIn}>+</button>
-      <button class="btn zoom-out" onclick={zoomOut}>-</button>
-      <button class="btn reset" onclick={resetView}>⟳</button>
+      {#each zoomBTN as { title, icon, event }}
+        <button class="toolbar-btn" aria-label={title} use:useSetIcon={icon} onclick={event}
+        ></button>
+      {/each}
     </div>
   </div>
 
@@ -383,7 +394,8 @@
     padding: 0px;
     /* border: 1px solid var(--background-modifier-border); */
   }
-  .toolbar .btn {
+
+  .toolbar .toolbar-btn {
     font-size: large;
     /* all: unset; */
     width: 25px;
