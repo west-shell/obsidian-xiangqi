@@ -293,6 +293,11 @@
         {/each}
       </g>
     </svg>
+    <div class="toolbar">
+      <button class="btn zoom-in">+</button>
+      <button class="btn zoom-out">-</button>
+      <button class="btn reset">⟳</button>
+    </div>
   </div>
 
   <textarea
@@ -326,6 +331,17 @@
     overflow: hidden;
     background-color: var(--board-background);
     min-height: 0;
+    position: relative; /* 作为定位参考 */
+    width: 100%;
+    height: 100%;
+  }
+
+  .toolbar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    gap: 0;
   }
 
   .tree-svg {
