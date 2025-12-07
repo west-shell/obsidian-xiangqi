@@ -28,11 +28,11 @@ export class GenFENRenderChild extends MarkdownRenderChild {
     ) {
         super(containerEl);
         this.settings = this.plugin.settings;
+        createGenFENModuleRegistry(this);
     }
 
     onload(): void {
-        this.plugin.renderChildren.add(this);
-        this.moduleRegistry = createGenFENModuleRegistry(this);
+        this.plugin.instances.add(this);
         this.eventBus.emit('load', 'fen');
     }
 
@@ -41,9 +41,8 @@ export class GenFENRenderChild extends MarkdownRenderChild {
     }
 
     onunload(): void {
-        this.plugin.renderChildren.delete(this);
+        this.plugin.instances.delete(this);
         this.eventBus.emit('unload');
-        destroyGenFENModuleRegistry(this);
     }
 
 }

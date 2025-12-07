@@ -28,11 +28,11 @@ export class ChessRenderChild extends MarkdownRenderChild {
     ) {
         super(containerEl);
         this.settings = this.plugin.settings;
+        createXQModuleRegistry(this);
     }
 
     onload(): void {
-        this.plugin.renderChildren.add(this);
-        createXQModuleRegistry(this);
+        this.plugin.instances.add(this);
         this.eventBus.emit('load', 'xq');
     }
 
@@ -41,9 +41,9 @@ export class ChessRenderChild extends MarkdownRenderChild {
     }
 
     onunload(): void {
-        this.plugin.renderChildren.delete(this);
+        this.plugin.instances.delete(this);
         this.eventBus.emit('unload');
-        destroyXQModuleRegistry(this);
+        // destroyXQModuleRegistry(this);
     }
 
 }

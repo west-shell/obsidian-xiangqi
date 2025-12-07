@@ -38,7 +38,7 @@ export class PGNView extends TextFileView {
 
     async onOpen() {
         await super.onOpen();
-        this.plugin.renderChildren.add(this)
+        this.plugin.instances.add(this)
         this.contentEl.empty()
     }
 
@@ -46,7 +46,7 @@ export class PGNView extends TextFileView {
         this.eventBus.emit('updateUI')
     }
     protected async onClose(): Promise<void> {
-        this.plugin.renderChildren.delete(this)
+        this.plugin.instances.delete(this)
         return super.onClose()
     }
     getViewType() { return PGNView.VIEW_TYPE; }

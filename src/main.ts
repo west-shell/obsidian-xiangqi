@@ -8,7 +8,7 @@ import { XQSettingTab, DEFAULT_SETTINGS } from "./settings";
 
 export default class XQPlugin extends Plugin {
 	settings: ISettings = DEFAULT_SETTINGS;
-	renderChildren: Set<{ refresh(): void }> = new Set();
+	instances: Set<{ refresh(): void }> = new Set();
 	async onload() {
 
 		await this.loadSettings();
@@ -102,8 +102,8 @@ export default class XQPlugin extends Plugin {
 	}
 
 	refresh() {
-		this.renderChildren.forEach((child) => {
-			child.refresh();
+		this.instances.forEach((instance) => {
+			instance.refresh();
 		});
 	}
 
