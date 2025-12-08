@@ -39,7 +39,9 @@
 
 <style>
   :global(.view-content.pgn-view) {
-    padding: 4px;
+    padding: 4px !important;
+    overflow: hidden !important;
+    margin: 0 !important;
   }
   .tree-view {
     display: flex;

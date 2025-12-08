@@ -98,8 +98,10 @@
   <svg {width} {height} viewBox={`0 0 ${width} ${height}`} class="xq-board" onclick={handleClick}>
     <!-- 背景 -->
     <rect
-      {width}
-      {height}
+      x={cellSize * 0.1}
+      y={cellSize * 0.1}
+      width={width - cellSize * 0.2}
+      height={height - cellSize * 0.2}
       fill="var(--board-background)"
       rx="5"
       stroke={showTurnBorder
@@ -107,7 +109,7 @@
           ? "var(--piece-red)"
           : "var(--piece-black)"
         : "var(--background-modifier-border)"}
-      stroke-width={cellSize * 0.2}
+      stroke-width={cellSize * 0.1}
     />
 
     <!-- 外框 -->
