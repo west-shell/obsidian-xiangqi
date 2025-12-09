@@ -309,7 +309,7 @@
   }
   .xq-board {
     user-select: none;
-    width: 100%;
+    width: auto;
     height: 100%;
   }
 </style>
