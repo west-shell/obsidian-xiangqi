@@ -238,7 +238,7 @@
 </script>
 
 <!-- ---- 结构 ---- -->
-<div class="container">
+<div class="tree-container">
   <div class="svg-wrapper">
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     <svg
@@ -360,7 +360,7 @@
 </div>
 
 <style>
-  .container {
+  .tree-container {
     display: flex;
     flex-direction: column;
     height: 100%;
