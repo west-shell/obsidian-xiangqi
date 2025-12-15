@@ -197,7 +197,7 @@ const ActionsModule = {
                 }
                 case 'openPikafish': {
                     // 1. 从 root 节点获取 fen 和 firstturn
-                    const initialFen = genFENFromBoard(host.root.board!, host.root.side === 'red' ? 'red' : 'black');
+                    const initialFen = genFENFromBoard(host.root.board!, host.root.side === 'red' ? 'black' : 'red');
 
                     // 2. 根据 currentPath 获取行棋的着法
                     // host.mainPath 包含 root 节点，但 root 节点没有 move data，所以从第二个节点开始
