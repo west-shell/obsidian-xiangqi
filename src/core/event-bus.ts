@@ -1,13 +1,14 @@
-type EventType = string | symbol;
-type Handler<T = any> = (payload?: T) => void;
 import {
     registerXQModule,
     registerGenFENModule,
     registerPGNViewModule
 } from './module-system';
 
+type EventType = string | symbol;
+type Handler = (payload?: unknown) => void
+
 export class EventBus {
-    private handlers = new Map<EventType, Set<Handler<any>>>();
+    private handlers = new Map<EventType, Set<Handler>>();
 
     constructor(public host: object) { }
 
@@ -19,14 +20,16 @@ export class EventBus {
         this.handlers.clear();
     }
 
-    on<T = any>(event: EventType, handler: Handler<T>) {
-        if (!this.handlers.has(event)) {
-            this.handlers.set(event, new Set());
+    on(event: EventType, handler: Handler) {
+        let set = this.handlers.get(event);
+        if (!set) {
+            set = new Set();
+            this.handlers.set(event, set);
         }
-        this.handlers.get(event)!.add(handler as Handler<any>);
+        set.add(handler);
     }
 
-    emit(event: EventType, payload?: any) {
+    emit(event: EventType, payload?: unknown) {
         const set = this.handlers.get(event);
         if (!set) return;
         const hasPayload = arguments.length === 2;
@@ -39,7 +42,7 @@ export class EventBus {
         }
     }
 
-    off<T = any>(event: EventType, handler: Handler<T>) {
+    off(event: EventType, handler: Handler) {
         this.handlers.get(event)?.delete(handler);
     }
 }
