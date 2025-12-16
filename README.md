@@ -5,6 +5,10 @@
 
 [中文](./README.md) | [English](./README.en.md)
 
+如果你喜欢这个项目，欢迎到我的主页  
+[![Bilibili](https://img.shields.io/badge/Bilibili-哔哩哔哩-ff69b4?logo=bilibili&logoColor=white)](https://space.bilibili.com/156446344)  
+点赞、投币、交流 
+
 ## 插件简介
 
 **中国象棋插件(Obsidian)** 是一款为 Obsidian 笔记软件量身打造的中国象棋渲染引擎，支持以 FEN 和 PGN 格式展示棋局，并可进行推演。插件提供丰富的自定义设置、棋谱导航、分支变化和皮卡鱼分析连接等功能。

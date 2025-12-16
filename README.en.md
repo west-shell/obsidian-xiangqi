@@ -5,6 +5,10 @@
 
 [中文](./README.md) | [English](./README.en.md)
 
+If you like this project, feel free to check out my page on  
+[![Bilibili](https://img.shields.io/badge/Bilibili-Bilibili-ff69b4?logo=bilibili&logoColor=white)](https://space.bilibili.com/156446344)  
+Likes, coins, and feedback are greatly appreciated.
+
 ## Plugin Overview
 
 **Chinese Chess Plugin for Obsidian** is a Chinese chess rendering engine tailor-made for Obsidian. It supports displaying chess games in FEN and PGN formats and allows move exploration. The plugin offers rich customization options, move navigation, saving functionality, and more.
