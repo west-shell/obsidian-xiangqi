@@ -107,6 +107,29 @@
     return node.comments?.filter((c) => !ALL_ANNOTATION_KEYS.includes(c)) ?? [];
   }
 
+  // ---- 自动保存逻辑 ----
+  let saveTimeout: number | undefined;
+
+  function handleCommentsInput() {
+    adjustTextareaHeight();
+
+    // 防抖：输入暂停 700ms 自动保存
+    if (saveTimeout) clearTimeout(saveTimeout);
+    saveTimeout = window.setTimeout(() => {
+      saveComments();
+      saveTimeout = undefined;
+    }, 700);
+  }
+
+  // 离开时立即保存
+  function handleCommentsBlur() {
+    if (saveTimeout) {
+      clearTimeout(saveTimeout);
+      saveTimeout = undefined;
+    }
+    saveComments();
+  }
+
   function saveComments() {
     if (!currentNode) return;
     const regularComments = commentsText.split("\n").filter((c) => c.trim() !== "");
@@ -353,8 +376,8 @@
     class="auto-height"
     placeholder="添加注释"
     bind:this={textareaEl}
-    oninput={adjustTextareaHeight}
-    onblur={saveComments}
+    oninput={handleCommentsInput}
+    onblur={handleCommentsBlur}
     rows="1"
   ></textarea>
 </div>
