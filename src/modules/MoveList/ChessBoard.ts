@@ -1,7 +1,7 @@
 import Xiangqi from "../../lib/Movelist/Xiangqi.svelte";
 import { registerXQModule } from "../../core/module-system";
 import type { IXQHost } from "../../types";
-import { mount, SvelteComponent } from "svelte";
+import { mount, unmount } from "svelte";
 
 const BoardModule = {
     init(host: IXQHost) {
@@ -25,7 +25,7 @@ const BoardModule = {
                     lastMove: host.modified ? host.history[host.currentStep - 1] || null : host.PGN[host.currentStep - 1] || null,
                     options: host.options || {}
                 },
-            }) as SvelteComponent;
+            });
         })
 
         eventBus.on('ready', () => {
@@ -44,7 +44,7 @@ const BoardModule = {
             }
         })
 
-        eventBus.on('updateUI', (type: string | undefined) => {
+        eventBus.on('updateUI', () => {
             // if (type === undefined) return;
             host.Xiangqi?.$set({
                 settings: { ...host.settings },
@@ -60,7 +60,8 @@ const BoardModule = {
         })
 
         eventBus.on("unload", () => {
-            // host.Xiangqi?.destroy();
+            unmount(host.Xiangqi)
+
         })
     }
 }

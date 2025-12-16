@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, tick } from "svelte";
+  import { onDestroy, onMount, tick } from "svelte";
   import type { EventBus } from "../../core/event-bus";
   import { PIECE_CHARS, type ChessNode, type NodeMap } from "../../types";
   import { createInteractionHandlers } from "./interact";
@@ -120,6 +120,14 @@
       saveTimeout = undefined;
     }, 700);
   }
+  // 组件卸载时清理定时器
+  onDestroy(() => {
+    // console.log("onDestroy Tree.svelte called");
+    if (saveTimeout) {
+      clearTimeout(saveTimeout);
+      saveTimeout = undefined;
+    }
+  });
 
   // 离开时立即保存
   function handleCommentsBlur() {

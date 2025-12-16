@@ -63,7 +63,6 @@ export type ChessNode = {
 	comments?: string[];
 };
 export type NodeMap = Map<string, ChessNode>;
-import type { SvelteComponent } from "svelte";
 import type { MarkdownPostProcessorContext, MarkdownSectionInformation } from "obsidian";
 import type XQPlugin from "./main";
 import type { EventBus } from "./core/event-bus";
@@ -92,7 +91,7 @@ export interface IXQHost extends IHost {
 	rotated: boolean;
 	options?: IOptions;
 	haveFEN?: boolean;
-	Xiangqi?: SvelteComponent;
+	Xiangqi?: any;
 	source: string;
 }
 

@@ -1,6 +1,6 @@
 import GenFEN from "../../lib/GenFEN/GenFEN.svelte";
 import { registerGenFENModule } from "../../core/module-system";
-import { mount } from "svelte";
+import { mount, unmount } from "svelte";
 
 const BoardModule = {
     init(host: Record<string, any>) {
@@ -33,8 +33,7 @@ const BoardModule = {
         })
 
         eventBus.on("unload", () => {
-            // host.Xiangqi.destroy();
-            host.Xiangqi = null;
+            unmount(host.Xiangqi)
         })
     }
 }

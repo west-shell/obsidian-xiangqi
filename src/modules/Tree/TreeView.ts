@@ -1,6 +1,6 @@
 import { registerPGNViewModule } from '../../core/module-system';
 import TreeView from '../../lib/Tree/Xiangqi.svelte';
-import { mount } from "svelte";
+import { mount, unmount } from "svelte";
 
 const TreeViewModule = {
     init(host: Record<string, any>) {
@@ -34,6 +34,9 @@ const TreeViewModule = {
                 currentNode: host.currentNode,
                 currentPath: host.currentPath,
             });
+        })
+        eventBus.on("unload", () => {
+            unmount(host.Xiangqi)
         })
 
     }

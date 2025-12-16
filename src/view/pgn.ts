@@ -46,6 +46,7 @@ export class PGNView extends TextFileView {
         this.eventBus.emit('updateUI')
     }
     protected async onClose(): Promise<void> {
+        this.eventBus.emit("unload");
         this.plugin.instances.delete(this)
         return super.onClose()
     }

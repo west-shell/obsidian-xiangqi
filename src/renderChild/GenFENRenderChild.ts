@@ -6,7 +6,6 @@ import {
 import {
     type ModuleRegistry,
     createGenFENModuleRegistry,
-    destroyGenFENModuleRegistry
 } from '../core/module-system';
 import type { EventBus } from '../core/event-bus';
 import type { ISettings } from '../types';

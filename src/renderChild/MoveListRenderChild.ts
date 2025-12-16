@@ -4,8 +4,7 @@ import {
     MarkdownRenderChild,
 } from 'obsidian';
 import {
-    createXQModuleRegistry,
-    destroyXQModuleRegistry
+    createXQModuleRegistry
 } from '../core/module-system';
 import type { EventBus } from '../core/event-bus';
 import type { ISettings } from '../types';
