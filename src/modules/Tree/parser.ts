@@ -4,6 +4,7 @@ import { loadBoardFromFEN } from '../../utils/parse';
 import { DEFAULT_FEN } from '../../types';
 
 export class PGNParser {
+    haveFEN: boolean = false;
     tokens: Token[];
     nodeMap: Map<string, ChessNode>;
     currentIndex: number;
@@ -71,6 +72,7 @@ export class PGNParser {
 
         if (tagName.toUpperCase() === 'FEN') {
             // 可选：你可以在这里初始化棋盘
+            this.haveFEN = true;
             const { board, turn } = loadBoardFromFEN(tagValue);
             this.currentNode.board = board; // 设置当前节点的棋盘状态
             this.currentSide = turn === 'b' ? 'black' : 'red'; // 设置当前方

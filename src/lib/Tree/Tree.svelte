@@ -122,7 +122,6 @@
   }
   // 组件卸载时清理定时器
   onDestroy(() => {
-    // console.log("onDestroy Tree.svelte called");
     if (saveTimeout) {
       clearTimeout(saveTimeout);
       saveTimeout = undefined;

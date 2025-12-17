@@ -24,6 +24,7 @@ const TreeViewModule = {
                 }
             })
         })
+
         eventBus.on("updateUI", () => {
             host.Xiangqi.$set({
                 settings: { ...host.settings },
@@ -35,6 +36,23 @@ const TreeViewModule = {
                 currentPath: host.currentPath,
             });
         })
+
+        eventBus.on('ready', () => {
+            if (!host.settings.autoJump) return
+            switch (host.settings.autoJump) {
+                case "never":
+                    break;
+                case "always":
+                    eventBus.emit('btn-click', { name: 'toEnd' });
+                    break;
+                case "auto":
+                    if (!host.haveFEN) {
+                        eventBus.emit('btn-click', { name: 'toEnd' });
+                    }
+                    break;
+            }
+        })
+
         eventBus.on("unload", () => {
             unmount(host.Xiangqi)
         })

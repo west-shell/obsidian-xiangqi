@@ -4,6 +4,7 @@
   import Toolbar from "./Toolbar.svelte";
   import type { ChessNode, IBoard, IPosition, ISettings, NodeMap } from "../../types";
   import type { EventBus } from "../../core/event-bus";
+  import { onMount, tick } from "svelte";
 
   interface Props {
     settings: ISettings;
@@ -29,6 +30,11 @@
 
   let lastMove = $derived(currentNode.data);
   let position = $derived(settings.position);
+
+  onMount(async () => {
+    await tick();
+    eventBus.emit("ready");
+  });
 </script>
 
 <div class="tree-view {position}">

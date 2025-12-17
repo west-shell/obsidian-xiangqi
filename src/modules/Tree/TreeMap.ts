@@ -38,6 +38,7 @@ const TreeMap = {
         eventBus.on('setViewData', () => {
             const parser = new PGNParser(host.data);
             host.parser = parser;
+            host.haveFEN = parser.haveFEN;
             host.root = parser.getRoot();
             host.nodeMap = parser.getMap();
             host.tags = parser.getTags();
