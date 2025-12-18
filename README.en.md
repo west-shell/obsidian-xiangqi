@@ -146,3 +146,8 @@ This plugin is now available on the official Obsidian plugin marketplace. Search
 6. Search for "Chinese chess" or "xiangqi" in the search bar.
 7. Find this plugin and click **Install**.
 8. After installation, click **Enable**.
+
+## Donation
+
+If you like this plugin, you can support me with a donation!
+![Donation](./IMAGE/打赏.png)
