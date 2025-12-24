@@ -1,13 +1,13 @@
 import { MarkdownView, Notice } from "obsidian";
 import { registerGenFENModule } from "../../core/module-system";
-import type { IBoard, IGenFENHost, ITurn } from "../../types";
+import type { IBoard, IGenFENHost, ITurn, PieceType } from "../../types";
 import { genFENFromBoard } from "../../utils/parse";
 
 const ActionsModule = {
     init(host: IGenFENHost) {
         const eventBus = host.eventBus;
 
-        eventBus.on("clickPieceBTN", (piece) => {
+        eventBus.on("clickPieceBTN", (piece: PieceType) => {
             if (!piece) return;
             host.markedPos = null;
             host.selectedPiece = piece;

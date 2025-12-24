@@ -5,11 +5,10 @@ import { MarkdownView } from "obsidian";
 const SourceModule = {
 	init(host: any) {
 		const eventBus = host.eventBus;
-
 		eventBus.on('load', (renderChild: string) => {
+			const { haveFEN, board, PGN, firstTurn, options, isPikafishUrl } = parseSource(host.source)
 			switch (renderChild) {
 				case 'xq':
-					const { haveFEN, board, PGN, firstTurn, options, isPikafishUrl } = parseSource(host.source)
 					host.haveFEN = haveFEN;
 					host.board = board;
 					host.PGN = PGN;
@@ -56,7 +55,7 @@ const SourceModule = {
 					}
 					break;
 				case 'fen':
-					host.board = parseSource('').board;
+					host.board = board;
 					host.currentTurn = 'red';
 					break;
 			}

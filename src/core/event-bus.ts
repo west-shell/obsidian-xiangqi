@@ -5,7 +5,7 @@ import {
 } from './module-system';
 
 type EventType = string | symbol;
-type Handler = (payload?: unknown) => void
+type Handler = (payload?: any) => void
 
 export class EventBus {
     private handlers = new Map<EventType, Set<Handler>>();
@@ -29,7 +29,7 @@ export class EventBus {
         set.add(handler);
     }
 
-    emit(event: EventType, payload?: unknown) {
+    emit(event: EventType, payload?: any) {
         const set = this.handlers.get(event);
         if (!set) return;
         const hasPayload = arguments.length === 2;
