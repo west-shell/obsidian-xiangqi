@@ -27,7 +27,7 @@ const BoardModule = {
                 selectedPiece: host.selectedPiece,
                 settings: { ...host.settings },
                 board: [...host.board],
-                markedPos: { ...host.markedPos },
+                markedPos: host.markedPos,
                 currentTurn: host.currentTurn,
             });
         })
