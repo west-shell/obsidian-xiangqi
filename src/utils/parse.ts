@@ -158,11 +158,11 @@ export function parseOption(source: string): IOptions {
 export function parseICCS(ICCS: string, tmpBoard: IBoard): IMove {
     // 解析 PGN 字符串为 IMove 数组
     // 解析走法，例如 "H2-D2" -> 起点和终点
-    const [fromSting, toSting] = ICCS.split("-");
-    const fromX = fromSting.charCodeAt(0) - "A".charCodeAt(0);
-    const fromY = 9 - parseInt(fromSting[1]); // 修正 Y 坐标，从下往上数
-    const toX = toSting.charCodeAt(0) - "A".charCodeAt(0);
-    const toY = 9 - parseInt(toSting[1]); // 修正 Y 坐标，从下往上数
+    const [fromSquare, toSquare] = ICCS.split("-");
+    const fromX = fromSquare.charCodeAt(0) - "A".charCodeAt(0);
+    const fromY = 9 - parseInt(fromSquare[1]); // 修正 Y 坐标，从下往上数
+    const toX = toSquare.charCodeAt(0) - "A".charCodeAt(0);
+    const toY = 9 - parseInt(toSquare[1]); // 修正 Y 坐标，从下往上数
     const from = { x: fromX, y: fromY };
     const to = { x: toX, y: toY };
     const type = tmpBoard[fromX][fromY];
