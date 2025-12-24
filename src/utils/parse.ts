@@ -216,7 +216,7 @@ export function getWXF(move: IMove, tmpBoard: IBoard): string {
     if (!piece) return "";
 
     const isRed = piece === piece.toUpperCase();
-
+    const pieceType = piece.toLowerCase();
     const numbers = isRed ? NUMBERS_RED : NUMBERS_BLACK;
     const BOARD: IBoard = Array.from({ length: 9 }, () => Array(10).fill(null));
     let fromx = from.x;
@@ -243,30 +243,84 @@ export function getWXF(move: IMove, tmpBoard: IBoard): string {
 
     // 获取起始位置描述（红方和黑方的坐标系是相反的）
     let pre = "";
-    let samecol: number[] = [];
-    // 检查同列是否有相同棋子
-    for (let y = 0; y < 10; y++) {
-        if (BOARD[fromx][y] === piece) {
-            samecol.push(y);
+
+    // 仕(士)和相(象)如果在同一纵线上，不用“前”和“后”区别，因为能退的一定在前，能进的一定在后。
+    if (pieceType === 'a' || pieceType === 'b') { pre = PIECE_CHARS[piece] + numbers[fromx]; }
+
+    // (1) 三个兵在一条纵线上：用“前”、“中”和“后”来区别；
+    // (2) 三个以上兵在一条纵线上：最前面的兵用“一”代替“前”，以后依次是“二”、“三”、“四”和“五”；
+    // (3) 在有两条纵线，每条纵线上都有一个以上的兵：按照“先从右到左，再从前到后”(即先看最左边一列，从前到后依次标记为“一”和“二”，可能还有“三”，再看右边一列) 的顺序，把这些兵的位置标依次标记为“一”、“二”、“三”、“四”和“五”，不在这两条纵线上的兵不参与标记。
+    if (pieceType === 'p') {
+        let pMap = new Map<number, number[]>();
+        let pArray: number[] = [];
+        for (let x = 0; x < 9; x++) {
+            for (let y = 0; y < 10; y++) {
+                if (BOARD[x][y] === piece) {
+                    const colArray = pMap.get(x);
+                    if (colArray) {
+                        colArray.push(y);
+                    } else {
+                        pMap.set(x, [y]);
+                    }
+                }
+                // 找到两列都有兵的情况
+            }
         }
-    }
-    if (samecol.length === 1) {
-        pre = PIECE_CHARS[piece] + numbers[fromx];
-    } else if (samecol.length === 2) {
-        const index = samecol.indexOf(fromy);
-        if (index === 0) {
-            pre = "后" + PIECE_CHARS[piece];
-        } else if (index === 1) {
-            pre = "前" + PIECE_CHARS[piece];
+        pMap.forEach((value, key) => {
+            if (value.length > 1) {
+                pArray.push(key);
+            }
+        });
+        switch (pArray.length) {
+            case 0:
+                pre = PIECE_CHARS[piece] + numbers[fromx];
+                break;
+            case 1:
+                if (!pArray.includes(fromx)) {
+                    pre = PIECE_CHARS[piece] + numbers[fromx];
+                } else {
+                    switch (pMap.get(fromx)!.length) {
+                        case 2:
+                            pre = (pMap.get(fromx)!.indexOf(fromy) === 0 ? "后" : "前") + PIECE_CHARS[piece];
+                            break;
+                        case 3:
+                            pre = ["后", "中", "前"][pMap.get(fromx)!.indexOf(fromy)] + PIECE_CHARS[piece];
+                            break;
+                        case 4:
+                            pre = ["四", "三", "二", "一"][pMap.get(fromx)!.indexOf(fromy)] + PIECE_CHARS[piece];
+                            break;
+                        case 5:
+                            pre = ["五", "四", "三", "二", "一"][pMap.get(fromx)!.indexOf(fromy)] + PIECE_CHARS[piece];
+                            break;
+                    }
+                } break;
+            case 2:
+                if (!pArray.includes(fromx)) {
+                    pre = PIECE_CHARS[piece] + numbers[fromx];
+                } else {
+                    if (pArray[1] === fromx)
+                        pre = ["一", "二", "三", "四", "五"][pMap.get(fromx)!.length - pMap.get(fromx)!.indexOf(fromy) + pMap.get(pArray[1])!.length - 1] + PIECE_CHARS[piece];
+                    if (pArray[0] === fromx)
+                        pre = ["一", "二", "三", "四", "五"][pMap.get(fromx)!.length - pMap.get(fromx)!.indexOf(fromy) - 1] + PIECE_CHARS[piece];
+                } break;
         }
-    } else if (samecol.length === 3) {
+    } else {
+        let samecol: number[] = [];
+        // 检查同列是否有相同棋子
+        for (let y = 0; y < 10; y++) {
+            if (BOARD[fromx][y] === piece) {
+                samecol.push(y);
+            }
+        }
         const index = samecol.indexOf(fromy);
-        if (index === 0) {
-            pre = "后" + PIECE_CHARS[piece];
-        } else if (index === 1) {
-            pre = "中" + PIECE_CHARS[piece];
-        } else if (index === 2) {
-            pre = "前" + PIECE_CHARS[piece];
+        if (samecol.length === 1) {
+            pre = PIECE_CHARS[piece] + numbers[fromx];
+        } else if (samecol.length === 2 && piece.toLowerCase() !== "p") {
+            if (index === 0) {
+                pre = "后" + PIECE_CHARS[piece];
+            } else if (index === 1) {
+                pre = "前" + PIECE_CHARS[piece];
+            }
         }
     }
     // 确定移动类型和距离
