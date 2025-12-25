@@ -132,7 +132,7 @@
       <path
         d={`M ${cellSize},${cellSize * (i + 2)} h ${cellSize * 8}`}
         stroke="var(--board-line)"
-        stroke-width={cellSize * 0.04}
+        stroke-width={cellSize * 0.03}
         fill="none"
       />
     {/each}
@@ -142,7 +142,7 @@
       <path
         d={`M ${cellSize * (i + 2)},${cellSize} v ${cellSize * 4}`}
         stroke="var(--board-line)"
-        stroke-width={cellSize * 0.04}
+        stroke-width={cellSize * 0.03}
         fill="none"
       />
       <path
@@ -223,18 +223,18 @@
           {#if piece}
             <g transform="translate({(x + 1) * cellSize}, {(y + 1) * cellSize})">
               <circle
-                r={cellSize * 0.4}
+                r={cellSize * 0.45}
                 fill={piece === piece.toUpperCase() ? "var(--piece-red)" : "var(--piece-black)"}
                 stroke="var(--board-line)"
-                stroke-width={cellSize * 0.02}
+                stroke-width={cellSize * 0.03}
               />
               <text
                 x="0"
                 y="0"
                 fill="white"
-                font-size={cellSize * 0.45}
+                font-size={cellSize * 0.55}
                 text-anchor="middle"
-                dy="0.41em"
+                dy="0.4em"
               >
                 {PIECE_CHARS[piece as keyof typeof PIECE_CHARS]}
               </text>
