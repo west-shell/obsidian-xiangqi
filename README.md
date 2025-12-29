@@ -1,4 +1,4 @@
-# 中国象棋插件 for Obsidian
+#  `Obsidian`中国象棋插件
 
 ![版本](https://img.shields.io/github/v/release/west-shell/obsidian-xiangqi)
 [![许可证](https://img.shields.io/github/license/west-shell/obsidian-xiangqi)](./LICENSE)
