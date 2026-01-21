@@ -169,7 +169,6 @@
     align-items: center;
     text-align: center;
     border-radius: 4px;
-    color: var(--text-accent);
     cursor: pointer;
     transition: background-color 0.2s ease;
     white-space: nowrap;
@@ -187,7 +186,7 @@
   span.move {
     /* color: #337ab7; */
     color: var(--text-normal);
-    padding: 0;
+    /* padding: 0; */
   }
 
   span.move.active {
