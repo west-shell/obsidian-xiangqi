@@ -346,7 +346,8 @@
                   : node.side === "black"
                     ? "var(--piece-black)"
                     : "gray"}
-                stroke="var(--board-line)"
+                stroke={node.id === currentNode?.id ? "green" : "var(--board-line)"}
+                stroke-width={node.id === currentNode?.id ? "2" : "1"}
               />
               <text dy="3.5" text-anchor="middle" fill="white" font-size="9px">
                 {node.data?.type ? PIECE_CHARS[node.data.type] : "始"}

@@ -3,8 +3,8 @@
     "version": "2.5.26",
     "name": "Chinese chess",
     "description": "A Chinese Chess (象棋/xiangqi) plugin designed for Obsidian",
-    "author": "weshell",
-    "authorUrl": "https://space.bilibili.com/156446344",
+    "author": "000100",
+    "authorUrl": "",
     "minAppVersion": "1.5.0",
     "isDesktopOnly": false
 }

@@ -68,18 +68,18 @@
     rotated && lastMove ? { from: rotatePos(lastMove.from), to: rotatePos(lastMove.to) } : lastMove,
   );
 
-  // 着法颜色数组
+  // 着法颜色数组 - 统一为橙色
   const colors = [
-    'var(--interactive-accent)', // 主线路颜色
-    '#FF6B6B', // 分支1颜色
-    '#4ECDC4', // 分支2颜色
-    '#45B7D1', // 分支3颜色
-    '#96CEB4', // 分支4颜色
-    '#FFEAA7', // 分支5颜色
-    '#DDA0DD', // 分支6颜色
-    '#98D8C8', // 分支7颜色
-    '#F7DC6F', // 分支8颜色
-    '#BB8FCE'  // 分支9颜色
+    'rgba(255, 102, 0, 0.8)', // 半透明橙色
+    'rgba(255, 102, 0, 0.8)', // 半透明橙色
+    'rgba(255, 102, 0, 0.8)', // 半透明橙色
+    'rgba(255, 102, 0, 0.8)', // 半透明橙色
+    'rgba(255, 102, 0, 0.8)', // 半透明橙色
+    'rgba(255, 102, 0, 0.8)', // 半透明橙色
+    'rgba(255, 102, 0, 0.8)', // 半透明橙色
+    'rgba(255, 102, 0, 0.8)', // 半透明橙色
+    'rgba(255, 102, 0, 0.8)', // 半透明橙色
+    'rgba(255, 102, 0, 0.8)'  // 半透明橙色
   ];
 
   function handleClick(e: MouseEvent) {
@@ -261,7 +261,7 @@
     </g>
 
     <!-- 分支线路 -->
-    {#if variations && variations.length > 0}
+    {#if variations && variations.length > 1}
       <g id="variations">
         {#each variations as variation, index}
           <!-- 计算变着的起点和终点 -->
@@ -286,37 +286,35 @@
               x2={toX}
               y2={toY}
               stroke={color}
-              stroke-width={isMainLine ? cellSize * 0.06 : cellSize * 0.04}
+              stroke-width={cellSize * 0.08}
               stroke-dasharray={isMainLine ? 'none' : `${cellSize * 0.2} ${cellSize * 0.1}`}
-              opacity={isMainLine ? 0.8 : 0.7}
+              opacity={0.7}
               stroke-linecap="round"
             />
             <!-- 绘制着法终点标记 -->
             <circle
               cx={toX}
               cy={toY}
-              r={isMainLine ? cellSize * 0.3 : cellSize * 0.25}
+              r={cellSize * 0.35}
               stroke={color}
-              stroke-width={isMainLine ? cellSize * 0.06 : cellSize * 0.04}
+              stroke-width={cellSize * 0.08}
               fill="none"
-              opacity={isMainLine ? 0.8 : 0.7}
+              opacity={0.7}
             />
             
-            <!-- 为主线路添加文本标记 -->
-            {#if isMainLine}
-              <text
-                x={toX}
-                y={toY}
-                fill={color}
-                font-size={cellSize * 0.3}
-                text-anchor="middle"
-                dominant-baseline="middle"
-                opacity="0.8"
-                font-weight="bold"
-              >
-                主
-              </text>
-            {/if}
+            <!-- 为着法添加数字标记 -->
+            <text
+              x={toX}
+              y={toY}
+              fill={color}
+              font-size={cellSize * 0.5}
+              text-anchor="middle"
+              dominant-baseline="middle"
+              opacity="0.9"
+              font-weight="bold"
+            >
+              {index + 1}
+            </text>
           {/if}
         {/each}
       </g>
