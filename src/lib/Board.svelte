@@ -11,6 +11,7 @@
     currentTurn: string;
     eventBus: EventBus;
     rotated: boolean;
+    variations?: IMove[];
   }
 
   let {
@@ -21,6 +22,7 @@
     currentTurn,
     eventBus,
     rotated,
+    variations = [],
   }: Props = $props();
 
   let Bnum = ["1", "2", "3", "4", "5", "6", "7", "8", "9"];
@@ -65,6 +67,20 @@
   let renderedLastMove = $derived(
     rotated && lastMove ? { from: rotatePos(lastMove.from), to: rotatePos(lastMove.to) } : lastMove,
   );
+
+  // 着法颜色数组
+  const colors = [
+    'var(--interactive-accent)', // 主线路颜色
+    '#FF6B6B', // 分支1颜色
+    '#4ECDC4', // 分支2颜色
+    '#45B7D1', // 分支3颜色
+    '#96CEB4', // 分支4颜色
+    '#FFEAA7', // 分支5颜色
+    '#DDA0DD', // 分支6颜色
+    '#98D8C8', // 分支7颜色
+    '#F7DC6F', // 分支8颜色
+    '#BB8FCE'  // 分支9颜色
+  ];
 
   function handleClick(e: MouseEvent) {
     const svg = e.currentTarget as SVGSVGElement;
@@ -243,6 +259,68 @@
         {/each}
       {/each}
     </g>
+
+    <!-- 分支线路 -->
+    {#if variations && variations.length > 0}
+      <g id="variations">
+        {#each variations as variation, index}
+          <!-- 计算变着的起点和终点 -->
+          {#if variation.from && variation.to}
+            {@const from = rotated ? rotatePos(variation.from) : variation.from}
+            {@const to = rotated ? rotatePos(variation.to) : variation.to}
+            <!-- 计算起点和终点的坐标 -->
+            {@const fromX = (from.x + 1) * cellSize}
+            {@const fromY = (from.y + 1) * cellSize}
+            {@const toX = (to.x + 1) * cellSize}
+            {@const toY = (to.y + 1) * cellSize}
+            
+            <!-- 判断是否为主线路 -->
+            {@const isMainLine = index === 0}
+            <!-- 获取当前着法的颜色 -->
+            {@const color = colors[index % colors.length]}
+            
+            <!-- 绘制着法线路 -->
+            <line
+              x1={fromX}
+              y1={fromY}
+              x2={toX}
+              y2={toY}
+              stroke={color}
+              stroke-width={isMainLine ? cellSize * 0.06 : cellSize * 0.04}
+              stroke-dasharray={isMainLine ? 'none' : `${cellSize * 0.2} ${cellSize * 0.1}`}
+              opacity={isMainLine ? 0.8 : 0.7}
+              stroke-linecap="round"
+            />
+            <!-- 绘制着法终点标记 -->
+            <circle
+              cx={toX}
+              cy={toY}
+              r={isMainLine ? cellSize * 0.3 : cellSize * 0.25}
+              stroke={color}
+              stroke-width={isMainLine ? cellSize * 0.06 : cellSize * 0.04}
+              fill="none"
+              opacity={isMainLine ? 0.8 : 0.7}
+            />
+            
+            <!-- 为主线路添加文本标记 -->
+            {#if isMainLine}
+              <text
+                x={toX}
+                y={toY}
+                fill={color}
+                font-size={cellSize * 0.3}
+                text-anchor="middle"
+                dominant-baseline="middle"
+                opacity="0.8"
+                font-weight="bold"
+              >
+                主
+              </text>
+            {/if}
+          {/if}
+        {/each}
+      </g>
+    {/if}
 
     <!-- 单个位置标记 -->
     {#if renderedMarkedPos}
