@@ -385,7 +385,7 @@
     bind:this={textareaEl}
     oninput={handleCommentsInput}
     onblur={handleCommentsBlur}
-    rows="1"
+    rows="10"
   ></textarea>
 </div>
 
@@ -446,8 +446,8 @@
 
   textarea {
     width: 100%;
-    height: var(--textarea-height, 20px);
-    max-height: 80px;
+    height: var(--textarea-height, 200px);
+    max-height: 300px;
     resize: none;
     font-family: var(--font-family);
     font-size: var(--font-size-normal);
@@ -455,7 +455,7 @@
     background: var(--background-secondary);
     border: 1px solid var(--background-modifier-border);
     border-radius: 3px;
-    padding: 0;
+    padding: 4px 8px;
     outline: none;
     overflow-y: auto;
   }

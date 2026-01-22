@@ -30,15 +30,22 @@
 
   let lastMove = $derived(currentNode.data);
   let position = $derived(settings.position);
+  let rotated = $state(false);
 
   onMount(async () => {
     await tick();
     eventBus.emit("ready");
   });
+
+  $effect(() => {
+    eventBus.on('rotate', () => {
+      rotated = !rotated;
+    });
+  });
 </script>
 
 <div class="tree-view {position}">
-  <Board {settings} {board} {lastMove} {markedPos} {currentTurn} {eventBus} rotated={false} />
+  <Board {settings} {board} {lastMove} {markedPos} {currentTurn} {eventBus} {rotated} />
   <Toolbar {eventBus} />
   <Tree {nodeMap} {eventBus} {currentNode} {currentPath} />
 </div>
