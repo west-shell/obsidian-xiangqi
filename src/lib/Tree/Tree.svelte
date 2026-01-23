@@ -314,11 +314,6 @@
             class="node-group"
             transform="translate({node.x! * spacingX} {node.y! * spacingY})"
             opacity={currentPath.includes(node.id) ? 1 : 0.8}
-            filter={!currentPath.includes(node.id)
-              ? "grayscale(100%) brightness(0.75)"
-              : node.id === currentNode?.id
-                ? "brightness(1.5) saturate(1.4) drop-shadow(0 0 1px rgba(255, 255, 255, 0.6))"
-                : undefined}
             stroke-width={node.id === currentNode?.id ? height * 0.09 : height * 0.045}
             onclick={() => eventBus.emit("node-click", node.id)}
           >
@@ -342,11 +337,13 @@
                 {height}
                 rx="2.5"
                 ry="2.5"
-                fill={node.side === "red"
-                  ? "var(--piece-red)"
-                  : node.side === "black"
-                    ? "var(--piece-black)"
-                    : "gray"}
+                fill={currentPath.includes(node.id) || !node.data
+                  ? (node.side === "red"
+                    ? "var(--piece-red)"
+                    : node.side === "black"
+                      ? "var(--piece-black)"
+                      : "green")
+                  : "gray"}
                 stroke={node.id === currentNode?.id ? "green" : "var(--board-line)"}
                 stroke-width={node.id === currentNode?.id ? height * 0.18 : height * 0.09}
               />

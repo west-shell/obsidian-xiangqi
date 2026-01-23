@@ -21,6 +21,9 @@ export function createInteractionHandlers(
     let startY = 0;
 
     let lastTouchDistance = 0;
+    
+    // 点击阈值，用于区分点击和拖动
+    const CLICK_THRESHOLD = 5;
 
     function getTouchDistance(touches: TouchList): number {
         if (touches.length < 2) return 0;
@@ -88,7 +91,8 @@ export function createInteractionHandlers(
             case "touchstart": {
                 const event = e as TouchEvent;
                 if (event.touches.length === 1) {
-                    isDragging = true;
+                    // 初始设置为false，只有在移动超过阈值后才设为true
+                    isDragging = false;
                     dragStartX = event.touches[0].clientX;
                     dragStartY = event.touches[0].clientY;
                     startX = state.x;
@@ -102,17 +106,24 @@ export function createInteractionHandlers(
 
             case "touchmove": {
                 const event = e as TouchEvent;
-                event.preventDefault();
-
-                if (event.touches.length === 1 && isDragging) {
+                
+                if (event.touches.length === 1) {
                     const dx = event.touches[0].clientX - dragStartX;
                     const dy = event.touches[0].clientY - dragStartY;
-                    options.setState({
-                        x: startX + dx,
-                        y: startY + dy,
-                        scale: state.scale,
-                    });
+                    const distance = Math.hypot(dx, dy);
+                    
+                    // 如果移动距离超过阈值，才认为是拖动
+                    if (distance > CLICK_THRESHOLD) {
+                        isDragging = true;
+                        event.preventDefault();
+                        options.setState({
+                            x: startX + dx,
+                            y: startY + dy,
+                            scale: state.scale,
+                        });
+                    }
                 } else if (event.touches.length === 2) {
+                    event.preventDefault();
                     const newDistance = getTouchDistance(event.touches);
                     const delta = newDistance - lastTouchDistance;
                     if (Math.abs(delta) > 1) {
