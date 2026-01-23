@@ -45,7 +45,7 @@
     rotated && markedPos ? rotatePos(markedPos) : markedPos,
   );
 
-  let { cellSize, showLastMove, showTurnBorder, showCoordinateLabels } = $derived(settings);
+  let { cellSize, showLastMove, showTurnBorder, showCoordinateLabels, boardMarginTop, boardMarginBottom } = $derived(settings);
   let margin = $derived(cellSize * 0.1);
   let width = $derived(cellSize * 10);
   let height = $derived(cellSize * 11);
@@ -110,7 +110,7 @@
 
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
-<div class="board-container">
+<div class="board-container" style={`--board-margin-top: ${boardMarginTop}; --board-margin-bottom: ${boardMarginBottom};`}>
   <svg {width} {height} viewBox={`0 0 ${width} ${height}`} class="xq-board" onclick={handleClick}>
     <!-- 背景 -->
     <rect
@@ -382,6 +382,8 @@
     --piece-red: var(--xq-piece-red, var(--color-red));
     --piece-black: var(--xq-piece-black, var(--color-blue));
     --text-color: var(--xq-text-color, var(--text-normal));
+    margin-top: calc(var(--board-margin-top, 0px) * 1px);
+    margin-bottom: calc(var(--board-margin-bottom, 0px) * 1px);
   }
   .xq-board {
     user-select: none;

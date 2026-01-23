@@ -50,10 +50,10 @@
 </script>
 
 <div class="tree-view {position}">
-  <Board {settings} {board} {lastMove} {markedPos} {currentTurn} {eventBus} {rotated} {variations} />
-  <Toolbar {eventBus} />
-  <Tree {nodeMap} {eventBus} {currentNode} {currentPath} />
-</div>
+    <Board {settings} {board} {lastMove} {markedPos} {currentTurn} {eventBus} {rotated} {variations} />
+    <Toolbar {eventBus} />
+    <Tree {nodeMap} {eventBus} {currentNode} {currentPath} {settings} />
+  </div>
 
 <style>
   :global(.view-content.pgn-view) {
@@ -73,10 +73,29 @@
     gap: 2px;
   }
 
+  .tree-view.right :global(.tree-container) {
+    flex: 1 1 auto;
+    min-width: 300px;
+  }
+
+  .tree-view.right :global(.svg-wrapper) {
+    min-width: 280px;
+  }
+
   .tree-view.bottom {
     flex-direction: column;
     align-items: center;
     height: 100%;
-    max-width: 40vh;
+  }
+
+  .tree-view.bottom :global(.tree-container) {
+    flex: 1 1 auto;
+    min-width: 400px;
+    width: 100%;
+  }
+
+  .tree-view.bottom :global(.svg-wrapper) {
+    min-width: 380px;
+    width: 100%;
   }
 </style>

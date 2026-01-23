@@ -12,7 +12,7 @@ export function createInteractionHandlers(
 ) {
     const minZoom = options.minZoom ?? 0.5;
     const maxZoom = options.maxZoom ?? 4;
-    const zoomSpeed = options.zoomSpeed ?? 0.2;
+    const zoomSpeed = options.zoomSpeed ?? 0.001;
 
     let isDragging = false;
     let dragStartX = 0;

@@ -14,6 +14,8 @@ export const DEFAULT_SETTINGS: ISettings = {
 	enableSpeech: true,
 	showMovelist: true,
 	showMovelistText: true,
+	boardMarginTop: 20,
+	boardMarginBottom: 20,
 	viewOnly: false,
 	rotated: false,
 };
@@ -193,6 +195,60 @@ export class XQSettingTab extends PluginSettingTab {
 						settings.autoJump = value as "never" | "always" | "auto";
 						this.plugin.saveSettings();
 					});
+			});
+
+		new Setting(containerEl).setName("棋盘边距").setHeading();
+
+		new Setting(containerEl)
+			.setName("上边距")
+			.setDesc("调整棋盘顶部边距")
+			.addSlider((slider) => {
+				const controlEl = slider.sliderEl.parentElement!;
+				const valueLabel = createEl("span", {
+					text: Math.abs(settings.boardMarginTop).toString(),
+					cls: "slider-value-label",
+				});
+				controlEl.prepend(valueLabel);
+				slider
+					.setLimits(0, 100, 1)
+					.setValue(settings.boardMarginTop)
+					.onChange((value) => {
+						settings.boardMarginTop = value;
+						valueLabel.textContent = value.toString();
+						this.plugin.saveSettings();
+						this.plugin.refresh();
+					});
+				slider.sliderEl.addEventListener("input", () => {
+					const value = slider.getValue();
+					settings.boardMarginTop = value;
+					valueLabel.textContent = value.toString();
+				});
+			});
+
+		new Setting(containerEl)
+			.setName("下边距")
+			.setDesc("调整棋盘底部边距")
+			.addSlider((slider) => {
+				const controlEl = slider.sliderEl.parentElement!;
+				const valueLabel = createEl("span", {
+					text: Math.abs(settings.boardMarginBottom).toString(),
+					cls: "slider-value-label",
+				});
+				controlEl.prepend(valueLabel);
+				slider
+					.setLimits(0, 100, 1)
+					.setValue(settings.boardMarginBottom)
+					.onChange((value) => {
+						settings.boardMarginBottom = value;
+						valueLabel.textContent = value.toString();
+						this.plugin.saveSettings();
+						this.plugin.refresh();
+					});
+				slider.sliderEl.addEventListener("input", () => {
+					const value = slider.getValue();
+					settings.boardMarginBottom = value;
+					valueLabel.textContent = value.toString();
+				});
 			});
 
 		if (window.speechSynthesis) {

@@ -11,6 +11,8 @@ export interface ISettings {
 	enableSpeech: boolean;
 	showMovelist: boolean;
 	showMovelistText: boolean;
+	boardMarginTop: number;
+	boardMarginBottom: number;
 	viewOnly?: boolean;
 	rotated?: boolean;
 }
