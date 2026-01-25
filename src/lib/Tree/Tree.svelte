@@ -297,10 +297,10 @@
               stroke="var(--board-line)"
               stroke-linejoin="round"
               stroke-width={currentPath.includes(node.id) && currentPath.includes(child.id) ? 2 : 1}
-              opacity={currentPath.includes(node.id) && currentPath.includes(child.id) ? 1 : 0.8}
+              opacity={currentPath.includes(node.id) && currentPath.includes(child.id) ? 1.5 : 0.7}
               filter={currentPath.includes(node.id) && currentPath.includes(child.id)
-                ? "grayscale(50%) brightness(0.75)"
-                : undefined}
+                ? "brightness(1.5) saturate(1.4) drop-shadow(0 0 1px rgba(255, 255, 255, 0.6))"
+                : "grayscale(50%) brightness(0.75)"}
               fill="none"
             />
           {/each}
