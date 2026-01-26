@@ -19,8 +19,8 @@
     "svelte5",
     "typescript"
   ],
-  "author": "000100",
-  "authorUrl": "",
+  "author": "weshell",
+  "authorUrl": "https://space.bilibili.com/156446344",
   "license": "MIT",
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^6.2.1",
