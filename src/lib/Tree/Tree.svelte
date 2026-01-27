@@ -392,7 +392,8 @@
 <style>
   .tree-container {
     display: flex;
-    flex: 1 1 0;
+    flex: 1 1 33%;
+    /* min-width: 280px; */
     flex-direction: column;
     height: 100%;
     max-height: 100vh;
