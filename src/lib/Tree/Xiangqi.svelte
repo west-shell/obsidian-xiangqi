@@ -29,7 +29,7 @@
   }: Props = $props();
 
   let lastMove = $derived(currentNode.data);
-  let { position, boardMarginTop, boardMarginBottom } = $derived(settings);
+  let { position } = $derived(settings);
   let rotated = $state(false);
   let variations = $derived(
     currentNode.children.map((child) => child.data).filter((data): data is IMove => data !== null), // 过滤掉null值
@@ -47,10 +47,7 @@
   });
 </script>
 
-<div
-  class="tree-view {position}"
-  style={`--board-margin-top: ${boardMarginTop}px; --board-margin-bottom: ${boardMarginBottom}px;`}
->
+<div class="tree-view {position}">
   <Board
     {settings}
     {board}
@@ -68,8 +65,6 @@
 <style>
   :global(.view-content.pgn-view) {
     overflow: hidden !important;
-    /* margin: 0 !important; */
-    /* padding: 0px; */
     padding-top: var(--board-margin-top, 0px);
     padding-bottom: var(--board-margin-bottom, 0px);
   }

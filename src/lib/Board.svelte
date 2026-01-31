@@ -68,20 +68,6 @@
     rotated && lastMove ? { from: rotatePos(lastMove.from), to: rotatePos(lastMove.to) } : lastMove,
   );
 
-  // 着法颜色数组 - 统一为橙色
-  const colors = [
-    "rgba(255, 102, 0, 0.8)", // 半透明橙色
-    "rgba(255, 102, 0, 0.8)", // 半透明橙色
-    "rgba(255, 102, 0, 0.8)", // 半透明橙色
-    "rgba(255, 102, 0, 0.8)", // 半透明橙色
-    "rgba(255, 102, 0, 0.8)", // 半透明橙色
-    "rgba(255, 102, 0, 0.8)", // 半透明橙色
-    "rgba(255, 102, 0, 0.8)", // 半透明橙色
-    "rgba(255, 102, 0, 0.8)", // 半透明橙色
-    "rgba(255, 102, 0, 0.8)", // 半透明橙色
-    "rgba(255, 102, 0, 0.8)", // 半透明橙色
-  ];
-
   function handleClick(e: MouseEvent) {
     const svg = e.currentTarget as SVGSVGElement;
     const boardRect = svg.getBoundingClientRect();
@@ -260,66 +246,6 @@
       {/each}
     </g>
 
-    <!-- 分支线路 -->
-    {#if variations && variations.length > 1}
-      <g id="variations">
-        {#each variations as variation, index}
-          <!-- 计算变着的起点和终点 -->
-          {#if variation.from && variation.to}
-            {@const from = rotated ? rotatePos(variation.from) : variation.from}
-            {@const to = rotated ? rotatePos(variation.to) : variation.to}
-            <!-- 计算起点和终点的坐标 -->
-            {@const fromX = (from.x + 1) * cellSize}
-            {@const fromY = (from.y + 1) * cellSize}
-            {@const toX = (to.x + 1) * cellSize}
-            {@const toY = (to.y + 1) * cellSize}
-
-            <!-- 判断是否为主线路 -->
-            {@const isMainLine = index === 0}
-            <!-- 获取当前着法的颜色 -->
-            {@const color = colors[index % colors.length]}
-
-            <!-- 绘制着法线路 -->
-            <line
-              x1={fromX}
-              y1={fromY}
-              x2={toX}
-              y2={toY}
-              stroke={color}
-              stroke-width={cellSize * 0.08}
-              stroke-dasharray={isMainLine ? "none" : `${cellSize * 0.2} ${cellSize * 0.1}`}
-              opacity={0.7}
-              stroke-linecap="round"
-            />
-            <!-- 绘制着法终点标记 -->
-            <circle
-              cx={toX}
-              cy={toY}
-              r={cellSize * 0.35}
-              stroke={color}
-              stroke-width={cellSize * 0.08}
-              fill="none"
-              opacity={0.7}
-            />
-
-            <!-- 为着法添加数字标记 -->
-            <text
-              x={toX}
-              y={toY}
-              fill={color}
-              font-size={cellSize * 0.5}
-              text-anchor="middle"
-              dominant-baseline="middle"
-              opacity="0.9"
-              font-weight="bold"
-            >
-              {index + 1}
-            </text>
-          {/if}
-        {/each}
-      </g>
-    {/if}
-
     <!-- 单个位置标记 -->
     {#if renderedMarkedPos}
       <g
@@ -370,6 +296,42 @@
             fill="none"
           />
         </g>
+      </g>
+    {/if}
+
+    <!-- 分支线路 -->
+    {#if variations && variations.length > 1}
+      <g class="variations" opacity={0.7}>
+        {#each variations as variation, index}
+          <!-- 计算变着的起点和终点 -->
+          {#if variation.from && variation.to}
+            {@const from = rotated ? rotatePos(variation.from) : variation.from}
+            {@const to = rotated ? rotatePos(variation.to) : variation.to}
+            <!-- 计算起点和终点的坐标 -->
+            {@const fromX = (from.x + 1) * cellSize}
+            {@const fromY = (from.y + 1) * cellSize}
+            {@const toX = (to.x + 1) * cellSize}
+            {@const toY = (to.y + 1) * cellSize}
+
+            <!-- 判断是否为主线路 -->
+            {@const isMainLine = index === 0}
+            <!-- 获取当前着法的颜色 -->
+            {@const color = "green"}
+
+            <!-- 绘制着法线路 -->
+            <line
+              x1={fromX}
+              y1={fromY}
+              x2={toX}
+              y2={toY}
+              stroke={color}
+              stroke-width={cellSize * 0.08}
+              stroke-linecap="round"
+            />
+            <!-- 绘制着法终点标记 -->
+            <circle cx={toX} cy={toY} r={cellSize * 0.15} stroke={color} />
+          {/if}
+        {/each}
       </g>
     {/if}
   </svg>
