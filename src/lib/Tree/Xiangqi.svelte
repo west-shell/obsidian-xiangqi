@@ -65,8 +65,9 @@
 <style>
   :global(.view-content.pgn-view) {
     overflow: hidden !important;
-    padding-top: var(--board-margin-top, 0px);
-    padding-bottom: var(--board-margin-bottom, 0px);
+    margin: 0 !important;
+    padding-top: var(--board-margin-top, 0px) !important;
+    padding-bottom: var(--board-margin-bottom, 0px) !important;
   }
   .tree-view {
     display: flex;

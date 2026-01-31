@@ -21,7 +21,7 @@ export function createInteractionHandlers(
     let startY = 0;
 
     let lastTouchDistance = 0;
-    
+
     // 点击阈值，用于区分点击和拖动
     const CLICK_THRESHOLD = 5;
 
@@ -50,7 +50,8 @@ export function createInteractionHandlers(
 
     function handleEvent(e: Event) {
         const state = options.getState();
-
+        // e.preventDefault();
+        e.stopPropagation();
         switch (e.type) {
             case "mousedown": {
                 const event = e as MouseEvent;
@@ -106,12 +107,12 @@ export function createInteractionHandlers(
 
             case "touchmove": {
                 const event = e as TouchEvent;
-                
+
                 if (event.touches.length === 1) {
                     const dx = event.touches[0].clientX - dragStartX;
                     const dy = event.touches[0].clientY - dragStartY;
                     const distance = Math.hypot(dx, dy);
-                    
+
                     // 如果移动距离超过阈值，才认为是拖动
                     if (distance > CLICK_THRESHOLD) {
                         isDragging = true;
