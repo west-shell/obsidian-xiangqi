@@ -285,6 +285,7 @@
       ontouchmove={handleEvent}
       ontouchend={handleEvent}
     >
+      <!-- 连线 -->
       <g transform="translate({translateX} {translateY}) scale({scale})">
         {#each renderedNodes as node}
           {#each node.children as child}
@@ -308,6 +309,7 @@
           {/each}
         {/each}
 
+        <!-- 节点 -->
         {#each renderedNodes as node (node.id)}
           {@const primaryAnnotation = getPrimaryAnnotation(node)}
           <!-- svelte-ignore a11y_click_events_have_key_events -->

@@ -51,6 +51,17 @@
   let width = $derived(cellSize * 10);
   let height = $derived(cellSize * 11);
 
+  function markPath(cellSize: number): string {
+    const s = cellSize * 0.44;
+    const m = cellSize * 0.18;
+    return `
+    M ${-s},${-s + m} v ${-m} h ${m}
+    M ${s - m},${-s} h ${m} v ${m}
+    M ${s},${s - m} v ${m} h ${-m}
+    M ${-s + m},${s} h ${-m} v ${-m}
+  `;
+  }
+
   function rotatePos(pos: IPosition): IPosition {
     return { x: 8 - pos.x, y: 9 - pos.y };
   }
@@ -254,12 +265,9 @@
         transform={`translate(${(renderedMarkedPos.x + 1) * cellSize}, ${(renderedMarkedPos.y + 1) * cellSize})`}
       >
         <path
-          d={`M ${-0.4 * cellSize},${-0.4 * cellSize + margin} v ${-margin} h ${margin}
-              M ${0.4 * cellSize - margin},${-0.4 * cellSize} h ${margin} v ${margin}
-              M ${0.4 * cellSize},${0.4 * cellSize - margin} v ${margin} h ${-margin}
-              M ${-0.4 * cellSize + margin},${0.4 * cellSize} h ${-margin} v ${-margin}`}
+          d={markPath(cellSize)}
           stroke="var(--board-line)"
-          stroke-width={cellSize * 0.04}
+          stroke-width={cellSize * 0.05}
           fill="none"
         />
       </g>
@@ -288,12 +296,9 @@
           transform={`translate(${(renderedLastMove.to.x + 1) * cellSize}, ${(renderedLastMove.to.y + 1) * cellSize})`}
         >
           <path
-            d={`M ${-0.4 * cellSize},${-0.4 * cellSize + margin} v ${-margin} h ${margin}
-              M ${0.4 * cellSize - margin},${-0.4 * cellSize} h ${margin} v ${margin}
-              M ${0.4 * cellSize},${0.4 * cellSize - margin} v ${margin} h ${-margin}
-              M ${-0.4 * cellSize + margin},${0.4 * cellSize} h ${-margin} v ${-margin}`}
+            d={markPath(cellSize)}
             stroke="var(--board-line)"
-            stroke-width={cellSize * 0.04}
+            stroke-width={cellSize * 0.05}
             fill="none"
           />
         </g>
@@ -330,7 +335,7 @@
               stroke-linecap="round"
             />
             <!-- 绘制着法终点标记 -->
-            <circle cx={toX} cy={toY} r={cellSize * 0.15} stroke={color} />
+            <circle cx={toX} cy={toY} r={cellSize * 0.1} stroke={color} />
           {/if}
         {/each}
       </g>
