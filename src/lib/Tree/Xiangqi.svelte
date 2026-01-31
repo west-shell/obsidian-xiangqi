@@ -2,7 +2,7 @@
   import Tree from "./Tree.svelte";
   import Board from "../Board.svelte";
   import Toolbar from "./Toolbar.svelte";
-  import type { ChessNode, IBoard, IPosition, ISettings, NodeMap } from "../../types";
+  import type { ChessNode, IBoard, IMove, IPosition, ISettings, NodeMap } from "../../types";
   import type { EventBus } from "../../core/event-bus";
   import { onMount, tick } from "svelte";
 
@@ -32,9 +32,7 @@
   let position = $derived(settings.position);
   let rotated = $state(false);
   let variations = $derived(
-    currentNode.children
-      .map(child => child.data)
-      .filter((data): data is IMove => data !== null) // 过滤掉null值
+    currentNode.children.map((child) => child.data).filter((data): data is IMove => data !== null), // 过滤掉null值
   );
 
   onMount(async () => {
@@ -43,17 +41,26 @@
   });
 
   $effect(() => {
-    eventBus.on('rotate', () => {
+    eventBus.on("rotate", () => {
       rotated = !rotated;
     });
   });
 </script>
 
 <div class="tree-view {position}">
-    <Board {settings} {board} {lastMove} {markedPos} {currentTurn} {eventBus} {rotated} {variations} />
-    <Toolbar {eventBus} />
-    <Tree {nodeMap} {eventBus} {currentNode} {currentPath} {settings} />
-  </div>
+  <Board
+    {settings}
+    {board}
+    {lastMove}
+    {markedPos}
+    {currentTurn}
+    {eventBus}
+    {rotated}
+    {variations}
+  />
+  <Toolbar {eventBus} />
+  <Tree {nodeMap} {eventBus} {currentNode} {currentPath} {settings} />
+</div>
 
 <style>
   :global(.view-content.pgn-view) {
