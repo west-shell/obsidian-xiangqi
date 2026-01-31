@@ -15,7 +15,7 @@ export default class XQPlugin extends Plugin {
 
 		this.addSettingTab(new XQSettingTab(this.app, this));
 
-		applyThemes(this.settings.theme);
+		applyThemes(this.settings);
 		addIcon("xiangqi-icon", `
 <svg viewBox="0 0 80 80">
   <circle cx="40" cy="40" r="38"
@@ -73,7 +73,7 @@ export default class XQPlugin extends Plugin {
 			this.app.workspace.on("css-change", () => {
 				// 主题已改变
 				if (this.settings.theme === "auto") {
-					applyThemes(this.settings.theme)
+					applyThemes(this.settings)
 				}
 			}),
 		);
@@ -129,7 +129,7 @@ export default class XQPlugin extends Plugin {
 
 	async saveSettings() {
 		await this.saveData(this.settings);
-		applyThemes(this.settings.theme);
+		applyThemes(this.settings);
 	}
 
 }

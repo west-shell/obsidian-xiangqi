@@ -45,7 +45,7 @@
     rotated && markedPos ? rotatePos(markedPos) : markedPos,
   );
 
-  let { cellSize, showLastMove, showTurnBorder, showCoordinateLabels, boardMarginTop, boardMarginBottom } = $derived(settings);
+  let { cellSize, showLastMove, showTurnBorder, showCoordinateLabels } = $derived(settings);
   let margin = $derived(cellSize * 0.1);
   let width = $derived(cellSize * 10);
   let height = $derived(cellSize * 11);
@@ -70,16 +70,16 @@
 
   // 着法颜色数组 - 统一为橙色
   const colors = [
-    'rgba(255, 102, 0, 0.8)', // 半透明橙色
-    'rgba(255, 102, 0, 0.8)', // 半透明橙色
-    'rgba(255, 102, 0, 0.8)', // 半透明橙色
-    'rgba(255, 102, 0, 0.8)', // 半透明橙色
-    'rgba(255, 102, 0, 0.8)', // 半透明橙色
-    'rgba(255, 102, 0, 0.8)', // 半透明橙色
-    'rgba(255, 102, 0, 0.8)', // 半透明橙色
-    'rgba(255, 102, 0, 0.8)', // 半透明橙色
-    'rgba(255, 102, 0, 0.8)', // 半透明橙色
-    'rgba(255, 102, 0, 0.8)'  // 半透明橙色
+    "rgba(255, 102, 0, 0.8)", // 半透明橙色
+    "rgba(255, 102, 0, 0.8)", // 半透明橙色
+    "rgba(255, 102, 0, 0.8)", // 半透明橙色
+    "rgba(255, 102, 0, 0.8)", // 半透明橙色
+    "rgba(255, 102, 0, 0.8)", // 半透明橙色
+    "rgba(255, 102, 0, 0.8)", // 半透明橙色
+    "rgba(255, 102, 0, 0.8)", // 半透明橙色
+    "rgba(255, 102, 0, 0.8)", // 半透明橙色
+    "rgba(255, 102, 0, 0.8)", // 半透明橙色
+    "rgba(255, 102, 0, 0.8)", // 半透明橙色
   ];
 
   function handleClick(e: MouseEvent) {
@@ -110,7 +110,7 @@
 
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
-<div class="board-container" style={`--board-margin-top: ${boardMarginTop}; --board-margin-bottom: ${boardMarginBottom};`}>
+<div class="board-container">
   <svg {width} {height} viewBox={`0 0 ${width} ${height}`} class="xq-board" onclick={handleClick}>
     <!-- 背景 -->
     <rect
@@ -273,12 +273,12 @@
             {@const fromY = (from.y + 1) * cellSize}
             {@const toX = (to.x + 1) * cellSize}
             {@const toY = (to.y + 1) * cellSize}
-            
+
             <!-- 判断是否为主线路 -->
             {@const isMainLine = index === 0}
             <!-- 获取当前着法的颜色 -->
             {@const color = colors[index % colors.length]}
-            
+
             <!-- 绘制着法线路 -->
             <line
               x1={fromX}
@@ -287,7 +287,7 @@
               y2={toY}
               stroke={color}
               stroke-width={cellSize * 0.08}
-              stroke-dasharray={isMainLine ? 'none' : `${cellSize * 0.2} ${cellSize * 0.1}`}
+              stroke-dasharray={isMainLine ? "none" : `${cellSize * 0.2} ${cellSize * 0.1}`}
               opacity={0.7}
               stroke-linecap="round"
             />
@@ -301,7 +301,7 @@
               fill="none"
               opacity={0.7}
             />
-            
+
             <!-- 为着法添加数字标记 -->
             <text
               x={toX}
@@ -382,8 +382,6 @@
     --piece-red: var(--xq-piece-red, var(--color-red));
     --piece-black: var(--xq-piece-black, var(--color-blue));
     --text-color: var(--xq-text-color, var(--text-normal));
-    margin-top: calc(var(--board-margin-top, 0px) * 1px);
-    margin-bottom: calc(var(--board-margin-bottom, 0px) * 1px);
   }
   .xq-board {
     user-select: none;

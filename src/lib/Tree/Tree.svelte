@@ -338,11 +338,11 @@
                 rx="2.5"
                 ry="2.5"
                 fill={currentPath.includes(node.id) || !node.data
-                  ? (node.side === "red"
+                  ? node.side === "red"
                     ? "var(--piece-red)"
                     : node.side === "black"
                       ? "var(--piece-black)"
-                      : "green")
+                      : "green"
                   : "gray"}
                 stroke={node.id === currentNode?.id ? "green" : "var(--board-line)"}
                 stroke-width={node.id === currentNode?.id ? height * 0.18 : height * 0.09}
@@ -384,7 +384,7 @@
     bind:this={textareaEl}
     oninput={handleCommentsInput}
     onblur={handleCommentsBlur}
-    rows="10"
+    rows="1"
   ></textarea>
 </div>
 

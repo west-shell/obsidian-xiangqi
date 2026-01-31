@@ -1,3 +1,5 @@
+import type { ISettings } from "./types";
+
 const themes = {
 	light: {
 		bgColor: "#E8C887",
@@ -15,9 +17,8 @@ const themes = {
 	},
 }
 
-type ThemeKey = keyof typeof themes;
-
-export function applyThemes(theme: ThemeKey | "auto") {
+export function applyThemes(settings: ISettings) {
+	const { theme, boardMarginTop, boardMarginBottom } = settings;
 	const isDarkMode = () => document.body.classList.contains("theme-dark");
 
 	let bgColor, lineColor, textColor, red, black;
@@ -42,4 +43,6 @@ export function applyThemes(theme: ThemeKey | "auto") {
 	// 无论模式如何，都设置棋子颜色
 	document.body.style.setProperty("--xq-piece-red", red);
 	document.body.style.setProperty("--xq-piece-black", black);
+	document.body.style.setProperty("--board-margin-top", `${boardMarginTop}px`);
+	document.body.style.setProperty("--board-margin-bottom", `${boardMarginBottom}px`);
 }
