@@ -300,7 +300,7 @@
     {/if}
 
     <!-- 分支线路 -->
-    {#if variations && variations.length > 1}
+    {#if variations && variations.length > 0}
       <g class="variations" opacity={0.7}>
         {#each variations as variation, index}
           <!-- 计算变着的起点和终点 -->
