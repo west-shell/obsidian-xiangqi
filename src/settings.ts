@@ -9,6 +9,7 @@ export const DEFAULT_SETTINGS: ISettings = {
 	fontSize: 12,
 	showCoordinateLabels: true,
 	showLastMove: true,
+	showNextMove: true,
 	showTurnBorder: true,
 	autoJump: "auto",
 	enableSpeech: true,
@@ -113,6 +114,16 @@ export class XQSettingTab extends PluginSettingTab {
 			.addToggle((toggle) =>
 				toggle.setValue(settings.showLastMove).onChange((value) => {
 					settings.showLastMove = value;
+					this.plugin.saveSettings();
+					this.plugin.refresh();
+				}),
+			);
+		new Setting(containerEl)
+			// .setName("是否显示当前着法")
+			.setDesc("是否显示下一步着法")
+			.addToggle((toggle) =>
+				toggle.setValue(settings.showNextMove).onChange((value) => {
+					settings.showNextMove = value;
 					this.plugin.saveSettings();
 					this.plugin.refresh();
 				}),

@@ -6,6 +6,7 @@ export interface ISettings {
 	fontSize: number;
 	showCoordinateLabels: boolean;
 	showLastMove: boolean;
+	showNextMove: boolean;
 	showTurnBorder: boolean;
 	autoJump: "never" | "always" | "auto";
 	enableSpeech: boolean;

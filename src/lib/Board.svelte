@@ -45,7 +45,8 @@
     rotated && markedPos ? rotatePos(markedPos) : markedPos,
   );
 
-  let { cellSize, showLastMove, showTurnBorder, showCoordinateLabels } = $derived(settings);
+  let { cellSize, showLastMove, showNextMove, showTurnBorder, showCoordinateLabels } =
+    $derived(settings);
   let margin = $derived(cellSize * 0.1);
   let width = $derived(cellSize * 10);
   let height = $derived(cellSize * 11);
@@ -300,7 +301,7 @@
     {/if}
 
     <!-- 分支线路 -->
-    {#if variations && variations.length > 0}
+    {#if showNextMove && variations && variations.length > 0}
       <g class="variations" opacity={0.7}>
         {#each variations as variation, index}
           <!-- 计算变着的起点和终点 -->
