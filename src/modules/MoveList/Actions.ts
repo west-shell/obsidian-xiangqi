@@ -121,6 +121,16 @@ const ActionsModule = {
             const url = `https://xiangqiai.com/#/${fen} moves ${movesStr}`;
             window.open(url);
         })
+
+        eventBus.on('rotate', () => {
+            // 切换棋盘翻转状态
+            if (!host.options) {
+                host.options = { rotated: true };
+            } else {
+                host.options.rotated = !host.options.rotated;
+            }
+            eventBus.emit('updateUI', 'rotate');
+        })
     }
 }
 

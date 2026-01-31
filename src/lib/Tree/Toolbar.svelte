@@ -14,6 +14,7 @@
     { title: "回退", icon: "arrow-left", event: "back" },
     { title: "前进", icon: "arrow-right", event: "next" },
     { title: "终局", icon: "arrow-right-to-line", event: "toEnd" },
+    { title: "翻转", icon: "flip-vertical", event: "rotate" },
     { title: "皮卡鱼Web", icon: "external-link", event: "openPikafish" },
     { title: "标注", icon: "tag", event: "toggle-annotation-menu" },
   ];
@@ -61,6 +62,8 @@
       onclick={(e) => {
         if (event === "toggle-annotation-menu") {
           handleAnnotationMenu(e); // ← 打开标注菜单
+        } else if (event === "rotate") {
+          eventBus.emit("rotate");
         } else {
           emitEvent(event);
         }

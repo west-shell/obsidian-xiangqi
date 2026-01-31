@@ -296,7 +296,9 @@
               `}
               stroke="var(--board-line)"
               stroke-linejoin="round"
-              stroke-width={currentPath.includes(node.id) && currentPath.includes(child.id) ? 2 : 1}
+              stroke-width={currentPath.includes(node.id) && currentPath.includes(child.id)
+                ? 1.5
+                : 1}
               opacity={currentPath.includes(node.id) && currentPath.includes(child.id) ? 1.5 : 0.7}
               filter={currentPath.includes(node.id) && currentPath.includes(child.id)
                 ? "brightness(1.5) saturate(1.4) drop-shadow(0 0 1px rgba(255, 255, 255, 0.6))"
@@ -345,7 +347,7 @@
                   ? "var(--piece-red)"
                   : node.side === "black"
                     ? "var(--piece-black)"
-                    : "gray"}
+                    : "green"}
                 stroke="var(--board-line)"
               />
               <text dy="3.5" text-anchor="middle" fill="white" font-size="9px">

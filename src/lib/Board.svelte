@@ -11,6 +11,7 @@
     currentTurn: string;
     eventBus: EventBus;
     rotated: boolean;
+    variations?: IMove[];
   }
 
   let {
@@ -21,6 +22,7 @@
     currentTurn,
     eventBus,
     rotated,
+    variations = [],
   }: Props = $props();
 
   let Bnum = ["1", "2", "3", "4", "5", "6", "7", "8", "9"];
@@ -294,6 +296,42 @@
             fill="none"
           />
         </g>
+      </g>
+    {/if}
+
+    <!-- 分支线路 -->
+    {#if variations && variations.length > 0}
+      <g class="variations" opacity={0.7}>
+        {#each variations as variation, index}
+          <!-- 计算变着的起点和终点 -->
+          {#if variation.from && variation.to}
+            {@const from = rotated ? rotatePos(variation.from) : variation.from}
+            {@const to = rotated ? rotatePos(variation.to) : variation.to}
+            <!-- 计算起点和终点的坐标 -->
+            {@const fromX = (from.x + 1) * cellSize}
+            {@const fromY = (from.y + 1) * cellSize}
+            {@const toX = (to.x + 1) * cellSize}
+            {@const toY = (to.y + 1) * cellSize}
+
+            <!-- 判断是否为主线路 -->
+            {@const isMainLine = index === 0}
+            <!-- 获取当前着法的颜色 -->
+            {@const color = "green"}
+
+            <!-- 绘制着法线路 -->
+            <line
+              x1={fromX}
+              y1={fromY}
+              x2={toX}
+              y2={toY}
+              stroke={color}
+              stroke-width={cellSize * 0.08}
+              stroke-linecap="round"
+            />
+            <!-- 绘制着法终点标记 -->
+            <circle cx={toX} cy={toY} r={cellSize * 0.15} stroke={color} />
+          {/if}
+        {/each}
       </g>
     {/if}
   </svg>

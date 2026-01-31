@@ -108,8 +108,16 @@ export function tokenize(pgn: string): Token[] {
             continue;
         }
 
-        // 其他无法识别的字符 → 报错
-        throw new Error(`无法识别的字符 '${char}' 在行 ${startLine}, 列 ${startCol}`);
+        // 尝试识别FEN字符串
+        const fen = matchAndConsume(/^[rnbakcpRNBAKCP1-9]+(\/[rnbakcpRNBAKCP1-9]+){8}(\s+[wb])?/);
+        if (fen) {
+            // 将FEN转换为标签格式
+            tokens.push({ type: "tag", value: `[FEN "${fen}"]`, line: startLine, column: startCol });
+            continue;
+        }
+
+        // 其他无法识别的字符 → 跳过（不再抛出错误）
+        advance(1);
     }
 
     tokens.push({ type: "eof", value: "", line, column });
