@@ -59,7 +59,7 @@
     {variations}
   />
   <Toolbar {eventBus} />
-  <Tree {nodeMap} {eventBus} {currentNode} {currentPath} {settings} />
+  <Tree {nodeMap} {eventBus} {currentNode} {currentPath} />
 </div>
 
 <style>

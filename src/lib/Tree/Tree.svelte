@@ -11,10 +11,9 @@
     eventBus: EventBus;
     currentNode: ChessNode | null;
     currentPath: string[];
-    settings: any;
   }
 
-  let { nodeMap, eventBus, currentNode = $bindable(), currentPath, settings }: Props = $props();
+  let { nodeMap, eventBus, currentNode = $bindable(), currentPath }: Props = $props();
 
   // ---- 状态 ----
   let commentsText = $state("");
@@ -66,10 +65,10 @@
   }
 
   // ---- 常量 ----
-  let spacingX = $derived((settings?.cellSize || 50) * 0.44); // 基于cellSize计算，保持比例
-  let spacingY = $derived((settings?.cellSize || 50) * 0.3); // 基于cellSize计算，保持比例
-  let width = $derived((settings?.cellSize || 50) * 0.26); // 基于cellSize计算，保持比例
-  let height = $derived((settings?.cellSize || 50) * 0.22); // 基于cellSize计算，保持比例
+  const spacingX = 22;
+  const spacingY = 15;
+  const width = 13;
+  const height = 11;
   const lucide_message_square_text = `<path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z"/><path d="M7 11h10"/><path d="M7 15h6"/><path d="M7 7h8"/>`;
   // const lucide_smile = `<path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" x2="9.01" y1="9" y2="9"/><line x1="15" x2="15.01" y1="9" y2="9"/>`;
   const lucide_thumbs_up = `<path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z"/><path d="M7 10v12"/>`;
@@ -169,7 +168,7 @@
       },
       minZoom: 0.5,
       maxZoom: 4,
-      zoomSpeed: 0.02,
+      zoomSpeed: 0.2,
     });
 
     handleEvent = handlers.handleEvent;
@@ -297,7 +296,9 @@
               `}
               stroke="var(--board-line)"
               stroke-linejoin="round"
-              stroke-width={currentPath.includes(node.id) && currentPath.includes(child.id) ? 2 : 1}
+              stroke-width={currentPath.includes(node.id) && currentPath.includes(child.id)
+                ? 1.5
+                : 1}
               opacity={currentPath.includes(node.id) && currentPath.includes(child.id) ? 1.5 : 0.7}
               filter={currentPath.includes(node.id) && currentPath.includes(child.id)
                 ? "brightness(1.5) saturate(1.4) drop-shadow(0 0 1px rgba(255, 255, 255, 0.6))"
@@ -314,16 +315,21 @@
             class="node-group"
             transform="translate({node.x! * spacingX} {node.y! * spacingY})"
             opacity={currentPath.includes(node.id) ? 1 : 0.8}
-            stroke-width={node.id === currentNode?.id ? height * 0.09 : height * 0.045}
+            filter={!currentPath.includes(node.id)
+              ? "grayscale(100%) brightness(0.75)"
+              : node.id === currentNode?.id
+                ? "brightness(1.5) saturate(1.4) drop-shadow(0 0 1px rgba(255, 255, 255, 0.6))"
+                : undefined}
+            stroke-width={node.id === currentNode?.id ? 1 : 0.5}
             onclick={() => eventBus.emit("node-click", node.id)}
           >
             {#if primaryAnnotation}
               {@const def = ANNOTATION_DEFINITIONS[primaryAnnotation]}
               <g
-                transform={`scale(${height * 0.06}) translate(-12 -12)`}
+                transform="translate({-7.2} {-7.2}) scale(0.6)"
                 fill={def.color}
                 stroke="currentColor"
-                stroke-width={height * 0.15}
+                stroke-width="1.5"
                 stroke-linecap="round"
                 stroke-linejoin="round"
               >
@@ -337,17 +343,14 @@
                 {height}
                 rx="2.5"
                 ry="2.5"
-                fill={currentPath.includes(node.id) || !node.data
-                  ? node.side === "red"
-                    ? "var(--piece-red)"
-                    : node.side === "black"
-                      ? "var(--piece-black)"
-                      : "green"
-                  : "gray"}
-                stroke={node.id === currentNode?.id ? "green" : "var(--board-line)"}
-                stroke-width={node.id === currentNode?.id ? height * 0.18 : height * 0.09}
+                fill={node.side === "red"
+                  ? "var(--piece-red)"
+                  : node.side === "black"
+                    ? "var(--piece-black)"
+                    : "green"}
+                stroke="var(--board-line)"
               />
-              <text dy={height * 0.32} text-anchor="middle" fill="white" font-size={height * 0.8}>
+              <text dy="3.5" text-anchor="middle" fill="white" font-size="9px">
                 {node.data?.type ? PIECE_CHARS[node.data.type] : "始"}
               </text>
             {/if}
@@ -355,10 +358,10 @@
             <!-- 评论标记 -->
             {#if getRegularComments(node).length > 0}
               <g
-                transform={`translate(${0.35 * width} ${-0.7 * height}) scale(${height * 0.035})`}
+                transform="translate({0.35 * width} {-0.7 * height}) scale(0.35)"
                 fill="royalblue"
                 stroke="currentColor"
-                stroke-width={height * 0.15}
+                stroke-width="1.5"
                 stroke-linecap="round"
                 stroke-linejoin="round"
               >
@@ -391,7 +394,8 @@
 <style>
   .tree-container {
     display: flex;
-    flex: 1 1 0;
+    flex: 1 1 33%;
+    /* min-width: 280px; */
     flex-direction: column;
     height: 100%;
     max-height: 100vh;
@@ -446,8 +450,8 @@
 
   textarea {
     width: 100%;
-    height: var(--textarea-height, 200px);
-    max-height: 300px;
+    height: var(--textarea-height, 20px);
+    max-height: 80px;
     resize: none;
     font-family: var(--font-family);
     font-size: var(--font-size-normal);
@@ -455,7 +459,7 @@
     background: var(--background-secondary);
     border: 1px solid var(--background-modifier-border);
     border-radius: 3px;
-    padding: 4px 8px;
+    padding: 0;
     outline: none;
     overflow-y: auto;
   }
