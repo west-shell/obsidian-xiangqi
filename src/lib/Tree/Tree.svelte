@@ -176,7 +176,7 @@
     const cy = h / 2;
     let { x: translateX, y: translateY, k: scale } = zoomTransform;
     const prev = scale;
-    const next = Math.max(0.5, Math.min(prev * factor, 4));
+    const next = prev * factor;
     // 计算当前屏幕中心对应的世界坐标（未缩放坐标系）
     const worldX = (cx - translateX) / prev;
     const worldY = (cy - translateY) / prev;
