@@ -2,9 +2,9 @@
   import { onDestroy, onMount, tick } from "svelte";
   import type { EventBus } from "../../core/event-bus";
   import { PIECE_CHARS, type ChessNode, type NodeMap } from "../../types";
-  import { createInteractionHandlers } from "./interact";
   import { calculateTreeLayout } from "./layout";
   import { setIcon } from "obsidian";
+  import * as d3 from "d3";
 
   interface Props {
     nodeMap: NodeMap;
@@ -15,71 +15,27 @@
 
   let { nodeMap, eventBus, currentNode = $bindable(), currentPath }: Props = $props();
 
-  // ---- 状态 ----
   let commentsText = $state("");
   let textareaEl: HTMLTextAreaElement | undefined = $state();
   let svgEl: SVGSVGElement | undefined = $state();
   let renderedNodes: ChessNode[] = $state([]);
-  let handleEvent: ((e: Event) => void) | undefined = $state();
 
-  // ---- 平移与缩放 ----
-  let translateX = $state(0);
-  let translateY = $state(0);
-  let scale = $state(1);
+  // ---- D3 Zoom ----
+  let zoomTransform = $state(d3.zoomIdentity);
+  let zoomBehavior: d3.ZoomBehavior<SVGSVGElement, unknown>;
 
-  // 缩放步长（用于按钮）
-  const ZOOM_STEP = 1.15;
-
-  // 在 SVG 中心处按 factor 缩放，同时保持屏幕中心对应的世界坐标不变
-  function zoomAtCenter(factor: number) {
-    if (!svgEl) {
-      scale = Math.max(0.5, Math.min(scale * factor, 4));
-      return;
-    }
-    const w = svgEl.clientWidth;
-    const h = svgEl.clientHeight;
-    const cx = w / 2;
-    const cy = h / 2;
-    const prev = scale;
-    const next = Math.max(0.5, Math.min(prev * factor, 4));
-    // 计算当前屏幕中心对应的世界坐标（未缩放坐标系）
-    const worldX = (cx - translateX) / prev;
-    const worldY = (cy - translateY) / prev;
-    // 应用新缩放并调整 translate 保持屏幕中心不变
-    scale = next;
-    translateX = cx - worldX * scale;
-    translateY = cy - worldY * scale;
-  }
-
-  function zoomIn() {
-    zoomAtCenter(ZOOM_STEP);
-  }
-  function zoomOut() {
-    zoomAtCenter(1 / ZOOM_STEP);
-  }
-
-  // 重置视图：重新布局并居中（与 centerAndFit 配合）
-  function resetView() {
-    updateTreeLayout();
-    tick().then(centerAndFit);
-  }
-
-  // ---- 常量 ----
   const spacingX = 22;
   const spacingY = 15;
-  const width = 13;
-  const height = 11;
+  const nodeWidth = 13;
+  const nodeHeight = 11;
   const lucide_message_square_text = `<path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z"/><path d="M7 11h10"/><path d="M7 15h6"/><path d="M7 7h8"/>`;
   // const lucide_smile = `<path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" x2="9.01" y1="9" y2="9"/><line x1="15" x2="15.01" y1="9" y2="9"/>`;
   const lucide_thumbs_up = `<path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z"/><path d="M7 10v12"/>`;
   const lucide_thumbs_down = `<path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2h13a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22a3.13 3.13 0 0 1-3-3.88Z"/><path d="M17 14V2"/>`;
-  // const lucide_handshake = `<path d="m11 17 2 2a1 1 0 1 0 3-3"/><path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4"/><path d="m21 3 1 11h-2"/><path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3"/><path d="M3 4h8"/>`;
   const lucide_handshake = `<path d="M19.414 14.414C21 12.828 22 11.5 22 9.5a5.5 5.5 0 0 0-9.591-3.676.6.6 0 0 1-.818.001A5.5 5.5 0 0 0 2 9.5c0 2.3 1.5 4 3 5.5l5.535 5.362a2 2 0 0 0 2.879.052 2.12 2.12 0 0 0-.004-3 2.124 2.124 0 1 0 3-3 2.124 2.124 0 0 0 3.004 0 2 2 0 0 0 0-2.828l-1.881-1.882a2.41 2.41 0 0 0-3.409 0l-1.71 1.71a2 2 0 0 1-2.828 0 2 2 0 0 1 0-2.828l2.823-2.762"/>`;
-  // const lucide_scale = `<path fill="red" d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/>`;
-  // const lucide_question = `<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="M9.1 9a3 3 0 0 1 5.82 1c0 2-3 3-3 3"/><path d="M12 17h.01"/>`;
-  // const lucide_shield_alert = `<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="M12 8v4"/><path d="M12 16h.01"/>`;
   const lucide_bookmark = `<path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>`;
   const lucide_star = `<path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/>`;
+
   const ANNOTATION_DEFINITIONS: Record<string, { symbol: string; color: string; icon?: string }> = {
     "R+": { symbol: "红优", color: "var(--piece-red)", icon: lucide_thumbs_up },
     "B+": { symbol: "黑优", color: "var(--piece-black)", icon: lucide_thumbs_down },
@@ -157,60 +113,41 @@
   // ---- 布局计算 ----
   function updateTreeLayout() {
     renderedNodes = calculateTreeLayout(nodeMap);
-    if (!svgEl) return;
-
-    const handlers = createInteractionHandlers(svgEl, {
-      getState: () => ({ x: translateX, y: translateY, scale }),
-      setState: ({ x, y, scale: s }) => {
-        translateX = x;
-        translateY = y;
-        scale = s;
-      },
-      minZoom: 0.5,
-      maxZoom: 4,
-      zoomSpeed: 0.2,
-    });
-
-    handleEvent = handlers.handleEvent;
   }
 
-  // ---- 自动居中 ----
-  function centerAndFit() {
-    if (!svgEl || renderedNodes.length === 0) return;
-
-    const { clientWidth, clientHeight } = svgEl;
-    const padding = 40;
-
-    let minX = Infinity,
-      maxX = -Infinity,
-      minY = Infinity,
-      maxY = -Infinity;
-
-    for (const n of renderedNodes) {
-      minX = Math.min(minX, n.x!);
-      maxX = Math.max(maxX, n.x!);
-      minY = Math.min(minY, n.y!);
-      maxY = Math.max(maxY, n.y!);
-    }
-
-    const treeWidth = (maxX - minX) * spacingX;
-    const treeHeight = (maxY - minY) * spacingY;
-
-    const scaleX = (clientWidth - padding * 2) / treeWidth;
-    const scaleY = (clientHeight - padding * 2) / treeHeight;
-    scale = Math.max(0.75, Math.min(scaleX, scaleY, 2));
-
-    const treeCenterX = minX * spacingX + treeWidth / 2;
-    const treeTopY = minY * spacingY;
-    translateX = clientWidth / 2 - treeCenterX * scale;
-    translateY = padding - treeTopY * scale;
+  function resetView() {
+    updateTreeLayout();
+    tick().then(() => {
+      if (!svgEl || !zoomBehavior) return;
+      const padding = 40;
+      let minX = Infinity,
+        maxX = -Infinity,
+        minY = Infinity,
+        maxY = -Infinity;
+      for (const n of renderedNodes) {
+        minX = Math.min(minX, n.x!);
+        maxX = Math.max(maxX, n.x!);
+        minY = Math.min(minY, n.y!);
+        maxY = Math.max(maxY, n.y!);
+      }
+      const treeWidth = (maxX - minX) * spacingX;
+      const treeHeight = (maxY - minY) * spacingY;
+      const { clientWidth, clientHeight } = svgEl;
+      const scaleX = (clientWidth - padding * 2) / treeWidth;
+      const scaleY = (clientHeight - padding * 2) / treeHeight;
+      const k = Math.max(0.75, Math.min(scaleX, scaleY, 2));
+      const tx = clientWidth / 2 - (minX * spacingX + treeWidth / 2) * k;
+      const ty = padding - minY * spacingY * k;
+      const t = d3.zoomIdentity.translate(tx, ty).scale(k);
+      d3.select(svgEl).transition().duration(300).call(zoomBehavior.transform, t);
+    });
   }
 
   function panToNodeIfNeeded(node: ChessNode) {
     if (!node || !svgEl || node.x === undefined || node.y === undefined) return;
     const { clientWidth, clientHeight } = svgEl;
     const padding = 50;
-
+    let { x: translateX, y: translateY, k: scale } = zoomTransform;
     const nodeScreenX = node.x * spacingX * scale + translateX;
     const nodeScreenY = node.y * spacingY * scale + translateY;
 
@@ -226,6 +163,38 @@
       translateX += dx;
       translateY += dy;
     }
+    const t = d3.zoomIdentity.translate(translateX, translateY).scale(scale);
+    d3.select(svgEl).transition().duration(300).call(zoomBehavior.transform, t);
+  }
+
+  function zoomAtCenter(factor: number) {
+    if (!svgEl) return;
+
+    const w = svgEl.clientWidth;
+    const h = svgEl.clientHeight;
+    const cx = w / 2;
+    const cy = h / 2;
+    let { x: translateX, y: translateY, k: scale } = zoomTransform;
+    const prev = scale;
+    const next = prev * factor;
+    // 计算当前屏幕中心对应的世界坐标（未缩放坐标系）
+    const worldX = (cx - translateX) / prev;
+    const worldY = (cy - translateY) / prev;
+    // 应用新缩放并调整 translate 保持屏幕中心不变
+    scale = next;
+    translateX = cx - worldX * scale;
+    translateY = cy - worldY * scale;
+    const t = d3.zoomIdentity.translate(translateX, translateY).scale(scale);
+    d3.select(svgEl).transition().duration(200).call(zoomBehavior.transform, t);
+  }
+
+  const ZOOM_STEP = 1.15;
+
+  function zoomIn() {
+    zoomAtCenter(ZOOM_STEP);
+  }
+  function zoomOut() {
+    zoomAtCenter(1 / ZOOM_STEP);
   }
 
   const zoomBTN = [
@@ -237,12 +206,19 @@
     setIcon(el, icon);
   }
 
-  // ---- 生命周期 ----
   onMount(() => {
-    if (nodeMap.size > 0) {
-      updateTreeLayout();
-      tick().then(centerAndFit);
-    }
+    if (!svgEl) return;
+    updateTreeLayout();
+
+    zoomBehavior = d3
+      .zoom<SVGSVGElement, unknown>()
+      .scaleExtent([0.5, 6])
+      .on("zoom", (event) => {
+        zoomTransform = event.transform;
+      });
+
+    d3.select(svgEl).call(zoomBehavior);
+    tick().then(resetView);
   });
 
   // ---- 响应式更新 ----
@@ -267,26 +243,11 @@
   });
 </script>
 
-<!-- ---- 结构 ---- -->
 <div class="tree-container">
   <div class="svg-wrapper">
-    <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <svg
-      bind:this={svgEl}
-      width="100%"
-      height="100%"
-      class="tree-svg"
-      onmousedown={handleEvent}
-      onmousemove={handleEvent}
-      onmouseup={handleEvent}
-      onmouseleave={handleEvent}
-      onwheel={handleEvent}
-      ontouchstart={handleEvent}
-      ontouchmove={handleEvent}
-      ontouchend={handleEvent}
-    >
-      <!-- 连线 -->
-      <g transform="translate({translateX} {translateY}) scale({scale})">
+    <svg bind:this={svgEl} width="100%" height="100%" class="tree-svg">
+      <g transform={zoomTransform.toString()}>
+        <!-- 连线 -->
         {#each renderedNodes as node}
           {#each node.children as child}
             <path
@@ -313,6 +274,7 @@
         {#each renderedNodes as node (node.id)}
           {@const primaryAnnotation = getPrimaryAnnotation(node)}
           <!-- svelte-ignore a11y_click_events_have_key_events -->
+          <!-- svelte-ignore a11y_no_static_element_interactions -->
           <g
             class="node-group"
             transform="translate({node.x! * spacingX} {node.y! * spacingY})"
@@ -328,7 +290,7 @@
             {#if primaryAnnotation}
               {@const def = ANNOTATION_DEFINITIONS[primaryAnnotation]}
               <g
-                transform="translate({-7.2} {-7.2}) scale(0.6)"
+                transform="translate(-7.2 -7.2) scale(0.6)"
                 fill={def.color}
                 stroke="currentColor"
                 stroke-width="1.5"
@@ -339,10 +301,10 @@
               </g>
             {:else}
               <rect
-                x={-width / 2}
-                y={-height / 2}
-                {width}
-                {height}
+                x={-nodeWidth / 2}
+                y={-nodeHeight / 2}
+                width={nodeWidth}
+                height={nodeHeight}
                 rx="2.5"
                 ry="2.5"
                 fill={node.side === "red"
@@ -360,7 +322,7 @@
             <!-- 评论标记 -->
             {#if getRegularComments(node).length > 0}
               <g
-                transform="translate({0.35 * width} {-0.7 * height}) scale(0.35)"
+                transform="translate({0.35 * nodeWidth} {-0.7 * nodeHeight}) scale(0.35)"
                 fill="royalblue"
                 stroke="currentColor"
                 stroke-width="1.5"
@@ -374,6 +336,7 @@
         {/each}
       </g>
     </svg>
+
     <div class="toolbar">
       {#each zoomBTN as { title, icon, event }}
         <button class="toolbar-btn" aria-label={title} use:useSetIcon={icon} onclick={event}
