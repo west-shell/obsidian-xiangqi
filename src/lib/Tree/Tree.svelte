@@ -117,30 +117,28 @@
 
   function resetView() {
     updateTreeLayout();
-    tick().then(() => {
-      if (!svgEl || !zoomBehavior) return;
-      const padding = 40;
-      let minX = Infinity,
-        maxX = -Infinity,
-        minY = Infinity,
-        maxY = -Infinity;
-      for (const n of renderedNodes) {
-        minX = Math.min(minX, n.x!);
-        maxX = Math.max(maxX, n.x!);
-        minY = Math.min(minY, n.y!);
-        maxY = Math.max(maxY, n.y!);
-      }
-      const treeWidth = (maxX - minX) * spacingX;
-      const treeHeight = (maxY - minY) * spacingY;
-      const { clientWidth, clientHeight } = svgEl;
-      const scaleX = (clientWidth - padding * 2) / treeWidth;
-      const scaleY = (clientHeight - padding * 2) / treeHeight;
-      const k = Math.max(0.75, Math.min(scaleX, scaleY, 2));
-      const tx = clientWidth / 2 - (minX * spacingX + treeWidth / 2) * k;
-      const ty = padding - minY * spacingY * k;
-      const t = d3.zoomIdentity.translate(tx, ty).scale(k);
-      d3.select(svgEl).transition().duration(300).call(zoomBehavior.transform, t);
-    });
+    if (!svgEl || !zoomBehavior) return;
+    const padding = 40;
+    let minX = Infinity,
+      maxX = -Infinity,
+      minY = Infinity,
+      maxY = -Infinity;
+    for (const n of renderedNodes) {
+      minX = Math.min(minX, n.x!);
+      maxX = Math.max(maxX, n.x!);
+      minY = Math.min(minY, n.y!);
+      maxY = Math.max(maxY, n.y!);
+    }
+    const treeWidth = (maxX - minX) * spacingX;
+    const treeHeight = (maxY - minY) * spacingY;
+    const { clientWidth, clientHeight } = svgEl;
+    const scaleX = (clientWidth - padding * 2) / treeWidth;
+    const scaleY = (clientHeight - padding * 2) / treeHeight;
+    const k = Math.max(0.75, Math.min(scaleX, scaleY, 2));
+    const tx = clientWidth / 2 - (minX * spacingX + treeWidth / 2) * k;
+    const ty = padding - minY * spacingY * k;
+    const t = d3.zoomIdentity.translate(tx, ty).scale(k);
+    d3.select(svgEl).transition().duration(300).call(zoomBehavior.transform, t);
   }
 
   function panToNodeIfNeeded(node: ChessNode) {
@@ -206,19 +204,24 @@
     setIcon(el, icon);
   }
 
-  onMount(() => {
+  onMount(async () => {
     if (!svgEl) return;
+
     updateTreeLayout();
 
     zoomBehavior = d3
       .zoom<SVGSVGElement, unknown>()
-      .scaleExtent([0.5, 6])
+      // .scaleExtent([0.5, 6])
       .on("zoom", (event) => {
         zoomTransform = event.transform;
       });
 
     d3.select(svgEl).call(zoomBehavior);
-    tick().then(resetView);
+
+    await tick();
+    await new Promise(requestAnimationFrame);
+
+    resetView();
   });
 
   // ---- 响应式更新 ----
@@ -385,13 +388,12 @@
 
   .toolbar {
     position: absolute;
-    top: 0;
-    right: 0;
+    top: 0.5rem;
+    right: 0.5rem;
     display: flex;
     gap: 0;
     margin: 0;
     padding: 0px;
-    /* border: 1px solid var(--background-modifier-border); */
   }
 
   .toolbar .toolbar-btn {
