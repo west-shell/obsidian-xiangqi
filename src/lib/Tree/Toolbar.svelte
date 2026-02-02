@@ -82,8 +82,21 @@
   :global(.tree-view.bottom) .toolbar-container {
     display: flex;
     flex-direction: row;
-    flex-wrap: nowrap;
-    justify-content: center;
+    flex-wrap: nowrap; /* 不换行 */
+    justify-content: space-between; /* 平均分布 */
     align-items: center;
+    width: 100%; /* 占满容器宽度 */
+    /* padding: 0 4px; 留点边距 */
+    box-sizing: border-box;
+    /* gap: 4px; 按钮间距 */
+  }
+
+  :global(.tree-view.bottom) .toolbar-container .toolbar-btn {
+    flex: 1 1 0; /* 平均分宽，可缩小 */
+    min-width: 24px; /* 最小宽度，保证可点击 */
+    max-width: 100%; /* 不超过容器 */
+    font-size: clamp(12px, 3vw, 16px); /* 字体随屏幕宽度缩放 */
+    padding: 0;
+    margin: 0;
   }
 </style>

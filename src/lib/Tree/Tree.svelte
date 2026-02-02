@@ -366,7 +366,8 @@
     /* min-width: 280px; */
     flex-direction: column;
     height: 100%;
-    max-height: 100vh;
+    max-height: 100%;
+    max-width: 35%;
     /* min-height: 30vh; */
     overflow: hidden;
     --board-background: var(--background-primary-alt);
@@ -380,8 +381,7 @@
     flex: 1 1 auto;
     overflow: hidden;
     background-color: var(--board-background);
-    min-height: 0;
-    position: relative; /* 作为定位参考 */
+    position: relative;
     width: 100%;
     height: 100%;
   }
