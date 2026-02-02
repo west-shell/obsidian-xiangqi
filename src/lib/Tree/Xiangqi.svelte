@@ -83,11 +83,6 @@
 
   .tree-view.right :global(.tree-container) {
     flex: 1 1 auto;
-    min-width: 300px;
-  }
-
-  .tree-view.right :global(.svg-wrapper) {
-    min-width: 280px;
   }
 
   .tree-view.bottom {
@@ -98,12 +93,6 @@
 
   .tree-view.bottom :global(.tree-container) {
     flex: 1 1 auto;
-    min-width: 400px;
-    width: 100%;
-  }
-
-  .tree-view.bottom :global(.svg-wrapper) {
-    min-width: 380px;
     width: 100%;
   }
 </style>

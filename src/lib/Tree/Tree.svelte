@@ -362,13 +362,8 @@
 <style>
   .tree-container {
     display: flex;
-    flex: 1 1 33%;
-    /* min-width: 280px; */
     flex-direction: column;
     height: 100%;
-    max-height: 100%;
-    max-width: 35%;
-    /* min-height: 30vh; */
     overflow: hidden;
     --board-background: var(--background-primary-alt);
     --board-line: var(--text-normal);
@@ -397,10 +392,10 @@
   }
 
   .toolbar .toolbar-btn {
-    font-size: large;
+    /* font-size: large; */
     /* all: unset; */
-    width: 25px;
-    height: 25px;
+    width: 30px;
+    height: 30px;
     padding: 0;
     margin: 0;
   }
