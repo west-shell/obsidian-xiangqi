@@ -32,7 +32,8 @@
   let { position } = $derived(settings);
   let rotated = $state(false);
   let variations = $derived(
-    currentNode.children.map((child) => child.data).filter((data): data is IMove => data != null), // 过滤掉null值
+    currentNode.children.map((child) => child.data).filter((data): data is IMove => data != null) ??
+      [], // 过滤掉null值
   );
 
   onMount(async () => {

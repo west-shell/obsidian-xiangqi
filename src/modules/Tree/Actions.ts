@@ -1,5 +1,6 @@
 import { registerPGNViewModule } from "../../core/module-system";
 import type { ChessNode, IMove } from "../../types";
+import { ConfirmModal } from "../../utils/confirmModal";
 import { getICCS, genFENFromBoard } from "../../utils/parse";
 
 const ActionsModule = {
@@ -68,7 +69,7 @@ const ActionsModule = {
             host.saveFile();
         })
 
-        eventBus.on('btn-click', (payload: { name: string, payload: any }) => {
+        eventBus.on('btn-click', async (payload: { name: string, payload: any }) => {
             host.markedPos = null;
             const { name, payload: data } = payload;
             switch (name) {
@@ -99,10 +100,24 @@ const ActionsModule = {
                 }
                 case 'remove': {
                     if (host.currentNode.id === 'node-root') {
-                        host.currentNode.children = [];
-                        host.nodeMap.clear();
-                        host.nodeMap.set(host.currentNode.id, host.currentNode)
-                        eventBus.emit("node-click", host.currentNode.id);
+                        const modal = new ConfirmModal(
+                            host.plugin.app,
+                            "确认删除",
+                            "确定要删除整盘棋局吗？此操作不可撤销。",
+                            "保存",
+                            "取消",
+                        );
+
+                        modal.open();
+                        const userConfirmed = await modal.promise;
+
+                        if (userConfirmed) {
+                            host.currentNode.children = [];
+                            host.nodeMap.clear();
+                            host.currentNode = { ...host.currentNode }
+                            host.nodeMap.set(host.currentNode.id, host.currentNode)
+                            eventBus.emit("node-click", host.currentNode.id);
+                        }
                         break;
 
                     }
