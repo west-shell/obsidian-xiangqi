@@ -1,3 +1,7 @@
+import "@west-shell/chessground-xq/assets/chessground.base.css";
+import "@west-shell/chessground-xq/assets/chessground.board.css";
+import "@west-shell/chessground-xq/assets/chessground.xq.css";
+
 import { MarkdownView, Plugin, TFile, addIcon } from "obsidian";
 import type { ISettings } from "./types";
 import { applyThemes } from "./themes";
