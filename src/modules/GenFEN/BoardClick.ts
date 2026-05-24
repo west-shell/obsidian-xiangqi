@@ -1,5 +1,6 @@
 import type { IPosition } from "../../types";
 import { registerGenFENModule } from "../../core/module-system";
+import { loadBoardFromFEN } from "../../utils/parse";
 
 const BoardClickModule = {
     init(host: Record<string, any>) {
@@ -18,7 +19,7 @@ const BoardClickModule = {
                 const from = host.markedPos
                 const to = clickedPos
                 host.board[to.x][to.y] = host.board[from.x][from.y];
-                host.board[from.x][from.y] = '';
+                host.board[from.x][from.y] = null;
                 host.markedPos = null;
                 host.Xiangqi.$set({
                     board: [...host.board.map((row: any) => [...row])],
@@ -27,13 +28,25 @@ const BoardClickModule = {
             } else if (host.selectedPiece) {
                 host.board[clickedPos.x][clickedPos.y] = host.selectedPiece;
                 host.selectedPiece = null;
-                host.markedPos = null; // 之前漏掉了这一行，现在补上
+                host.markedPos = null;
                 host.Xiangqi.$set({
                     board: [...host.board.map((row: any) => [...row])],
                     selectedPiece: host.selectedPiece,
                     markedPos: host.markedPos,
                 });
             }
+        })
+
+        // Sync board state from chessground after drags/click-click moves
+        eventBus.on('fen-updated', (fen: string) => {
+            if (!fen) return;
+            const { board } = loadBoardFromFEN(fen);
+            host.board = board;
+            host.markedPos = null;
+            host.Xiangqi.$set({
+                board: [...host.board.map((row: any) => [...row])],
+                markedPos: null,
+            });
         })
     }
 }

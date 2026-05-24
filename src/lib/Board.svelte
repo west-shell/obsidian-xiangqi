@@ -21,6 +21,7 @@
     eventBus: EventBus;
     rotated: boolean;
     variations?: IMove[];
+    freeMode?: boolean;
   }
 
   let {
@@ -32,6 +33,7 @@
     eventBus,
     rotated,
     variations = [],
+    freeMode = false,
   }: Props = $props();
 
   let boardElement: HTMLDivElement;
@@ -91,18 +93,46 @@
   let dests = $derived(computeDests(board, currentTurn));
 
   onMount(async () => {
+    const events: Config["events"] = freeMode
+      ? {
+          change: () => {
+            if (api) eventBus.emit("fen-updated", api.getFen());
+          },
+          select: (key) => {
+            eventBus.emit("click", toPos(key));
+          },
+        }
+      : {
+          move: (orig, dest) => {
+            const from = toPos(orig);
+            const to = toPos(dest);
+
+            if (isValidMove(from, to, board)) {
+              eventBus.emit("runmove", {
+                from,
+                to,
+              } as IMove);
+            } else {
+              api?.cancelMove();
+              eventBus.emit("invalid-move", { from: orig, to: dest });
+            }
+          },
+        };
+
     const config: Config = {
       fen,
       orientation: rotated ? "black" : "white",
       turnColor,
       coordinates: settings.showCoordinateLabels,
       viewOnly: settings.viewOnly ?? false,
-      movable: {
-        free: false,
-        color: turnColor,
-        showDests: true,
-        dests,
-      },
+      movable: freeMode
+        ? { free: true, color: "both" }
+        : {
+            free: false,
+            color: turnColor,
+            showDests: true,
+            dests,
+          },
       highlight: {
         lastMove: settings.showLastMove,
         check: true,
@@ -115,24 +145,12 @@
           eventBus.emit("shapes-updated", s);
         },
       },
-      events: {
-        move: (orig, dest) => {
-          const from = toPos(orig);
-          const to = toPos(dest);
-
-          if (isValidMove(from, to, board)) {
-            const move: IMove = {
-              from,
-              to,
-            };
-            eventBus.emit("runmove", move);
-          } else {
-            api?.cancelMove();
-            eventBus.emit("invalid-move", { from: orig, to: dest });
-          }
-        },
-      },
+      events,
     };
+
+    if (freeMode) {
+      config.draggable = { deleteOnDropOff: true };
+    }
 
     if (lastMove) {
       config.lastMove = [toKey(lastMove.from), toKey(lastMove.to)];
@@ -153,11 +171,11 @@
 
   $effect(() => {
     if (!api) return;
-    api.set({
-      fen,
-      turnColor,
-      movable: { color: turnColor, dests },
-    });
+    if (freeMode) {
+      api.set({ fen, turnColor });
+    } else {
+      api.set({ fen, turnColor, movable: { color: turnColor, dests } });
+    }
   });
 
   $effect(() => {
@@ -178,7 +196,7 @@
   });
 
   $effect(() => {
-    if (!api) return;
+    if (!api || freeMode) return;
     if (markedPos) {
       api.selectSquare(toKey(markedPos), true);
     } else {

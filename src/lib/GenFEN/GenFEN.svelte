@@ -20,7 +20,7 @@
 </script>
 
 <div class="XQ-container {settings.position}">
-  <Board {settings} {board} {markedPos} {currentTurn} {eventBus} rotated={false} />
+  <Board {settings} {board} {markedPos} {currentTurn} {eventBus} rotated={false} freeMode={true} />
   <PieceBTNs {settings} {board} {eventBus} {position} {selectedPiece} />
   <Toolbar {eventBus} {position} {currentTurn} />
 </div>
