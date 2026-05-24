@@ -2,7 +2,7 @@
   import Tree from "./Tree.svelte";
   import Board from "../Board.svelte";
   import Toolbar from "./Toolbar.svelte";
-  import type { ChessNode, IBoard, IMove, IPosition, ISettings, NodeMap } from "../../types";
+  import type { ChessNode, IBoard, IMove, IPosition, ISettings, NodeMap, ITurn } from "../../types";
   import type { EventBus } from "../../core/event-bus";
   import { onMount, tick } from "svelte";
 
@@ -10,7 +10,7 @@
     settings: ISettings;
     board: IBoard;
     markedPos: IPosition;
-    currentTurn: string;
+    currentTurn: ITurn;
     eventBus: EventBus;
     nodeMap: NodeMap;
     currentNode: ChessNode;
