@@ -54,8 +54,8 @@
 
 <div
   class={`piece-btn-container ${position}`}
-  style="--height: {11 * settings.cellSize}px;
-    --width: {10 * settings.cellSize}px;
+  style="--height: {10 * settings.cellSize}px;
+    --width: {9 * settings.cellSize}px;
     --font-size: {settings.cellSize * 0.3}px;"
 >
   {#each Object.entries(PIECE_CHARS) as [piece, name]}
@@ -97,42 +97,49 @@
   }
 
   .piece-btn.right {
-    flex: 1; /* 每个按钮平分高度 */
+    flex: 1;
     width: 100%;
     border-radius: 4px;
     cursor: pointer;
-    font-size: 1rem;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: var(--font-size);
+    border: 1.5px solid rgba(0, 0, 0, 0.35);
+    margin: 1px 0;
+    transition: box-shadow 0.15s, border-color 0.15s;
   }
 
   .piece-btn.bottom {
     padding: 0;
-    border: 0;
     width: calc(var(--width) / 7);
     border-radius: 4px;
     cursor: pointer;
     font-size: var(--font-size);
+    border: 1.5px solid rgba(0, 0, 0, 0.35);
+    transition: box-shadow 0.15s, border-color 0.15s;
   }
 
   .red-piece {
     background-color: var(--piece-red);
     color: white;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
   }
 
   .black-piece {
     background-color: var(--piece-black);
     color: white;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
   }
 
   .active {
+    border-color: #ffd700;
+    box-shadow: 0 0 0 2px #ffd700;
     filter: brightness(1.5) saturate(1.4) drop-shadow(0 0 6px rgba(255, 255, 255, 0.6));
   }
 
   .empty {
     pointer-events: none;
-    filter: grayscale(0.4) brightness(0.8);
+    opacity: 0.35;
   }
 </style>

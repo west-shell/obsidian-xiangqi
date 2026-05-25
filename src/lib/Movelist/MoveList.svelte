@@ -36,8 +36,8 @@
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
   class="move-container {settings.position}"
-  style="--height: {11 * settings.cellSize}px;
-    --width: {10 * settings.cellSize}px;
+  style="--height: {10 * settings.cellSize}px;
+    --width: {9 * settings.cellSize}px;
     --fontsize: {settings.fontSize}px;"
 >
   <ul class="move-list {settings.position}" bind:this={ulRef}>

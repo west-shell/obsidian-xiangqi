@@ -22,6 +22,7 @@
     rotated: boolean;
     variations?: IMove[];
     freeMode?: boolean;
+    boardWidth?: number;
   }
 
   let {
@@ -34,7 +35,10 @@
     rotated,
     variations = [],
     freeMode = false,
+    boardWidth: boardWidthOverride,
   }: Props = $props();
+
+  let boardWidth = $derived(boardWidthOverride ?? settings.cellSize * 9);
 
   let boardElement: HTMLDivElement;
   let api: Api | null = null;
@@ -214,11 +218,14 @@
   });
 </script>
 
-<div bind:this={boardElement} class="cg-wrap"></div>
+<div
+  bind:this={boardElement}
+  class="cg-wrap"
+  style="width: {boardWidth}px"
+></div>
 
 <style>
   .cg-wrap {
-    width: 540px;
     height: 100%;
     flex-shrink: 0;
     aspect-ratio: 450 / 500;

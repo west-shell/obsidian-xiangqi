@@ -33,8 +33,34 @@
   let rotated = $state(false);
   let variations = $derived(
     currentNode.children.map((child) => child.data).filter((data): data is IMove => data != null) ??
-      [], // 过滤掉null值
+      [],
   );
+
+  let treeViewEl: HTMLDivElement;
+  let adaptiveBoardWidth = $state(300);
+
+  $effect(() => {
+    const el = treeViewEl;
+    if (!el) return;
+    const pos = position;
+    const ro = new ResizeObserver(() => {
+      const rect = el.getBoundingClientRect();
+
+      if (pos === "right") {
+        const availWidth = rect.width * 0.6;
+        const availHeight = rect.height;
+        const byHeight = (availHeight * 9) / 10;
+        adaptiveBoardWidth = Math.min(availWidth, byHeight);
+      } else {
+        const availWidth = rect.width;
+        const availHeight = rect.height * 0.65;
+        const byHeight = (availHeight * 9) / 10;
+        adaptiveBoardWidth = Math.min(availWidth, byHeight);
+      }
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  });
 
   onMount(async () => {
     await tick();
@@ -48,17 +74,20 @@
   });
 </script>
 
-<div class="tree-view {position}">
-  <Board
-    {settings}
-    {board}
-    {lastMove}
-    {markedPos}
-    {currentTurn}
-    {eventBus}
-    {rotated}
-    {variations}
-  />
+<div class="tree-view {position}" bind:this={treeViewEl}>
+  <div class="board-area">
+    <Board
+      {settings}
+      {board}
+      {lastMove}
+      {markedPos}
+      {currentTurn}
+      {eventBus}
+      {rotated}
+      {variations}
+      boardWidth={adaptiveBoardWidth}
+    />
+  </div>
   <Toolbar {eventBus} />
   <Tree {nodeMap} {eventBus} {currentNode} {currentPath} />
 </div>
@@ -73,7 +102,6 @@
   .tree-view {
     display: flex;
     justify-content: center;
-    margin: 0 auto; /* 添加此行以使 .tree-view 容器本身居中 */
   }
 
   .tree-view.right {
@@ -84,6 +112,19 @@
 
   .tree-view.right :global(.tree-container) {
     flex: 1 1 auto;
+    min-width: 25%;
+    max-width: 50%;
+  }
+
+  .board-area {
+    flex: 1 1 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .board-area :global(.cg-wrap) {
+    height: auto !important;
   }
 
   .tree-view.bottom {
@@ -94,6 +135,7 @@
 
   .tree-view.bottom :global(.tree-container) {
     flex: 1 1 auto;
+    min-height: 25%;
     width: 100%;
   }
 </style>
