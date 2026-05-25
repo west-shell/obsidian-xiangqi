@@ -42,6 +42,7 @@
 
   let boardElement: HTMLDivElement;
   let api: Api | null = null;
+  let layoutChangeHandler: (() => void) | null = null;
   let fen = $derived(genFENFromBoard(board, currentTurn));
   let turnColor: cg.Color = $derived(
     currentTurn === "black" ? "black" : "white",
@@ -165,9 +166,20 @@
     }
 
     api = Chessground(boardElement, config);
+
+    layoutChangeHandler = () => {
+      if (api) {
+        api.state.dom.bounds.clear();
+        api.state.dom.redraw();
+      }
+    };
+    document.body.addEventListener("xq-layout-change", layoutChangeHandler);
   });
 
   onDestroy(() => {
+    if (layoutChangeHandler) {
+      document.body.removeEventListener("xq-layout-change", layoutChangeHandler);
+    }
     if (api) {
       api.destroy();
     }

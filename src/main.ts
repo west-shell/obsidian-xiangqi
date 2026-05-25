@@ -74,6 +74,12 @@ export default class XQPlugin extends Plugin {
 		});
 
 		this.registerEvent(
+			this.app.workspace.on("resize", () => {
+				document.body.dispatchEvent(new CustomEvent("xq-layout-change"));
+			}),
+		);
+
+		this.registerEvent(
 			this.app.workspace.on("css-change", () => {
 				// 主题已改变
 				if (this.settings.theme === "auto") {

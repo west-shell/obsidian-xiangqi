@@ -117,9 +117,8 @@
   }
 
   .board-area {
-    flex: 1 1 auto;
+    flex: 0 0 auto;
     display: flex;
-    justify-content: center;
     align-items: center;
   }
 
