@@ -46,9 +46,7 @@
   let api: Api | null = null;
   let layoutChangeHandler: (() => void) | null = null;
   let fen = $derived(genFENFromBoard(board, currentTurn));
-  let turnColor: cg.Color = $derived(
-    currentTurn === "black" ? "black" : "white",
-  );
+  let turnColor: cg.Color = $derived(currentTurn === "black" ? "black" : "white");
 
   // Our internal coords: y=0 top, y=9 bottom
   // Chessground: y=0 bottom, y=9 top
@@ -92,7 +90,7 @@
     return variations.map((move) => ({
       orig: toKey(move.from),
       dest: toKey(move.to),
-      brush: "paleBlue",
+      brush: "blue",
     }));
   }
 
@@ -240,11 +238,7 @@
   });
 </script>
 
-<div
-  bind:this={boardElement}
-  class="cg-wrap"
-  style="width: {boardWidth}px"
-></div>
+<div bind:this={boardElement} class="cg-wrap" style="width: {boardWidth}px"></div>
 
 <style>
   .cg-wrap {
