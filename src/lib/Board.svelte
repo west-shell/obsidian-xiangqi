@@ -149,6 +149,7 @@
         visible: true,
         shapes: userShapes,
         autoShapes: shapes,
+        eraseOnMovablePieceClick: false,
         onChange: (s) => {
           eventBus.emit("user-shapes-changed", s);
         },
