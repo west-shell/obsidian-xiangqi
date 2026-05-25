@@ -23,6 +23,7 @@
     variations?: IMove[];
     freeMode?: boolean;
     boardWidth?: number;
+    userShapes?: DrawShape[];
   }
 
   let {
@@ -36,6 +37,7 @@
     variations = [],
     freeMode = false,
     boardWidth: boardWidthOverride,
+    userShapes = [],
   }: Props = $props();
 
   let boardWidth = $derived(boardWidthOverride ?? settings.cellSize * 9);
@@ -145,9 +147,10 @@
       drawable: {
         enabled: true,
         visible: true,
+        shapes: userShapes,
         autoShapes: shapes,
         onChange: (s) => {
-          eventBus.emit("shapes-updated", s);
+          eventBus.emit("user-shapes-changed", s);
         },
       },
       events,
@@ -209,6 +212,11 @@
   $effect(() => {
     if (!api) return;
     api.set({ drawable: { autoShapes: shapes } });
+  });
+
+  $effect(() => {
+    if (!api) return;
+    api.setShapes(userShapes);
   });
 
   $effect(() => {

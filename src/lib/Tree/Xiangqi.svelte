@@ -4,7 +4,27 @@
   import Toolbar from "./Toolbar.svelte";
   import type { ChessNode, IBoard, IMove, IPosition, ISettings, NodeMap, ITurn } from "../../types";
   import type { EventBus } from "../../core/event-bus";
+  import type { DrawShape } from "@west-shell/chessground-xq/draw";
   import { onMount, tick } from "svelte";
+
+  const SHAPES_PREFIX = "__SHAPES__";
+
+  function loadShapes(node: ChessNode): DrawShape[] {
+    const entry = node.comments?.find((c) => c.startsWith(SHAPES_PREFIX));
+    if (!entry) return [];
+    try {
+      return JSON.parse(entry.slice(SHAPES_PREFIX.length));
+    } catch {
+      return [];
+    }
+  }
+
+  function saveShapes(node: ChessNode, shapes: DrawShape[]) {
+    node.comments = (node.comments ?? []).filter((c) => !c.startsWith(SHAPES_PREFIX));
+    if (shapes.length > 0) {
+      node.comments.push(SHAPES_PREFIX + JSON.stringify(shapes));
+    }
+  }
 
   interface Props {
     settings: ISettings;
@@ -35,6 +55,7 @@
     currentNode.children.map((child) => child.data).filter((data): data is IMove => data != null) ??
       [],
   );
+  let userShapes = $derived(loadShapes(currentNode));
 
   let treeViewEl: HTMLDivElement;
   let adaptiveBoardWidth = $state(300);
@@ -68,6 +89,14 @@
   });
 
   $effect(() => {
+    eventBus.on("user-shapes-changed", (shapes: DrawShape[]) => {
+      saveShapes(currentNode, shapes);
+      eventBus.emit("updatePGN", null);
+      eventBus.emit("updateUI", null);
+    });
+  });
+
+  $effect(() => {
     eventBus.on("rotate", () => {
       rotated = !rotated;
     });
@@ -85,6 +114,7 @@
       {eventBus}
       {rotated}
       {variations}
+      {userShapes}
       boardWidth={adaptiveBoardWidth}
     />
   </div>
