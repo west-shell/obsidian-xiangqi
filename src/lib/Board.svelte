@@ -221,6 +221,7 @@
 
   $effect(() => {
     if (!api || freeMode) return;
+    void board;
     if (markedPos) {
       api.selectSquare(toKey(markedPos), true);
     } else {
