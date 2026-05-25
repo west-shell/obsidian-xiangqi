@@ -5,15 +5,25 @@
   import type { ChessNode, IBoard, IMove, IPosition, ISettings, NodeMap, ITurn } from "../../types";
   import type { EventBus } from "../../core/event-bus";
   import type { DrawShape } from "@west-shell/chessground-xq/draw";
+  import type * as cg from "@west-shell/chessground-xq/types";
   import { onMount, tick } from "svelte";
 
   const SHAPES_PREFIX = "__SHAPES__";
+  const BRUSH_MAP: Record<string, string> = { green: "g", red: "r", blue: "b", yellow: "y" };
+  const BRUSH_REV: Record<string, string> = { g: "green", r: "red", b: "blue", y: "yellow" };
 
   function loadShapes(node: ChessNode): DrawShape[] {
     const entry = node.comments?.find((c) => c.startsWith(SHAPES_PREFIX));
     if (!entry) return [];
     try {
-      return JSON.parse(entry.slice(SHAPES_PREFIX.length));
+      const data = entry.slice(SHAPES_PREFIX.length);
+      if (!data) return [];
+      return data.split(",").map((s) => {
+        const m = s.match(/^([gryb]):([a-i][0-9])([a-i][0-9])?$/);
+        if (!m) throw new Error("bad shape");
+        const brush = BRUSH_REV[m[1]];
+        return { orig: m[2] as cg.Key, dest: m[3] as cg.Key | undefined, brush };
+      });
     } catch {
       return [];
     }
@@ -22,7 +32,10 @@
   function saveShapes(node: ChessNode, shapes: DrawShape[]) {
     node.comments = (node.comments ?? []).filter((c) => !c.startsWith(SHAPES_PREFIX));
     if (shapes.length > 0) {
-      node.comments.push(SHAPES_PREFIX + JSON.stringify(shapes));
+      const data = shapes
+        .map((s) => `${BRUSH_MAP[s.brush ?? "green"]}:${s.orig}${s.dest ?? ""}`)
+        .join(",");
+      node.comments.push(SHAPES_PREFIX + data);
     }
   }
 

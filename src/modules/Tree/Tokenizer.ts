@@ -73,9 +73,17 @@ export function tokenize(pgn: string): Token[] {
             continue;
         }
 
-        // 注释 { ... }
-        const comment = matchAndConsume(/^\{[^}]*\}/);
-        if (comment) {
+        // 注释 { ... }，支持嵌套大括号（如 JSON 数据）
+        if (char === "{") {
+            let depth = 1;
+            let end = pos + 1;
+            while (end < pgn.length && depth > 0) {
+                if (pgn[end] === "{") depth++;
+                else if (pgn[end] === "}") depth--;
+                end++;
+            }
+            const comment = pgn.slice(pos, end);
+            advance(end - pos);
             tokens.push({ type: "comment", value: comment, line: startLine, column: startCol });
             continue;
         }
