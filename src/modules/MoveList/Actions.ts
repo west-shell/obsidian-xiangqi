@@ -10,6 +10,8 @@ const ActionsModule = {
 
         eventBus.on('runmove', (move) => {
             if (!move) return;
+            if (!host.modified) host.modifiedStep = host.currentStep;
+            host.modified = true;
             eventBus.emit('edithistory', move);
             runmove(host, move);
             eventBus.emit('updateUI', 'runmove');
