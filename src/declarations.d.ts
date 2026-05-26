@@ -1,4 +1,4 @@
-declare module "@west-shell/chessground-xq/assets/*.css" {
+declare module "*.css" {
     const content: string;
     export default content;
 }
