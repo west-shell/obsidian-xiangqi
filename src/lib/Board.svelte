@@ -94,7 +94,7 @@
     }));
   }
 
-  let shapes = $derived(computeVariationShapes(variations));
+  let shapes = $derived(settings.showNextMove ? computeVariationShapes(variations) : []);
   let dests = $derived(computeDests(board, currentTurn));
 
   onMount(async () => {
