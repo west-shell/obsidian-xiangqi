@@ -165,7 +165,7 @@
     align-items: center;
   }
 
-  .board-area :global(.cg-wrap) {
+  .board-area :global(.xq-wrap) {
     height: auto !important;
   }
 

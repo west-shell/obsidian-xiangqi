@@ -238,10 +238,10 @@
   });
 </script>
 
-<div bind:this={boardElement} class="cg-wrap" style="width: {boardWidth}px"></div>
+<div bind:this={boardElement} class="xq-wrap" style="width: {boardWidth}px"></div>
 
 <style>
-  .cg-wrap {
+  .xq-wrap {
     height: 100%;
     flex-shrink: 0;
     aspect-ratio: 450 / 500;
