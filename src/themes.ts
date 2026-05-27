@@ -13,6 +13,8 @@ interface ThemeDef {
 	/** 黑方棋子色 */
 	black: string;
 }
+const tree_red = '#861818';
+const tree_black = '#000080';
 
 const themes: Record<string, ThemeDef> = {
 	wood: {
@@ -20,40 +22,50 @@ const themes: Record<string, ThemeDef> = {
 		bg: "#CBA35C",
 		texture: "repeating-linear-gradient(87deg, rgba(139,90,43,0.25) 0px, rgba(139,90,43,0.25) 2px, transparent 2px, transparent 6px)",
 		grid: "dark",
-		red: "#b24747",
-		black: "#5166b2",
+		// red: "#b24747",
+		// black: "#5166b2",
+		red: tree_red,
+		black: tree_black,
 	},
 	parchment: {
 		name: "羊皮纸",
 		bg: "#d0b899b4",
 		texture: "radial-gradient(ellipse at 40% 30%, rgba(180,170,150,0.3) 0%, transparent 70%)",
 		grid: "dark",
-		red: "#b24747",
-		black: "#3b4b8c",
+		// red: "#b24747",
+		// black: "#3b4b8c",
+		red: tree_red,
+		black: tree_black,
 	},
 	green: {
 		name: "绿绒布",
 		bg: "#2d5a27",
 		texture: "repeating-linear-gradient(0deg, rgba(255,255,255,0.04) 0px, rgba(255,255,255,0.04) 1px, transparent 1px, transparent 3px)",
 		grid: "light",
-		red: "#d44b4b",
-		black: "#8ca3e0",
+		// red: "#d44b4b",
+		// black: "#8ca3e0",
+		red: tree_red,
+		black: tree_black,
 	},
 	light: {
 		name: "经典浅色",
 		bg: "#c8c0b8",
 		texture: "none",
 		grid: "dark",
-		red: "#b24747",
-		black: "#5166b2",
+		// red: "#b24747",
+		// black: "#5166b2",
+		red: tree_red,
+		black: tree_black,
 	},
 	dark: {
 		name: "经典深色",
 		bg: "#2d2d2d",
 		texture: "none",
 		grid: "light",
-		red: "#861818",
-		black: "#2090ff",
+		// red: "#861818",
+		// black: "#2090ff",
+		red: tree_red,
+		black: tree_black,
 	},
 	auto: {
 		name: "自动",

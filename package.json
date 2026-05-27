@@ -28,7 +28,6 @@
     "@types/d3": "^7.4.3",
     "@types/node": "^24.3.0",
     "@west-shell/chessground-xq": "file:../chessground-xq",
-    "@west-shell/chess.js": "file:../chess.js",
     "d3": "^7.9.0",
     "obsidian": "^1.4.11",
     "svelte": "^5.0.0",

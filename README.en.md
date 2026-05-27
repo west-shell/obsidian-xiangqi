@@ -20,6 +20,8 @@ This plugin registers a custom view for `.pgn` files. Simply open a `.pgn` file 
 - **Real-time Read/Write**: Any changes to the game (like making moves, adding variations, or comments) are saved back to the original `.pgn` file instantly and automatically.
 - **Full-featured**: Supports variations, comments, and annotations.
 - **Jump to AI**: Supports packaging the current branch to Pikafish web version for analysis.
+- **View Toggling**: Switch between text view and chess view via the file menu.
+- **Quick Create**: Create new PGN files via the toolbar button.
 
 ![PGN File](./IMAGE/PGN文件.png)
 
@@ -73,10 +75,13 @@ Two code block names are supported:
     - Confirm before saving
     - If no moves, saving clears PGN
 - **Settings**:
-    - Theme: light / dark / system
-    - Button position: right / bottom
+    - Board theme: Wood, Parchment, Green Felt, Marble, Classic Light, Classic Dark
+    - 3-layer board background: grid lines + texture + base color
+    - Coordinate labels auto-scale with board size
+    - Toolbar position: right / bottom
     - Board size
     - Show/hide move list and move text
+    - Move text font size
     - Auto-scroll to latest move
     - Optional move narration (not on mobile)
 - **Mobile Friendly**: Manual layout adjustment for small screens
