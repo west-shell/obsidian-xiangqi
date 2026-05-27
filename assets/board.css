@@ -2,9 +2,9 @@
  * chessground.board.css — 中国象棋棋盘网格背景
  *
  * 三层叠加：网格线 / 纹理 / 底色
- * --xq-grid:        选择网格线色（深色线用于浅背景，浅色线用于深背景）
+ * --xq-grid:         选择网格线色（深色线用于浅背景，浅色线用于深背景）
  * --xq-board-texture: 纹理叠加图案（默认 none）
- * --xq-board-bg:    底层背景色
+ * --xq-board-bg:     底层背景色
  *
  * 生成命令：node scripts/gen-board.js
  */

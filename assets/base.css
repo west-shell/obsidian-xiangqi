@@ -2,6 +2,7 @@
   box-sizing: content-box;
   position: relative;
   display: block;
+  container-type: inline-size;
 }
 
 xq-container {
@@ -38,7 +39,7 @@ xq-board square {
   position: absolute;
   top: 0;
   left: 0;
-  width: 11.11111111111111%;
+  width: calc(100% / 9);
   height: 10%;
   pointer-events: none;
 }
@@ -56,7 +57,7 @@ xq-board square.last-move-dest {
   position: absolute;
   top: 0;
   left: 0;
-  width: 11.1111111111%;
+  width: calc(100% / 9);
   height: 10%;
   background-size: cover;
   z-index: 2;
@@ -148,18 +149,18 @@ piece.fading {
   pointer-events: none;
   opacity: 0.8;
   font-family: sans-serif;
-  font-size: 12px;
+  font-size: clamp(7px, 2.7cqw, 18px);
 }
 
 .xq-wrap coords.files {
-  bottom: 1%;
+  bottom: 0.5%;
   left: 0;
   flex-flow: row;
   align-items: center;
   width: 100%;
-  height: 16px;
+  height: clamp(9px, 3.6cqw, 24px);
   text-align: center;
-  line-height: 16px;
+  line-height: clamp(9px, 3.6cqw, 24px);
 }
 
 .xq-wrap coords.files.top {
