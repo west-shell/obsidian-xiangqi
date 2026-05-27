@@ -128,7 +128,7 @@
       fen,
       orientation: rotated ? "black" : "white",
       turnColor,
-      coordinates: settings.showCoordinateLabels,
+      coordinates: true,
       viewOnly: settings.viewOnly ?? false,
       movable: freeMode
         ? { free: true, color: "both" }
@@ -231,7 +231,7 @@
   $effect(() => {
     if (!api) return;
     api.set({
-      coordinates: settings.showCoordinateLabels,
+      coordinates: true,
       viewOnly: settings.viewOnly ?? false,
       highlight: { lastMove: settings.showLastMove },
     });

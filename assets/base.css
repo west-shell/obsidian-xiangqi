@@ -145,7 +145,7 @@ piece.fading {
 
 .xq-wrap coords {
   position: absolute;
-  display: flex;
+  display: var(--xq-coords-display, flex);
   pointer-events: none;
   opacity: 0.8;
   font-family: sans-serif;

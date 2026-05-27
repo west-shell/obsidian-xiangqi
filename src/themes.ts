@@ -70,7 +70,7 @@ export const THEME_OPTIONS = Object.fromEntries(
 ) as Record<string, string>;
 
 export function applyThemes(settings: ISettings) {
-	const { theme, boardMarginTop, boardMarginBottom } = settings;
+	const { theme, boardMarginTop, boardMarginBottom, showCoordinateLabels } = settings;
 	const t = themes[theme] ?? themes.light;
 
 	document.body.style.setProperty("--xq-board-bg", t.bg);
@@ -78,6 +78,10 @@ export function applyThemes(settings: ISettings) {
 	document.body.style.setProperty(
 		"--xq-grid",
 		t.grid === "dark" ? "var(--xq-grid-dark)" : "var(--xq-grid-light)",
+	);
+	document.body.style.setProperty(
+		"--xq-coords-display",
+		showCoordinateLabels ? "flex" : "none",
 	);
 	document.body.style.setProperty("--xq-piece-red", t.red);
 	document.body.style.setProperty("--xq-piece-black", t.black);
