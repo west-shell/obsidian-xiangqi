@@ -200,7 +200,7 @@ xq-board square.premove-dest.hover {
 }
 
 xq-board square.last-move-orig {
-  background: linear-gradient(rgba(155, 199, 0, 0.), rgba(155, 199, 0, 0.6)) center / 30% 30% no-repeat;
+  background: linear-gradient(rgba(155, 199, 0, 0.8), rgba(155, 199, 0, 0.6)) center / 30% 30% no-repeat;
 }
 
 xq-board square.last-move-dest {
