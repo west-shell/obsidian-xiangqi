@@ -147,9 +147,12 @@ const css = `/**
  * 生成命令：node scripts/gen-board.js
  */
 
-xq-board {
+:root {
   --xq-grid-dark: url('data:image/svg+xml;base64,${b64Dark}');
   --xq-grid-light: url('data:image/svg+xml;base64,${b64Light}');
+}
+
+xq-board {
   background:
     var(--xq-grid, var(--xq-grid-dark)) center / 100% 100% no-repeat,
     var(--xq-board-texture, none) center / cover no-repeat,

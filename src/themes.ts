@@ -17,15 +17,15 @@ interface ThemeDef {
 const themes: Record<string, ThemeDef> = {
 	wood: {
 		name: "木质",
-		bg: "#c8963e",
-		texture: "repeating-linear-gradient(87deg, rgba(139,90,43,0.25) 0px, rgba(139,90,43,0.25) 1px, transparent 1px, transparent 4px)",
+		bg: "#CBA35C",
+		texture: "repeating-linear-gradient(87deg, rgba(139,90,43,0.25) 0px, rgba(139,90,43,0.25) 2px, transparent 2px, transparent 6px)",
 		grid: "dark",
 		red: "#b24747",
 		black: "#5166b2",
 	},
 	parchment: {
 		name: "羊皮纸",
-		bg: "#e8d5a3",
+		bg: "#e0c277",
 		texture: "radial-gradient(ellipse at 40% 30%, rgba(255,255,240,0.6) 0%, transparent 60%)",
 		grid: "dark",
 		red: "#b24747",
@@ -62,6 +62,14 @@ const themes: Record<string, ThemeDef> = {
 		grid: "light",
 		red: "#861818",
 		black: "#2090ff",
+	},
+	auto: {
+		name: "自动",
+		bg: "var(--background-primary-alt)",
+		texture: "none",
+		grid: "dark",
+		red: "var(--xq-auto-red)",
+		black: "var(--xq-auto-black)",
 	},
 };
 
