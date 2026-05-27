@@ -182,7 +182,7 @@ xq-board square.premove-dest {
 }
 
 xq-board square.oc.move-dest {
-  background: radial-gradient(transparent 0%, transparent 80%, rgba(20, 85, 0, 0.3) 80%);
+  background: radial-gradient(transparent 0%, transparent 75%, rgba(20, 85, 0, 0.5) 75%);
 }
 
 xq-board square.oc.premove-dest {
@@ -200,7 +200,7 @@ xq-board square.premove-dest.hover {
 }
 
 xq-board square.last-move-orig {
-  background: linear-gradient(rgba(155, 199, 0, 0.41), rgba(155, 199, 0, 0.8)) center / 30% 30% no-repeat;
+  background: linear-gradient(rgba(155, 199, 0, 0.), rgba(155, 199, 0, 0.6)) center / 30% 30% no-repeat;
 }
 
 xq-board square.last-move-dest {
@@ -208,7 +208,8 @@ xq-board square.last-move-dest {
 }
 
 xq-board square.selected {
-  background-color: rgba(20, 85, 30, 0.5);
+  /* background-color: rgba(20, 85, 30, 0.5); */
+  background: radial-gradient(transparent 0%, transparent 75%, rgba(20, 85, 0, 1) 75%);
 }
 
 xq-board square.check {
