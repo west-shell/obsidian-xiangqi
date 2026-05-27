@@ -1,6 +1,6 @@
-import "../assets/chessground.base.css";
-import "../assets/chessground.board.css";
-import "../assets/chessground.xq.css";
+import "../assets/base.css";
+import "../assets/board.css";
+import "../assets/pieces.css";
 
 import { MarkdownView, Plugin, TFile, addIcon } from "obsidian";
 import type { ISettings } from "./types";
@@ -81,10 +81,7 @@ export default class XQPlugin extends Plugin {
 
 		this.registerEvent(
 			this.app.workspace.on("css-change", () => {
-				// 主题已改变
-				if (this.settings.theme === "auto") {
-					applyThemes(this.settings)
-				}
+				applyThemes(this.settings)
 			}),
 		);
 

@@ -1,10 +1,11 @@
 import XQPlugin from "./main";
 import type { ISettings } from "./types";
 import { type App, PluginSettingTab, Setting } from "obsidian";
+import { THEME_OPTIONS } from "./themes";
 
 export const DEFAULT_SETTINGS: ISettings = {
 	position: "right",
-	theme: "auto",
+	theme: "wood",
 	cellSize: 50,
 	fontSize: 12,
 	showCoordinateLabels: true,
@@ -38,15 +39,11 @@ export class XQSettingTab extends PluginSettingTab {
 			.setName("主题")
 			// .setDesc("设置棋盘主题.")
 			.addDropdown((dropdown) => {
-				dropdown.addOptions({
-					light: "浅色",
-					dark: "深色",
-					auto: "跟随",
-				});
+				dropdown.addOptions(THEME_OPTIONS);
 				dropdown
 					.setValue(settings.theme)
 					.onChange((theme) => {
-						settings.theme = theme as "auto" | "light" | "dark";
+						settings.theme = theme as ISettings["theme"];
 						this.plugin.saveSettings();
 						this.plugin.refresh();
 					});

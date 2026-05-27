@@ -16,16 +16,11 @@ const ROWS = 10;
 const W = (COLS - 1) * CELL + PAD * 2; // 450
 const H = (ROWS - 1) * CELL + PAD * 2; // 500
 
-// 实际颜色值（代替 CSS 变量）
-const BG = '#d0b899b4';
-const LINE = '#555';
 const MARGIN = CELL * 0.1;
 
-function buildSvg() {
+function buildSvg(lineColor) {
   const lines = [];
-
-  // 背景
-  lines.push(`<rect width="${W}" height="${H}" fill="${BG}" rx="8"/>`);
+  const LINE = lineColor;
 
   // 外框
   lines.push(
@@ -128,14 +123,6 @@ function buildSvg() {
     }
   }
 
-  // 坐标标签（红方视角）
-  // const topNums = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
-  // const botNums = ['九', '八', '七', '六', '五', '四', '三', '二', '一'];
-  // for (let i = 0; i < 9; i++) {
-  //   lines.push(`<text x="${PAD + i * CELL}" y="${PAD * 0.38}" font-size="${CELL * 0.25}" fill="${LINE}" text-anchor="middle" dominant-baseline="middle">${topNums[i]}</text>`);
-  //   lines.push(`<text x="${PAD + i * CELL}" y="${H - PAD * 0.38}" font-size="${CELL * 0.25}" fill="${LINE}" text-anchor="middle" dominant-baseline="middle">${botNums[i]}</text>`);
-  // }`
-
   const inner = lines.join('\n  ');
 
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">
@@ -144,22 +131,30 @@ function buildSvg() {
 }
 
 // ---- 生成 CSS ----
-const svg = buildSvg();
-const b64 = Buffer.from(svg, 'utf-8').toString('base64');
+const svgDark = buildSvg('#555');   // 深色线，用于浅色背景
+const svgLight = buildSvg('#ccc');  // 浅色线，用于深色背景
+const b64Dark = Buffer.from(svgDark, 'utf-8').toString('base64');
+const b64Light = Buffer.from(svgLight, 'utf-8').toString('base64');
 
 const css = `/**
- * chessground.board.css — 中国象棋棋盘背景图
+ * chessground.board.css — 中国象棋棋盘网格背景
  *
- * 将 SVG 棋盘网格硬编码为 base64 data URI。
- * 仅包含棋盘背景，交互样式见 chessground.base.css。
+ * 三层叠加：网格线 / 纹理 / 底色
+ * --xq-grid:        选择网格线色（深色线用于浅背景，浅色线用于深背景）
+ * --xq-board-texture: 纹理叠加图案（默认 none）
+ * --xq-board-bg:    底层背景色
  *
  * 生成命令：node scripts/gen-board.js
  */
 
 xq-board {
-  background-image: url('data:image/svg+xml;base64,${b64}');
-  background-size: 100% 100%;
+  --xq-grid-dark: url('data:image/svg+xml;base64,${b64Dark}');
+  --xq-grid-light: url('data:image/svg+xml;base64,${b64Light}');
+  background:
+    var(--xq-grid, var(--xq-grid-dark)) center / 100% 100% no-repeat,
+    var(--xq-board-texture, none) center / cover no-repeat,
+    var(--xq-board-bg, #d0b899);
 }
 `;
 
-fs.writeFileSync('assets/chessground.board.css', css, 'utf-8');
+fs.writeFileSync('assets/board.css', css, 'utf-8');

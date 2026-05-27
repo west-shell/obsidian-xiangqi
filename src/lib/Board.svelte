@@ -245,5 +245,13 @@
     height: 100%;
     flex-shrink: 0;
     aspect-ratio: 450 / 500;
+    --piece-red: var(--xq-piece-red, var(--color-red));
+    --piece-black: var(--xq-piece-black, var(--color-blue));
+  }
+  :global(xq-board) {
+    /* border-radius: 10px; */
+    margin: 3px solid red;
+    /* background-color: green; */
+    /* background-image: url("../../IMAGE/board-bg.png"); */
   }
 </style>
