@@ -208,12 +208,23 @@ xq-board square.premove-dest.hover {
   background: rgba(20, 30, 85, 0.2);
 }
 
-xq-board square.last-move-orig {
-  background: linear-gradient(rgba(155, 199, 0, 0.8), rgba(155, 199, 0, 0.6)) center / 30% 30% no-repeat;
+
+.turn-red xq-board square.last-move-orig {
+  background: linear-gradient(var(--piece-black, #44c), var(--piece-black, #44c)) center / 30% 30% no-repeat;
 }
 
-xq-board square.last-move-dest {
-  background-color: rgba(20, 85, 30, 0.5);
+.turn-black xq-board square.last-move-orig {
+  background: linear-gradient(var(--piece-red, #c44), var(--piece-red, #c44)) center / 30% 30% no-repeat;
+}
+
+.turn-red xq-board square.last-move-dest {
+  /* background-color: rgba(20, 85, 30, 0.5); */
+  background: radial-gradient(transparent 0%, transparent 75%, var(--piece-black, rgba(68, 68, 204, 0.5)) 75%);
+}
+
+.turn-black xq-board square.last-move-dest {
+  /* background-color: rgba(20, 85, 30, 0.5); */
+  background: radial-gradient(transparent 0%, transparent 75%, var(--piece-red, rgba(204, 68, 68, 0.5)) 75%);
 }
 
 xq-board square.selected {
