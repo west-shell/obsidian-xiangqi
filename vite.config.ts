@@ -7,11 +7,13 @@ const setOutDir = (mode: string) => {
 		case "development":
 			return "./test-vault/.obsidian/plugins/xiangqi";
 		case "production":
+		case "production-min":
 			return "build";
 	}
 };
 
 export default defineConfig(({ mode }) => {
+	const isMin = mode === "production-min";
 	return {
 		plugins: [
 			svelte({
@@ -53,8 +55,8 @@ export default defineConfig(({ mode }) => {
 			},
 			outDir: setOutDir(mode),
 			emptyOutDir: false,
-			minify: false,
-			sourcemap: "inline",
+			minify: isMin,
+			sourcemap: isMin ? false : "inline",
 		},
 	};
 });
