@@ -47,6 +47,7 @@
   let layoutChangeHandler: (() => void) | null = null;
   let fen = $derived(genFENFromBoard(board, currentTurn));
   let turnColor: cg.Color = $derived(currentTurn === "black" ? "black" : "white");
+  let turnClass = $derived(settings.showTurnBorder ? `turn-${currentTurn}` : "");
 
   // Our internal coords: y=0 top, y=9 bottom
   // Chessground: y=0 bottom, y=9 top
@@ -238,7 +239,7 @@
   });
 </script>
 
-<div bind:this={boardElement} class="xq-wrap" style="width: {boardWidth}px"></div>
+<div bind:this={boardElement} class="xq-wrap {turnClass}" style="width: {boardWidth}px"></div>
 
 <style>
   .xq-wrap {

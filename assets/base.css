@@ -5,6 +5,15 @@
   container-type: inline-size;
 }
 
+/* Turn border indicator */
+.xq-wrap.turn-red {
+  box-shadow: 0 0 0 3px var(--piece-red, #c44);
+}
+
+.xq-wrap.turn-black {
+  box-shadow: 0 0 0 3px var(--piece-black, #44c);
+}
+
 xq-container {
   position: absolute;
   width: 100%;
