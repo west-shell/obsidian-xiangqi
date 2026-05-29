@@ -149,6 +149,31 @@ p:true
 7. 找到本插件并点击 **安装** (Install)。
 8. 安装完成后，点击 **启用** (Enable)。
 
+## 构建
+
+1. 克隆本项目及其依赖 [chessground-xq](https://github.com/west-shell/chessground-xq) 到同一目录：
+
+   ```bash
+   git clone https://github.com/west-shell/obsidian-xiangqi.git
+   git clone https://github.com/west-shell/chessground-xq.git
+   ```
+
+2. 先构建 chessground-xq：
+
+   ```bash
+   cd chessground-xq
+   npm install
+   npm run dist
+   ```
+
+3. 再构建本插件：
+
+   ```bash
+   cd ../obsidian-xiangqi
+   npm install
+   npm run build        # 开发版本（不压缩，带 sourcemap，方便调试）
+   npm run build:min    # 精简版本（压缩，无 sourcemap，适合发布）
+   ```
 ## 打赏
 
 如果喜欢该插件,可以打赏一下哦

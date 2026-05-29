@@ -152,6 +152,32 @@ This plugin is now available on the official Obsidian plugin marketplace. Search
 7. Find this plugin and click **Install**.
 8. After installation, click **Enable**.
 
+## Build
+
+1. Clone this repository and its dependency [chessground-xq](https://github.com/west-shell/chessground-xq) into the same parent directory:
+
+   ```bash
+   git clone https://github.com/west-shell/obsidian-xiangqi.git
+   git clone https://github.com/west-shell/chessground-xq.git
+   ```
+
+2. Build chessground-xq first:
+
+   ```bash
+   cd chessground-xq
+   npm install
+   npm run dist
+   ```
+
+3. Then build the plugin:
+
+   ```bash
+   cd ../obsidian-xiangqi
+   npm install
+   npm run build        # Dev build (unminified, with sourcemaps, for debugging)
+   npm run build:min    # Minified build (compressed, no sourcemaps, for release)
+   ```
+
 ## Donation
 
 If you like this plugin, you can support me with a donation!
