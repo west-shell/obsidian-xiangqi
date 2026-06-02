@@ -2,6 +2,7 @@ import { MarkdownView, Notice } from "obsidian";
 import { registerGenFENModule } from "../../core/module-system";
 import type { IBoard, IGenFENHost, ITurn, PieceType } from "../../types";
 import { genFENFromBoard } from "../../utils/parse";
+import { t } from "../../i18n";
 
 const ActionsModule = {
     init(host: IGenFENHost) {
@@ -79,5 +80,5 @@ async function onSaveBTNClick(host: IGenFENHost) {
 
         return newContent;
     });
-    new Notice("FEN已保存到代码块");
+    new Notice(t("notice.fenSaved"));
 }

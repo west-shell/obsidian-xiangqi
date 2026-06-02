@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { EventBus } from "../../core/event-bus";
+  import { t, onLangChange } from "../../i18n";
 
   interface Props {
     eventBus: EventBus;
@@ -8,12 +9,15 @@
   }
   let { eventBus, position, currentTurn }: Props = $props();
 
-  const buttons = [
-    { title: "先手", text: "先", action: "turn", color: true },
-    { title: "清空", text: "空", action: "empty" },
-    { title: "填满", text: "满", action: "full" },
-    { title: "保存", text: "存", action: "save" },
-  ];
+  let _lv = $state(0);
+  onLangChange(() => _lv++);
+
+  const buttons = $derived([
+    { title: t("genfen.turn", _lv), text: "先", action: "turn", color: true },
+    { title: t("genfen.clear", _lv), text: "空", action: "empty" },
+    { title: t("genfen.fill", _lv), text: "满", action: "full" },
+    { title: t("genfen.save", _lv), text: "存", action: "save" },
+  ]);
 </script>
 
 <div class={`getFENT-toolbar-container ${position}`}>

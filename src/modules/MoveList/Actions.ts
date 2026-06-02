@@ -3,6 +3,7 @@ import { registerXQModule } from "../../core/module-system";
 import type { IMove, IXQHost, PieceType } from "../../types";
 import { getICCS, genFENFromBoard, parseSource } from "../../utils/parse";
 import { ConfirmModal } from "../../utils/confirmModal";
+import { t } from "../../i18n";
 
 const ActionsModule = {
     init(host: IXQHost) {
@@ -65,21 +66,21 @@ const ActionsModule = {
         eventBus.on('save', async () => {
             let message = "";
             if (host.history.length === 0 && host.PGN.length === 0) {
-                new Notice("历史记录和PGN记录为空，无需保存！");
+                new Notice(t("notice.saveEmpty"));
                 return;
             }
             if (host.history.length === 0 && host.PGN.length > 0)
-                message = "当前PGN记录不为空，是否要清空？";
+                message = t("confirm.saveClear");
             if (host.history.length > 0 && host.PGN.length === 0)
-                message = "当前PGN记录为空，是否要保存历史为PGN？";
+                message = t("confirm.saveNew");
             if (host.history.length > 0 && host.PGN.length > 0)
-                message = "当前PGN记录不为空，是否要覆盖保存？";
+                message = t("confirm.saveOverwrite");
             const modal = new ConfirmModal(
                 host.plugin.app,
-                "确认保存",
+                t("confirm.saveTitle"),
                 message,
-                "保存",
-                "取消",
+                t("confirm.saveBtn"),
+                t("confirm.cancel"),
             );
 
             modal.open();
@@ -87,7 +88,7 @@ const ActionsModule = {
 
             if (userConfirmed) {
                 await savePGN(host);
-                new Notice("保存成功！");
+                new Notice(t("notice.saveSuccess"));
             }
             eventBus.emit('updateUI', 'save');
         })

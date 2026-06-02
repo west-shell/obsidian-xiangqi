@@ -2,6 +2,7 @@ import { registerPGNViewModule } from "../../core/module-system";
 import type { ChessNode, IMove } from "../../types";
 import { ConfirmModal } from "../../utils/confirmModal";
 import { getICCS, genFENFromBoard } from "../../utils/parse";
+import { t } from "../../i18n";
 
 const ActionsModule = {
     init(host: Record<string, any>) {
@@ -102,10 +103,10 @@ const ActionsModule = {
                     if (host.currentNode.id === 'node-root') {
                         const modal = new ConfirmModal(
                             host.plugin.app,
-                            "确认删除",
-                            "确定要删除整盘棋局吗？此操作不可撤销。",
-                            "保存",
-                            "取消",
+                            t("confirm.deleteTitle"),
+                            t("confirm.deleteMsg"),
+                            t("confirm.saveBtn"),
+                            t("confirm.cancel"),
                         );
 
                         modal.open();

@@ -2,6 +2,7 @@
   import { onDestroy, onMount, tick } from "svelte";
   import type { EventBus } from "../../core/event-bus";
   import { PIECE_CHARS, type ChessNode, type NodeMap } from "../../types";
+  import { t } from "../../i18n";
   import { calculateTreeLayout } from "./layout";
   import { setIcon } from "obsidian";
   import * as d3 from "d3";
@@ -355,7 +356,7 @@
   <textarea
     bind:value={commentsText}
     class="auto-height"
-    placeholder="添加注释"
+    placeholder={t("tree.placeholder")}
     bind:this={textareaEl}
     oninput={handleCommentsInput}
     onblur={handleCommentsBlur}

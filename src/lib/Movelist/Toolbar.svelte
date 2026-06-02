@@ -2,6 +2,7 @@
   import { setIcon } from "obsidian";
   import type { EventBus } from "../../core/event-bus";
   import type { ISettings, IMove } from "../../types";
+  import { t, onLangChange } from "../../i18n";
 
   interface Props {
     settings: ISettings;
@@ -19,15 +20,18 @@
     buttonClass = modified ? "unsaved" : PGN.length > 0 ? "saved" : "empty";
   });
 
-  const buttons = [
-    { title: "重置", icon: "refresh-cw", event: "reset" },
-    { title: "开局", icon: "arrow-left-to-line", event: "toStart" },
-    { title: "回退", icon: "arrow-left", event: "undo" },
-    { title: "前进", icon: "arrow-right", event: "redo" },
-    { title: "终局", icon: "arrow-right-to-line", event: "toEnd" },
-    { title: "翻转", icon: "flip-vertical", event: "rotate" },
+  let _lv = $state(0);
+  onLangChange(() => _lv++);
+
+  const buttons = $derived([
+    { title: t("toolbar.reset", _lv), icon: "refresh-cw", event: "reset" },
+    { title: t("toolbar.start", _lv), icon: "arrow-left-to-line", event: "toStart" },
+    { title: t("toolbar.back", _lv), icon: "arrow-left", event: "undo" },
+    { title: t("toolbar.forward", _lv), icon: "arrow-right", event: "redo" },
+    { title: t("toolbar.end", _lv), icon: "arrow-right-to-line", event: "toEnd" },
+    { title: t("toolbar.flip", _lv), icon: "flip-vertical", event: "rotate" },
     { title: "皮卡鱼Web", icon: "external-link", event: "openPikafish" },
-  ];
+  ]);
 
   let saveBtnEl: HTMLButtonElement;
 
@@ -62,7 +66,7 @@
   <button
     class="toolbar-btn {buttonClass}"
     class:disabled={isprotected}
-    aria-label="保存"
+    aria-label={t("toolbar.save", _lv)}
     bind:this={saveBtnEl}
     use:useSetSaveIcon
     onclick={() => emitEvent("save")}

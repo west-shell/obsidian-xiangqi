@@ -9,6 +9,7 @@ import { ChessRenderChild } from "./renderChild/MoveListRenderChild";
 import { GenFENRenderChild } from './renderChild/GenFENRenderChild';
 import { PGNView } from './view/pgn';
 import { XQSettingTab, DEFAULT_SETTINGS } from "./settings";
+import { initI18n, t } from "./i18n";
 
 export default class XQPlugin extends Plugin {
 	settings: ISettings = DEFAULT_SETTINGS;
@@ -16,6 +17,7 @@ export default class XQPlugin extends Plugin {
 	async onload() {
 
 		await this.loadSettings();
+		initI18n(this.settings.lang);
 
 		this.addSettingTab(new XQSettingTab(this.app, this));
 
@@ -51,7 +53,7 @@ export default class XQPlugin extends Plugin {
 
 		this.registerExtensions(["pgn"], PGNView.VIEW_TYPE);
 
-		this.addRibbonIcon("xiangqi-icon", "新建 PGN 文件", async () => {
+		this.addRibbonIcon("xiangqi-icon", t("pgn.newFile"), async () => {
 			let baseFileName = "未命名";
 			let fileExtension = ".pgn";
 			let fileName = baseFileName + fileExtension;
@@ -69,7 +71,7 @@ export default class XQPlugin extends Plugin {
 				const newFile = await this.app.vault.create(fileName, fileContent);
 				this.app.workspace.getLeaf(true).openFile(newFile);
 			} catch (error) {
-				console.error("创建 PGN 文件失败:", error);
+				console.error(t("pgn.error"), error);
 			}
 		});
 
@@ -94,13 +96,13 @@ export default class XQPlugin extends Plugin {
 				if (!(currentView instanceof MarkdownView && currentView.file === file)) {
 					menu.addItem((item) =>
 						item
-							.setTitle("用 Markdown 视图打开")
+							.setTitle(t("menu.markdown"))
 							.setIcon("file-text")
 							.onClick(() => this.changeView(file, 'markdown'))
 					);
 				} if (!(currentView instanceof PGNView && currentView.file === file)) {
 					menu.addItem((item) =>
-						item.setTitle("用 PGN 视图打开")
+						item.setTitle(t("menu.pgn"))
 							.setIcon("xiangqi-icon")
 							.onClick(() => this.changeView(file, PGNView.VIEW_TYPE)));
 				}

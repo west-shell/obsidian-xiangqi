@@ -2,8 +2,10 @@ import XQPlugin from "./main";
 import type { ISettings } from "./types";
 import { type App, PluginSettingTab, Setting } from "obsidian";
 import { THEME_OPTIONS } from "./themes";
+import { t, initI18n } from "./i18n";
 
 export const DEFAULT_SETTINGS: ISettings = {
+	lang: "auto",
 	position: "right",
 	theme: "wood",
 	cellSize: 50,
@@ -69,12 +71,21 @@ export class XQSettingTab extends PluginSettingTab {
 		const { containerEl } = this;
 		containerEl.empty();
 
+		new Setting(containerEl).setName("Language / 语言")
+			.addDropdown(d => d.addOptions({ auto: "Auto/跟随软件", en: "English", "zh-cn": "中文" })
+				.setValue(settings.lang).onChange(v => {
+					settings.lang = v as ISettings["lang"];
+					this.plugin.saveSettings();
+					initI18n(v);
+					this.display();
+				}));
+
 		// ==================== 棋盘外观 ====================
-		containerEl.createEl("h2", { text: "棋盘外观" });
+		containerEl.createEl("h2", { text: t("board.title") });
 
 		new Setting(containerEl)
-			.setName("主题")
-			.setDesc("切换棋盘配色与纹理")
+			.setName(t("board.theme"))
+			.setDesc(t("board.theme.desc"))
 			.addDropdown((dropdown) => {
 				dropdown.addOptions(THEME_OPTIONS);
 				dropdown.setValue(settings.theme).onChange((theme) => {
@@ -86,8 +97,8 @@ export class XQSettingTab extends PluginSettingTab {
 
 		addSliderWithValue(
 			containerEl,
-			"界面大小",
-			"调整棋盘和棋子的显示尺寸",
+			t("board.cellSize"),
+			t("board.cellSize.desc"),
 			settings.cellSize,
 			{ min: 15, max: 100, step: 1 },
 			"px",
@@ -99,11 +110,11 @@ export class XQSettingTab extends PluginSettingTab {
 		);
 
 		new Setting(containerEl)
-			.setName("布局")
-			.setDesc("工具栏在棋盘的右侧还是底部")
+			.setName(t("board.layout"))
+			.setDesc(t("board.layout.desc"))
 			.addDropdown((dropdown) => {
 				dropdown
-					.addOptions({ right: "横向", bottom: "纵向" })
+					.addOptions({ right: t("board.layout.side"), bottom: t("board.layout.bottom") })
 					.setValue(settings.position)
 					.onChange((position) => {
 						settings.position = position as "bottom" | "right";
@@ -113,8 +124,8 @@ export class XQSettingTab extends PluginSettingTab {
 			});
 
 		new Setting(containerEl)
-			.setName("显示坐标标签")
-			.setDesc("在棋盘边缘显示「一二三四五…」和「12345…」列号")
+			.setName(t("board.coordinates"))
+			.setDesc(t("board.coordinates.desc"))
 			.addToggle((toggle) =>
 				toggle.setValue(settings.showCoordinateLabels).onChange((value) => {
 					settings.showCoordinateLabels = value;
@@ -123,11 +134,11 @@ export class XQSettingTab extends PluginSettingTab {
 			);
 
 		// ==================== 对局提示 ====================
-		containerEl.createEl("h2", { text: "对局提示" });
+		containerEl.createEl("h2", { text: t("game.title") });
 
 		new Setting(containerEl)
-			.setName("显示当前着法")
-			.setDesc("高亮上一步走棋的起止位置")
+			.setName(t("game.lastMove"))
+			.setDesc(t("game.lastMove.desc"))
 			.addToggle((toggle) =>
 				toggle.setValue(settings.showLastMove).onChange((value) => {
 					settings.showLastMove = value;
@@ -137,8 +148,8 @@ export class XQSettingTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("显示下一步着法")
-			.setDesc("标记当前选中棋子的可走位置")
+			.setName(t("game.legalMoves"))
+			.setDesc(t("game.legalMoves.desc"))
 			.addToggle((toggle) =>
 				toggle.setValue(settings.showNextMove).onChange((value) => {
 					settings.showNextMove = value;
@@ -148,8 +159,8 @@ export class XQSettingTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("显示行棋边框")
-			.setDesc("在行棋方一侧显示高亮边框提示轮到谁走")
+			.setName(t("game.turnBorder"))
+			.setDesc(t("game.turnBorder.desc"))
 			.addToggle((toggle) =>
 				toggle.setValue(settings.showTurnBorder).onChange((value) => {
 					settings.showTurnBorder = value;
@@ -160,8 +171,8 @@ export class XQSettingTab extends PluginSettingTab {
 
 		if (window.speechSynthesis) {
 			new Setting(containerEl)
-				.setName("朗读着法")
-				.setDesc("走棋时用语音播报着法内容（移动端不支持）")
+				.setName(t("game.speech"))
+				.setDesc(t("game.speech.desc"))
 				.addToggle((toggle) =>
 					toggle.setValue(settings.enableSpeech).onChange((value) => {
 						settings.enableSpeech = value;
@@ -171,11 +182,11 @@ export class XQSettingTab extends PluginSettingTab {
 		}
 
 		// ==================== 着法列表 ====================
-		containerEl.createEl("h2", { text: "着法列表" });
+		containerEl.createEl("h2", { text: t("movelist.title") });
 
 		new Setting(containerEl)
-			.setName("显示着法面板")
-			.setDesc("在棋盘旁显示完整的走棋记录和变招")
+			.setName(t("movelist.show"))
+			.setDesc(t("movelist.show.desc"))
 			.addToggle((toggle) =>
 				toggle.setValue(settings.showMovelist).onChange((value) => {
 					settings.showMovelist = value;
@@ -185,8 +196,8 @@ export class XQSettingTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("显示着法文字")
-			.setDesc("着法列表中显示每一步的中文描述")
+			.setName(t("movelist.text"))
+			.setDesc(t("movelist.text.desc"))
 			.addToggle((toggle) =>
 				toggle.setValue(settings.showMovelistText).onChange((value) => {
 					settings.showMovelistText = value;
@@ -198,8 +209,8 @@ export class XQSettingTab extends PluginSettingTab {
 
 		addSliderWithValue(
 			containerEl,
-			"着法文字大小",
-			"调整着法列表中文字的显示大小",
+			t("movelist.fontSize"),
+			t("movelist.fontSize.desc"),
 			settings.fontSize,
 			{ min: 10, max: 25, step: 1 },
 			"px",
@@ -211,14 +222,14 @@ export class XQSettingTab extends PluginSettingTab {
 		);
 
 		new Setting(containerEl)
-			.setName("开局跳转")
-			.setDesc("打开棋谱时自动定位到哪一步")
+			.setName(t("movelist.autoJump"))
+			.setDesc(t("movelist.autoJump.desc"))
 			.addDropdown((dropdown) => {
 				dropdown
 					.addOptions({
-						never: "不跳转",
-						always: "始终跳转至末尾",
-						auto: "仅默认开局时跳转",
+						never: t("movelist.autoJump.never"),
+						always: t("movelist.autoJump.always"),
+						auto: t("movelist.autoJump.auto"),
 					})
 					.setValue(settings.autoJump)
 					.onChange(async (value) => {
@@ -228,12 +239,12 @@ export class XQSettingTab extends PluginSettingTab {
 			});
 
 		// ---- 边距 ----
-		containerEl.createEl("h3", { text: "棋盘边距" });
+		containerEl.createEl("h3", { text: t("margin.title") });
 
 		addSliderWithValue(
 			containerEl,
-			"上边距",
-			"棋盘顶部的留白距离",
+			t("margin.top"),
+			t("margin.top.desc"),
 			settings.boardMarginTop,
 			{ min: 0, max: 100, step: 1 },
 			"px",
@@ -246,8 +257,8 @@ export class XQSettingTab extends PluginSettingTab {
 
 		addSliderWithValue(
 			containerEl,
-			"下边距",
-			"棋盘底部的留白距离",
+			t("margin.bottom"),
+			t("margin.bottom.desc"),
 			settings.boardMarginBottom,
 			{ min: 0, max: 100, step: 1 },
 			"px",
