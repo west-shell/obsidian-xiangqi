@@ -1,71 +1,54 @@
+import { type Move } from "@west-shell/xiangqi.js";
 import { registerPGNViewModule } from "../../core/module-system";
-import type { ChessNode, IMove } from "../../types";
+import type { ChessNode } from "../../types";
 import { ConfirmModal } from "../../utils/confirmModal";
-import { getICCS, genFENFromBoard } from "../../utils/parse";
 import { t } from "../../i18n";
 
 const ActionsModule = {
     init(host: Record<string, any>) {
         const eventBus = host.eventBus;
 
-        eventBus.on('runmove', (move: IMove) => {
+        eventBus.on('runmove', (move: Move) => {
             const { from, to } = move
             const currentNode = host.currentNode;
             for (let node of currentNode.children) {
-                if (node.data && node.data.from.x === from.x && node.data.from.y === from.y && node.data.to.x === to.x && node.data.to.y === to.y) {
+                if (node.move && node.move.from === from && node.move.to === to) {
                     host.currentNode = node;
-                    host.board = host.currentNode.board;
-                    host.currentTurn = host.currentTurn === 'red' ? 'black' : 'red';
                     host.updateMainPath();
                     eventBus.emit('updateUI')
                     return;
                 }
             }
-            const piece = host.currentNode.board![move.from.x][move.from.y];
-            move.type = piece;
-            move.ICCS = getICCS(move);
-            host.nodeId = host.parser.nodeId
             const newNode: ChessNode = {
                 id: `node-${host.parser.nodeId++}`,
-                data: move,
+                fen: move.after,
+                move,
                 step: host.currentStep,
-                side: host.currentTurn,
+                side: move.color === 'w' ? 'red' : 'black',
                 parentID: host.currentNode.id,
                 children: [],
                 mainID: null,
-                comments: []
+                comments: [],
             };
             host.nodeMap.set(newNode.id, newNode);
-            const newboard = host.currentNode.board!.map((row: string | null[]) => row.slice());
-            newboard[move.from.x][move.from.y] = null; // 清除原位置
-            if (newboard[move.to.x][move.to.y]) {
-                move.captured = newboard[move.to.x][move.to.y]; // 记录被吃掉的棋子
-            }
-            newboard[move.to.x][move.to.y] = piece; // 设置新位置
-            newNode.board = newboard;
-            host.board = newboard;
             host.currentNode.children.push(newNode);
             host.currentNode = newNode;
-            host.currentTurn = host.currentTurn === 'red' ? 'black' : 'red';
             host.currentStep++;
             host.updateMainPath();
             eventBus.emit('updateUI')
             eventBus.emit('updatePGN')
         })
+
         eventBus.on('node-click', (id: string) => {
             host.markedPos = null;
             host.currentNode = host.nodeMap.get(id);
-            host.board = host.currentNode.board;
-            host.currentTurn = host.currentNode.side === 'red' ? 'black' : 'red';
             host.updateMainPath();
             host.eventBus.emit('updateUI')
         })
 
         eventBus.on('updatePGN', () => {
             const pgn = stringifyPGN(host.root);
-            const content = [host.tags?.trim(), pgn]
-                .filter(Boolean)
-                .join('\n');
+            const content = [host.tags?.trim(), pgn].filter(Boolean).join('\n');
             host.data = content;
             host.saveFile();
         })
@@ -77,42 +60,25 @@ const ActionsModule = {
                 case 'annotation': {
                     if (!host.currentNode) break;
                     const node = host.currentNode;
-                    if (!node.comments) {
-                        node.comments = [];
-                    }
-
-                    // 定义所有可能的批注符号
-                    const ALL_ANNOTATIONS = ["R+", "B+", "=", "?", "!", "R#", "B#"];
-                    const isClickedDataAnnotation = ALL_ANNOTATIONS.includes(data);
-
-                    if (isClickedDataAnnotation) {
-                        const existingAnnotationIndex = node.comments.indexOf(data);
-
-                        if (existingAnnotationIndex !== -1) {
-                            // 如果点击的批注已存在，则移除它（取消批注）
-                            node.comments.splice(existingAnnotationIndex, 1);
-                        } else {
-                            // 如果点击的批注不存在，则清除所有其他批注，然后添加新的批注
-                            node.comments = node.comments.filter((comment: string) => !ALL_ANNOTATIONS.includes(comment)); // 清除所有现有批注
-                            node.comments.push(data); // 添加新的批注
+                    if (!node.comments) node.comments = [];
+                    const ALL_ANNOTATIONS = ["R+", "B+", "=", "?", "!", "1-0", "0-1", "1/2-1/2"];
+                    if (ALL_ANNOTATIONS.includes(data)) {
+                        const idx = node.comments.indexOf(data);
+                        if (idx !== -1) node.comments.splice(idx, 1);
+                        else {
+                            node.comments = node.comments.filter((c: string) => !ALL_ANNOTATIONS.includes(c));
+                            node.comments.push(data);
                         }
                     }
                     break;
                 }
                 case 'remove': {
                     if (host.currentNode.id === 'node-root') {
-                        const modal = new ConfirmModal(
-                            host.plugin.app,
-                            t("confirm.deleteTitle"),
-                            t("confirm.deleteMsg"),
-                            t("confirm.saveBtn"),
-                            t("confirm.cancel"),
-                        );
-
+                        const modal = new ConfirmModal(host.plugin.app,
+                            t("confirm.deleteTitle"), t("confirm.deleteMsg"),
+                            t("confirm.saveBtn"), t("confirm.cancel"));
                         modal.open();
-                        const userConfirmed = await modal.promise;
-
-                        if (userConfirmed) {
+                        if (await modal.promise) {
                             host.currentNode.children = [];
                             host.nodeMap.clear();
                             host.currentNode = { ...host.currentNode }
@@ -120,25 +86,18 @@ const ActionsModule = {
                             eventBus.emit("node-click", host.currentNode.id);
                         }
                         break;
-
                     }
                     const removeNode = host.currentNode;
                     const parentNode = host.nodeMap.get(removeNode.parentID!);
-
                     host.currentNode = parentNode;
-
                     if (parentNode) {
-                        const index = parentNode.children.indexOf(removeNode);
-                        if (index !== -1) parentNode.children.splice(index, 1);
+                        const idx = parentNode.children.indexOf(removeNode);
+                        if (idx !== -1) parentNode.children.splice(idx, 1);
                     }
-
                     function deleteSubtree(node: ChessNode) {
-                        for (const child of node.children) {
-                            deleteSubtree(child);
-                        }
+                        for (const child of node.children) deleteSubtree(child);
                         host.nodeMap.delete(node.id);
                     }
-
                     deleteSubtree(removeNode);
                     host.updateMainPath();
                     eventBus.emit("node-click", host.currentNode.id);
@@ -146,164 +105,92 @@ const ActionsModule = {
                 }
                 case 'promote': {
                     if (!host.currentNode.parentID || host.currentNode.id === 'node-root') break;
-
                     let nodeToPromote = host.currentNode;
                     let parent = host.nodeMap.get(nodeToPromote.parentID!);
-
                     if (!parent) break;
-
-                    // Find the ancestor that is not the first child
                     while (parent.children.length > 0 && parent.children[0].id === nodeToPromote.id) {
-                        if (!parent.parentID) break; // Reached the root's direct child, and it's the main line
+                        if (!parent.parentID) break;
                         nodeToPromote = parent;
                         parent = host.nodeMap.get(parent.parentID);
                         if (!parent) break;
                     }
-
-                    // Now, `parent` is the node whose children need reordering.
-                    // `nodeToPromote` is the child to be promoted.
-
-                    // Clear mainID on all siblings before reordering
-                    for (const child of parent.children) {
-                        child.mainID = null;
+                    for (const child of parent.children) child.mainID = null;
+                    const idx = parent.children.findIndex((c: ChessNode) => c.id === nodeToPromote.id);
+                    if (idx > 0) {
+                        const item = parent.children[idx];
+                        parent.children = [item, ...parent.children.filter((c: ChessNode) => c.id !== item.id)];
                     }
-
-                    const children = parent.children;
-                    const index = children.findIndex((c: ChessNode) => c.id === nodeToPromote.id);
-
-                    if (index > 0) { // If it's not already the main line
-                        const item = children[index];
-                        // Create new array for reactivity, reordering the item to the front
-                        const otherChildren = children.filter((c: ChessNode) => c.id !== item.id);
-                        parent.children = [item, ...otherChildren];
-                    }
-
                     host.updateMainPath();
                     break;
                 }
-                case 'toStart': {
+                case 'toStart':
                     host.currentNode = host.nodeMap.get(host.currentPath[0]);
-                    host.board = host.currentNode.board;
-                    host.currentTurn = host.currentNode.side === 'red' ? 'black' : 'red';
                     break;
-                }
-                case 'back': {
-                    if (host.currentNode.parentID) {
-                        host.currentNode = host.nodeMap.get(host.currentNode.parentID);
-                        host.board = host.currentNode.board;
-                        host.currentTurn = host.currentNode.side === 'red' ? 'black' : 'red';
-                    }
+                case 'back':
+                    if (host.currentNode.parentID) host.currentNode = host.nodeMap.get(host.currentNode.parentID);
                     break;
-                }
                 case 'next': {
-                    const currentIndex = host.currentPath.indexOf(host.currentNode.id);
-                    if (currentIndex < host.currentPath.length - 1) {
-                        const nextNodeId = host.currentPath[currentIndex + 1];
-                        host.currentNode = host.nodeMap.get(nextNodeId);
-                        host.board = host.currentNode.board;
-                        host.currentTurn = host.currentNode.side === 'red' ? 'black' : 'red';
-                    }
+                    const ci = host.currentPath.indexOf(host.currentNode.id);
+                    if (ci < host.currentPath.length - 1) host.currentNode = host.nodeMap.get(host.currentPath[ci + 1]);
                     break;
                 }
-                case 'toEnd': {
+                case 'toEnd':
                     host.currentNode = host.nodeMap.get(host.currentPath[host.currentPath.length - 1]);
-                    host.board = host.currentNode.board;
-                    host.currentTurn = host.currentNode.side === 'red' ? 'black' : 'red';
                     break;
-                }
                 case 'openPikafish': {
-                    // 1. 从 root 节点获取 fen 和 firstturn
-                    const initialFen = genFENFromBoard(host.root.board!, host.root.side === 'red' ? 'black' : 'red');
-
-                    // 2. 根据 currentPath 获取行棋的着法
-                    // host.mainPath 包含 root 节点，但 root 节点没有 move data，所以从第二个节点开始
-                    const movesOnCurrentPath: string[] = [];
+                    const fen = host.root.fen;
+                    const movesOnPath: string[] = [];
                     for (let i = 1; i < host.currentPath.length; i++) {
-                        const nodeId = host.currentPath[i];
-                        const node = host.nodeMap.get(nodeId);
-                        if (node && node.data && node.data.ICCS) {
-                            movesOnCurrentPath.push(node.data.ICCS.replace('-', '').toLowerCase());
-                        }
+                        const node = host.nodeMap.get(host.currentPath[i]);
+                        if (node?.move?.san) movesOnPath.push(node.move.san.replace(/[-+]/g, '').toLowerCase());
                     }
-                    const movesStr = movesOnCurrentPath.join('');
-
-                    // 3. 完善 URL
-                    const url = `https://xiangqiai.com/#/${initialFen} moves ${movesStr}`;
-                    window.open(url);
+                    window.open(`https://xiangqiai.com/#/${fen} moves ${movesOnPath.join('')}`);
                     break;
                 }
             }
-
             eventBus.emit('updateUI')
             eventBus.emit('updatePGN')
         })
     }
 }
 
-
 registerPGNViewModule('actions', ActionsModule);
 
 function stringifyPGN(root: ChessNode): string {
+    const nodeBrothers = genNodeBrothers(root)
 
-    let nodeBrothers = genNodeBrothers(root)
     function genNodeBrothers(root: ChessNode): Map<ChessNode, ChessNode[]> {
-        const nodeBrothers = new Map<ChessNode, ChessNode[]>();
-
+        const map = new Map<ChessNode, ChessNode[]>();
         function dfs(node: ChessNode) {
             if (node.children.length > 1) {
-                const [mainChild, ...siblings] = node.children;
-                nodeBrothers.set(mainChild, siblings);
+                const [main, ...siblings] = node.children;
+                map.set(main, siblings);
             }
-
-            for (const child of node.children) {
-                dfs(child);
-            }
+            for (const child of node.children) dfs(child);
         }
-
         dfs(root);
-        return nodeBrothers;
+        return map;
     }
 
     function walk(node: ChessNode, stepNum: number): string {
         let result = '';
-
-        if (node.side === 'red') {
-            result += `${stepNum}. ${node.data!.ICCS}`;
-        } else if (node.side === 'black') {
-            result += `${node.data!.ICCS}`;
-        }
-
-        // 注释
+        if (node.side === 'red') result += `${stepNum}. ${node.move!.san}`;
+        else if (node.side === 'black') result += `${node.move!.san}`;
         if (node.comments?.length) {
-            for (const c of node.comments) {
-                result += `{${c}}`;
-            }
+            for (const c of node.comments) result += `{${c}}`;
         }
-
-        // 分支（兄弟节点）
         const brothers = nodeBrothers.get(node);
         if (brothers?.length) {
             for (const brother of brothers) {
-                if (brother.side === 'red') {
-                    result += ` (${walk(brother, stepNum)})`;
-                } else if (brother.side === 'black') {
-                    result += ` (${stepNum}. ... ${walk(brother, stepNum)})`;
-                }
+                if (brother.side === 'red') result += ` (${walk(brother, stepNum)})`;
+                else result += ` (${stepNum}. ... ${walk(brother, stepNum)})`;
             }
         }
-
-        // 递归主线（第一个子节点）
         if (node.children[0]) {
             const next = node.children[0];
-            const nextStepNum = next.side === 'red' ? stepNum + 1 : stepNum;
-            result += ` ${walk(next, nextStepNum)}`;
+            result += ` ${walk(next, next.side === 'red' ? stepNum + 1 : stepNum)}`;
         }
-
         return result;
     }
-
-    const pgn = walk(root, 0);
-    // console.log(pgn);
-    return pgn;
-
+    return walk(root, 0);
 }

@@ -1,16 +1,15 @@
 import { MarkdownView, Notice } from "obsidian";
 import { registerGenFENModule } from "../../core/module-system";
-import type { IBoard, IGenFENHost, ITurn, PieceType } from "../../types";
-import { genFENFromBoard } from "../../utils/parse";
+import type { IGenFENHost } from "../../types";
 import { t } from "../../i18n";
+import { DEFAULT_FEN } from "../../types";
 
 const ActionsModule = {
     init(host: IGenFENHost) {
         const eventBus = host.eventBus;
 
-        eventBus.on("clickPieceBTN", (piece: PieceType) => {
+        eventBus.on("clickPieceBTN", (piece: string) => {
             if (!piece) return;
-            host.markedPos = null;
             host.selectedPiece = piece;
             host.eventBus.emit('updateUI');
         })
@@ -19,19 +18,17 @@ const ActionsModule = {
             if (!action) return;
             switch (action) {
                 case 'turn':
-                    host.currentTurn = host.currentTurn === 'red' ? 'black' : 'red';
+                    const parts = host.fen.split(' ');
+                    parts[1] = parts[1] === 'w' ? 'b' : 'w';
+                    host.fen = parts.join(' ');
                     break
                 case 'empty':
-                    host.board = Array.from({ length: 10 }, () => Array(9).fill(null));
-                    host.board[4][0] = 'k';
-                    host.board[4][9] = 'K'
-                    host.selectedPiece = null
-                    host.markedPos = null;
+                    host.fen = '4k4/9/9/9/9/9/9/9/9/4K4 w - - 0 1';
+                    host.selectedPiece = null;
                     break
                 case 'full':
-                    host.eventBus.emit('full');
-                    host.selectedPiece = null
-                    host.markedPos = null;
+                    host.fen = DEFAULT_FEN;
+                    host.selectedPiece = null;
                     break
                 case 'save':
                     onSaveBTNClick(host);
@@ -45,39 +42,26 @@ const ActionsModule = {
 registerGenFENModule('actions', ActionsModule)
 
 async function onSaveBTNClick(host: IGenFENHost) {
-    // 1. 生成 FEN
-    const fen = genFENFromBoard(host.board, host.currentTurn);
-    // 2. 获取当前 markdown 编辑器视图和文件
+    const fen = host.fen;
     const view = host.plugin.app.workspace.getActiveViewOfType(MarkdownView);
     if (!view) return;
     const file = view.file;
     if (!file) return;
 
     host.plugin.app.vault.process(file, fileContent => {
-        // 3. 获取当前代码块的 section 信息
         const section = host.ctx.getSectionInfo(host.containerEl);
         if (!section) return fileContent;
         const { lineStart, lineEnd } = section;
-
-        // 4. 读取文件内容并分行
         const lines = fileContent.split("\n");
-
-        // 5. 获取代码块内容行
         let blockLines: string[] = lines.slice(lineStart, lineEnd + 1);
         if (blockLines.length < 2) return fileContent;
-
-        // 6. 判断并替换代码块类型为 xiangqi，内容为 FEN
-        // 只替换代码块首尾行，内容只保留 FEN
         blockLines[0] = blockLines[0].replace(/^```xq\b.*$/, "```xiangqi");
         blockLines = [blockLines[0], `[FEN "${fen}"]`, "```"];
-
-        // 7. 拼接新内容并写回
         const newContent = [
             ...lines.slice(0, lineStart),
             ...blockLines,
             ...lines.slice(lineEnd + 1),
         ].join("\n");
-
         return newContent;
     });
     new Notice(t("notice.fenSaved"));

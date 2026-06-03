@@ -4,23 +4,20 @@
   import type { Api } from "@west-shell/chessground-xq/api";
   import type { Config } from "@west-shell/chessground-xq/config";
   import type { DrawShape } from "@west-shell/chessground-xq/draw";
-  import { pos2key, key2pos } from "@west-shell/chessground-xq/util";
   import type * as cg from "@west-shell/chessground-xq/types";
-  import { genFENFromBoard } from "../utils/parse";
-  import { isValidMove } from "../utils/rules";
-  import type { ITurn } from "../types";
+  import { Chess, type Move, type Square } from "@west-shell/xiangqi.js";
   import type { EventBus } from "../core/event-bus";
-  import type { IBoard, IMove, IPosition, ISettings } from "../types";
+  import type { ISettings } from "../types";
 
   interface Props {
     settings: ISettings;
-    board: IBoard;
-    lastMove?: IMove | null;
-    markedPos?: IPosition | null;
-    currentTurn: ITurn;
+    fen: string;
+    lastMove?: [Square, Square] | null;
+    selectedSquare?: Square | null;
+    checkColor?: cg.Color | null;
     eventBus: EventBus;
     rotated: boolean;
-    variations?: IMove[];
+    variations?: Move[];
     freeMode?: boolean;
     boardWidth?: number;
     userShapes?: DrawShape[];
@@ -28,10 +25,10 @@
 
   let {
     settings,
-    board,
+    fen,
     lastMove = null,
-    markedPos = null,
-    currentTurn,
+    selectedSquare = null,
+    checkColor = null,
     eventBus,
     rotated,
     variations = [],
@@ -41,62 +38,40 @@
   }: Props = $props();
 
   let boardWidth = $derived(boardWidthOverride ?? settings.cellSize * 9);
-
   let boardElement: HTMLDivElement;
   let api: Api | null = null;
   let layoutChangeHandler: (() => void) | null = null;
-  let fen = $derived(genFENFromBoard(board, currentTurn));
-  let turnColor: cg.Color = $derived(currentTurn === "black" ? "black" : "white");
-  let turnClass = $derived(settings.showTurnBorder ? `turn-${currentTurn}` : "");
+  let turnColor: cg.Color = $derived(fen.split(' ')[1] === 'b' ? 'black' : 'white');
+  let turnClass = $derived(settings.showTurnBorder ? `turn-${fen.split(' ')[1] === 'b' ? 'black' : 'red'}` : "");
+  let _check: cg.Color | false = $derived(checkColor || false);
 
-  // Our internal coords: y=0 top, y=9 bottom
-  // Chessground: y=0 bottom, y=9 top
-  function toKey(pos: IPosition): cg.Key {
-    return pos2key([pos.x, 9 - pos.y])!;
-  }
-
-  function toPos(key: cg.Key): IPosition {
-    const [x, y] = key2pos(key);
-    return { x, y: 9 - y };
-  }
-
-  function computeDests(board: IBoard, turn: ITurn): Map<cg.Key, cg.Key[]> {
-    const dests = new Map<cg.Key, cg.Key[]>();
-    for (let x = 0; x < 9; x++) {
-      for (let y = 0; y < 10; y++) {
-        const piece = board[x][y];
-        if (!piece) continue;
-        const isRed = piece === piece.toUpperCase();
-        if ((turn === "red" && !isRed) || (turn === "black" && isRed)) continue;
-
-        const from: IPosition = { x, y };
-        const keys: cg.Key[] = [];
-        for (let tx = 0; tx < 9; tx++) {
-          for (let ty = 0; ty < 10; ty++) {
-            if (tx === x && ty === y) continue;
-            if (isValidMove(from, { x: tx, y: ty }, board)) {
-              keys.push(toKey({ x: tx, y: ty }));
-            }
-          }
-        }
-        if (keys.length > 0) {
-          dests.set(toKey(from), keys);
-        }
+  function computeDests(fen: string): Map<cg.Key, cg.Key[]> {
+    try {
+      const chess = new Chess(fen);
+      const dests = new Map<cg.Key, cg.Key[]>();
+      const moves = chess.moves({ verbose: true }) as Move[];
+      for (const move of moves) {
+        const orig = move.from;
+        const dest = move.to;
+        if (!dests.has(orig)) dests.set(orig, []);
+        dests.get(orig)!.push(dest);
       }
+      return dests;
+    } catch {
+      return new Map();
     }
-    return dests;
   }
 
-  function computeVariationShapes(variations: IMove[]): DrawShape[] {
+  function computeVariationShapes(variations: Move[]): DrawShape[] {
     return variations.map((move) => ({
-      orig: toKey(move.from),
-      dest: toKey(move.to),
+      orig: move.from,
+      dest: move.to,
       brush: "blue",
     }));
   }
 
   let shapes = $derived(settings.showNextMove ? computeVariationShapes(variations) : []);
-  let dests = $derived(computeDests(board, currentTurn));
+  let dests = $derived(computeDests(fen));
 
   onMount(async () => {
     const events: Config["events"] = freeMode
@@ -105,20 +80,21 @@
             if (api) eventBus.emit("fen-updated", api.getFen());
           },
           select: (key) => {
-            eventBus.emit("click", toPos(key));
+            eventBus.emit("click", key);
           },
         }
       : {
           move: (orig, dest) => {
-            const from = toPos(orig);
-            const to = toPos(dest);
-
-            if (isValidMove(from, to, board)) {
-              eventBus.emit("runmove", {
-                from,
-                to,
-              } as IMove);
-            } else {
+            try {
+              const chess = new Chess(fen);
+              const move = chess.move({ from: orig, to: dest });
+              if (move) {
+                eventBus.emit("runmove", move);
+              } else {
+                api?.cancelMove();
+                eventBus.emit("invalid-move", { from: orig, to: dest });
+              }
+            } catch {
               api?.cancelMove();
               eventBus.emit("invalid-move", { from: orig, to: dest });
             }
@@ -130,6 +106,7 @@
       orientation: rotated ? "black" : "white",
       turnColor,
       coordinates: true,
+      draggable: { enabled: true },
       viewOnly: settings.viewOnly ?? false,
       movable: freeMode
         ? { free: true, color: "both" }
@@ -160,12 +137,14 @@
       config.draggable = { deleteOnDropOff: true };
     }
 
+    config.check = _check;
+
     if (lastMove) {
-      config.lastMove = [toKey(lastMove.from), toKey(lastMove.to)];
+      config.lastMove = lastMove;
     }
 
-    if (markedPos) {
-      config.selected = toKey(markedPos);
+    if (selectedSquare) {
+      config.selected = selectedSquare;
     }
 
     api = Chessground(boardElement, config);
@@ -191,9 +170,9 @@
   $effect(() => {
     if (!api) return;
     if (freeMode) {
-      api.set({ fen, turnColor });
+      api.set({ fen, turnColor, check: _check });
     } else {
-      api.set({ fen, turnColor, movable: { color: turnColor, dests } });
+      api.set({ fen, turnColor, movable: { color: turnColor, dests }, check: _check });
     }
   });
 
@@ -204,9 +183,7 @@
 
   $effect(() => {
     if (!api) return;
-    api.set({
-      lastMove: lastMove ? [toKey(lastMove.from), toKey(lastMove.to)] : undefined,
-    });
+    api.set({ lastMove: lastMove ? lastMove : undefined });
   });
 
   $effect(() => {
@@ -221,9 +198,8 @@
 
   $effect(() => {
     if (!api || freeMode) return;
-    void board;
-    if (markedPos) {
-      api.selectSquare(toKey(markedPos), true);
+    if (selectedSquare) {
+      api.selectSquare(selectedSquare, true);
     } else {
       api.selectSquare(null);
     }
@@ -246,7 +222,16 @@
     height: 100%;
     flex-shrink: 0;
     aspect-ratio: 450 / 500;
+    border-radius: 2px;
     --piece-red: var(--xq-piece-red, var(--color-red));
     --piece-black: var(--xq-piece-black, var(--color-blue));
+  }
+
+  .xq-wrap.turn-red {
+    box-shadow: 0 0 12px 3px rgba(255, 50, 50, 0.5);
+  }
+
+  .xq-wrap.turn-black {
+    box-shadow: 0 0 12px 3px rgba(0, 0, 0, 0.7);
   }
 </style>

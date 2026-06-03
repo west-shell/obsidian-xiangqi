@@ -7,31 +7,26 @@ const TreeViewModule = {
         const eventBus = host.eventBus;
 
         eventBus.on('createUI', () => {
-
             const Container = host.contentEl;
             Container.classList.add('pgn-view');
-            host.Xiangqi = mount(TreeView, {
+            host.Chess = mount(TreeView, {
                 target: Container,
                 props: {
                     nodeMap: host.nodeMap,
                     settings: host.settings,
-                    board: host.currentNode.board,
-                    markedPos: host.markedPos,
-                    currentTurn: host.currentTurn,
+                    fen: host.currentNode.fen,
                     eventBus: host.eventBus,
                     currentNode: host.currentNode,
                     currentPath: host.currentPath,
                 }
-            })
+            });
         })
 
         eventBus.on("updateUI", () => {
-            host.Xiangqi.$set({
+            host.Chess?.$set({
                 settings: { ...host.settings },
                 nodeMap: new Map(host.nodeMap),
-                board: host.currentNode.board,
-                markedPos: host.markedPos,
-                currentTurn: host.currentTurn,
+                fen: host.currentNode?.fen ?? '',
                 currentNode: host.currentNode,
                 currentPath: host.currentPath,
             });
@@ -40,23 +35,17 @@ const TreeViewModule = {
         eventBus.on('ready', () => {
             if (!host.settings.autoJump) return
             switch (host.settings.autoJump) {
-                case "never":
-                    break;
-                case "always":
-                    eventBus.emit('btn-click', { name: 'toEnd' });
-                    break;
+                case "never": break;
+                case "always": eventBus.emit('btn-click', { name: 'toEnd' }); break;
                 case "auto":
-                    if (!host.haveFEN) {
-                        eventBus.emit('btn-click', { name: 'toEnd' });
-                    }
+                    if (!host.haveFEN) eventBus.emit('btn-click', { name: 'toEnd' });
                     break;
             }
         })
 
         eventBus.on("unload", () => {
-            unmount(host.Xiangqi)
+            unmount(host.Chess)
         })
-
     }
 }
 

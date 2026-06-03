@@ -1,52 +1,55 @@
-import type { IPosition } from "../../types";
+import { Chess } from "@west-shell/xiangqi.js";
+import type { Square } from "@west-shell/xiangqi.js";
 import { registerGenFENModule } from "../../core/module-system";
-import { loadBoardFromFEN } from "../../utils/parse";
 
 const BoardClickModule = {
     init(host: Record<string, any>) {
         const eventBus = host.eventBus;
 
-        eventBus.on('click', (clickedPos: IPosition) => {
-            const clickedPiece = host.board[clickedPos.x][clickedPos.y];
+        eventBus.on('click', (clickedKey: string) => {
+            const chess = new Chess(host.fen, { skipValidation: true });
+
             if (!host.markedPos && !host.selectedPiece) {
-                if (clickedPiece) {
-                    host.markedPos = clickedPos;
-                    host.Xiangqi.$set({
-                        markedPos: { ...host.markedPos },
-                    });
+                const piece = chess.get(clickedKey as Square);
+                if (piece) {
+                    host.markedPos = clickedKey;
+                    eventBus.emit('updateUI');
                 }
             } else if (host.markedPos && !host.selectedPiece) {
-                const from = host.markedPos
-                const to = clickedPos
-                host.board[to.x][to.y] = host.board[from.x][from.y];
-                host.board[from.x][from.y] = null;
-                host.markedPos = null;
-                host.Xiangqi.$set({
-                    board: [...host.board.map((row: any) => [...row])],
-                    markedPos: host.markedPos,
-                });
+                const from = host.markedPos as Square;
+                const to = clickedKey as Square;
+                const piece = chess.get(from);
+                if (piece) {
+                    chess.remove(to);
+                    const sqPiece = chess.get(from);
+                    chess.remove(from);
+                    if (sqPiece) chess.put(sqPiece, to);
+                    host.fen = chess.fen();
+                    host.markedPos = null;
+                    eventBus.emit('updateUI');
+                } else {
+                    host.markedPos = null;
+                    eventBus.emit('updateUI');
+                }
             } else if (host.selectedPiece) {
-                host.board[clickedPos.x][clickedPos.y] = host.selectedPiece;
+                chess.remove(clickedKey as Square);
+                if (host.selectedPiece) {
+                    const color = host.selectedPiece === host.selectedPiece.toUpperCase() ? 'w' : 'b';
+                    const type = host.selectedPiece.toLowerCase();
+                    chess.put({ type: type as any, color }, clickedKey as Square);
+                }
+                host.fen = chess.fen();
                 host.selectedPiece = null;
                 host.markedPos = null;
-                host.Xiangqi.$set({
-                    board: [...host.board.map((row: any) => [...row])],
-                    selectedPiece: host.selectedPiece,
-                    markedPos: host.markedPos,
-                });
+                eventBus.emit('updateUI');
             }
         })
 
-        // Sync board state from chessground after drags/click-click moves
         eventBus.on('fen-updated', (fen: string) => {
             if (!fen) return;
-            const { board } = loadBoardFromFEN(fen);
-            host.board = board;
+            host.fen = fen;
             host.markedPos = null;
-            host.Xiangqi.$set({
-                board: [...host.board.map((row: any) => [...row])],
-                markedPos: null,
-            });
+            eventBus.emit('updateUI');
         })
     }
 }

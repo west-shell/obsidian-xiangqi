@@ -2,6 +2,7 @@ import Xiangqi from "../../lib/Movelist/Xiangqi.svelte";
 import { registerXQModule } from "../../core/module-system";
 import type { IXQHost } from "../../types";
 import { mount, unmount } from "svelte";
+import type { Square } from "@west-shell/xiangqi.js";
 
 const BoardModule = {
     init(host: IXQHost) {
@@ -10,20 +11,20 @@ const BoardModule = {
         eventBus.on("load", () => {
             host.modified = false
             const Container = host.containerEl.createEl('div');
-            host.Xiangqi = mount(Xiangqi, {
+            host.Chess = mount(Xiangqi, {
                 target: Container,
                 props: {
                     settings: host.settings,
-                    board: host.board,
-                    markedPos: host.markedPos,
-                    currentTurn: host.currentTurn,
+                    fen: host.fen,
+                    checkColor: null,
+                    selectedSquare: null,
                     currentStep: host.currentStep,
                     eventBus: host.eventBus,
                     modified: host.modified,
                     PGN: host.PGN,
                     history: host.history,
-                    lastMove: host.modified ? host.history[host.currentStep - 1] || null : host.PGN[host.currentStep - 1] || null,
-                    options: host.options || {}
+                    lastMove: null,
+                    options: host.options || {},
                 },
             });
         })
@@ -31,37 +32,34 @@ const BoardModule = {
         eventBus.on('ready', () => {
             if (!host.settings.autoJump) return
             switch (host.settings.autoJump) {
-                case "never":
-                    break;
-                case "always":
-                    eventBus.emit('toEnd');
-                    break;
+                case "never": break;
+                case "always": eventBus.emit('toEnd'); break;
                 case "auto":
-                    if (!host.haveFEN) {
-                        eventBus.emit('toEnd');
-                    }
+                    if (!host.haveFEN) eventBus.emit('toEnd');
                     break;
             }
         })
 
         eventBus.on('updateUI', () => {
-            // if (type === undefined) return;
-            host.Xiangqi?.$set({
+            const currentMoves = host.modified ? host.history : host.PGN;
+            const lastMove = currentMoves[host.currentStep - 1] ?? null;
+            const checkColor = lastMove && /\+|#/.test(lastMove.san)
+                ? (lastMove.color === 'w' ? 'black' : 'white') : null;
+            host.Chess?.$set({
                 settings: { ...host.settings },
-                board: [...host.board.map(row => [...row])], // 创建新的 board 数组引用
-                markedPos: host.markedPos,
-                currentTurn: host.currentTurn,
+                fen: host.fen,
+                checkColor,
+                selectedSquare: null,
                 currentStep: host.currentStep,
                 modified: host.modified,
                 history: [...host.history],
-                lastMove: host.modified ? host.history[host.currentStep - 1] || null : host.PGN[host.currentStep - 1] || null,
-                options: { ...(host.options || {}) }
+                lastMove: lastMove ? [lastMove.from, lastMove.to] as [Square, Square] : null,
+                options: { ...(host.options || {}) },
             });
         })
 
         eventBus.on("unload", () => {
-            unmount(host.Xiangqi)
-
+            unmount(host.Chess)
         })
     }
 }

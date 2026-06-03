@@ -7,33 +7,28 @@ const BoardModule = {
         const eventBus = host.eventBus;
 
         eventBus.on("load", () => {
-            host.modified = false
             const Container = host.containerEl.createEl('div');
-            host.Xiangqi = mount(GenFEN, {
+            host.Chess = mount(GenFEN, {
                 target: Container,
                 props: {
                     selectedPiece: host.selectedPiece,
                     settings: host.settings,
-                    board: host.board,
-                    markedPos: host.markedPos,
-                    currentTurn: host.currentTurn,
+                    fen: host.fen,
                     eventBus: host.eventBus,
                 },
             });
         })
 
-        eventBus.on('updateUI', (type: string) => {
-            host.Xiangqi.$set({
+        eventBus.on('updateUI', () => {
+            host.Chess?.$set({
                 selectedPiece: host.selectedPiece,
                 settings: { ...host.settings },
-                board: [...host.board],
-                markedPos: host.markedPos,
-                currentTurn: host.currentTurn,
+                fen: host.fen,
             });
         })
 
         eventBus.on("unload", () => {
-            unmount(host.Xiangqi)
+            unmount(host.Chess)
         })
     }
 }

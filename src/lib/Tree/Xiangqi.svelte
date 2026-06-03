@@ -2,10 +2,11 @@
   import Tree from "./Tree.svelte";
   import Board from "../Board.svelte";
   import Toolbar from "./Toolbar.svelte";
-  import type { ChessNode, IBoard, IMove, IPosition, ISettings, NodeMap, ITurn } from "../../types";
+  import type { ChessNode, ISettings, NodeMap } from "../../types";
   import type { EventBus } from "../../core/event-bus";
   import type { DrawShape } from "@west-shell/chessground-xq/draw";
   import type * as cg from "@west-shell/chessground-xq/types";
+  import type { Move, Square } from "@west-shell/xiangqi.js";
   import { onMount, tick } from "svelte";
 
   const SHAPES_PREFIX = "__SHAPES__";
@@ -41,9 +42,7 @@
 
   interface Props {
     settings: ISettings;
-    board: IBoard;
-    markedPos: IPosition;
-    currentTurn: ITurn;
+    fen: string;
     eventBus: EventBus;
     nodeMap: NodeMap;
     currentNode: ChessNode;
@@ -52,21 +51,27 @@
 
   let {
     settings,
-    board,
-    markedPos,
-    currentTurn,
+    fen,
     eventBus,
     nodeMap,
     currentNode,
     currentPath,
   }: Props = $props();
 
-  let lastMove = $derived(currentNode.data);
+  let lastMove: [Square, Square] | null = $derived(
+    currentNode.move ? [currentNode.move.from, currentNode.move.to] : null
+  );
   let { position } = $derived(settings);
   let rotated = $state(false);
   let variations = $derived(
-    currentNode.children.map((child) => child.data).filter((data): data is IMove => data != null) ??
-      [],
+    currentNode.children
+      .map((child) => child.move)
+      .filter((m): m is Move => m != null) ?? [],
+  );
+  let checkColor = $derived(
+    currentNode.move && /\+|#/.test(currentNode.move.san)
+      ? (currentNode.move.color === 'w' ? 'black' : 'white')
+      : null
   );
   let userShapes = $derived(loadShapes(currentNode));
 
@@ -79,7 +84,6 @@
     const pos = position;
     const ro = new ResizeObserver(() => {
       const rect = el.getBoundingClientRect();
-
       if (pos === "right") {
         const availWidth = rect.width * 0.6;
         const availHeight = rect.height;
@@ -119,15 +123,7 @@
 <div class="tree-view {position}" bind:this={treeViewEl}>
   <div class="board-area">
     <Board
-      {settings}
-      {board}
-      {lastMove}
-      {markedPos}
-      {currentTurn}
-      {eventBus}
-      {rotated}
-      {variations}
-      {userShapes}
+      {settings} {fen} {lastMove} {checkColor} {eventBus} {rotated} {variations} {userShapes}
       boardWidth={adaptiveBoardWidth}
     />
   </div>
@@ -142,42 +138,11 @@
     padding-top: var(--board-margin-top, 0px) !important;
     padding-bottom: var(--board-margin-bottom, 0px) !important;
   }
-  .tree-view {
-    display: flex;
-    justify-content: center;
-  }
-
-  .tree-view.right {
-    flex-direction: row;
-    height: 100%;
-    gap: 2px;
-  }
-
-  .tree-view.right :global(.tree-container) {
-    flex: 1 1 auto;
-    min-width: 25%;
-    max-width: 50%;
-  }
-
-  .board-area {
-    flex: 0 0 auto;
-    display: flex;
-    align-items: center;
-  }
-
-  .board-area :global(.xq-wrap) {
-    height: auto !important;
-  }
-
-  .tree-view.bottom {
-    flex-direction: column;
-    align-items: center;
-    height: 100%;
-  }
-
-  .tree-view.bottom :global(.tree-container) {
-    flex: 1 1 auto;
-    min-height: 25%;
-    width: 100%;
-  }
+  .tree-view { display: flex; justify-content: center; }
+  .tree-view.right { flex-direction: row; height: 100%; gap: 2px; }
+  .tree-view.right :global(.tree-container) { flex: 1 1 auto; min-width: 25%; max-width: 50%; }
+  .board-area { flex: 0 0 auto; display: flex; align-items: center; }
+  .board-area :global(.xq-wrap) { height: auto !important; }
+  .tree-view.bottom { flex-direction: column; align-items: center; height: 100%; }
+  .tree-view.bottom :global(.tree-container) { flex: 1 1 auto; min-height: 25%; width: 100%; }
 </style>

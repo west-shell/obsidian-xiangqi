@@ -11,6 +11,7 @@ import '../modules/Tree/TreeMap'
 import '../modules/Tree/TreeView'
 import '../modules/BoardClick'
 import '../modules/Tree/Actions'
+import '../modules/Tree/Speaker'
 
 export class PGNView extends TextFileView {
     static readonly VIEW_TYPE = "PGN_VIEW";

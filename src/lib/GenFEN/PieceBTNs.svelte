@@ -1,54 +1,50 @@
 <script lang="ts">
-  import { PIECE_CHARS, type IBoard } from "../../types";
+  import { PIECE_CHARS, type ISettings } from "../../types";
   import type { EventBus } from "../../core/event-bus";
-  import type { ISettings } from "../../types";
+  import { setIcon } from "obsidian";
 
   interface Props {
     settings: ISettings;
-    board: IBoard;
+    fen: string;
     eventBus: EventBus;
     position?: string;
-    selectedPiece: string;
+    selectedPiece: string | null;
   }
+  let { settings, fen, eventBus, position = "", selectedPiece }: Props = $props();
 
-  let { settings, board, eventBus, position = "", selectedPiece }: Props = $props();
-
-  // 判断是否为红方棋子（大写字母）
-  const isRed = (piece: string) => piece === piece.toUpperCase();
-
-  // 每种棋子的标准上限（可按需调整）
   const MAX_COUNT: Record<string, number> = {
-    R: 2,
-    N: 2,
-    B: 2,
-    A: 2,
     K: 1,
+    A: 2,
+    B: 2,
+    N: 2,
+    R: 2,
     C: 2,
     P: 5,
-    r: 2,
-    n: 2,
-    b: 2,
-    a: 2,
     k: 1,
+    a: 2,
+    b: 2,
+    n: 2,
+    r: 2,
     c: 2,
     p: 5,
   };
 
-  // 实时统计当前棋子数量
+  // 判断是否为红方棋子（大写字母）
+  const isRed = (piece: string) => piece === piece.toUpperCase();
+
   let pieceCount = $derived(
-    board.flat().reduce(
-      (acc, piece) => {
-        if (piece) acc[piece] = (acc[piece] || 0) + 1;
+    fen
+      .split(" ")[0]
+      .split("")
+      .reduce((acc: Record<string, number>, c) => {
+        if (/[1-9]/.test(c)) return acc;
+        if (/[a-zA-Z]/.test(c)) acc[c] = (acc[c] || 0) + 1;
         return acc;
-      },
-      {} as Record<string, number>,
-    ),
+      }, {}),
   );
 
   let count = $derived(
-    Object.fromEntries(
-      Object.keys(MAX_COUNT).map((piece) => [piece, MAX_COUNT[piece] - (pieceCount[piece] || 0)]),
-    ),
+    Object.fromEntries(Object.keys(MAX_COUNT).map((p) => [p, MAX_COUNT[p] - (pieceCount[p] || 0)])),
   );
 </script>
 
@@ -107,7 +103,9 @@
     font-size: var(--font-size);
     border: 1.5px solid rgba(0, 0, 0, 0.35);
     margin: 1px 0;
-    transition: box-shadow 0.15s, border-color 0.15s;
+    transition:
+      box-shadow 0.15s,
+      border-color 0.15s;
   }
 
   .piece-btn.bottom {
@@ -117,7 +115,9 @@
     cursor: pointer;
     font-size: var(--font-size);
     border: 1.5px solid rgba(0, 0, 0, 0.35);
-    transition: box-shadow 0.15s, border-color 0.15s;
+    transition:
+      box-shadow 0.15s,
+      border-color 0.15s;
   }
 
   .red-piece {

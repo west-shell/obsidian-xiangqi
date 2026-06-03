@@ -2,12 +2,13 @@
   import { tick } from "svelte";
   import { scrollToBTN } from "../../utils/utils";
   import type { EventBus } from "../../core/event-bus";
-  import type { ISettings, IBoard, IMove } from "../../types";
+  import type { Move } from "@west-shell/xiangqi.js";
+  import type { ISettings } from "../../types";
 
   interface Props {
     settings: ISettings;
     currentStep: number;
-    moves: IMove[];
+    moves: Move[];
     eventBus: EventBus;
   }
   let { settings, currentStep, moves, eventBus }: Props = $props();
@@ -60,7 +61,7 @@
             class:active={currentStep === i + 1}
             onclick={() => eventBus.emit("clickstep", i + 1)}
           >
-            {settings.showMovelistText ? move.WXF : "红"}
+            {settings.showMovelistText ? move.san : "红"}
           </span>
           {#if moves[i + 1]}
             <span

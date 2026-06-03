@@ -1,14 +1,15 @@
 <script lang="ts">
   import { setIcon } from "obsidian";
   import type { EventBus } from "../../core/event-bus";
-  import type { ISettings, IMove } from "../../types";
+  import type { Move } from "@west-shell/xiangqi.js";
+  import type { ISettings } from "../../types";
   import { t, onLangChange } from "../../i18n";
 
   interface Props {
     settings: ISettings;
     eventBus: EventBus;
     modified: boolean;
-    PGN: IMove[];
+    PGN: Move[];
     isprotected: boolean;
   }
 

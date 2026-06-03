@@ -6,6 +6,13 @@
   import { calculateTreeLayout } from "./layout";
   import { setIcon } from "obsidian";
   import * as d3 from "d3";
+  import type { Move } from "@west-shell/xiangqi.js";
+
+  function pieceLabel(move: Move): string {
+    const raw = move.piece;
+    const char = move.color === "w" ? raw.toUpperCase() : raw;
+    return (PIECE_CHARS as Record<string, string>)[char] || raw;
+  }
 
   interface Props {
     nodeMap: NodeMap;
@@ -323,7 +330,7 @@
                 stroke="var(--board-line)"
               />
               <text dy="3.5" text-anchor="middle" fill="white" font-size="9px">
-                {node.data?.type ? PIECE_CHARS[node.data.type] : "始"}
+                {node.move?.piece ? pieceLabel(node.move) : "始"}
               </text>
             {/if}
 

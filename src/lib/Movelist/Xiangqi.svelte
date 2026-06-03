@@ -2,35 +2,28 @@
   import Board from "../Board.svelte";
   import Toolbar from "./Toolbar.svelte";
   import MoveList from "./MoveList.svelte";
-  import type { IBoard, IMove, IOptions, IPosition, ISettings } from "../../types";
+  import type { ISettings, IOptions } from "../../types";
   import type { EventBus } from "../../core/event-bus";
+  import type { Move, Square } from "@west-shell/xiangqi.js";
   import { onMount, tick } from "svelte";
 
   interface Props {
     settings: ISettings;
-    board: IBoard;
-    markedPos: IPosition | null;
-    currentTurn: string;
+    fen: string;
+    checkColor?: string | null;
+    selectedSquare: Square | null;
     currentStep: number;
     eventBus: EventBus;
     modified: boolean;
-    PGN: IMove[];
-    history: IMove[];
-    lastMove: IMove | null;
+    PGN: Move[];
+    history: Move[];
+    lastMove: [Square, Square] | null;
     options: IOptions;
   }
 
   let {
-    settings,
-    board,
-    markedPos,
-    currentTurn,
-    currentStep,
-    eventBus,
-    modified,
-    PGN,
-    history,
-    lastMove,
+    settings, fen, checkColor, selectedSquare, currentStep,
+    eventBus, modified, PGN, history, lastMove,
     options,
   }: Props = $props();
 
@@ -45,7 +38,7 @@
 </script>
 
 <div class="XQ-container {settings.position}">
-  <Board {settings} {board} {lastMove} {markedPos} {currentTurn} {eventBus} {rotated} />
+  <Board {settings} {fen} {lastMove} {checkColor} {selectedSquare} {eventBus} {rotated} />
   <Toolbar {settings} {eventBus} {modified} {PGN} {isprotected} />
   {#if settings.showMovelist}
     <MoveList {settings} {currentStep} {moves} {eventBus} />
