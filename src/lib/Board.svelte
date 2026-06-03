@@ -147,6 +147,15 @@
       config.selected = selectedSquare;
     }
 
+    // 等待容器布局完成，避免 bounds 为 0 时 renderCircle 产生 NaN
+    if (!boardElement.offsetWidth) {
+      await new Promise<void>(resolve => {
+        const ro = new ResizeObserver(() => {
+          if (boardElement.offsetWidth) { ro.disconnect(); resolve(); }
+        });
+        ro.observe(boardElement);
+      });
+    }
     api = Chessground(boardElement, config);
 
     layoutChangeHandler = () => {
