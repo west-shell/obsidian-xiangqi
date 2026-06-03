@@ -17,7 +17,7 @@
 </script>
 
 <div class="XQ-container {settings.position}">
-  <Board {settings} {fen} {eventBus} rotated={false} freeMode={true} />
+  <Board settings={{...settings, showLastMove: false}} {fen} {eventBus} rotated={false} freeMode={true} />
   <PieceBTNs {settings} {fen} {eventBus} {position} {selectedPiece} />
   <Toolbar {eventBus} {position} currentTurn={fen.split(' ')[1] === 'b' ? 'black' : 'red'} />
 </div>
