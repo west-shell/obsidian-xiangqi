@@ -69,7 +69,7 @@
               class:active={currentStep === i + 2}
               onclick={() => eventBus.emit("clickstep", i + 2)}
             >
-              {settings.showMovelistText ? moves[i + 1].WXF : "黑"}
+              {settings.showMovelistText ? moves[i + 1].wxf : "黑"}
             </span>
           {/if}
         </li>
