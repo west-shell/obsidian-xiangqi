@@ -1,13 +1,14 @@
 import type { ISettings } from "./types";
+import type { App } from "obsidian";
 
 interface ThemeDef {
 	name: string;
-	/** 底层背景色 */
+	/** 底层背景：CSS颜色值 或 图片路径（相对vault根目录） */
 	bg: string;
 	/** 纹理叠加，若无则为 "none" */
 	texture: string;
-	/** 网格线: 'dark' (#555) 或 'light' (#ccc) */
-	grid: "dark" | "light";
+	/** 网格线: 'dark' | 'light' | 'none'（图片背景可关闭网格） */
+	grid: "dark" | "light" | "none";
 	/** 红方棋子色 */
 	red: string;
 	/** 黑方棋子色 */
@@ -22,8 +23,6 @@ const themes: Record<string, ThemeDef> = {
 		bg: "#CBA35C",
 		texture: "repeating-linear-gradient(87deg, rgba(139,90,43,0.25) 0px, rgba(139,90,43,0.25) 2px, transparent 2px, transparent 6px)",
 		grid: "dark",
-		// red: "#b24747",
-		// black: "#5166b2",
 		red: tree_red,
 		black: tree_black,
 	},
@@ -32,8 +31,6 @@ const themes: Record<string, ThemeDef> = {
 		bg: "#d0b899b4",
 		texture: "radial-gradient(ellipse at 40% 30%, rgba(180,170,150,0.3) 0%, transparent 70%)",
 		grid: "dark",
-		// red: "#b24747",
-		// black: "#3b4b8c",
 		red: tree_red,
 		black: tree_black,
 	},
@@ -42,8 +39,6 @@ const themes: Record<string, ThemeDef> = {
 		bg: "#2d5a27",
 		texture: "repeating-linear-gradient(0deg, rgba(255,255,255,0.04) 0px, rgba(255,255,255,0.04) 1px, transparent 1px, transparent 3px)",
 		grid: "light",
-		// red: "#d44b4b",
-		// black: "#8ca3e0",
 		red: tree_red,
 		black: tree_black,
 	},
@@ -52,8 +47,6 @@ const themes: Record<string, ThemeDef> = {
 		bg: "#c8c0b8",
 		texture: "none",
 		grid: "dark",
-		// red: "#b24747",
-		// black: "#5166b2",
 		red: tree_red,
 		black: tree_black,
 	},
@@ -62,8 +55,6 @@ const themes: Record<string, ThemeDef> = {
 		bg: "#2d2d2d",
 		texture: "none",
 		grid: "light",
-		// red: "#861818",
-		// black: "#2090ff",
 		red: tree_red,
 		black: tree_black,
 	},
@@ -75,21 +66,47 @@ const themes: Record<string, ThemeDef> = {
 		red: "var(--xq-auto-red)",
 		black: "var(--xq-auto-black)",
 	},
+	bamboo: {
+		name: "竹韵",
+		bg: ".obsidian/plugins/xiangqi/assets/竹韵.png",
+		texture: "none",
+		grid: "none",
+		red: tree_red,
+		black: tree_black,
+	},
+	kingdom: {
+		name: "王朝",
+		bg: ".obsidian/plugins/xiangqi/assets/王朝.png",
+		texture: "none",
+		grid: "none",
+		red: tree_red,
+		black: tree_black,
+	}
 };
 
 export const THEME_OPTIONS = Object.fromEntries(
 	Object.entries(themes).map(([k, v]) => [k, v.name]),
 ) as Record<string, string>;
 
-export function applyThemes(settings: ISettings) {
+function isImagePath(s: string): boolean {
+	return /\.(png|jpe?g|gif|webp|svg|bmp)$/i.test(s);
+}
+
+export function applyThemes(app: App, settings: ISettings) {
 	const { theme, boardMarginTop, boardMarginBottom, showCoordinateLabels } = settings;
 	const t = themes[theme] ?? themes.light;
 
-	document.body.style.setProperty("--xq-board-bg", t.bg);
+	const bg = isImagePath(t.bg)
+		? `url('${app.vault.adapter.getResourcePath(t.bg)}') center / cover no-repeat`
+		: t.bg;
+
+	document.body.style.setProperty("--xq-board-bg", bg);
 	document.body.style.setProperty("--xq-board-texture", t.texture);
 	document.body.style.setProperty(
 		"--xq-grid",
-		t.grid === "dark" ? "var(--xq-grid-dark)" : "var(--xq-grid-light)",
+		t.grid === "dark" ? "var(--xq-grid-dark)"
+			: t.grid === "light" ? "var(--xq-grid-light)"
+				: "none",
 	);
 	document.body.style.setProperty(
 		"--xq-coords-display",

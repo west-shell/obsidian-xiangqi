@@ -13,7 +13,7 @@ export const PIECE_CHARS = {
 export interface ISettings {
     lang: "auto" | "en" | "zh-cn";
     position: "bottom" | "right";
-    theme: "wood" | "parchment" | "green" | "marble" | "light" | "dark";
+    theme: "wood" | "parchment" | "green" | "marble" | "light" | "dark" | "bamboo";
     cellSize: number;
     fontSize: number;
     showCoordinateLabels: boolean;
