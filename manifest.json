@@ -2,9 +2,9 @@
     "id": "xiangqi",
     "version": "3.1.0",
     "name": "Chinese chess",
-    "description": "A Chinese Chess (象棋/xiangqi) plugin designed for Obsidian",
+    "description": "Chinese chess variation tree.",
     "author": "weshell",
-    "authorUrl": "https://space.bilibili.com/156446344",
+    "authorUrl": "https://github.com/west-shell",
     "minAppVersion": "1.5.0",
     "isDesktopOnly": false
 }
