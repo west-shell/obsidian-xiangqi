@@ -86,14 +86,10 @@ const ActionsModule = {
         })
 
         eventBus.on('clickstep', (step) => {
-            if (step === undefined) return;
-            const dif = step - host.currentStep;
-            if (dif === 0) return;
-            if (dif > 0) {
-                for (let i = 0; i < dif; i++) { redo(host); }
-            } else {
-                for (let i = 0; i < -dif; i++) { undo(host); }
-            }
+            if (step === undefined || step === host.currentStep) return;
+            host.currentStep = step;
+            host.fen = replayFen(host);
+            host.currentTurn = getTurnFromFen(host.fen);
             eventBus.emit('updateUI');
         })
 
@@ -108,7 +104,6 @@ const ActionsModule = {
 registerXQModule('actions', ActionsModule);
 
 function undo(host: IXQHost) {
-    if (host.history.length === 0) return;
     if (host.currentStep > 0) {
         host.currentStep--;
         host.fen = replayFen(host);
@@ -135,16 +130,19 @@ function redo(host: IXQHost) {
 }
 
 function replayFen(host: IXQHost): string {
-    try {
-        const chess = new Chess(host.fenRoot);
-        const currentMoves = host.modified ? host.history : host.PGN;
-        for (let i = 0; i < host.currentStep; i++) {
-            chess.move(currentMoves[i].san);
+    const chess = new Chess(host.fenRoot);
+    const currentMoves = host.modified ? host.history : host.PGN;
+    for (let i = 0; i < host.currentStep; i++) {
+        const move = currentMoves[i];
+        if (!move) break;
+        try {
+            chess.move(move.san);
+        } catch {
+            // fallback: try lan (ICCS format, e.g. "h2e2")
+            chess.move(move.lan);
         }
-        return chess.fen();
-    } catch {
-        return host.fenRoot;
     }
+    return chess.fen();
 }
 
 function getTurnFromFen(fen: string): ITurn {
