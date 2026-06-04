@@ -104,9 +104,8 @@
   .move-list.bottom {
     display: flex;
     flex-wrap: nowrap;
-    overflow-x: auto; /* 添加水平滚动条以处理溢出 */
+    overflow-x: auto;
     width: var(--width);
-    /* max-height: calc(var(--width) / 2); */
     align-content: flex-start;
     padding: 0;
     margin: 0;
@@ -115,31 +114,31 @@
   }
 
   .move-list.right li {
-    display: flex; /* 明确设置为 flex 容器 */
-    flex-wrap: nowrap; /* 确保 li 内部的元素不换行 */
-    flex-shrink: 0; /* 防止 li 元素收缩 */
-    flex-grow: 0; /* 防止 li 元素增长 */
+    display: flex;
+    flex-wrap: nowrap;
+    flex-shrink: 0;
+    flex-grow: 0;
     align-items: center;
     gap: 0.5em;
-    padding: 0px;
+    padding: 0;
     margin: 0;
-    /* margin-bottom: -22px; */
     border-bottom: none;
-    width: 100%; /* 每个 li 元素占据一行 */
-    white-space: nowrap; /* 强制 li 元素本身不换行 */
+    width: 100%;
+    white-space: nowrap;
   }
 
   .move-list.bottom li {
-    display: flex; /* 明确设置为 flex 容器 */
-    flex-wrap: nowrap; /* 确保 li 内部的元素不换行 */
-    flex-shrink: 0; /* 防止 li 元素收缩 */
-    flex-grow: 0; /* 防止 li 元素增长 */
+    display: flex;
+    flex-wrap: nowrap;
+    flex-shrink: 0;
+    flex-grow: 0;
     align-items: center;
+    justify-content: center;
     gap: 0.25em;
-    padding: 1px;
+    padding: 4px 2px;
     margin: 0;
     border-bottom: none;
-    white-space: nowrap; /* 强制 li 元素本身不换行 */
+    white-space: nowrap;
     writing-mode: vertical-rl;
     text-orientation: upright;
   }
@@ -151,29 +150,36 @@
     text-align: right;
     margin-right: 0.4em;
     white-space: nowrap;
-    flex-shrink: 0; /* 防止收缩 */
+    flex-shrink: 0;
     color: var(--text-muted);
   }
 
   .move-list.bottom .roundnum {
-    writing-mode: horizontal-tb; /* 强制水平方向 */
-    text-orientation: mixed; /* 确保数字横排 */
+    writing-mode: horizontal-tb;
+    text-orientation: mixed;
     display: inline-block;
-    /* width: 2ch; 固定宽度对齐 */
-    text-align: center; /* 右对齐，个位数前会空出 */
+    text-align: center;
+    margin-bottom: 4px;
   }
 
+  /* 美化后的 move 样式 */
   span.move {
     display: inline-block;
-    line-height: 1;
+    line-height: 1.2;
     justify-content: center;
     align-items: center;
     text-align: center;
-    border-radius: 4px;
+    border-radius: 6px;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: all 0.2s ease;
     white-space: nowrap;
-    flex-shrink: 0; /* 防止收缩 */
+    flex-shrink: 0;
+    padding: 4px 8px; /* 增加内边距，让点击区域更大 */
+  }
+
+  span.move.red,
+  span.move.black {
+    min-width: 4em; /* 稍微加宽 */
   }
 
   span.start {
@@ -182,18 +188,30 @@
 
   span.move:hover {
     background-color: var(--background-modifier-hover);
+    transform: scale(1.02); /* 悬停时轻微放大 */
   }
 
   span.move {
-    /* color: #337ab7; */
     color: var(--text-normal);
-    /* padding: 0; */
   }
 
+  /* 美化后的选中样式 - 增加内边距和圆角 */
   span.move.active {
-    /* background-color: var(--interactive-accent); */
-    /* color: red; */
-    color: var(--color-accent);
-    /* font-weight: bold; */
+    background-color: var(--color-accent);
+    color: var(--text-on-accent); /* 使用合适的文字颜色 */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15); /* 添加阴影增加层次感 */
+    font-weight: 500; /* 稍微加粗 */
+    transform: scale(1.02); /* 选中时轻微放大 */
+  }
+
+  /* 可选：为右侧列表的 li 添加间隙，让选中效果更舒展 */
+  .move-list.right li span.move {
+    margin: 2px 0;
+  }
+
+  /* 可选：底部列表的 move 间距优化 */
+  .move-list.bottom li span.move {
+    margin: 2px 0;
+    padding: 6px 4px; /* 底部列表因为竖排，调整内边距 */
   }
 </style>
