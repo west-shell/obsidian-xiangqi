@@ -16,13 +16,29 @@ interface ThemeDef {
 }
 const tree_red = '#861818';
 const tree_black = '#000080';
-
+const auto_grid = document.body.classList.contains("theme-dark") ? "light" : "dark";
 const themes: Record<string, ThemeDef> = {
-	wood: {
-		name: "木质",
-		bg: "#CBA35C",
-		texture: "repeating-linear-gradient(87deg, rgba(139,90,43,0.25) 0px, rgba(139,90,43,0.25) 2px, transparent 2px, transparent 6px)",
+	auto: {
+		name: "自动",
+		bg: "var(--background-primary-alt)",
+		texture: "none",
+		grid: auto_grid,
+		red: "var(--xq-auto-red)",
+		black: "var(--xq-auto-black)",
+	},
+	light: {
+		name: "经典浅色",
+		bg: "#ebe0d5",
+		texture: "none",
 		grid: "dark",
+		red: tree_red,
+		black: tree_black,
+	},
+	dark: {
+		name: "经典深色",
+		bg: "#2d2d2d",
+		texture: "none",
+		grid: "light",
 		red: tree_red,
 		black: tree_black,
 	},
@@ -42,29 +58,13 @@ const themes: Record<string, ThemeDef> = {
 		red: tree_red,
 		black: tree_black,
 	},
-	light: {
-		name: "经典浅色",
-		bg: "#c8c0b8",
-		texture: "none",
-		grid: "dark",
-		red: tree_red,
-		black: tree_black,
-	},
-	dark: {
-		name: "经典深色",
-		bg: "#2d2d2d",
+	wood: {
+		name: "木纹",
+		bg: ".obsidian/plugins/xiangqi/assets/木纹.png",
 		texture: "none",
 		grid: "light",
 		red: tree_red,
 		black: tree_black,
-	},
-	auto: {
-		name: "自动",
-		bg: "var(--background-primary-alt)",
-		texture: "none",
-		grid: "dark",
-		red: "var(--xq-auto-red)",
-		black: "var(--xq-auto-black)",
 	},
 	bamboo: {
 		name: "竹韵",
@@ -78,7 +78,7 @@ const themes: Record<string, ThemeDef> = {
 		name: "王朝",
 		bg: ".obsidian/plugins/xiangqi/assets/王朝.png",
 		texture: "none",
-		grid: "none",
+		grid: document.body.classList.contains("theme-dark") ? "dark" : "light",
 		red: tree_red,
 		black: tree_black,
 	}

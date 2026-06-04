@@ -135,7 +135,7 @@
     align-items: center;
     justify-content: center;
     gap: 0.25em;
-    padding: 4px 2px;
+    padding: 0.25em 0.125em; /* 4px -> 0.25em, 2px -> 0.125em (假设 font-size=16px) */
     margin: 0;
     border-bottom: none;
     white-space: nowrap;
@@ -159,7 +159,7 @@
     text-orientation: mixed;
     display: inline-block;
     text-align: center;
-    margin-bottom: 4px;
+    margin-bottom: 0.25em; /* 4px -> 0.25em */
   }
 
   /* 美化后的 move 样式 */
@@ -169,12 +169,12 @@
     justify-content: center;
     align-items: center;
     text-align: center;
-    border-radius: 6px;
+    border-radius: 0.375em; /* 6px -> 0.375em (6/16) */
     cursor: pointer;
     transition: all 0.2s ease;
     white-space: nowrap;
     flex-shrink: 0;
-    padding: 4px 8px; /* 增加内边距，让点击区域更大 */
+    padding: 0.25em 0.5em; /* 4px -> 0.25em, 8px -> 0.5em */
   }
 
   span.move.red,
@@ -198,20 +198,20 @@
   /* 美化后的选中样式 - 增加内边距和圆角 */
   span.move.active {
     background-color: var(--color-accent);
-    color: var(--text-on-accent); /* 使用合适的文字颜色 */
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15); /* 添加阴影增加层次感 */
-    font-weight: 500; /* 稍微加粗 */
-    transform: scale(1.02); /* 选中时轻微放大 */
+    color: var(--text-on-accent);
+    box-shadow: 0 0.125em 0.375em rgba(0, 0, 0, 0.15); /* 0 2px 6px -> 0 0.125em 0.375em */
+    font-weight: 500;
+    transform: scale(1.02);
   }
 
   /* 可选：为右侧列表的 li 添加间隙，让选中效果更舒展 */
   .move-list.right li span.move {
-    margin: 2px 0;
+    margin: 0.125em 0; /* 2px -> 0.125em */
   }
 
   /* 可选：底部列表的 move 间距优化 */
   .move-list.bottom li span.move {
-    margin: 2px 0;
-    padding: 6px 4px; /* 底部列表因为竖排，调整内边距 */
+    margin: 0.125em 0; /* 2px -> 0.125em */
+    padding: 0.375em 0.25em; /* 6px -> 0.375em, 4px -> 0.25em */
   }
 </style>
