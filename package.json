@@ -28,7 +28,7 @@
     "@tsconfig/svelte": "^5.0.4",
     "@types/d3": "^7.4.3",
     "@types/node": "^24.3.0",
-    "@west-shell/chessground-xq": "file:../chessground-xq",
+    "@west-shell/chessground-xq": "file:../xiangqiground",
     "@west-shell/xiangqi.js": "file:../xiangqi.js",
     "d3": "^7.9.0",
     "obsidian": "^1.4.11",
