@@ -154,8 +154,10 @@ p:true
 1. 克隆本项目及其依赖 [chessground-xq](https://github.com/west-shell/chessground-xq) 到同一目录：
 
    ```bash
-   git clone https://github.com/west-shell/obsidian-xiangqi.git
    git clone https://github.com/west-shell/chessground-xq.git
+   git clone https://github.com/west-shell/xiangqi.js.git
+   git clone https://github.com/west-shell/obsidian-xiangqi.git
+
    ```
 
 2. 先构建 chessground-xq：
@@ -165,8 +167,15 @@ p:true
    npm install
    npm run dist
    ```
+3. 先构建 xiangqi.js：
 
-3. 再构建本插件：
+   ```bash
+   cd ../xiangqi.js
+   npm install
+   npm run dist
+   ```
+
+4. 再构建本插件：
 
    ```bash
    cd ../obsidian-xiangqi

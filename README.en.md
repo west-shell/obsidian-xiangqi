@@ -157,8 +157,9 @@ This plugin is now available on the official Obsidian plugin marketplace. Search
 1. Clone this repository and its dependency [chessground-xq](https://github.com/west-shell/chessground-xq) into the same parent directory:
 
    ```bash
-   git clone https://github.com/west-shell/obsidian-xiangqi.git
    git clone https://github.com/west-shell/chessground-xq.git
+   git clone https://github.com/west-shell/xiangqi.js.git
+   git clone https://github.com/west-shell/obsidian-xiangqi.git
    ```
 
 2. Build chessground-xq first:
@@ -169,7 +170,15 @@ This plugin is now available on the official Obsidian plugin marketplace. Search
    npm run dist
    ```
 
-3. Then build the plugin:
+3. Build xiangqi.js:
+
+   ```bash
+   cd ../xiangqi.js
+   npm install
+   npm run dist
+   ```
+
+4. Then build the plugin:
 
    ```bash
    cd ../obsidian-xiangqi
