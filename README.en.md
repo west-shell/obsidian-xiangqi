@@ -154,7 +154,7 @@ This plugin is now available on the official Obsidian plugin marketplace. Search
 
 ## Build
 
-1. Clone this repository and its dependency [chessground-xq](https://github.com/west-shell/chessground-xq) into the same parent directory:
+1. Clone this repository and its dependency [xiangqiground](https://github.com/west-shell/xiangqiground) and  [xiangqi.js](https://github.com/west-shell/xiangqi.js)into the same parent directory:
 
    ```bash
    git clone https://github.com/west-shell/xiangqiground.git
