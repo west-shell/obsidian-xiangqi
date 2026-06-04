@@ -8,6 +8,8 @@ on:
 
 permissions:
   contents: write
+  id-token: write
+  attestations: write
 
 jobs:
   build-and-release:
@@ -51,6 +53,14 @@ jobs:
       - name: Build
         working-directory: obsidian-xiangqi
         run: npm run build
+
+      - name: Generate build provenance
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: |
+            obsidian-xiangqi/build/main.js
+            obsidian-xiangqi/build/manifest.json
+            obsidian-xiangqi/build/styles.css
 
       - name: Create pre-release
         uses: softprops/action-gh-release@v2
