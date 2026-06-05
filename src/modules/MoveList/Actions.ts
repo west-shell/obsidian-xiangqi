@@ -168,7 +168,7 @@ async function savePGN(host: IXQHost) {
         if (host.currentStep > 0) {
             const moves = host.history
                 .slice(0, host.currentStep)
-                .map((move: Move) => move.san ?? "");
+                .map((move: Move) => move.lan ?? "");
             const pgnLines: string[] = [];
             for (let i = 0; i < moves.length; i += 2) {
                 const line = `${Math.ceil((i + 1) / 2)}. ${moves[i]} ${moves[i + 1] || ""}`.trim();
