@@ -59,10 +59,10 @@ export function tokenize(pgn: string): Token[] {
             continue;
         }
 
-        // ICCS Move: A0-B9
-        const iccs = matchAndConsume(/^[A-Ia-i][0-9][\-x\*][A-Ia-i][0-9]/);
+        // ICCS Move: A0-B9（直接匹配，交给 xiangqi.js 解析大小写和分隔符）
+        const iccs = matchAndConsume(/^[A-Ia-i][0-9]-?[A-Ia-i][0-9]/);
         if (iccs) {
-            tokens.push({ type: "iccs-move", value: iccs.toUpperCase(), line: startLine, column: startCol });
+            tokens.push({ type: "iccs-move", value: iccs, line: startLine, column: startCol });
             continue;
         }
 

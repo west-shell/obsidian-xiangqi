@@ -111,10 +111,9 @@ function parsePikafishUrl(source: string): {
 
 function extractICCSMoves(source: string): string[] {
     const clean = source.replace(/[rnbakcpRNBAKCP1-9\/]+\s+[wr].*/g, "").replace(/^[pr]\s*[:：].*/gim, "");
-    const movePattern = /\b([A-I][0-9]+[-+][A-I][0-9]+)\b/g;
-    const matches = clean.match(movePattern);
-    if (!matches) return [];
-    return matches.filter(m => !/^\d+\.?$/.test(m));
+    // 直接匹配，交给 xiangqi.js 解析
+    const movePattern = /\b[A-Ia-i][0-9]-?[A-Ia-i][0-9]\b/g;
+    return clean.match(movePattern) ?? [];
 }
 
 // --- options parsing ---

@@ -174,8 +174,8 @@ function stringifyPGN(root: ChessNode): string {
 
     function walk(node: ChessNode, stepNum: number): string {
         let result = '';
-        if (node.side === 'red') result += `${stepNum}. ${node.move!.san}`;
-        else if (node.side === 'black') result += `${node.move!.san}`;
+        if (node.side === 'red') result += `${stepNum}. ${node.move!.from.toUpperCase()}-${node.move!.to.toUpperCase()}`;
+        else if (node.side === 'black') result += `${node.move!.from.toUpperCase()}-${node.move!.to.toUpperCase()}`;
         if (node.comments?.length) {
             for (const c of node.comments) result += `{${c}}`;
         }
