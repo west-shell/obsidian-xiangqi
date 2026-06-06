@@ -1,5 +1,5 @@
 import type { Move } from "@west-shell/xiangqi.js"
-import type { MarkdownPostProcessorContext, MarkdownSectionInformation } from "obsidian";
+import type { MarkdownSectionInformation } from "obsidian";
 import type XQPlugin from "./main";
 import type { EventBus } from "./core/event-bus";
 
@@ -61,7 +61,7 @@ export interface IHost {
 
 export interface IXQHost extends IHost {
     containerEl: HTMLElement;
-    ctx: MarkdownPostProcessorContext & {
+    ctx: {
         getSectionInfo(el: HTMLElement): MarkdownSectionInformation;
     };
     fen: string;
@@ -83,7 +83,7 @@ export interface IXQHost extends IHost {
 
 export interface IGenFENHost extends IHost {
     containerEl: HTMLElement;
-    ctx: MarkdownPostProcessorContext & {
+    ctx: {
         getSectionInfo(el: HTMLElement): MarkdownSectionInformation;
     };
     fen: string;
