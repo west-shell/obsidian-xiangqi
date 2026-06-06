@@ -16,7 +16,7 @@ interface ThemeDef {
 }
 const tree_red = '#861818';
 const tree_black = '#000080';
-const auto_grid = (app.activeDocument ?? document).body.classList.contains("theme-dark") ? "light" : "dark";
+const auto_grid = document.body.classList.contains("theme-dark") ? "light" : "dark";
 const themes: Record<string, ThemeDef> = {
 	auto: {
 		name: "自动",
