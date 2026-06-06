@@ -17,11 +17,12 @@ const ActionsModule = {
         eventBus.on("btn-click", (action) => {
             if (!action) return;
             switch (action) {
-                case 'turn':
+                case 'turn': {
                     const parts = host.fen.split(' ');
                     parts[1] = parts[1] === 'w' ? 'b' : 'w';
                     host.fen = parts.join(' ');
                     break
+                }
                 case 'empty':
                     host.fen = '4k4/9/9/9/9/9/9/9/9/4K4 w - - 0 1';
                     host.selectedPiece = null;
