@@ -2,7 +2,7 @@
     "id": "xiangqi",
     "version": "3.4.0",
     "name": "Chinese chess",
-    "description": "Chinese chess variation tree.",
+    "description": "Variation tree viewer and editor for Chinese chess (Xiangqi).",
     "author": "weshell",
     "authorUrl": "https://github.com/west-shell",
     "minAppVersion": "1.5.0",
