@@ -9,37 +9,30 @@
   import type { Move, Square } from "@west-shell/xiangqi.js";
   import { onMount, tick } from "svelte";
 
-  const SHAPES_PREFIX = "__SHAPES__";
+  const SHAPES_RE = /^{([a-i][0-9])([a-i][0-9])?:([gryb])}$/
   const BRUSH_MAP: Record<string, string> = { green: "g", red: "r", blue: "b", yellow: "y" };
   const BRUSH_REV: Record<string, string> = { g: "green", r: "red", b: "blue", y: "yellow" };
 
   function loadShapes(node: ChessNode): DrawShape[] {
-    const entry = node.comments?.find((c) => c.startsWith(SHAPES_PREFIX));
-    if (!entry) return [];
-    try {
-      const data = entry.slice(SHAPES_PREFIX.length);
-      if (!data) return [];
-      return data.split(",").map((s) => {
-        const m = s.match(/^([gryb]):([a-i][0-9])([a-i][0-9])?$/);
-        if (!m) throw new Error("bad shape");
-        const brush = BRUSH_REV[m[1]];
-        return { orig: m[2] as cg.Key, dest: m[3] as cg.Key | undefined, brush };
-      });
-    } catch {
-      return [];
+    if (!node.comments) return [];
+    const shapes: DrawShape[] = [];
+    for (const c of node.comments) {
+      const m = c.match(SHAPES_RE);
+      if (m) {
+        const brush = BRUSH_REV[m[3]];
+        shapes.push({ orig: m[1] as cg.Key, dest: m[2] as cg.Key | undefined, brush });
+      }
     }
+    return shapes;
   }
 
   function saveShapes(node: ChessNode, shapes: DrawShape[]) {
-    node.comments = (node.comments ?? []).filter((c) => !c.startsWith(SHAPES_PREFIX));
-    if (shapes.length > 0) {
-      const data = shapes
-        .map((s) => `${BRUSH_MAP[s.brush ?? "green"]}:${s.orig}${s.dest ?? ""}`)
-        .join(",");
-      node.comments.push(SHAPES_PREFIX + data);
+    node.comments = (node.comments ?? []).filter((c) => !SHAPES_RE.test(c));
+    for (const s of shapes) {
+      const color = BRUSH_MAP[s.brush ?? "green"];
+      node.comments.push("{" + s.orig + (s.dest ?? "") + ":" + color + "}");
     }
   }
-
   interface Props {
     settings: ISettings;
     fen: string;
