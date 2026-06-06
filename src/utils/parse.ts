@@ -20,7 +20,7 @@ export function parseSource(source: string): {
 
     // try to find FEN in source
     let fen = source.match(
-        /([rnbakcpRNBAKCP1-9]+/){9}[rnbakcpRNBAKCP1-9]+(?:\s+[wr])?/,
+        /([rnbakcpRNBAKCP1-9]+\/){9}[rnbakcpRNBAKCP1-9]+(?:\s+[wr])?/, 
     )?.[0];
     if (!fen) {
         fen = DEFAULT_FEN;
@@ -64,7 +64,7 @@ function parsePikafishUrl(source: string): {
     PGN: Move[];
     firstTurn: ITurn;
 } | null {
-    const match = source.match(/https://xiangqiai\.com/#/([^\s\n]+)/);
+    const match = source.match(/https:\/\/xiangqiai\.com\/#\/([^\s\n]+)/);
     if (!match) return null;
 
     let raw = match[1];
