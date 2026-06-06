@@ -57,32 +57,34 @@ const ActionsModule = {
             }
         })
 
-        eventBus.on('save', async () => {
-            let message = "";
-            if (host.history.length === 0 && host.PGN.length === 0) {
-                new Notice(t("notice.saveEmpty"));
-                return;
-            }
-            if (host.history.length === 0 && host.PGN.length > 0)
-                message = t("confirm.saveClear");
-            if (host.history.length > 0 && host.PGN.length === 0)
-                message = t("confirm.saveNew");
-            if (host.history.length > 0 && host.PGN.length > 0)
-                message = t("confirm.saveOverwrite");
-            const modal = new ConfirmModal(
-                host.plugin.app,
-                t("confirm.saveTitle"),
-                message,
-                t("confirm.saveBtn"),
-                t("confirm.cancel"),
-            );
-            modal.open();
-            const userConfirmed = await modal.promise;
-            if (userConfirmed) {
-                await savePGN(host);
-                new Notice(t("notice.saveSuccess"));
-            }
-            eventBus.emit('updateUI', 'save');
+        eventBus.on('save', () => {
+            void (async () => {
+                let message = "";
+                if (host.history.length === 0 && host.PGN.length === 0) {
+                    new Notice(t("notice.saveEmpty"));
+                    return;
+                }
+                if (host.history.length === 0 && host.PGN.length > 0)
+                    message = t("confirm.saveClear");
+                if (host.history.length > 0 && host.PGN.length === 0)
+                    message = t("confirm.saveNew");
+                if (host.history.length > 0 && host.PGN.length > 0)
+                    message = t("confirm.saveOverwrite");
+                const modal = new ConfirmModal(
+                    host.plugin.app,
+                    t("confirm.saveTitle"),
+                    message,
+                    t("confirm.saveBtn"),
+                    t("confirm.cancel"),
+                );
+                modal.open();
+                const userConfirmed = await modal.promise;
+                if (userConfirmed) {
+                    await savePGN(host);
+                    new Notice(t("notice.saveSuccess"));
+                }
+                eventBus.emit('updateUI', 'save');
+            })();
         })
 
         eventBus.on('clickstep', (step) => {
