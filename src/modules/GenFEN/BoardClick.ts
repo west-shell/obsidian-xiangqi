@@ -1,5 +1,5 @@
 import { Chess } from "@west-shell/xiangqi.js";
-import type { Square } from "@west-shell/xiangqi.js";
+import type { PieceSymbol, Square } from "@west-shell/xiangqi.js";
 import { registerGenFENModule } from "../../core/module-system";
 
 const BoardClickModule = {
@@ -36,7 +36,7 @@ const BoardClickModule = {
                 if (host.selectedPiece) {
                     const color = host.selectedPiece === host.selectedPiece.toUpperCase() ? 'w' : 'b';
                     const type = host.selectedPiece.toLowerCase();
-                    chess.put({ type: type as any, color }, clickedKey as Square);
+                    chess.put({ type: type as PieceSymbol, color }, clickedKey as Square);
                 }
                 host.fen = chess.fen();
                 host.selectedPiece = null;
