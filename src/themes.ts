@@ -16,13 +16,12 @@ interface ThemeDef {
 }
 const tree_red = '#861818';
 const tree_black = '#000080';
-const auto_grid = document.body.classList.contains("theme-dark") ? "light" : "dark";
 const themes: Record<string, ThemeDef> = {
 	auto: {
 		name: "自动",
 		bg: "var(--background-primary-alt)",
 		texture: "none",
-		grid: auto_grid,
+		grid: "dark",
 		red: "var(--xq-auto-red)",
 		black: "var(--xq-auto-black)",
 	},
@@ -78,7 +77,7 @@ const themes: Record<string, ThemeDef> = {
 		// 	name: "王朝",
 		// 	bg: ".obsidian/plugins/xiangqi/assets/王朝.png",
 		// 	texture: "none",
-		// 	grid: (app.activeDocument ?? document).body.classList.contains("theme-dark") ? "dark" : "light",
+		// 	grid: (activeDocument ?? document).body.classList.contains("theme-dark") ? "dark" : "light",
 		// 	red: tree_red,
 		// 	black: tree_black,
 	}
@@ -93,6 +92,7 @@ function isImagePath(s: string): boolean {
 }
 
 export function applyThemes(app: App, settings: ISettings) {
+	const auto_grid = (activeDocument ?? document).body.classList.contains("theme-dark") ? "light" : "dark";
 	const { theme, boardMarginTop, boardMarginBottom, showCoordinateLabels } = settings;
 	const t = themes[theme] ?? themes.light;
 
@@ -100,20 +100,20 @@ export function applyThemes(app: App, settings: ISettings) {
 		? `url('${app.vault.adapter.getResourcePath(t.bg)}') center / cover no-repeat`
 		: t.bg;
 
-	(app.activeDocument ?? document).body.style.setProperty("--xq-board-bg", bg);
-	(app.activeDocument ?? document).body.style.setProperty("--xq-board-texture", t.texture);
-	(app.activeDocument ?? document).body.style.setProperty(
+	(activeDocument ?? document).body.style.setProperty("--xq-board-bg", bg);
+	(activeDocument ?? document).body.style.setProperty("--xq-board-texture", t.texture);
+	(activeDocument ?? document).body.style.setProperty(
 		"--xq-grid",
 		t.grid === "dark" ? "var(--xq-grid-dark)"
 			: t.grid === "light" ? "var(--xq-grid-light)"
 				: "none",
 	);
-	(app.activeDocument ?? document).body.style.setProperty(
+	(activeDocument ?? document).body.style.setProperty(
 		"--xq-coords-display",
 		showCoordinateLabels ? "flex" : "none",
 	);
-	(app.activeDocument ?? document).body.style.setProperty("--xq-piece-red", t.red);
-	(app.activeDocument ?? document).body.style.setProperty("--xq-piece-black", t.black);
-	(app.activeDocument ?? document).body.style.setProperty("--board-margin-top", `${boardMarginTop}px`);
-	(app.activeDocument ?? document).body.style.setProperty("--board-margin-bottom", `${boardMarginBottom}px`);
+	(activeDocument ?? document).body.style.setProperty("--xq-piece-red", t.red);
+	(activeDocument ?? document).body.style.setProperty("--xq-piece-black", t.black);
+	(activeDocument ?? document).body.style.setProperty("--board-margin-top", `${boardMarginTop}px`);
+	(activeDocument ?? document).body.style.setProperty("--board-margin-bottom", `${boardMarginBottom}px`);
 }

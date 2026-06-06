@@ -77,7 +77,7 @@ export default class XQPlugin extends Plugin {
 
 		this.registerEvent(
 			this.app.workspace.on("resize", () => {
-				(this.app.activeDocument ?? document).body.dispatchEvent(new CustomEvent("xq-layout-change"));
+				(activeDocument ?? document).body.dispatchEvent(new CustomEvent("xq-layout-change"));
 			}),
 		);
 

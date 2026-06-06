@@ -3,7 +3,7 @@ import type { PieceSymbol, Square } from "@west-shell/xiangqi.js";
 import { registerGenFENModule } from "../../core/module-system";
 
 const BoardClickModule = {
-    init(host: Record<string, unknown>) {
+    init(host: Record<string, any>) {
         const eventBus = host.eventBus;
 
         eventBus.on('click', (clickedKey: string) => {

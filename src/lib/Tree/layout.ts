@@ -27,7 +27,7 @@ function insertBySide(arr: ChessNode[], nodes: ChessNode | ChessNode[], target: 
         nonMainAncestor = findFirstNonMainAncestorInArr(target, nodemap);
     }
 
-    const index = arr.indexOf(nonMainAncestor);
+    const index = arr.indexOf(nonMainAncestor!);
     if (index === -1) return;
 
     const insertNodes = Array.isArray(nodes) ? nodes : [nodes];

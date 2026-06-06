@@ -32,8 +32,8 @@ function createModuleSystem() {
         const registry = registryMap.get(host);
         if (!registry) return;
         for (const module of registry.values()) {
-            if (typeof (module as any).destroy === "function") {
-                (module as any).destroy();
+            if (typeof (module as { destroy?(): void }).destroy === "function") {
+                (module as { destroy?(): void }).destroy?.();
             }
         }
         registry.clear();

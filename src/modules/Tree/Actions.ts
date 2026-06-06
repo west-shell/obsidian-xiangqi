@@ -5,7 +5,7 @@ import { ConfirmModal } from "../../utils/confirmModal";
 import { t } from "../../i18n";
 
 const ActionsModule = {
-    init(host: Record<string, unknown>) {
+    init(host: Record<string, any>) {
         const eventBus = host.eventBus;
 
         eventBus.on('runmove', (move: Move) => {
@@ -55,7 +55,7 @@ const ActionsModule = {
 
         eventBus.on('btn-click', async (payload: { name: string, payload: unknown }) => {
             host.markedPos = null;
-            const { name, payload: data } = payload;
+            const { name } = payload; const data = payload.payload as string;
             switch (name) {
                 case 'annotation': {
                     if (!host.currentNode) break;
@@ -88,7 +88,7 @@ const ActionsModule = {
                         break;
                     }
                     const removeNode = host.currentNode;
-                    const parentNode = host.nodeMap.get(removeNode.parentID!);
+                    const parentNode = host.nodeMap.get(removeNode.parentID as string);
                     host.currentNode = parentNode;
                     if (parentNode) {
                         const idx = parentNode.children.indexOf(removeNode);
@@ -106,7 +106,7 @@ const ActionsModule = {
                 case 'promote': {
                     if (!host.currentNode.parentID || host.currentNode.id === 'node-root') break;
                     let nodeToPromote = host.currentNode;
-                    let parent = host.nodeMap.get(nodeToPromote.parentID!);
+                    let parent = host.nodeMap.get(nodeToPromote.parentID as string);
                     if (!parent) break;
                     while (parent.children.length > 0 && parent.children[0].id === nodeToPromote.id) {
                         if (!parent.parentID) break;

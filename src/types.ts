@@ -1,5 +1,5 @@
 import type { Move } from "@west-shell/xiangqi.js"
-import type { MarkdownSectionInformation } from "obsidian";
+import type { MarkdownPostProcessorContext, MarkdownSectionInformation } from "obsidian";
 import type XQPlugin from "./main";
 import type { EventBus } from "./core/event-bus";
 
@@ -61,7 +61,7 @@ export interface IHost {
 
 export interface IXQHost extends IHost {
     containerEl: HTMLElement;
-    ctx: {
+    ctx: MarkdownPostProcessorContext & {
         getSectionInfo(el: HTMLElement): MarkdownSectionInformation;
     };
     fen: string;
@@ -77,13 +77,13 @@ export interface IXQHost extends IHost {
     rotated: boolean;
     options?: IOptions;
     haveFEN?: boolean;
-    Chess?: unknown;
+    Chess?: any;  // eslint-disable-line @typescript-eslint/no-explicit-any
     source: string;
 }
 
 export interface IGenFENHost extends IHost {
     containerEl: HTMLElement;
-    ctx: {
+    ctx: MarkdownPostProcessorContext & {
         getSectionInfo(el: HTMLElement): MarkdownSectionInformation;
     };
     fen: string;

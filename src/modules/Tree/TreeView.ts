@@ -3,7 +3,7 @@ import TreeView from '../../lib/Tree/Xiangqi.svelte';
 import { mount, unmount } from "svelte";
 
 const TreeViewModule = {
-    init(host: Record<string, unknown>) {
+    init(host: Record<string, any>) {
         const eventBus = host.eventBus;
 
         eventBus.on('createUI', () => {

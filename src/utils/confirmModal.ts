@@ -1,4 +1,4 @@
-import { type App, Modal } from "obsidian";
+import { type App, Modal, Setting } from "obsidian";
 
 export class ConfirmModal extends Modal {
 	private resolvePromise: (value: boolean) => void;
@@ -22,7 +22,7 @@ export class ConfirmModal extends Modal {
 		const { contentEl } = this;
 
 		// 标题
-		contentEl.createEl("h2", { text: this.title });
+		new Setting(contentEl).setName(this.title).setHeading();
 
 		// 消息内容
 		contentEl.createEl("p", { text: this.message });
