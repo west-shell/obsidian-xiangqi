@@ -26,12 +26,10 @@
     return shapes;
   }
 
+  /** Convert DrawShape[] to comment strings and save to node */
   function saveShapes(node: ChessNode, shapes: DrawShape[]) {
-    node.comments = (node.comments ?? []).filter((c) => !SHAPES_RE.test(c));
-    for (const s of shapes) {
-      const color = BRUSH_MAP[s.brush ?? "green"];
-      node.comments.push("{" + s.orig + (s.dest ?? "") + ":" + color + "}");
-    }
+    const shapeComments = shapes.map((s) => "{" + s.orig + (s.dest ?? "") + ":" + (BRUSH_MAP[s.brush ?? "green"]) + "}");
+    node.comments = [...(node.comments ?? []).filter((c) => !SHAPES_RE.test(c)), ...shapeComments];
   }
   interface Props {
     settings: ISettings;
