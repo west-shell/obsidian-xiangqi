@@ -5,7 +5,7 @@ import {
 } from './module-system';
 
 type EventType = string | symbol;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- pub/sub event system must accept any payload
 type Handler = (payload?: any) => void
 
 export class EventBus {

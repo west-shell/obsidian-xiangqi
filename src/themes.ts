@@ -92,7 +92,6 @@ function isImagePath(s: string): boolean {
 }
 
 export function applyThemes(app: App, settings: ISettings) {
-	const auto_grid = (activeDocument ?? document).body.classList.contains("theme-dark") ? "light" : "dark";
 	const { theme, boardMarginTop, boardMarginBottom, showCoordinateLabels } = settings;
 	const t = themes[theme] ?? themes.light;
 

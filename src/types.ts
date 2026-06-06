@@ -1,4 +1,4 @@
-import type { Move } from "@west-shell/xiangqi.js"
+import type { Move as XQMove } from "@west-shell/xiangqi.js"
 import type { MarkdownPostProcessorContext, MarkdownSectionInformation } from "obsidian";
 import type XQPlugin from "./main";
 import type { EventBus } from "./core/event-bus";
@@ -40,7 +40,7 @@ export type ITurn = "red" | "black";
 export type ChessNode = {
     id: string;
     fen: string;
-    move: Move | null;
+    move: XQMove | null;
     side: string | null;
     step?: number;
     x?: number;
@@ -52,7 +52,7 @@ export type ChessNode = {
 };
 
 export type NodeMap = Map<string, ChessNode>;
-export type IHistory = Move[];
+export type IHistory = XQMove[];
 
 export interface IHost {
     plugin: XQPlugin;
@@ -68,7 +68,7 @@ export interface IXQHost extends IHost {
     fenRoot: string;
     currentTurn: ITurn;
     history: IHistory;
-    PGN: Move[];
+    PGN: XQMove[];
     currentStep: number;
     modified: boolean;
     modifiedStep: number | null;
