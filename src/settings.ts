@@ -1,4 +1,5 @@
 import XQPlugin from "./main";
+import "./settings.css";
 import type { ISettings } from "./types";
 import { type App, PluginSettingTab, Setting } from "obsidian";
 import { THEME_OPTIONS } from "./themes";
@@ -269,27 +270,6 @@ export class XQSettingTab extends PluginSettingTab {
 			},
 		);
 
-		// 加一点样式
-		const style = containerEl.createEl("style");
-		style.textContent = `
-			.xq-slider-value {
-				display: inline-flex;
-				align-items: center;
-				justify-content: center;
-				min-width: 42px;
-				height: 24px;
-				margin-right: 8px;
-				font-size: 13px;
-				font-weight: 600;
-				color: var(--text-accent);
-				background: var(--background-modifier-border);
-				border-radius: 4px;
-				padding: 0 6px;
-			}
-			.xq-setting-tab .setting-item {
-				border-top: none;
-			}
-		`;
 		containerEl.parentElement?.classList.add("xq-setting-tab");
 	}
 
