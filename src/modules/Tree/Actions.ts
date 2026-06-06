@@ -142,7 +142,7 @@ const ActionsModule = {
                     const movesOnPath: string[] = [];
                     for (let i = 1; i < host.currentPath.length; i++) {
                         const node = host.nodeMap.get(host.currentPath[i]);
-                        if (node?.move?.zh) movesOnPath.push(node.move.zh.replace(/[-+]/g, '').toLowerCase());
+                        if (node?.move?.iccs) movesOnPath.push(node.move.iccs.replace(/-/g, ''));
                     }
                     window.open(`https://xiangqiai.com/#/${fen} moves ${movesOnPath.join('')}`);
                     break;
