@@ -73,8 +73,8 @@ export class PGNParser {
         if (tagName.toUpperCase() === 'FEN') {
             this.haveFEN = true;
             try {
-                this.chess.load(tagValue);
-                this.rootNode.fen = tagValue;
+                this.chess.load(tagValue.trim());
+                this.rootNode.fen = tagValue.trim();
             } catch { /* invalid FEN */ }
         }
     }
