@@ -29,7 +29,7 @@ export class EventBus {
         set.add(handler);
     }
 
-    emit(event: EventType, payload?: any) {
+    emit(event: EventType, payload?: unknown) {
         const set = this.handlers.get(event);
         if (!set) return;
         const hasPayload = arguments.length === 2;

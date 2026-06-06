@@ -72,12 +72,12 @@ export interface IXQHost extends IHost {
     currentStep: number;
     modified: boolean;
     modifiedStep: number | null;
-    markedPos?: any;
+    markedPos?: unknown;
     settings: ISettings;
     rotated: boolean;
     options?: IOptions;
     haveFEN?: boolean;
-    Chess?: any;
+    Chess?: unknown;
     source: string;
 }
 

@@ -3,7 +3,7 @@ import { parseSource } from "../utils/parse";
 import { DEFAULT_FEN } from "../types";
 
 const SourceModule = {
-    init(host: any) {
+    init(host: Record<string, unknown>) {
         const eventBus = host.eventBus;
         eventBus.on('load', (renderChild: string) => {
             const { haveFEN, fen, fenRoot, PGN, firstTurn, options } = parseSource(host.source);

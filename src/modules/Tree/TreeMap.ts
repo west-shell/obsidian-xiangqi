@@ -2,7 +2,7 @@ import { PGNParser } from './parser';
 import { registerPGNViewModule } from '../../core/module-system';
 
 const TreeMap = {
-    init(host: any) {
+    init(host: Record<string, unknown>) {
         const eventBus = host.eventBus;
 
         host.updateMainPath = function updateMainPath() {

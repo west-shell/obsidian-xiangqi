@@ -53,7 +53,7 @@ const ActionsModule = {
             host.saveFile();
         })
 
-        eventBus.on('btn-click', async (payload: { name: string, payload: any }) => {
+        eventBus.on('btn-click', async (payload: { name: string, payload: unknown }) => {
             host.markedPos = null;
             const { name, payload: data } = payload;
             switch (name) {
