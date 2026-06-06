@@ -1,36 +1,36 @@
-#  `Obsidian`中国象棋插件
+# Chinese chess
 
-![版本](https://img.shields.io/github/v/release/west-shell/obsidian-xiangqi)
-[![许可证](https://img.shields.io/github/license/west-shell/obsidian-xiangqi)](./LICENSE)
+![Version](https://img.shields.io/github/v/release/west-shell/obsidian-xiangqi)
+[![License](https://img.shields.io/github/license/west-shell/obsidian-xiangqi)](./LICENSE)
 
-[中文](./README.md) | [English](./README.en.md)
+[English](./README.md) | [中文](./README.zh.md)
 
-如果你喜欢这个项目，欢迎到我的主页  
-[![Bilibili](https://img.shields.io/badge/Bilibili-哔哩哔哩-ff69b4?logo=bilibili&logoColor=white)](https://space.bilibili.com/156446344)  
-点赞、投币、交流 
+If you like this project, feel free to check out my page on  
+[![Bilibili](https://img.shields.io/badge/Bilibili-Bilibili-ff69b4?logo=bilibili&logoColor=white)](https://space.bilibili.com/156446344)  
+Likes, coins, and feedback are greatly appreciated.
 
-## 插件简介
+## Plugin Overview
 
-**中国象棋插件(Obsidian)** 是一款为 Obsidian 笔记软件量身打造的中国象棋渲染引擎，支持以 FEN 和 PGN 格式展示棋局，并可进行推演。插件提供丰富的自定义设置、棋谱导航、分支变化和皮卡鱼分析连接等功能。
+**Chinese Chess Plugin for Obsidian** is a Chinese chess rendering engine tailor-made for Obsidian. It supports displaying chess games in FEN and PGN formats and allows move exploration. The plugin offers rich customization options, move navigation, saving functionality, and more.
 
-## PGN 文件支持
+## PGN File Support
 
-本插件注册了 `.pgn` 文件的专属视图。在 Obsidian 中直接打开 `.pgn` 文件。
+This plugin registers a custom view for `.pgn` files. Simply open a `.pgn` file in Obsidian to see the rendered board interface instead of plain text.
 
-- **实时读写**：对棋谱的任何操作（如走子、添加变招或评论）都会被实时、自动地保存回原始 `.pgn` 文件。
-- **功能完备**：支持分支变招、评论和标注。
-- **跳转AI**：支持将当前分支打包到网页版皮卡鱼进行分析
-- **切换视图**：支持通过文件菜单在文本视图和象棋视图间切换
-- **快速新建**：支持工具栏按钮新建PGN文件
+- **Real-time Read/Write**: Any changes to the game (like making moves, adding variations, or comments) are saved back to the original `.pgn` file instantly and automatically.
+- **Full-featured**: Supports variations, comments, and annotations.
+- **Jump to AI**: Supports packaging the current branch to Pikafish web version for analysis.
+- **View Toggling**: Switch between text view and chess view via the file menu.
+- **Quick Create**: Create new PGN files via the toolbar button.
 
-![PGN 文件](./IMAGE/PGN文件.png)
+![PGN File](./IMAGE/PGN文件.png)
 
-## 代码块示例
-提供两种代码块名
+## Code Block Demo
+Two code block names are supported:
 
 ---
 
-`xiangqi`: 用于在 Markdown 文件中展示棋谱, 留空为默认开局
+`xiangqi` : to display a game in a Markdown file. Leave it empty for the default opening.
 
 ````markdown
 ```xiangqi
@@ -44,12 +44,12 @@
 ```
 ````
 
-![PGN 展示](./IMAGE/PGN测试.png)
+![PGN Display](./IMAGE/PGN测试.png)
 
 ---
 
-`xq`: 用于生成生成带fEN的`xiangqi`代码段  
-`xq`代码块内的内容会被清空换成`FEN`
+`xq` : to generate a `xiangqi` code block with a FEN string.
+`xq` content will be replaced with the FEN.
 
 ````markdown
 ```xq
@@ -57,67 +57,70 @@
 ```
 ````
 
-![FEN 生成](./IMAGE/FEN生成.png)
+![FEN Generator](./IMAGE/FEN生成.png)
 
 ---
 
-## 功能特点
+## Features
 
-- **棋盘渲染**：可在笔记中展示并复盘中国象棋棋局
-- **定制开局**:
-    - 可视化编辑开局
-    - 清空\填满辅助摆放
-    - 先后手设置
-    - 保存为fen
-- **棋谱保存**：
-    - 支持将走棋历史保存为 PGN 格式
-    - 无 PGN 时保存按钮为**灰色**，有 PGN 时为**绿色**,推演后为**橙色**
-    - 点击保存时弹出确认提示
-    - 若当前无任何走棋记录，保存操作将清空原有 PGN
-- **自定义设置**：
-    - 棋盘主题：木质、羊皮纸、绿绒布、石纹、经典浅色、经典深色
-    - 棋盘背景三层叠加：网格线 + 纹理 + 底色
-    - 坐标标签随棋盘大小自动缩放
-    - 工具栏位置调整（右侧 / 底部）
-    - 棋盘大小
-    - 着法列表及其文字显示
-    - 着法文字大小
-    - 着法列表是否自动跳转到结尾
-    - 可选是否朗读着法，移动端不支持
+- **Board Display**: Show and review Chinese chess games in notes
+- **Custom Opening**:
+    - Visual editor
+    - Clear/Fill board
+    - Set first player
+    - Save as FEN
+- **PGN Saving**:
+    - Save move history as PGN
+    - Button colors: **gray** (empty), **green** (has PGN), **orange** (edited)
+    - Confirm before saving
+    - If no moves, saving clears PGN
+- **Settings**:
+    - Board theme: Wood, Parchment, Green Felt, Marble, Classic Light, Classic Dark
+    - 3-layer board background: grid lines + texture + base color
+    - Coordinate labels auto-scale with board size
+    - Toolbar position: right / bottom
+    - Board size
+    - Show/hide move list and move text
+    - Move text font size
+    - Auto-scroll to latest move
+    - Optional move narration (not on mobile)
+- **Mobile Friendly**: Manual layout adjustment for small screens
+- **Move Narration**: Optional voice readout of moves
+- **Format Support**: Supports ICCS-style PGN
+- **Jump to AI**: Supports packaging the move list to Pikafish web version for analysis.
+- **View Toggling**: Supports switching between text view and chess view via the file menu.
+- **Quick Create**: Supports creating new PGN files via a toolbar button.
 
-- **移动端适配**：通过手动调整棋盘大小和按钮位置，可适配手机等小屏设备
-- **朗读功能**：可选的语音播报走棋内容（可在设置中启用/关闭）
-- **格式支持**：支持 ICCS 格式的 PGN 棋谱
-- **跳转AI**：支持将着法列表打包跳转到网页版皮卡鱼进行分析
+## Usage
 
-## 使用方法
+### `xq` Code Block
 
-### `xq`代码块
+1. Add the `xq` code block tag
+2. Manually edit the board; use the buttons to clear, fill, or switch first player
+3. Click "Save" to generate a `xiangqi` block with the corresponding FEN
 
-1. 输入xq代码块标记即可
-2. 可手动编辑局面,右侧按钮可以清空填满棋盘,切换先手
-3. 编辑好后点击保存,会生成相应的带fen的`xiangqi`代码块
+### `xiangqi` Code Block
 
-### `xiangqi`代码块
+1. Write the moves inside a code block marked with `xiangqi`.
+2. FEN is optional — defaults to the standard starting position. Supports parsing Pikafish web links.
+3. Behavior:
 
-1. 将棋谱写入以 `xiangqi` 标记的代码块中
-2. FEN 格式可省略，省略则默认从标准开局开始。支持解析皮卡鱼的网页连接。
-3. 操作说明：
-    - 若未手动走棋，着法列表会展示PGN
-    - 手动走棋后，着法列表将展示手动后的记录
-    - 点击“重置”恢复到手动推演前的着法
-    - 再次点击"重置"回到最初状态
-4. 点击“保存”将用当前走法覆盖原 PGN 内容
+    - If no manual moves, the move list shows the PGN.
+    - After manual moves, it shows the updated sequence.
+    - Click **Reset** to go back to before manual edits.
+    - Click **Reset** again to return to the initial state.
 
-### 可选参数
+4. Click **Save** to overwrite the original PGN with current moves.
 
-| 名称            | 值         | 描述                                |
-| --------------- | ---------- | ----------------------------------- |
-| `fen`           | 可用的fen  | 特殊开局的fen代码,留空为默认开局    |
-| `protected`/`p` | true/false | ture时保存按钮将失效,留空为false    |
-| `rotated`/`r`   | true/flase | true时倒转棋盘,留空为false,红方在下 |
+### Optional Parameters
 
-#### 示例
+| Name              | Value        | Description                                                       |
+| ----------------- | ------------ | ----------------------------------------------------------------- |
+| `fen`             | valid FEN    | Custom starting position; empty = default                         |
+| `protected` / `p` | true / false | When true, the Save button is disabled; default is false          |
+| `rotated` / `r`   | true / false | When true, the board is flipped (Red on bottom); default is false |
+
+#### DEMO
 
 ````markdown
 ```xiangqi
@@ -131,43 +134,43 @@ p:true
 ```
 ````
 
-- 冒号中英文皆可,rp大小写皆可
-- fen 两边带不带引号都行,随意
-- PGN 两个个一起编号也行,不编号也行
-- 一个一个的写也行,怎么都行
+- Colons can be either Chinese or English.
+- `r` and `p` can be uppercase or lowercase.
+- The `fen` value can be with or without quotes, either is fine.
+- PGN moves can be numbered together, not numbered, or written one by one—any format works.
 
-## 安装说明
+## Installation
 
-本插件已在 Obsidian 官方插件市场上线，搜索“Chinese chess”或者"xiangqi"即可安装。
+This plugin is now available on the official Obsidian plugin marketplace. Search for "Chinese chess" or "xiangqi" to install it.
 
-1. 打开 Obsidian。
-2. 进入 **设置** (Settings)。
-3. 点击 **第三方插件** (Community plugins)。
-4. 确保 **安全模式** (Restricted mode) 已关闭。
-5. 点击 **浏览** (Browse) 按钮。
-6. 在搜索框中输入 “Chinese chess”。
-7. 找到本插件并点击 **安装** (Install)。
-8. 安装完成后，点击 **启用** (Enable)。
+1. Open Obsidian.
+2. Go to **Settings**.
+3. Click on **Community plugins**.
+4. Make sure **Restricted mode** is turned off.
+5. Click the **Browse** button.
+6. Search for "Chinese chess" or "xiangqi" in the search bar.
+7. Find this plugin and click **Install**.
+8. After installation, click **Enable**.
 
-## 构建
+## Build
 
-1. 克隆本项目及其依赖 [xiangqiground](https://github.com/west-shell/xiangqiground) 和 [xiangqi.js](https://github.com/west-shell/xiangqi.js) 到同一目录：
+1. Clone this repository and its dependency [xiangqiground](https://github.com/west-shell/xiangqiground) and  [xiangqi.js](https://github.com/west-shell/xiangqi.js)into the same parent directory:
 
    ```bash
    git clone https://github.com/west-shell/xiangqiground.git
    git clone https://github.com/west-shell/xiangqi.js.git
    git clone https://github.com/west-shell/obsidian-xiangqi.git
-
    ```
 
-2. 先构建 xiangqiground：
+2. Build xiangqiground first:
 
    ```bash
    cd xiangqiground
    npm install
    npm run dist
    ```
-3. 再构建 xiangqi.js：
+
+3. Build xiangqi.js:
 
    ```bash
    cd ../xiangqi.js
@@ -175,15 +178,16 @@ p:true
    npm run dist
    ```
 
-4. 最后构建本插件：
+4. Then build the plugin:
 
    ```bash
    cd ../obsidian-xiangqi
    npm install
-   npm run build        # 开发版本（不压缩，带 sourcemap，方便调试）
-   npm run build:min    # 精简版本（压缩，无 sourcemap，适合发布）
+   npm run build        # Dev build (unminified, with sourcemaps, for debugging)
+   npm run build:min    # Minified build (compressed, no sourcemaps, for release)
    ```
-## 打赏
 
-如果喜欢该插件,可以打赏一下哦
-![打赏](./IMAGE/打赏.png)
+## Donation
+
+If you like this plugin, you can support me with a donation!
+![Donation](./IMAGE/打赏.png)
