@@ -32,7 +32,7 @@ const ActionsModule = {
                     host.selectedPiece = null;
                     break
                 case 'save':
-                    onSaveBTNClick(host);
+                    void onSaveBTNClick(host);
                     break
             }
             eventBus.emit('updateUI');

@@ -76,7 +76,7 @@ export class XQSettingTab extends PluginSettingTab {
 			.addDropdown(d => d.addOptions({ auto: "Auto/跟随软件", en: "English", "zh-cn": "中文" })
 				.setValue(settings.lang).onChange(v => {
 					settings.lang = v as ISettings["lang"];
-					this.plugin.saveSettings();
+					void this.plugin.saveSettings();
 					initI18n(v);
 					this.display();
 				}));
@@ -91,7 +91,7 @@ export class XQSettingTab extends PluginSettingTab {
 				dropdown.addOptions(THEME_OPTIONS);
 				dropdown.setValue(settings.theme).onChange((theme) => {
 					settings.theme = theme as ISettings["theme"];
-					this.plugin.saveSettings();
+					void this.plugin.saveSettings();
 					this.plugin.refresh();
 				});
 			});
@@ -105,7 +105,7 @@ export class XQSettingTab extends PluginSettingTab {
 			"px",
 			(v) => {
 				settings.cellSize = v;
-				this.plugin.saveSettings();
+				void this.plugin.saveSettings();
 				this.plugin.refresh();
 			},
 		);
@@ -119,7 +119,7 @@ export class XQSettingTab extends PluginSettingTab {
 					.setValue(settings.position)
 					.onChange((position) => {
 						settings.position = position as "bottom" | "right";
-						this.plugin.saveSettings();
+						void this.plugin.saveSettings();
 						this.plugin.refresh();
 					});
 			});
@@ -130,7 +130,7 @@ export class XQSettingTab extends PluginSettingTab {
 			.addToggle((toggle) =>
 				toggle.setValue(settings.showCoordinateLabels).onChange((value) => {
 					settings.showCoordinateLabels = value;
-					this.plugin.saveSettings();
+					void this.plugin.saveSettings();
 				}),
 			);
 
@@ -143,7 +143,7 @@ export class XQSettingTab extends PluginSettingTab {
 			.addToggle((toggle) =>
 				toggle.setValue(settings.showLastMove).onChange((value) => {
 					settings.showLastMove = value;
-					this.plugin.saveSettings();
+					void this.plugin.saveSettings();
 					this.plugin.refresh();
 				}),
 			);
@@ -154,7 +154,7 @@ export class XQSettingTab extends PluginSettingTab {
 			.addToggle((toggle) =>
 				toggle.setValue(settings.showNextMove).onChange((value) => {
 					settings.showNextMove = value;
-					this.plugin.saveSettings();
+					void this.plugin.saveSettings();
 					this.plugin.refresh();
 				}),
 			);
@@ -165,7 +165,7 @@ export class XQSettingTab extends PluginSettingTab {
 			.addToggle((toggle) =>
 				toggle.setValue(settings.showTurnBorder).onChange((value) => {
 					settings.showTurnBorder = value;
-					this.plugin.saveSettings();
+					void this.plugin.saveSettings();
 					this.plugin.refresh();
 				}),
 			);
@@ -177,7 +177,7 @@ export class XQSettingTab extends PluginSettingTab {
 				.addToggle((toggle) =>
 					toggle.setValue(settings.enableSpeech).onChange((value) => {
 						settings.enableSpeech = value;
-						this.plugin.saveSettings();
+						void this.plugin.saveSettings();
 					}),
 				);
 		}
@@ -191,7 +191,7 @@ export class XQSettingTab extends PluginSettingTab {
 			.addToggle((toggle) =>
 				toggle.setValue(settings.showMovelist).onChange((value) => {
 					settings.showMovelist = value;
-					this.plugin.saveSettings();
+					void this.plugin.saveSettings();
 					this.plugin.refresh();
 				}),
 			);
@@ -202,7 +202,7 @@ export class XQSettingTab extends PluginSettingTab {
 			.addToggle((toggle) =>
 				toggle.setValue(settings.showMovelistText).onChange((value) => {
 					settings.showMovelistText = value;
-					this.plugin.saveSettings();
+					void this.plugin.saveSettings();
 					this.plugin.refresh();
 					this.display();
 				}),
@@ -217,7 +217,7 @@ export class XQSettingTab extends PluginSettingTab {
 			"px",
 			(v) => {
 				settings.fontSize = v;
-				this.plugin.saveSettings();
+				void this.plugin.saveSettings();
 				this.plugin.refresh();
 			},
 		);
@@ -235,7 +235,7 @@ export class XQSettingTab extends PluginSettingTab {
 					.setValue(settings.autoJump)
 					.onChange(async (value) => {
 						settings.autoJump = value as "never" | "always" | "auto";
-						this.plugin.saveSettings();
+						void this.plugin.saveSettings();
 					});
 			});
 
@@ -251,7 +251,7 @@ export class XQSettingTab extends PluginSettingTab {
 			"px",
 			(v) => {
 				settings.boardMarginTop = v;
-				this.plugin.saveSettings();
+				void this.plugin.saveSettings();
 				this.plugin.refresh();
 			},
 		);
@@ -265,7 +265,7 @@ export class XQSettingTab extends PluginSettingTab {
 			"px",
 			(v) => {
 				settings.boardMarginBottom = v;
-				this.plugin.saveSettings();
+				void this.plugin.saveSettings();
 				this.plugin.refresh();
 			},
 		);
