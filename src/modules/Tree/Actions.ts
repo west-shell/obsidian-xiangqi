@@ -142,7 +142,7 @@ const ActionsModule = {
                     const movesOnPath: string[] = [];
                     for (let i = 1; i < host.currentPath.length; i++) {
                         const node = host.nodeMap.get(host.currentPath[i]);
-                        if (node?.move?.san) movesOnPath.push(node.move.san.replace(/[-+]/g, '').toLowerCase());
+                        if (node?.move?.zh) movesOnPath.push(node.move.zh.replace(/[-+]/g, '').toLowerCase());
                     }
                     window.open(`https://xiangqiai.com/#/${fen} moves ${movesOnPath.join('')}`);
                     break;
@@ -174,8 +174,8 @@ function stringifyPGN(root: ChessNode): string {
 
     function walk(node: ChessNode, stepNum: number): string {
         let result = '';
-        if (node.side === 'red') result += `${stepNum}. ${node.move!.from.toUpperCase()}-${node.move!.to.toUpperCase()}`;
-        else if (node.side === 'black') result += `${node.move!.from.toUpperCase()}-${node.move!.to.toUpperCase()}`;
+        if (node.side === 'red') result += `${stepNum}. ${node.move!.iccs}`;
+        else if (node.side === 'black') result += `${node.move!.iccs}`;
         if (node.comments?.length) {
             for (const c of node.comments) result += `{${c}}`;
         }

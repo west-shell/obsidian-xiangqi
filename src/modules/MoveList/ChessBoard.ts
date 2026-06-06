@@ -43,7 +43,7 @@ const BoardModule = {
         eventBus.on('updateUI', () => {
             const currentMoves = host.modified ? host.history : host.PGN;
             const lastMove = currentMoves[host.currentStep - 1] ?? null;
-            const checkColor = lastMove && /\+|#/.test(lastMove.san)
+            const checkColor = lastMove && (lastMove.isCheck || lastMove.isCheckmate)
                 ? (lastMove.color === 'w' ? 'black' : 'white') : null;
             host.Chess?.$set({
                 settings: { ...host.settings },

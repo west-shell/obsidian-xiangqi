@@ -14,14 +14,14 @@ describe('中国象棋PGN解析器', () => {
     expect(gameTree.children).toHaveLength(1)
 
     const move1 = gameTree.children[0]
-    expect(move1.move?.san).toBeTruthy()
+    expect(move1.move?.zh).toBeTruthy()
     expect(move1.side).toBe('red')
     expect(move1.step).toBe(1)
     expect(move1.children).toHaveLength(1)
     expect(move1.fen).toBeTruthy()
 
     const move2 = move1.children[0]
-    expect(move2.move?.san).toBeTruthy()
+    expect(move2.move?.zh).toBeTruthy()
     expect(move2.side).toBe('black')
     expect(move2.step).toBe(2)
     expect(move2.fen).toBeTruthy()
@@ -50,12 +50,12 @@ describe('中国象棋PGN解析器', () => {
     const gameTree = parser.getRoot()
     const mainLine = gameTree.children[0]
 
-    expect(mainLine.move?.san).toBeTruthy()
+    expect(mainLine.move?.zh).toBeTruthy()
     expect(mainLine.children).toHaveLength(1)
 
     expect(gameTree.children.length).toBeGreaterThan(1)
     const variation = gameTree.children[1]
-    expect(variation.move?.san).toBeTruthy()
+    expect(variation.move?.zh).toBeTruthy()
     expect(variation.comments).toEqual(['变着'])
   })
 })

@@ -69,7 +69,7 @@
       .filter((m): m is Move => m != null) ?? [],
   );
   let checkColor = $derived(
-    currentNode.move && /\+|#/.test(currentNode.move.san)
+    currentNode.move && (currentNode.move.isCheck || currentNode.move.isCheckmate)
       ? (currentNode.move.color === 'w' ? 'black' : 'white')
       : null
   );

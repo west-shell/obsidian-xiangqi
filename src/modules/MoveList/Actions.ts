@@ -136,10 +136,10 @@ function replayFen(host: IXQHost): string {
         const move = currentMoves[i];
         if (!move) break;
         try {
-            chess.move(move.san);
+            chess.move(move.zh);
         } catch {
             // fallback: try lan (ICCS format, e.g. "h2e2")
-            chess.move(move.lan);
+            chess.move(move.iccs);
         }
     }
     return chess.fen();
@@ -168,7 +168,7 @@ async function savePGN(host: IXQHost) {
         if (host.currentStep > 0) {
             const moves = host.history
                 .slice(0, host.currentStep)
-                .map((move: Move) => move.lan ?? "");
+                .map((move: Move) => move.iccs ?? "");
             const pgnLines: string[] = [];
             for (let i = 0; i < moves.length; i += 2) {
                 const line = `${Math.ceil((i + 1) / 2)}. ${moves[i]} ${moves[i + 1] || ""}`.trim();
