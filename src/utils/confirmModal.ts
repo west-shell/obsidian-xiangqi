@@ -22,7 +22,7 @@ export class ConfirmModal extends Modal {
 		const { contentEl } = this;
 
 		// 标题
-		new Setting(contentEl).setName(this.title).setHeading();
+		contentEl.createEl("h2", { text: this.title });
 
 		// 消息内容
 		contentEl.createEl("p", { text: this.message });
