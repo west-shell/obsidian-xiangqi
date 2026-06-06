@@ -5,14 +5,14 @@ import {
 } from './module-system';
 
 type EventType = string | symbol;
-type Handler = (payload?: any) => void
+type Handler = (payload?: unknown) => void
 
 export class EventBus {
     private handlers = new Map<EventType, Set<Handler>>();
 
     constructor(public host: object) { }
 
-    static init(host: Record<string, any>): void {
+    static init(host: Record<string, unknown[]>): void {
         host.eventBus = new EventBus(host);
     }
 

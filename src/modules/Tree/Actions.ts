@@ -5,7 +5,7 @@ import { ConfirmModal } from "../../utils/confirmModal";
 import { t } from "../../i18n";
 
 const ActionsModule = {
-    init(host: Record<string, any>) {
+    init(host: Record<string, unknown>) {
         const eventBus = host.eventBus;
 
         eventBus.on('runmove', (move: Move) => {

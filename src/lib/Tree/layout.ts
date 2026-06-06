@@ -48,7 +48,7 @@ function assignY(node: ChessNode, depth = 0) {
     node.y = depth;
     node.children.map((child) => assignY(child, depth + 1));
 }
-function setIndexForChildren(node: any, i: number) {
+function setIndexForChildren(node: ChessNode, i: number) {
     if (node) {
         node.x = i; // 设置当前节点的 x 属性
         // 递归处理子节点的 children[0]，不改变 i

@@ -2,7 +2,7 @@ import { registerPGNViewModule } from "../../core/module-system";
 import { speak } from "../speak";
 
 const SpeakerModule = {
-    init(host: Record<string, any>) {
+    init(host: Record<string, unknown>) {
         const eventBus = host.eventBus;
         let lastSpokenNodeId: string | null = null;
 

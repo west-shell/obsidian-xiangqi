@@ -3,7 +3,7 @@ import { registerGenFENModule } from "../../core/module-system";
 import { mount, unmount } from "svelte";
 
 const BoardModule = {
-    init(host: Record<string, any>) {
+    init(host: Record<string, unknown>) {
         const eventBus = host.eventBus;
 
         eventBus.on("load", () => {

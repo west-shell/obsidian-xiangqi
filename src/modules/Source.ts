@@ -1,4 +1,3 @@
-import { Chess } from '@west-shell/xiangqi.js';
 import { registerGenFENModule, registerXQModule } from "../core/module-system";
 import { parseSource } from "../utils/parse";
 import { DEFAULT_FEN } from "../types";

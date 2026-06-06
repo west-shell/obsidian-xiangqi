@@ -20,7 +20,7 @@ export function parseSource(source: string): {
 
     // try to find FEN in source
     let fen = source.match(
-        /([rnbakcpRNBAKCP1-9]+\/){9}[rnbakcpRNBAKCP1-9]+(?:\s+[wr])?/,
+        /([rnbakcpRNBAKCP1-9]+/){9}[rnbakcpRNBAKCP1-9]+(?:\s+[wr])?/,
     )?.[0];
     if (!fen) {
         fen = DEFAULT_FEN;
@@ -64,7 +64,7 @@ function parsePikafishUrl(source: string): {
     PGN: Move[];
     firstTurn: ITurn;
 } | null {
-    const match = source.match(/https:\/\/xiangqiai\.com\/#\/([^\s\n]+)/);
+    const match = source.match(/https://xiangqiai\.com/#/([^\s\n]+)/);
     if (!match) return null;
 
     let raw = match[1];
@@ -110,7 +110,7 @@ function parsePikafishUrl(source: string): {
 // --- ICCS move extraction ---
 
 function extractICCSMoves(source: string): string[] {
-    const clean = source.replace(/[rnbakcpRNBAKCP1-9\/]+\s+[wr].*/g, "").replace(/^[pr]\s*[:：].*/gim, "");
+    const clean = source.replace(/[rnbakcpRNBAKCP1-9/]+\s+[wr].*/g, "").replace(/^[pr]\s*[:：].*/gim, "");
     // 直接匹配，交给 xiangqi.js 解析
     const movePattern = /\b[A-Ia-i][0-9]-?[A-Ia-i][0-9]\b/g;
     return clean.match(movePattern) ?? [];

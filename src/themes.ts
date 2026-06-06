@@ -16,7 +16,7 @@ interface ThemeDef {
 }
 const tree_red = '#861818';
 const tree_black = '#000080';
-const auto_grid = document.body.classList.contains("theme-dark") ? "light" : "dark";
+const auto_grid = (app.activeDocument ?? document).body.classList.contains("theme-dark") ? "light" : "dark";
 const themes: Record<string, ThemeDef> = {
 	auto: {
 		name: "自动",
@@ -78,7 +78,7 @@ const themes: Record<string, ThemeDef> = {
 		// 	name: "王朝",
 		// 	bg: ".obsidian/plugins/xiangqi/assets/王朝.png",
 		// 	texture: "none",
-		// 	grid: document.body.classList.contains("theme-dark") ? "dark" : "light",
+		// 	grid: (app.activeDocument ?? document).body.classList.contains("theme-dark") ? "dark" : "light",
 		// 	red: tree_red,
 		// 	black: tree_black,
 	}
@@ -100,20 +100,20 @@ export function applyThemes(app: App, settings: ISettings) {
 		? `url('${app.vault.adapter.getResourcePath(t.bg)}') center / cover no-repeat`
 		: t.bg;
 
-	document.body.style.setProperty("--xq-board-bg", bg);
-	document.body.style.setProperty("--xq-board-texture", t.texture);
-	document.body.style.setProperty(
+	(app.activeDocument ?? document).body.style.setProperty("--xq-board-bg", bg);
+	(app.activeDocument ?? document).body.style.setProperty("--xq-board-texture", t.texture);
+	(app.activeDocument ?? document).body.style.setProperty(
 		"--xq-grid",
 		t.grid === "dark" ? "var(--xq-grid-dark)"
 			: t.grid === "light" ? "var(--xq-grid-light)"
 				: "none",
 	);
-	document.body.style.setProperty(
+	(app.activeDocument ?? document).body.style.setProperty(
 		"--xq-coords-display",
 		showCoordinateLabels ? "flex" : "none",
 	);
-	document.body.style.setProperty("--xq-piece-red", t.red);
-	document.body.style.setProperty("--xq-piece-black", t.black);
-	document.body.style.setProperty("--board-margin-top", `${boardMarginTop}px`);
-	document.body.style.setProperty("--board-margin-bottom", `${boardMarginBottom}px`);
+	(app.activeDocument ?? document).body.style.setProperty("--xq-piece-red", t.red);
+	(app.activeDocument ?? document).body.style.setProperty("--xq-piece-black", t.black);
+	(app.activeDocument ?? document).body.style.setProperty("--board-margin-top", `${boardMarginTop}px`);
+	(app.activeDocument ?? document).body.style.setProperty("--board-margin-bottom", `${boardMarginBottom}px`);
 }
