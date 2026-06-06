@@ -165,7 +165,6 @@ const messages: Record<string, Record<string, string>> = {
 };
 
 let lang = "zh-cn";
-let _ver = 0;
 const listeners = new Set<() => void>();
 
 function detect(): string {
@@ -190,6 +189,5 @@ export function initI18n(locale: string) {
 	} else if (locale?.toLowerCase().startsWith("zh")) {
 		lang = "zh-cn";
 	}
-	_ver++;
 	listeners.forEach(fn => fn());
 }
