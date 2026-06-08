@@ -79,20 +79,15 @@
 </div>
 
 <style>
+  /* ========== 基础容器样式 ========== */
   .move-container {
     font-size: var(--fontsize);
     padding: 0;
     margin: 0;
   }
 
-  .move-list.right {
+  .move-list {
     display: flex;
-    flex-wrap: nowrap;
-    flex-direction: column;
-    align-items: flex-start;
-    overflow-y: auto;
-    overflow-x: hidden;
-    height: var(--height);
     padding: 0;
     margin: 0;
     color: var(--text-normal);
@@ -101,16 +96,14 @@
     border-radius: var(--radius-s);
   }
 
-  .move-list.bottom {
-    display: flex;
+  /* ========== 右侧垂直布局 (right) ========== */
+  .move-list.right {
+    flex-direction: column;
+    height: var(--height);
+    overflow-y: auto;
+    overflow-x: hidden;
     flex-wrap: nowrap;
-    overflow-x: auto;
-    width: var(--width);
-    align-content: flex-start;
-    padding: 0;
-    margin: 0;
-    background-color: var(--background-secondary);
-    border-top: 1px solid var(--background-modifier-border);
+    align-items: flex-start;
   }
 
   .move-list.right li {
@@ -120,11 +113,68 @@
     flex-grow: 0;
     align-items: center;
     gap: 0.5em;
+    width: 100%;
     padding: 0;
     margin: 0;
     border-bottom: none;
-    width: 100%;
     white-space: nowrap;
+  }
+
+  .move-list.right .roundnum {
+    display: inline-block;
+    min-width: 1.5em;
+    max-width: 3em;
+    text-align: right;
+    margin-right: 0.4em;
+    color: var(--text-muted);
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  /* right 布局的 move 按钮 */
+  .move-list.right span.move {
+    display: inline-block;
+    line-height: 1.2;
+    text-align: center;
+    border-radius: 0.375em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    flex-shrink: 0;
+    padding: 0.25em 0.5em;
+    margin: 0.125em 0;
+    color: var(--text-normal);
+  }
+
+  .move-list.right span.move.red,
+  .move-list.right span.move.black {
+    min-width: 4em;
+  }
+
+  .move-list.right span.start {
+    flex: 1;
+  }
+
+  .move-list.right span.move:hover {
+    background-color: var(--background-modifier-hover);
+    transform: scale(1.02);
+  }
+
+  .move-list.right span.move.active {
+    background-color: var(--color-accent);
+    color: var(--text-on-accent);
+    box-shadow: 0 0.125em 0.375em rgba(0, 0, 0, 0.15);
+    font-weight: 500;
+    transform: scale(1.02);
+  }
+
+  /* ========== 底部水平布局 (bottom) - 竖向文字 ========== */
+  .move-list.bottom {
+    width: var(--width);
+    overflow-x: auto;
+    overflow-y: hidden;
+    flex-wrap: nowrap;
+    align-items: flex-start;
   }
 
   .move-list.bottom li {
@@ -135,7 +185,7 @@
     align-items: center;
     justify-content: center;
     gap: 0.25em;
-    padding: 0.25em 0.125em; /* 4px -> 0.25em, 2px -> 0.125em (假设 font-size=16px) */
+    padding: 0.125em 0.125em; /* 减小上下内边距 */
     margin: 0;
     border-bottom: none;
     white-space: nowrap;
@@ -143,75 +193,49 @@
     text-orientation: upright;
   }
 
-  .move-list.right .roundnum {
-    display: inline-block;
-    min-width: 1.5em;
-    max-width: 3em;
-    text-align: right;
-    margin-right: 0.4em;
-    white-space: nowrap;
-    flex-shrink: 0;
-    color: var(--text-muted);
-  }
-
   .move-list.bottom .roundnum {
     writing-mode: horizontal-tb;
     text-orientation: mixed;
     display: inline-block;
     text-align: center;
-    margin-bottom: 0.25em; /* 4px -> 0.25em */
+    margin-bottom: 0.125em; /* 减小底部间距 */
   }
 
-  /* 美化后的 move 样式 */
-  span.move {
+  /* bottom 布局的 move 按钮 - 竖向文字，减小内边距 */
+  .move-list.bottom span.move {
     display: inline-block;
     line-height: 1.2;
-    justify-content: center;
-    align-items: center;
     text-align: center;
-    border-radius: 0.375em; /* 6px -> 0.375em (6/16) */
+    border-radius: 0.25em; /* 稍小圆角 */
     cursor: pointer;
     transition: all 0.2s ease;
     white-space: nowrap;
     flex-shrink: 0;
-    padding: 0.25em 0.5em; /* 4px -> 0.25em, 8px -> 0.5em */
+    padding: 0.125em 0.125em; /* 减小内边距，让竖向文字更紧凑 */
+    margin: 0.0625em 0; /* 极小垂直间距 */
+    color: var(--text-normal);
+    /* font-size: 0.9em; 可选：稍微缩小字体 */
   }
 
-  span.move.red,
-  span.move.black {
-    min-width: 4em; /* 稍微加宽 */
+  .move-list.bottom span.move.red,
+  .move-list.bottom span.move.black {
+    min-width: auto; /* 竖向排列不需要固定最小宽度 */
   }
 
-  span.start {
+  .move-list.bottom span.start {
     flex: 1;
   }
 
-  span.move:hover {
+  .move-list.bottom span.move:hover {
     background-color: var(--background-modifier-hover);
-    transform: scale(1.02); /* 悬停时轻微放大 */
-  }
-
-  span.move {
-    color: var(--text-normal);
-  }
-
-  /* 美化后的选中样式 - 增加内边距和圆角 */
-  span.move.active {
-    background-color: var(--color-accent);
-    color: var(--text-on-accent);
-    box-shadow: 0 0.125em 0.375em rgba(0, 0, 0, 0.15); /* 0 2px 6px -> 0 0.125em 0.375em */
-    font-weight: 500;
     transform: scale(1.02);
   }
 
-  /* 可选：为右侧列表的 li 添加间隙，让选中效果更舒展 */
-  .move-list.right li span.move {
-    margin: 0.125em 0; /* 2px -> 0.125em */
-  }
-
-  /* 可选：底部列表的 move 间距优化 */
-  .move-list.bottom li span.move {
-    margin: 0.125em 0; /* 2px -> 0.125em */
-    padding: 0.375em 0.25em; /* 6px -> 0.375em, 4px -> 0.25em */
+  .move-list.bottom span.move.active {
+    background-color: var(--color-accent);
+    color: var(--text-on-accent);
+    box-shadow: 0 0.125em 0.375em rgba(0, 0, 0, 0.15);
+    font-weight: 500;
+    transform: scale(1.02);
   }
 </style>

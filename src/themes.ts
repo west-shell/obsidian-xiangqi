@@ -67,7 +67,7 @@ const themes: Record<string, ThemeDef> = {
 	},
 	bamboo: {
 		name: "竹韵",
-		bg: ".obsidian/plugins/xiangqi/assets/bamboo.png",
+		bg: ".obsidian/plugins/xiangqi/assets/bamboo.jpg",
 		texture: "none",
 		grid: "none",
 		red: tree_red,
