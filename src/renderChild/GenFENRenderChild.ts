@@ -7,8 +7,8 @@ import '../modules/GenFEN/Actions';
 import { type MarkdownPostProcessorContext, MarkdownRenderChild } from 'obsidian';
 
 import type { EventBus } from '../core/event-bus';
-import { type ModuleRegistry, createGenFENModuleRegistry } from '../core/module-system';
-import XQPlugin from '../main';
+import { createGenFENModuleRegistry, type ModuleRegistry } from '../core/module-system';
+import type XQPlugin from '../main';
 import type { ISettings } from '../types';
 
 export class GenFENRenderChild extends MarkdownRenderChild {

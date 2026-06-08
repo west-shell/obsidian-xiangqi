@@ -2,12 +2,12 @@ import '../assets/base.css';
 import '../assets/board.css';
 import '../assets/pieces.css';
 
-import { MarkdownView, Plugin, TFile, addIcon } from 'obsidian';
+import { addIcon, MarkdownView, Plugin, TFile } from 'obsidian';
 
 import { initI18n, t } from './i18n';
 import { GenFENRenderChild } from './renderChild/GenFENRenderChild';
 import { ChessRenderChild } from './renderChild/MoveListRenderChild';
-import { XQSettingTab, DEFAULT_SETTINGS } from './settings';
+import { DEFAULT_SETTINGS, XQSettingTab } from './settings';
 import { applyThemes } from './themes';
 import type { ISettings } from './types';
 import { PGNView } from './view/pgn';

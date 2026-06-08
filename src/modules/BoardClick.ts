@@ -1,6 +1,6 @@
 import { Chess } from '@west-shell/xiangqi.js';
 
-import { registerXQModule, registerPGNViewModule } from '../core/module-system';
+import { registerPGNViewModule, registerXQModule } from '../core/module-system';
 import type { IXQHost } from '../types';
 
 const BoardClickModule = {

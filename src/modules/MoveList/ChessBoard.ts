@@ -62,7 +62,7 @@ const BoardModule = {
         modified: host.modified,
         history: [...host.history],
         lastMove: lastMove ? ([lastMove.from, lastMove.to] as [Square, Square]) : null,
-        options: { ...(host.options || {}) },
+        options: { ...host.options },
       });
     });
 

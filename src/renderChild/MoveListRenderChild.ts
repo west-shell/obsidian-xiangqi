@@ -10,7 +10,7 @@ import { type MarkdownPostProcessorContext, MarkdownRenderChild } from 'obsidian
 
 import type { EventBus } from '../core/event-bus';
 import { createXQModuleRegistry } from '../core/module-system';
-import XQPlugin from '../main';
+import type XQPlugin from '../main';
 import type { ISettings } from '../types';
 
 export class ChessRenderChild extends MarkdownRenderChild {

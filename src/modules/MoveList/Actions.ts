@@ -3,7 +3,7 @@ import { MarkdownView, Notice } from 'obsidian';
 
 import { registerXQModule } from '../../core/module-system';
 import { t } from '../../i18n';
-import type { IXQHost, ITurn } from '../../types';
+import type { ITurn, IXQHost } from '../../types';
 import { ConfirmModal } from '../../utils/confirmModal';
 
 const ActionsModule = {

@@ -2,8 +2,8 @@ import './settings.css';
 
 import { type App, PluginSettingTab, Setting } from 'obsidian';
 
-import { t, initI18n } from './i18n';
-import XQPlugin from './main';
+import { initI18n, t } from './i18n';
+import type XQPlugin from './main';
 import { THEME_OPTIONS } from './themes';
 import type { ISettings } from './types';
 

@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { setIcon, Menu } from "obsidian";
+  import { Menu, setIcon } from "obsidian";
   import type { EventBus } from "../../core/event-bus";
-  import { t, onLangChange } from "../../i18n";
+  import { onLangChange, t } from "../../i18n";
 
   interface Props {
     eventBus: EventBus;

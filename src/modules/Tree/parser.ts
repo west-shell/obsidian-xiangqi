@@ -3,7 +3,7 @@ import { Chess, type Move } from '@west-shell/xiangqi.js';
 import type { ChessNode } from '../../types';
 import { DEFAULT_FEN } from '../../types';
 
-import { tokenize, type Token, type TokenType } from './Tokenizer';
+import { type Token, tokenize, type TokenType } from './Tokenizer';
 
 export class PGNParser {
   haveFEN: boolean = false;

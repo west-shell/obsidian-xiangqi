@@ -1,6 +1,6 @@
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 import { pathToFileURL } from 'url';
-import { PluginOption, defineConfig } from 'vite';
+import { type PluginOption, defineConfig } from 'vite';
 
 const setOutDir = (mode: string) => {
   switch (mode) {

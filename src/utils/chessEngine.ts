@@ -1,10 +1,10 @@
 import {
   Chess,
-  Move,
   validateFen as chessValidateFen,
-  type Square,
-  type PieceSymbol,
   type Color,
+  Move,
+  type PieceSymbol,
+  type Square,
 } from '@west-shell/xiangqi.js';
 
 import { DEFAULT_FEN } from '../types';

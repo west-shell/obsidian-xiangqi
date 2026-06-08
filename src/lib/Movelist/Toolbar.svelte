@@ -3,7 +3,7 @@
   import type { EventBus } from "../../core/event-bus";
   import type { Move } from "@west-shell/xiangqi.js";
   import type { ISettings } from "../../types";
-  import { t, onLangChange } from "../../i18n";
+  import { onLangChange, t } from "../../i18n";
 
   interface Props {
     settings: ISettings;

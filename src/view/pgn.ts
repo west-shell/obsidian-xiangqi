@@ -7,9 +7,9 @@ import '../modules/Tree/Speaker';
 
 import { TextFileView, type WorkspaceLeaf } from 'obsidian';
 
-import { EventBus } from '../core/event-bus';
+import { type EventBus } from '../core/event-bus';
 import { createPGNViewModuleRegistry, destroyPGNViewModuleRegistry } from '../core/module-system';
-import XQPlugin from '../main';
+import type XQPlugin from '../main';
 import type { ISettings } from '../types';
 
 export class PGNView extends TextFileView {

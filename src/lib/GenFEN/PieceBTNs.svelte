@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { PIECE_CHARS, type ISettings } from "../../types";
+  import { type ISettings, PIECE_CHARS } from "../../types";
   import type { EventBus } from "../../core/event-bus";
   import { setIcon } from "obsidian";
 

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onDestroy, onMount, tick } from "svelte";
   import type { EventBus } from "../../core/event-bus";
-  import { PIECE_CHARS, type ChessNode, type NodeMap } from "../../types";
+  import { type ChessNode, type NodeMap, PIECE_CHARS } from "../../types";
   import { t } from "../../i18n";
   import { calculateTreeLayout } from "./layout";
   import { setIcon } from "obsidian";
