@@ -4,8 +4,8 @@
   import Toolbar from "./Toolbar.svelte";
   import type { ChessNode, ISettings, NodeMap } from "../../types";
   import type { EventBus } from "../../core/event-bus";
-  import type { DrawShape } from "@west-shell/chessground-xq/draw";
-  import type * as cg from "@west-shell/chessground-xq/types";
+  import type { DrawShape } from "@west-shell/xiangqiground/draw";
+  import type * as cg from "@west-shell/xiangqiground/types";
   import type { Move, Square } from "@west-shell/xiangqi.js";
   import { onMount, tick } from "svelte";
 
