@@ -1,67 +1,75 @@
-import Xiangqi from "../../lib/Movelist/Xiangqi.svelte";
-import { registerXQModule } from "../../core/module-system";
-import type { IXQHost } from "../../types";
-import { mount, unmount } from "svelte";
-import type { Square } from "@west-shell/xiangqi.js";
+import type { Square } from '@west-shell/xiangqi.js';
+import { mount, unmount } from 'svelte';
+
+import { registerXQModule } from '../../core/module-system';
+import Xiangqi from '../../lib/Movelist/Xiangqi.svelte';
+import type { IXQHost } from '../../types';
 
 const BoardModule = {
-    init(host: IXQHost) {
-        const eventBus = host.eventBus;
+  init(host: IXQHost) {
+    const eventBus = host.eventBus;
 
-        eventBus.on("load", () => {
-            host.modified = false
-            const Container = host.containerEl.createEl('div');
-            host.Chess = mount(Xiangqi, {
-                target: Container,
-                props: {
-                    settings: host.settings,
-                    fen: host.fen,
-                    checkColor: null,
-                    selectedSquare: null,
-                    currentStep: host.currentStep,
-                    eventBus: host.eventBus,
-                    modified: host.modified,
-                    PGN: host.PGN,
-                    history: host.history,
-                    lastMove: null,
-                    options: host.options || {},
-                },
-            });
-        })
+    eventBus.on('load', () => {
+      host.modified = false;
+      const Container = host.containerEl.createEl('div');
+      host.Chess = mount(Xiangqi, {
+        target: Container,
+        props: {
+          settings: host.settings,
+          fen: host.fen,
+          checkColor: null,
+          selectedSquare: null,
+          currentStep: host.currentStep,
+          eventBus: host.eventBus,
+          modified: host.modified,
+          PGN: host.PGN,
+          history: host.history,
+          lastMove: null,
+          options: host.options || {},
+        },
+      });
+    });
 
-        eventBus.on('ready', () => {
-            if (!host.settings.autoJump) return
-            switch (host.settings.autoJump) {
-                case "never": break;
-                case "always": eventBus.emit('toEnd'); break;
-                case "auto":
-                    if (!host.haveFEN) eventBus.emit('toEnd');
-                    break;
-            }
-        })
+    eventBus.on('ready', () => {
+      if (!host.settings.autoJump) return;
+      switch (host.settings.autoJump) {
+        case 'never':
+          break;
+        case 'always':
+          eventBus.emit('toEnd');
+          break;
+        case 'auto':
+          if (!host.haveFEN) eventBus.emit('toEnd');
+          break;
+      }
+    });
 
-        eventBus.on('updateUI', () => {
-            const currentMoves = host.modified ? host.history : host.PGN;
-            const lastMove = currentMoves[host.currentStep - 1] ?? null;
-            const checkColor = lastMove && (lastMove.isCheck || lastMove.isCheckmate)
-                ? (lastMove.color === 'w' ? 'black' : 'white') : null;
-            host.Chess?.$set({
-                settings: { ...host.settings },
-                fen: host.fen,
-                checkColor,
-                selectedSquare: null,
-                currentStep: host.currentStep,
-                modified: host.modified,
-                history: [...host.history],
-                lastMove: lastMove ? [lastMove.from, lastMove.to] as [Square, Square] : null,
-                options: { ...(host.options || {}) },
-            });
-        })
+    eventBus.on('updateUI', () => {
+      const currentMoves = host.modified ? host.history : host.PGN;
+      const lastMove = currentMoves[host.currentStep - 1] ?? null;
+      const checkColor =
+        lastMove && (lastMove.isCheck || lastMove.isCheckmate)
+          ? lastMove.color === 'w'
+            ? 'black'
+            : 'white'
+          : null;
+      host.Chess?.$set({
+        settings: { ...host.settings },
+        fen: host.fen,
+        checkColor,
+        selectedSquare: null,
+        currentStep: host.currentStep,
+        modified: host.modified,
+        history: [...host.history],
+        lastMove: lastMove ? ([lastMove.from, lastMove.to] as [Square, Square]) : null,
+        options: { ...(host.options || {}) },
+      });
+    });
 
-        eventBus.on("unload", () => {
-            unmount(host.Chess)
-        })
-    }
-}
+    eventBus.on('unload', () => {
+      unmount(host.Chess);
+    });
+  },
+};
 
 registerXQModule('board', BoardModule);

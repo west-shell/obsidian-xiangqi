@@ -1,17 +1,17 @@
 .xq-slider-value {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	min-width: 42px;
-	height: 24px;
-	margin-right: 8px;
-	font-size: 13px;
-	font-weight: 600;
-	color: var(--text-accent);
-	background: var(--background-modifier-border);
-	border-radius: 4px;
-	padding: 0 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 42px;
+  height: 24px;
+  margin-right: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-accent);
+  background: var(--background-modifier-border);
+  border-radius: 4px;
+  padding: 0 6px;
 }
 .xq-setting-tab .setting-item {
-	border-top: none;
+  border-top: none;
 }

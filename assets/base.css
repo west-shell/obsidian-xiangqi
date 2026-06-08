@@ -208,7 +208,6 @@ xq-board square.premove-dest.hover {
   background: rgba(20, 30, 85, 0.2);
 }
 
-
 .turn-red xq-board square.last-move-orig {
   background: linear-gradient(var(--piece-black, #44c), var(--piece-black, #44c)) center / 30% 30% no-repeat;
 }
@@ -219,7 +218,11 @@ xq-board square.premove-dest.hover {
 
 .turn-red xq-board square.last-move-dest {
   /* background-color: rgba(20, 85, 30, 0.5); */
-  background: radial-gradient(transparent 0%, transparent 75%, var(--piece-black, rgba(68, 68, 204, 0.5)) 75%);
+  background: radial-gradient(
+    transparent 0%,
+    transparent 75%,
+    var(--piece-black, rgba(68, 68, 204, 0.5)) 75%
+  );
 }
 
 .turn-black xq-board square.last-move-dest {
@@ -233,11 +236,13 @@ xq-board square.selected {
 }
 
 xq-board square.check {
-  background: radial-gradient(ellipse at center,
-      rgba(255, 0, 0, 1) 0%,
-      rgba(231, 0, 0, 1) 25%,
-      rgba(169, 0, 0, 0) 89%,
-      rgba(158, 0, 0, 0) 100%);
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 0, 0, 1) 0%,
+    rgba(231, 0, 0, 1) 25%,
+    rgba(169, 0, 0, 0) 89%,
+    rgba(158, 0, 0, 0) 100%
+  );
 }
 
 xq-board square.current-premove {

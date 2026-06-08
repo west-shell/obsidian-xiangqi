@@ -38,11 +38,14 @@
   }: Props = $props();
 
   let boardWidth = $derived(boardWidthOverride ?? settings.cellSize * 9);
+  let boardHeight = $derived((boardWidth * 10) / 9);
   let boardElement: HTMLDivElement;
   let api: Api | null = null;
   let layoutChangeHandler: (() => void) | null = null;
-  let turnColor: cg.Color = $derived(fen.split(' ')[1] === 'b' ? 'black' : 'white');
-  let turnClass = $derived(settings.showTurnBorder ? `turn-${fen.split(' ')[1] === 'b' ? 'black' : 'red'}` : "");
+  let turnColor: cg.Color = $derived(fen.split(" ")[1] === "b" ? "black" : "white");
+  let turnClass = $derived(
+    settings.showTurnBorder ? `turn-${fen.split(" ")[1] === "b" ? "black" : "red"}` : "",
+  );
   let _check: cg.Color | false = $derived(checkColor || false);
 
   function computeDests(fen: string): Map<cg.Key, cg.Key[]> {
@@ -149,9 +152,12 @@
 
     // 等待容器布局完成，避免 bounds 为 0 时 renderCircle 产生 NaN
     if (!boardElement.offsetWidth) {
-      await new Promise<void>(resolve => {
+      await new Promise<void>((resolve) => {
         const ro = new ResizeObserver(() => {
-          if (boardElement.offsetWidth) { ro.disconnect(); resolve(); }
+          if (boardElement.offsetWidth) {
+            ro.disconnect();
+            resolve();
+          }
         });
         ro.observe(boardElement);
       });
@@ -169,7 +175,10 @@
 
   onDestroy(() => {
     if (layoutChangeHandler) {
-      (activeDocument ?? document).body.removeEventListener("xq-layout-change", layoutChangeHandler);
+      (activeDocument ?? document).body.removeEventListener(
+        "xq-layout-change",
+        layoutChangeHandler,
+      );
     }
     if (api) {
       api.destroy();
@@ -224,23 +233,27 @@
   });
 </script>
 
-<div bind:this={boardElement} class="xq-wrap {turnClass}" style="width: {boardWidth}px"></div>
+<!-- <div class="board-container {turnClass}" style="width: {boardWidth}px height: {boardHeight}px"> -->
+<div bind:this={boardElement} class="xq-wrap {turnClass}" style="width:{boardWidth}px"></div>
+
+<!-- </div> -->
 
 <style>
   .xq-wrap {
     height: 100%;
     flex-shrink: 0;
     aspect-ratio: 450 / 500;
-    border-radius: 2px;
+    /* border-radius: 2px; */
+    /* background-color: yellow; */
     --piece-red: var(--xq-piece-red, var(--color-red));
     --piece-black: var(--xq-piece-black, var(--color-blue));
   }
 
   .xq-wrap.turn-red {
-    box-shadow: 0 0 12px 3px rgba(255, 50, 50, 0.5);
+    box-shadow: 0 0 0.12em 0.15em rgba(255, 50, 50, 0.5);
   }
 
   .xq-wrap.turn-black {
-    box-shadow: 0 0 12px 3px rgba(0, 0, 0, 0.7);
+    box-shadow: 0 0 0.12em 0.15em rgba(0, 0, 0, 0.7);
   }
 </style>

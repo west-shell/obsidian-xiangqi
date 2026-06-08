@@ -131,8 +131,8 @@ function buildSvg(lineColor) {
 }
 
 // ---- 生成 CSS ----
-const svgDark = buildSvg('#555');   // 深色线，用于浅色背景
-const svgLight = buildSvg('#ccc');  // 浅色线，用于深色背景
+const svgDark = buildSvg('#555'); // 深色线，用于浅色背景
+const svgLight = buildSvg('#ccc'); // 浅色线，用于深色背景
 const b64Dark = Buffer.from(svgDark, 'utf-8').toString('base64');
 const b64Light = Buffer.from(svgLight, 'utf-8').toString('base64');
 

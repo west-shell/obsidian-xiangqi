@@ -1,53 +1,49 @@
-import {
-    registerXQModule,
-    registerGenFENModule,
-    registerPGNViewModule
-} from './module-system';
+import { registerXQModule, registerGenFENModule, registerPGNViewModule } from './module-system';
 
 type EventType = string | symbol;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- pub/sub event system must accept any payload
-type Handler = (payload?: any) => void
+type Handler = (payload?: any) => void;
 
 export class EventBus {
-    private handlers = new Map<EventType, Set<Handler>>();
+  private handlers = new Map<EventType, Set<Handler>>();
 
-    constructor(public host: object) { }
+  constructor(public host: object) {}
 
-    static init(host: Record<string, any>): void {
-        host.eventBus = new EventBus(host);
+  static init(host: Record<string, any>): void {
+    host.eventBus = new EventBus(host);
+  }
+
+  destroy(): void {
+    this.handlers.clear();
+  }
+
+  on(event: EventType, handler: Handler) {
+    let set = this.handlers.get(event);
+    if (!set) {
+      set = new Set();
+      this.handlers.set(event, set);
     }
+    set.add(handler);
+  }
 
-    destroy(): void {
-        this.handlers.clear();
+  emit(event: EventType, payload?: unknown) {
+    const set = this.handlers.get(event);
+    if (!set) return;
+    const hasPayload = arguments.length === 2;
+    for (const handler of set) {
+      if (hasPayload) {
+        handler(payload);
+      } else {
+        handler();
+      }
     }
+  }
 
-    on(event: EventType, handler: Handler) {
-        let set = this.handlers.get(event);
-        if (!set) {
-            set = new Set();
-            this.handlers.set(event, set);
-        }
-        set.add(handler);
-    }
-
-    emit(event: EventType, payload?: unknown) {
-        const set = this.handlers.get(event);
-        if (!set) return;
-        const hasPayload = arguments.length === 2;
-        for (const handler of set) {
-            if (hasPayload) {
-                handler(payload);
-            } else {
-                handler();
-            }
-        }
-    }
-
-    off(event: EventType, handler: Handler) {
-        this.handlers.get(event)?.delete(handler);
-    }
+  off(event: EventType, handler: Handler) {
+    this.handlers.get(event)?.delete(handler);
+  }
 }
 
 registerXQModule('eventBus', EventBus);
 registerGenFENModule('eventBus', EventBus);
-registerPGNViewModule('eventBus', EventBus)
+registerPGNViewModule('eventBus', EventBus);

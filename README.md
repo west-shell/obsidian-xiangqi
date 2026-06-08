@@ -26,6 +26,7 @@ This plugin registers a custom view for `.pgn` files. Simply open a `.pgn` file 
 ![PGN File](./IMAGE/PGN文件.png)
 
 ## Code Block Demo
+
 Two code block names are supported:
 
 ---
@@ -65,25 +66,25 @@ Two code block names are supported:
 
 - **Board Display**: Show and review Chinese chess games in notes
 - **Custom Opening**:
-    - Visual editor
-    - Clear/Fill board
-    - Set first player
-    - Save as FEN
+  - Visual editor
+  - Clear/Fill board
+  - Set first player
+  - Save as FEN
 - **PGN Saving**:
-    - Save move history as PGN
-    - Button colors: **gray** (empty), **green** (has PGN), **orange** (edited)
-    - Confirm before saving
-    - If no moves, saving clears PGN
+  - Save move history as PGN
+  - Button colors: **gray** (empty), **green** (has PGN), **orange** (edited)
+  - Confirm before saving
+  - If no moves, saving clears PGN
 - **Settings**:
-    - Board theme: Wood, Parchment, Green Felt, Marble, Classic Light, Classic Dark
-    - 3-layer board background: grid lines + texture + base color
-    - Coordinate labels auto-scale with board size
-    - Toolbar position: right / bottom
-    - Board size
-    - Show/hide move list and move text
-    - Move text font size
-    - Auto-scroll to latest move
-    - Optional move narration (not on mobile)
+  - Board theme: Wood, Parchment, Green Felt, Marble, Classic Light, Classic Dark
+  - 3-layer board background: grid lines + texture + base color
+  - Coordinate labels auto-scale with board size
+  - Toolbar position: right / bottom
+  - Board size
+  - Show/hide move list and move text
+  - Move text font size
+  - Auto-scroll to latest move
+  - Optional move narration (not on mobile)
 - **Mobile Friendly**: Manual layout adjustment for small screens
 - **Move Narration**: Optional voice readout of moves
 - **Format Support**: Supports ICCS-style PGN
@@ -104,11 +105,10 @@ Two code block names are supported:
 1. Write the moves inside a code block marked with `xiangqi`.
 2. FEN is optional — defaults to the standard starting position. Supports parsing Pikafish web links.
 3. Behavior:
-
-    - If no manual moves, the move list shows the PGN.
-    - After manual moves, it shows the updated sequence.
-    - Click **Reset** to go back to before manual edits.
-    - Click **Reset** again to return to the initial state.
+   - If no manual moves, the move list shows the PGN.
+   - After manual moves, it shows the updated sequence.
+   - Click **Reset** to go back to before manual edits.
+   - Click **Reset** again to return to the initial state.
 
 4. Click **Save** to overwrite the original PGN with current moves.
 
@@ -154,7 +154,7 @@ This plugin is now available on the official Obsidian plugin marketplace. Search
 
 ## Build
 
-1. Clone this repository and its dependency [xiangqiground](https://github.com/west-shell/xiangqiground) and  [xiangqi.js](https://github.com/west-shell/xiangqi.js)into the same parent directory:
+1. Clone this repository and its dependency [xiangqiground](https://github.com/west-shell/xiangqiground) and [xiangqi.js](https://github.com/west-shell/xiangqi.js)into the same parent directory:
 
    ```bash
    git clone https://github.com/west-shell/xiangqiground.git

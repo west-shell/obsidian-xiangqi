@@ -9,7 +9,7 @@
   import type { Move, Square } from "@west-shell/xiangqi.js";
   import { onMount, tick } from "svelte";
 
-  const SHAPES_RE = /^{([a-i][0-9])([a-i][0-9])?:([gryb])}$/
+  const SHAPES_RE = /^{([a-i][0-9])([a-i][0-9])?:([gryb])}$/;
   const BRUSH_MAP: Record<string, string> = { green: "g", red: "r", blue: "b", yellow: "y" };
   const BRUSH_REV: Record<string, string> = { g: "green", r: "red", b: "blue", y: "yellow" };
 
@@ -28,7 +28,9 @@
 
   /** Convert DrawShape[] to comment strings and save to node */
   function saveShapes(node: ChessNode, shapes: DrawShape[]) {
-    const shapeComments = shapes.map((s) => "{" + s.orig + (s.dest ?? "") + ":" + (BRUSH_MAP[s.brush ?? "green"]) + "}");
+    const shapeComments = shapes.map(
+      (s) => "{" + s.orig + (s.dest ?? "") + ":" + BRUSH_MAP[s.brush ?? "green"] + "}",
+    );
     node.comments = [...(node.comments ?? []).filter((c) => !SHAPES_RE.test(c)), ...shapeComments];
   }
   interface Props {
@@ -40,29 +42,22 @@
     currentPath: string[];
   }
 
-  let {
-    settings,
-    fen,
-    eventBus,
-    nodeMap,
-    currentNode,
-    currentPath,
-  }: Props = $props();
+  let { settings, fen, eventBus, nodeMap, currentNode, currentPath }: Props = $props();
 
   let lastMove: [Square, Square] | null = $derived(
-    currentNode.move ? [currentNode.move.from, currentNode.move.to] : null
+    currentNode.move ? [currentNode.move.from, currentNode.move.to] : null,
   );
   let { position } = $derived(settings);
   let rotated = $state(false);
   let variations = $derived(
-    currentNode.children
-      .map((child) => child.move)
-      .filter((m): m is Move => m != null) ?? [],
+    currentNode.children.map((child) => child.move).filter((m): m is Move => m != null) ?? [],
   );
-  let checkColor = $derived(
+  let checkColor: "white" | "black" | null | undefined = $derived(
     currentNode.move && (currentNode.move.isCheck || currentNode.move.isCheckmate)
-      ? (currentNode.move.color === 'w' ? 'black' : 'white')
-      : null
+      ? currentNode.move.color === "w"
+        ? "black"
+        : "white"
+      : null,
   );
   let userShapes = $derived(loadShapes(currentNode));
 
@@ -114,7 +109,14 @@
 <div class="tree-view {position}" bind:this={treeViewEl}>
   <div class="board-area">
     <Board
-      {settings} {fen} {lastMove} {checkColor} {eventBus} {rotated} {variations} {userShapes}
+      {settings}
+      {fen}
+      {lastMove}
+      {checkColor}
+      {eventBus}
+      {rotated}
+      {variations}
+      {userShapes}
       boardWidth={adaptiveBoardWidth}
     />
   </div>
@@ -123,17 +125,43 @@
 </div>
 
 <style>
-  :global(.view-content.pgn-view) {
-    overflow: hidden !important;
-    margin: 0 !important;
-    padding-top: var(--board-margin-top, 0px) !important;
-    padding-bottom: var(--board-margin-bottom, 0px) !important;
+  /* :global(.view-content.pgn-view) { */
+  /* overflow: hidden !important; */
+  /* margin: 0 !important; */
+  /* padding-top: var(--board-margin-top, 0px) !important; */
+  /* padding-bottom: var(--board-margin-bottom, 0px) !important; */
+  /* } */
+
+  .tree-view {
+    display: flex;
+    justify-content: center;
   }
-  .tree-view { display: flex; justify-content: center; }
-  .tree-view.right { flex-direction: row; height: 100%; gap: 2px; }
-  .tree-view.right :global(.tree-container) { flex: 1 1 auto; min-width: 25%; max-width: 50%; }
-  .board-area { flex: 0 0 auto; display: flex; align-items: center; }
-  .board-area :global(.xq-wrap) { height: auto !important; }
-  .tree-view.bottom { flex-direction: column; align-items: center; height: 100%; }
-  .tree-view.bottom :global(.tree-container) { flex: 1 1 auto; min-height: 25%; width: 100%; }
+  .tree-view.right {
+    flex-direction: row;
+    height: 100%;
+    gap: 2px;
+  }
+  .tree-view.right :global(.tree-container) {
+    flex: 1 1 auto;
+    min-width: 25%;
+    max-width: 50%;
+  }
+  .board-area {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+  }
+  .board-area :global(.xq-wrap) {
+    height: auto !important;
+  }
+  .tree-view.bottom {
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+  }
+  .tree-view.bottom :global(.tree-container) {
+    flex: 1 1 auto;
+    min-height: 25%;
+    width: 100%;
+  }
 </style>
