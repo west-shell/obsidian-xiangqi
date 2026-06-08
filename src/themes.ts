@@ -56,30 +56,22 @@ const themes: Record<string, ThemeDef> = {
 		grid: "light",
 		red: tree_red,
 		black: tree_black,
-		// },
-		// wood: {
-		// 	name: "木纹",
-		// 	bg: ".obsidian/plugins/xiangqi/assets/木纹.png",
-		// 	texture: "none",
-		// 	grid: "light",
-		// 	red: tree_red,
-		// 	black: tree_black,
-		// },
-		// bamboo: {
-		// 	name: "竹韵",
-		// 	bg: ".obsidian/plugins/xiangqi/assets/竹韵.png",
-		// 	texture: "none",
-		// 	grid: "none",
-		// 	red: tree_red,
-		// 	black: tree_black,
-		// },
-		// kingdom: {
-		// 	name: "王朝",
-		// 	bg: ".obsidian/plugins/xiangqi/assets/王朝.png",
-		// 	texture: "none",
-		// 	grid: (activeDocument ?? document).body.classList.contains("theme-dark") ? "dark" : "light",
-		// 	red: tree_red,
-		// 	black: tree_black,
+	},
+	wood: {
+		name: "木纹",
+		bg: ".obsidian/plugins/xiangqi/assets/wood.png",
+		texture: "none",
+		grid: "light",
+		red: tree_red,
+		black: tree_black,
+	},
+	bamboo: {
+		name: "竹韵",
+		bg: ".obsidian/plugins/xiangqi/assets/bamboo.png",
+		texture: "none",
+		grid: "none",
+		red: tree_red,
+		black: tree_black,
 	}
 };
 
