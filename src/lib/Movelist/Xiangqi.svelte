@@ -10,7 +10,7 @@
   interface Props {
     settings: ISettings;
     fen: string;
-    checkColor?: string | null;
+    checkColor?: "white" | "black" | null | undefined;
     selectedSquare: Square | null;
     currentStep: number;
     eventBus: EventBus;
@@ -22,8 +22,16 @@
   }
 
   let {
-    settings, fen, checkColor, selectedSquare, currentStep,
-    eventBus, modified, PGN, history, lastMove,
+    settings,
+    fen,
+    checkColor,
+    selectedSquare,
+    currentStep,
+    eventBus,
+    modified,
+    PGN,
+    history,
+    lastMove,
     options,
   }: Props = $props();
 
