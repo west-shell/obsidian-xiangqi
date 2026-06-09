@@ -233,27 +233,38 @@
   });
 </script>
 
-<!-- <div class="board-container {turnClass}" style="width: {boardWidth}px height: {boardHeight}px"> -->
-<div bind:this={boardElement} class="xq-wrap {turnClass}" style="width:{boardWidth}px"></div>
-
-<!-- </div> -->
+<div
+  class="board-area {turnClass}"
+  style="width:{boardWidth * 1.12}px ;height:{boardHeight * 1.12}px"
+>
+  <div bind:this={boardElement} class="xq-wrap"></div>
+</div>
 
 <style>
-  .xq-wrap {
-    height: 100%;
-    flex-shrink: 0;
-    aspect-ratio: 450 / 500;
-    /* border-radius: 2px; */
+  .board-area {
+    /* height: 100%; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* aspect-ratio: 450 / 500; */
     /* background-color: yellow; */
+    background:
+      var(--xq-board-texture, none) center / cover no-repeat,
+      var(--xq-board-bg, #d0b899);
+  }
+  .xq-wrap {
+    width: 97%;
+    align-self: center;
+    aspect-ratio: 450 / 500;
     --piece-red: var(--xq-piece-red, var(--color-red));
     --piece-black: var(--xq-piece-black, var(--color-blue));
   }
 
-  .xq-wrap.turn-red {
-    box-shadow: 0 0 0.12em 0.15em rgba(255, 50, 50, 0.5);
+  .board-area.turn-red {
+    box-shadow: 0 0 0.12em 0.15em var(--xq-piece-red, var(--color-red));
   }
 
-  .xq-wrap.turn-black {
-    box-shadow: 0 0 0.12em 0.15em rgba(0, 0, 0, 0.7);
+  .board-area.turn-black {
+    box-shadow: 0 0 0.15em 0.15em var(--xq-piece-black, var(--color-blue));
   }
 </style>

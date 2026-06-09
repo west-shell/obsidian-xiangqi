@@ -1,11 +1,6 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": [
-    "import",
-    "promise",
-    "typescript",
-    "unicorn"
-  ],
+  "plugins": ["import", "promise", "typescript", "unicorn"],
   "ignorePatterns": [],
   "rules": {
     "branches-sharing-code": "error",
@@ -102,10 +97,7 @@
     "typescript/prefer-includes": "error",
     "typescript/prefer-nullish-coalescing": "error",
     "typescript/prefer-readonly": "error",
-    "typescript/return-await": [
-      "error",
-      "error-handling-correctness-only"
-    ],
+    "typescript/return-await": ["error", "error-handling-correctness-only"],
     "typescript/unbound-method": "off",
     "unicorn/consistent-date-clone": "error",
     "unicorn/consistent-empty-array-spread": "error",

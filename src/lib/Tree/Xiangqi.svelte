@@ -73,7 +73,7 @@
       if (pos === "right") {
         const availWidth = rect.width * 0.6;
         const availHeight = rect.height;
-        const byHeight = (availHeight * 9) / 10;
+        const byHeight = (availHeight * 8) / 10;
         adaptiveBoardWidth = Math.min(availWidth, byHeight);
       } else {
         const availWidth = rect.width;
@@ -125,12 +125,12 @@
 </div>
 
 <style>
-  /* :global(.view-content.pgn-view) { */
-  /* overflow: hidden !important; */
-  /* margin: 0 !important; */
-  /* padding-top: var(--board-margin-top, 0px) !important; */
-  /* padding-bottom: var(--board-margin-bottom, 0px) !important; */
-  /* } */
+  :global(.view-content.pgn-view) {
+    overflow: hidden !important;
+    margin: 0 !important;
+    padding-top: var(--board-margin-top, 0px) !important;
+    padding-bottom: var(--board-margin-bottom, 0px) !important;
+  }
 
   .tree-view {
     display: flex;
