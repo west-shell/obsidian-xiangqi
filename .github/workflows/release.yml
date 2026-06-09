@@ -61,6 +61,14 @@ jobs:
             obsidian-xiangqi/build/main.js
             obsidian-xiangqi/build/manifest.json
             obsidian-xiangqi/build/styles.css
+            obsidian-xiangqi/assets/wood.png
+            obsidian-xiangqi/assets/bamboo.jpg
+
+      - name: Copy assets to build (preserve path)
+        working-directory: obsidian-xiangqi
+        run: |
+          mkdir -p build/assets
+          cp assets/wood.png assets/bamboo.jpg build/assets/
 
       - name: Create pre-release
         uses: softprops/action-gh-release@v2
@@ -71,3 +79,13 @@ jobs:
             obsidian-xiangqi/build/main.js
             obsidian-xiangqi/build/manifest.json
             obsidian-xiangqi/build/styles.css
+
+      - name: Upload assets with assets/ prefix
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="${{ github.ref_name }}"
+          gh release upload "$TAG" \
+            'obsidian-xiangqi/build/assets/wood.png#assets/wood.png' \
+            'obsidian-xiangqi/build/assets/bamboo.jpg#assets/bamboo.jpg' \
+            --clobber

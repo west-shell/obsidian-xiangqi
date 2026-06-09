@@ -139,7 +139,7 @@ p:true
 
 ## 安装说明
 
-本插件已在 Obsidian 官方插件市场上线，搜索“Chinese chess”或者"xiangqi"即可安装。
+本插件已在 Obsidian 官方插件市场上线，搜索”Chinese chess”或者”xiangqi”即可安装。
 
 1. 打开 Obsidian。
 2. 进入 **设置** (Settings)。
@@ -149,6 +149,24 @@ p:true
 6. 在搜索框中输入 “Chinese chess”。
 7. 找到本插件并点击 **安装** (Install)。
 8. 安装完成后，点击 **启用** (Enable)。
+
+### 图片棋盘资源
+
+**木质**和**竹纹**棋盘主题使用图片纹理。安装插件后，需要从
+[最新 Release](https://github.com/west-shell/obsidian-xiangqi/releases/latest)
+下载 `assets/wood.png` 和 `assets/bamboo.jpg`，放入插件的 `assets/` 目录：
+
+```
+.obsidian/plugins/xiangqi/
+├── main.js
+├── manifest.json
+├── styles.css
+└── assets/
+    ├── wood.png
+    └── bamboo.jpg
+```
+
+> **注意：** 只有使用木质或竹纹主题时才需要这些资源文件，其他主题无需下载。
 
 ## 构建
 

@@ -152,6 +152,26 @@ This plugin is now available on the official Obsidian plugin marketplace. Search
 7. Find this plugin and click **Install**.
 8. After installation, click **Enable**.
 
+### Image Board Assets
+
+The **Wood** and **Bamboo** board themes use image textures. After installation,
+download `assets/wood.png` and `assets/bamboo.jpg` from the
+[latest release](https://github.com/west-shell/obsidian-xiangqi/releases/latest)
+and place them in the plugin's `assets/` folder:
+
+```
+.obsidian/plugins/xiangqi/
+├── main.js
+├── manifest.json
+├── styles.css
+└── assets/
+    ├── wood.png
+    └── bamboo.jpg
+```
+
+> **Note:** These assets are only needed if you use the Wood or Bamboo board
+> themes. Other themes work without them.
+
 ## Build
 
 1. Clone this repository and its dependency [xiangqiground](https://github.com/west-shell/xiangqiground) and [xiangqi.js](https://github.com/west-shell/xiangqi.js)into the same parent directory:
