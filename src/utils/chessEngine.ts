@@ -2,7 +2,7 @@ import {
   Chess,
   validateFen as chessValidateFen,
   type Color,
-  Move,
+  type Move,
   type PieceSymbol,
   type Square,
 } from '@west-shell/xiangqi.js';

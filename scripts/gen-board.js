@@ -7,7 +7,7 @@
  * 用法：node scripts/gen-board.js
  */
 
-import fs from 'fs';
+import fs from 'node:fs';
 
 const CELL = 50;
 const PAD = CELL * 0.5;
