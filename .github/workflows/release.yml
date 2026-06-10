@@ -36,7 +36,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
 
       - name: Install dependencies (xiangqi.js)
         working-directory: xiangqi.js
@@ -52,7 +52,7 @@ jobs:
 
       - name: Build
         working-directory: obsidian-xiangqi
-        run: npm run build
+        run: npm run build:min
 
       - name: Generate build provenance
         uses: actions/attest-build-provenance@v2
@@ -66,6 +66,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           prerelease: true
+          draft: true
           generate_release_notes: true
           files: |
             obsidian-xiangqi/build/main.js
