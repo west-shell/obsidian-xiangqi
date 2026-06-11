@@ -144,10 +144,12 @@ function replayFen(host: IXQHost): string {
     const move = currentMoves[i];
     if (!move) break;
     try {
-      chess.move(move.zh);
+      chess.move(move.iccs);
+
     } catch {
       // fallback: try lan (ICCS format, e.g. "h2e2")
-      chess.move(move.iccs);
+      // console.log(`Failed to apply move ${move.zh}, trying ICCS format...`);
+      chess.move(move.zh);
     }
   }
   return chess.fen();
