@@ -1,4 +1,4 @@
-.xq-slider-value {
+.ws-slider-value {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -12,6 +12,6 @@
   border-radius: 4px;
   padding: 0 6px;
 }
-.xq-setting-tab .setting-item {
+.ws-setting-tab .setting-item {
   border-top: none;
 }

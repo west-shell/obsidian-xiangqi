@@ -39,7 +39,7 @@ function addSliderWithValue(
   let currentValue = value;
   const setting = new Setting(containerEl).setName(name).setDesc(desc);
 
-  const valueDisplay = createSpan({ cls: 'xq-slider-value' });
+  const valueDisplay = createSpan({ cls: 'ws-slider-value' });
   valueDisplay.setText(`${currentValue}${unit}`);
   setting.controlEl.prepend(valueDisplay);
 
@@ -275,7 +275,7 @@ export class XQSettingTab extends PluginSettingTab {
       },
     );
 
-    containerEl.parentElement?.classList.add('xq-setting-tab');
+    containerEl.parentElement?.classList.add('ws-setting-tab');
   }
 
   async hide() {
