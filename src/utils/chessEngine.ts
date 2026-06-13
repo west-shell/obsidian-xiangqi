@@ -10,11 +10,15 @@ import { DEFAULT_FEN } from '../types';
 
 export type { Move, Square, PieceSymbol, Color };
 
+let _chess: Chess | null = null;
+
 /**
- * Create a Chess instance from a FEN string.
+ * Load a FEN position into a shared Chess instance.
  */
 export function loadGame(fen: string = DEFAULT_FEN): Chess {
-  return new Chess(fen);
+  if (!_chess) _chess = new Chess();
+  _chess.load(fen);
+  return _chess;
 }
 
 /**
