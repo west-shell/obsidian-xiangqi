@@ -93,10 +93,15 @@
     }, 700);
   }
   // 组件卸载时清理定时器
+  let layoutChangeHandler: (() => void) | null = null;
   onDestroy(() => {
     if (saveTimeout) {
       clearTimeout(saveTimeout);
       saveTimeout = undefined;
+    }
+    if (layoutChangeHandler) {
+      document.body.removeEventListener('layout-change', layoutChangeHandler);
+      layoutChangeHandler = null;
     }
   });
 
@@ -153,7 +158,7 @@
     const scaleY = (clientHeight - padding * 2) / treeHeight;
     const k = Math.max(0.75, Math.min(scaleX, scaleY, 2));
     const tx = clientWidth / 2 - (minX * spacingX + treeWidth / 2) * k;
-    const ty = padding - minY * spacingY * k;
+    const ty = clientHeight / 2 - (minY * spacingY + treeHeight / 2) * k;
     const t = d3.zoomIdentity.translate(tx, ty).scale(k);
     d3.select(svgEl).transition().duration(300).call(zoomBehavior.transform, t);
   }
@@ -239,6 +244,9 @@
     await new Promise(requestAnimationFrame);
 
     resetView();
+
+    layoutChangeHandler = () => resetView();
+    document.body.addEventListener('layout-change', layoutChangeHandler);
   });
 
   // ---- 响应式更新 ----
