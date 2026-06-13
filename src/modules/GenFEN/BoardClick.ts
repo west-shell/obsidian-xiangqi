@@ -5,18 +5,18 @@ const BoardClickModule = {
   init(host: Record<string, any>) {
     const eventBus = host.eventBus;
 
-    eventBus.on('click', (clickedKey: string) => {
+    eventBus.on('click', (clickedKey: Square) => {
       const chess = new Chess(host.fen, { skipValidation: true });
 
       if (!host.markedPos && !host.selectedPiece) {
-        const piece = chess.get(clickedKey as Square);
+        const piece = chess.get(clickedKey);
         if (piece) {
           host.markedPos = clickedKey;
           eventBus.emit('updateUI');
         }
       } else if (host.markedPos && !host.selectedPiece) {
         const from = host.markedPos as Square;
-        const to = clickedKey as Square;
+        const to = clickedKey;
         const piece = chess.get(from);
         if (piece) {
           chess.remove(to);
@@ -31,12 +31,10 @@ const BoardClickModule = {
           eventBus.emit('updateUI');
         }
       } else if (host.selectedPiece) {
-        chess.remove(clickedKey as Square);
-        if (host.selectedPiece) {
-          const color = host.selectedPiece === host.selectedPiece.toUpperCase() ? 'w' : 'b';
-          const type = host.selectedPiece.toLowerCase();
-          chess.put({ type: type as PieceSymbol, color }, clickedKey as Square);
-        }
+        chess.remove(clickedKey);
+        const color = host.selectedPiece === host.selectedPiece.toUpperCase() ? 'w' : 'b';
+        const type = host.selectedPiece.toLowerCase();
+        chess.put({ type: type as PieceSymbol, color }, clickedKey);
         host.fen = chess.fen();
         host.selectedPiece = null;
         host.markedPos = null;
