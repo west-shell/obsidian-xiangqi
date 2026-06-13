@@ -70,7 +70,9 @@
   const SHAPES_RE = /^{([a-i][0-9])([a-i][0-9])?:([gryb])}$/;
 
   function getRegularComments(node: ChessNode): string[] {
-    return node.comments?.filter((c) => !ALL_ANNOTATION_KEYS.includes(c) && !SHAPES_RE.test(c)) ?? [];
+    return (
+      node.comments?.filter((c) => !ALL_ANNOTATION_KEYS.includes(c) && !SHAPES_RE.test(c)) ?? []
+    );
   }
 
   function getAllShapes(node: ChessNode): string[] {
@@ -249,6 +251,7 @@
     const node = currentNode;
     commentsText = getRegularComments(node).join("\n");
 
+    // oxlint-disable-next-line promise/always-return
     tick().then(() => {
       if (textareaEl) adjustTextareaHeight();
       panToNodeIfNeeded(node);
@@ -256,6 +259,7 @@
   });
 
   $effect(() => {
+    // oxlint-disable-next-line no-unused-expressions
     nodeMap.size;
     updateTreeLayout();
   });

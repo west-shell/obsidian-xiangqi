@@ -145,7 +145,6 @@ function replayFen(host: IXQHost): string {
     if (!move) break;
     try {
       chess.move(move.iccs);
-
     } catch {
       // fallback: try lan (ICCS format, e.g. "h2e2")
       // console.log(`Failed to apply move ${move.zh}, trying ICCS format...`);

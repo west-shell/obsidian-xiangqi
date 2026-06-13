@@ -154,9 +154,7 @@ const css = `/**
 
 xq-board {
   background:
-    var(--xq-grid, var(--xq-grid-dark)) center / 100% 100% no-repeat,
-    var(--xq-board-texture, none) center / cover no-repeat,
-    var(--xq-board-bg, #d0b899);
+    var(--xq-grid, var(--xq-grid-dark)) center / 100% 100% no-repeat;
 }
 `;
 
