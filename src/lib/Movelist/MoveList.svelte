@@ -2,7 +2,7 @@
   import { tick } from "svelte";
   import { scrollToBTN } from "../../utils/utils";
   import type { EventBus } from "../../core/event-bus";
-  import type { Move } from "@west-shell/xiangqi.js";
+  import type { Move } from "../../chess";
   import type { ISettings } from "../../types";
 
   interface Props {

@@ -1,6 +1,6 @@
-import type { Move as XQMove } from '@west-shell/xiangqi.js';
 import type { MarkdownPostProcessorContext, MarkdownSectionInformation } from 'obsidian';
 
+import type { Move as XQMove } from './chess';
 import type { EventBus } from './core/event-bus';
 import type XQPlugin from './main';
 

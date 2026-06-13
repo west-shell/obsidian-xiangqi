@@ -5,8 +5,7 @@ import {
   type Move,
   type PieceSymbol,
   type Square,
-} from '@west-shell/xiangqi.js';
-
+} from '../chess';
 import { DEFAULT_FEN } from '../types';
 
 export type { Move, Square, PieceSymbol, Color };

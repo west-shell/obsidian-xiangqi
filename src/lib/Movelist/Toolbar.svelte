@@ -1,7 +1,7 @@
 <script lang="ts">
   import { setIcon } from "obsidian";
   import type { EventBus } from "../../core/event-bus";
-  import type { Move } from "@west-shell/xiangqi.js";
+  import type { Move } from "../../chess";
   import type { ISettings } from "../../types";
   import { onLangChange, t } from "../../i18n";
 

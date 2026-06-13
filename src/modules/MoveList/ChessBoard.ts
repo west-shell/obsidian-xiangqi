@@ -1,6 +1,6 @@
-import type { Square } from '@west-shell/xiangqi.js';
 import { mount, unmount } from 'svelte';
 
+import type { Square } from '../../chess';
 import { registerXQModule } from '../../core/module-system';
 import Xiangqi from '../../lib/Movelist/Xiangqi.svelte';
 import type { IXQHost } from '../../types';

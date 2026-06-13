@@ -1,5 +1,4 @@
-import type { Move } from '@west-shell/xiangqi.js';
-
+import type { Move } from '../../chess';
 import { registerXQModule } from '../../core/module-system';
 import type { IXQHost } from '../../types';
 

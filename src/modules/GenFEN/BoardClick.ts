@@ -1,6 +1,4 @@
-import { Chess } from '@west-shell/xiangqi.js';
-import type { PieceSymbol, Square } from '@west-shell/xiangqi.js';
-
+import { Chess, type PieceSymbol, type Square } from '../../chess';
 import { registerGenFENModule } from '../../core/module-system';
 
 const BoardClickModule = {

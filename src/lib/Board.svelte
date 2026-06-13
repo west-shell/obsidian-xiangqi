@@ -1,11 +1,6 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
-  import { Chessground } from "@west-shell/xiangqiground";
-  import type { Api } from "@west-shell/xiangqiground/api";
-  import type { Config } from "@west-shell/xiangqiground/config";
-  import type { DrawShape } from "@west-shell/xiangqiground/draw";
-  import type * as cg from "@west-shell/xiangqiground/types";
-  import { Chess, type Move, type Square } from "@west-shell/xiangqi.js";
+  import { Chessground, type Api, type Config, type DrawShape, type cg, Chess, type Move, type Square } from "../chess";
   import type { EventBus } from "../core/event-bus";
   import type { ISettings } from "../types";
 

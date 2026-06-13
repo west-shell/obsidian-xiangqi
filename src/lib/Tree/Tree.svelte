@@ -6,7 +6,7 @@
   import { calculateTreeLayout } from "./layout";
   import { setIcon } from "obsidian";
   import * as d3 from "d3";
-  import type { Move } from "@west-shell/xiangqi.js";
+  import type { Move } from "../../chess";
 
   function pieceLabel(move: Move): string {
     const raw = move.piece;

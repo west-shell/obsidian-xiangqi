@@ -1,5 +1,4 @@
-import { Chess, type Move } from '@west-shell/xiangqi.js';
-
+import { Chess, type Move } from '../chess';
 import type { IOptions, ITurn } from '../types';
 import { DEFAULT_FEN } from '../types';
 

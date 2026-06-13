@@ -1,5 +1,4 @@
-import { type Move } from '@west-shell/xiangqi.js';
-
+import { type Move } from '../../chess';
 import { registerPGNViewModule } from '../../core/module-system';
 import { t } from '../../i18n';
 import type { ChessNode } from '../../types';

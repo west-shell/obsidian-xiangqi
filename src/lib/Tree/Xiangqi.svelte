@@ -4,9 +4,7 @@
   import Toolbar from "./Toolbar.svelte";
   import type { ChessNode, ISettings, NodeMap } from "../../types";
   import type { EventBus } from "../../core/event-bus";
-  import type { DrawShape } from "@west-shell/xiangqiground/draw";
-  import type * as cg from "@west-shell/xiangqiground/types";
-  import type { Move, Square } from "@west-shell/xiangqi.js";
+  import type { DrawShape, cg, Move, Square } from "../../chess";
   import { onMount, tick } from "svelte";
 
   const SHAPES_RE = /^{([a-i][0-9])([a-i][0-9])?:([gryb])}$/;

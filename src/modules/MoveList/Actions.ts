@@ -1,6 +1,6 @@
-import { Chess, type Move } from '@west-shell/xiangqi.js';
 import { MarkdownView, Notice } from 'obsidian';
 
+import { Chess, type Move } from '../../chess';
 import { registerXQModule } from '../../core/module-system';
 import { t } from '../../i18n';
 import type { ITurn, IXQHost } from '../../types';

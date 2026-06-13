@@ -1,4 +1,4 @@
-import type { Move } from '@west-shell/xiangqi.js';
+import type { Move } from '../chess';
 
 export function speak(move: Move) {
   const { zh } = move;
