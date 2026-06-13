@@ -7,19 +7,19 @@ import { addIcon, MarkdownView, Plugin, TFile } from 'obsidian';
 import { initI18n, t } from './i18n';
 import { GenFENRenderChild } from './renderChild/GenFENRenderChild';
 import { ChessRenderChild } from './renderChild/MoveListRenderChild';
-import { DEFAULT_SETTINGS, XQSettingTab } from './settings';
+import { DEFAULT_SETTINGS, ChessSettingTab } from './settings';
 import { applyThemes } from './themes';
 import type { ISettings } from './types';
 import { PGNView } from './view/pgn';
 
-export default class XQPlugin extends Plugin {
+export default class ChessPlugin extends Plugin {
   settings: ISettings = DEFAULT_SETTINGS;
   instances: Set<{ refresh(): void }> = new Set();
   async onload() {
     await this.loadSettings();
     initI18n(this.settings.lang);
 
-    this.addSettingTab(new XQSettingTab(this.app, this));
+    this.addSettingTab(new ChessSettingTab(this.app, this));
 
     applyThemes(this.app, this.settings);
     addIcon(

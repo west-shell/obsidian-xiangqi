@@ -2,7 +2,7 @@ import type { MarkdownPostProcessorContext, MarkdownSectionInformation } from 'o
 
 import type { Move as XQMove } from './chess';
 import type { EventBus } from './core/event-bus';
-import type XQPlugin from './main';
+import type ChessPlugin from './main';
 
 export const DEFAULT_FEN = 'rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w';
 
@@ -68,7 +68,7 @@ export type NodeMap = Map<string, ChessNode>;
 export type IHistory = XQMove[];
 
 export interface IHost {
-  plugin: XQPlugin;
+  plugin: ChessPlugin;
   eventBus: EventBus;
 }
 

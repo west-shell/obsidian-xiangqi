@@ -3,7 +3,7 @@ import './settings.css';
 import { type App, PluginSettingTab, Setting } from 'obsidian';
 
 import { initI18n, t } from './i18n';
-import type XQPlugin from './main';
+import type ChessPlugin from './main';
 import { THEME_OPTIONS } from './themes';
 import type { ISettings } from './types';
 
@@ -61,10 +61,10 @@ function addSliderWithValue(
   return setting;
 }
 
-export class XQSettingTab extends PluginSettingTab {
-  plugin: XQPlugin;
+export class ChessSettingTab extends PluginSettingTab {
+  plugin: ChessPlugin;
 
-  constructor(app: App, plugin: XQPlugin) {
+  constructor(app: App, plugin: ChessPlugin) {
     super(app, plugin);
     this.plugin = plugin;
   }

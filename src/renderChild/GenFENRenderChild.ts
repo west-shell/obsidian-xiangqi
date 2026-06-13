@@ -8,7 +8,7 @@ import { type MarkdownPostProcessorContext, MarkdownRenderChild } from 'obsidian
 
 import type { EventBus } from '../core/event-bus';
 import { createGenFENModuleRegistry, type ModuleRegistry } from '../core/module-system';
-import type XQPlugin from '../main';
+import type ChessPlugin from '../main';
 import type { ISettings } from '../types';
 
 export class GenFENRenderChild extends MarkdownRenderChild {
@@ -19,7 +19,7 @@ export class GenFENRenderChild extends MarkdownRenderChild {
     public containerEl: HTMLElement,
     public ctx: MarkdownPostProcessorContext,
     public source: string,
-    public plugin: XQPlugin,
+    public plugin: ChessPlugin,
   ) {
     super(containerEl);
     this.settings = this.plugin.settings;

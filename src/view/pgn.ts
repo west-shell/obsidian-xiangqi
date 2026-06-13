@@ -9,7 +9,7 @@ import { TextFileView, type WorkspaceLeaf } from 'obsidian';
 
 import { type EventBus } from '../core/event-bus';
 import { createPGNViewModuleRegistry, destroyPGNViewModuleRegistry } from '../core/module-system';
-import type XQPlugin from '../main';
+import type ChessPlugin from '../main';
 import type { ISettings } from '../types';
 
 export class PGNView extends TextFileView {
@@ -18,7 +18,7 @@ export class PGNView extends TextFileView {
   eventBus!: EventBus;
   constructor(
     leaf: WorkspaceLeaf,
-    public plugin: XQPlugin,
+    public plugin: ChessPlugin,
   ) {
     super(leaf);
     this.settings = this.plugin.settings;
