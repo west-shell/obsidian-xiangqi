@@ -1,7 +1,7 @@
 import { mount, unmount } from 'svelte';
 
 import { registerPGNViewModule } from '../../core/module-system';
-import TreeView from '../../lib/Tree/Xiangqi.svelte';
+import TreeView from '../../lib/Tree/Chess.svelte';
 
 const TreeViewModule = {
   init(host: Record<string, any>) {

@@ -2,7 +2,7 @@ import { mount, unmount } from 'svelte';
 
 import type { Square } from '../../chess';
 import { registerXQModule } from '../../core/module-system';
-import Xiangqi from '../../lib/Movelist/Xiangqi.svelte';
+import Chess from '../../lib/Movelist/Chess.svelte';
 import type { IXQHost } from '../../types';
 
 const BoardModule = {
@@ -12,7 +12,7 @@ const BoardModule = {
     eventBus.on('load', () => {
       host.modified = false;
       const Container = host.containerEl.createEl('div');
-      host.Chess = mount(Xiangqi, {
+      host.Chess = mount(Chess, {
         target: Container,
         props: {
           settings: host.settings,
