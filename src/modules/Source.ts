@@ -1,4 +1,4 @@
-import { registerGenFENModule, registerXQModule } from '../core/module-system';
+import { registerGenFENModule, registerPGNViewModule, registerXQModule } from '../core/module-system';
 import { DEFAULT_FEN } from '../types';
 import { parseSource } from '../utils/parse';
 
@@ -21,6 +21,9 @@ const SourceModule = {
         case 'fen':
           host.fen = fen;
           break;
+        case 'pgn':
+          host.data = host.source;
+          break;
       }
     });
 
@@ -32,3 +35,4 @@ const SourceModule = {
 
 registerXQModule('source', SourceModule);
 registerGenFENModule('source', SourceModule);
+registerPGNViewModule('source', SourceModule);
