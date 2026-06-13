@@ -4,6 +4,7 @@
   import { type ChessNode, type NodeMap, PIECE_CHARS } from "../../types";
   import { t } from "../../i18n";
   import { calculateTreeLayout } from "./layout";
+  import { iconPaths } from "../../utils/icon";
   import { setIcon } from "obsidian";
   import * as d3 from "d3";
   import type { Move } from "../../chess";
@@ -36,23 +37,16 @@
   const spacingY = 15;
   const nodeWidth = 13;
   const nodeHeight = 11;
-  const lucide_message_square_text = `<path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z"/><path d="M7 11h10"/><path d="M7 15h6"/><path d="M7 7h8"/>`;
-  // const lucide_smile = `<path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" x2="9.01" y1="9" y2="9"/><line x1="15" x2="15.01" y1="9" y2="9"/>`;
-  const lucide_thumbs_up = `<path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z"/><path d="M7 10v12"/>`;
-  const lucide_thumbs_down = `<path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2h13a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22a3.13 3.13 0 0 1-3-3.88Z"/><path d="M17 14V2"/>`;
-  const lucide_handshake = `<path d="M19.414 14.414C21 12.828 22 11.5 22 9.5a5.5 5.5 0 0 0-9.591-3.676.6.6 0 0 1-.818.001A5.5 5.5 0 0 0 2 9.5c0 2.3 1.5 4 3 5.5l5.535 5.362a2 2 0 0 0 2.879.052 2.12 2.12 0 0 0-.004-3 2.124 2.124 0 1 0 3-3 2.124 2.124 0 0 0 3.004 0 2 2 0 0 0 0-2.828l-1.881-1.882a2.41 2.41 0 0 0-3.409 0l-1.71 1.71a2 2 0 0 1-2.828 0 2 2 0 0 1 0-2.828l2.823-2.762"/>`;
-  const lucide_bookmark = `<path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>`;
-  const lucide_star = `<path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/>`;
 
   const ANNOTATION_DEFINITIONS: Record<string, { symbol: string; color: string; icon?: string }> = {
-    "R+": { symbol: "红优", color: "var(--piece-red)", icon: lucide_thumbs_up },
-    "B+": { symbol: "黑优", color: "var(--piece-black)", icon: lucide_thumbs_down },
-    "=": { symbol: "均势", color: "green", icon: lucide_handshake },
-    "?": { symbol: "问题", color: "var(--text-warning)", icon: lucide_bookmark },
-    "!": { symbol: "妙手", color: "var(--color-yellow)", icon: lucide_star },
-    "R#": { symbol: "红胜", color: "red", icon: lucide_thumbs_up },
-    "B#": { symbol: "黑胜", color: "black", icon: lucide_thumbs_up },
-    "=#": { symbol: "和棋", color: "gray", icon: lucide_handshake },
+    "R+": { symbol: "红优", color: "var(--piece-red)", icon: iconPaths("thumbs-up") },
+    "B+": { symbol: "黑优", color: "var(--piece-black)", icon: iconPaths("thumbs-down") },
+    "=": { symbol: "均势", color: "green", icon: iconPaths("handshake") },
+    "?": { symbol: "问题", color: "var(--text-warning)", icon: iconPaths("bookmark") },
+    "!": { symbol: "妙手", color: "var(--color-yellow)", icon: iconPaths("star") },
+    "R#": { symbol: "红胜", color: "red", icon: iconPaths("thumbs-up") },
+    "B#": { symbol: "黑胜", color: "black", icon: iconPaths("thumbs-up") },
+    "=#": { symbol: "和棋", color: "gray", icon: iconPaths("handshake") },
   };
 
   const ALL_ANNOTATION_KEYS = Object.keys(ANNOTATION_DEFINITIONS);
@@ -359,7 +353,7 @@
                 stroke-linecap="round"
                 stroke-linejoin="round"
               >
-                {@html lucide_message_square_text}
+                {@html iconPaths("message-square-text")}
               </g>
             {/if}
           </g>
