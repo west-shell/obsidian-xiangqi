@@ -92,7 +92,7 @@
   $effect(() => {
     eventBus.on("user-shapes-changed", (shapes: DrawShape[]) => {
       saveShapes(currentNode, shapes);
-      eventBus.emit("updatePGN", null);
+      eventBus.emit("modified", null);
       eventBus.emit("updateUI", null);
     });
   });
@@ -123,13 +123,9 @@
 </div>
 
 <style>
-  :global(.pgn-view) {
-    overflow: hidden !important;
-    margin: 0 !important;
-    padding-top: var(--board-margin-top, 0px) !important;
-    padding-bottom: var(--board-margin-bottom, 0px) !important;
+  :global(.tree-codeblock) .tree-view {
+    height: var(--tree-hight, 300px) !important;
   }
-
 
   .tree-view {
     display: flex;

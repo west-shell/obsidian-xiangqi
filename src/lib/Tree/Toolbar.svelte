@@ -11,6 +11,16 @@
   let _lv = $state(0);
   onLangChange(() => _lv++);
 
+  let modified = $state(false);
+
+  $effect(() => {
+    eventBus.on("modified", () => { modified = true; });
+    eventBus.on("setViewData", () => { modified = false; });
+    eventBus.on("save", () => { modified = false; });
+  });
+
+  let saveBtnClass = $derived(modified ? "unsaved" : "saved");
+
   const buttons = $derived([
     { title: t("toolbar.reset", _lv), icon: "rotate-ccw", event: "reset" },
     { title: t("toolbar.delete", _lv), icon: "circle-x", event: "remove" },
@@ -22,10 +32,8 @@
     { title: t("toolbar.flip", _lv), icon: "flip-vertical", event: "rotate" },
     { title: "皮卡鱼Web", icon: "external-link", event: "openPikafish" },
     { title: t("toolbar.annotate", _lv), icon: "tag", event: "toggle-annotation-menu" },
-    { title: t("toolbar.save", _lv), icon: "save", event: "save" },
   ]);
 
-  // 你的 annotation 项目 —— 会放进菜单
   const annotations = $derived([
     { title: t("annotation.r+", _lv), icon: "thumbs-up", symbol: "R+", event: "annotation" },
     { title: t("annotation.b+", _lv), icon: "thumbs-down", symbol: "B+", event: "annotation" },
@@ -42,14 +50,17 @@
     setIcon(el, icon);
   }
 
-  // 👇 在这里实现菜单
+  function useSetSaveIcon(el: HTMLElement) {
+    setIcon(el, "save");
+  }
+
   function handleAnnotationMenu(evt: MouseEvent) {
     const menu = new Menu();
 
     annotations.forEach((item) => {
       menu.addItem((mi) => {
         mi.setTitle(item.title)
-          .setIcon(item.icon) // 你可以换别的 icon，也可以省略
+          .setIcon(item.icon)
           .onClick(() => emitEvent(item.event, item.symbol));
       });
     });
@@ -60,14 +71,13 @@
 
 <div class="toolbar-container">
   {#each buttons as { title, icon, event }}
-    <!-- svelte-ignore event_directive_deprecated -->
     <button
       class="toolbar-btn"
       aria-label={title}
       use:useSetIcon={icon}
       onclick={(e) => {
         if (event === "toggle-annotation-menu") {
-          handleAnnotationMenu(e); // ← 打开标注菜单
+          handleAnnotationMenu(e);
         } else if (event === "rotate") {
           eventBus.emit("rotate");
         } else {
@@ -76,6 +86,13 @@
       }}
     ></button>
   {/each}
+
+  <button
+    class="toolbar-btn {saveBtnClass}"
+    aria-label={t("toolbar.save", _lv)}
+    use:useSetSaveIcon
+    onclick={() => emitEvent("save")}
+  ></button>
 </div>
 
 <style>
@@ -88,21 +105,37 @@
   :global(.tree-view.bottom) .toolbar-container {
     display: flex;
     flex-direction: row;
-    flex-wrap: nowrap; /* 不换行 */
-    justify-content: space-between; /* 平均分布 */
+    flex-wrap: nowrap;
+    justify-content: space-between;
     align-items: center;
-    width: 100%; /* 占满容器宽度 */
-    /* padding: 0 4px; 留点边距 */
+    width: 100%;
     box-sizing: border-box;
-    /* gap: 4px; 按钮间距 */
   }
 
   :global(.tree-view.bottom) .toolbar-container .toolbar-btn {
-    flex: 1 1 0; /* 平均分宽，可缩小 */
-    min-width: 24px; /* 最小宽度，保证可点击 */
-    max-width: 100%; /* 不超过容器 */
-    font-size: clamp(12px, 3vw, 16px); /* 字体随屏幕宽度缩放 */
+    flex: 1 1 0;
+    min-width: 24px;
+    max-width: 100%;
+    font-size: clamp(12px, 3vw, 16px);
     padding: 0;
     margin: 0;
+  }
+
+  .toolbar-btn {
+    border: none;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition:
+      background-color 0.2s ease,
+      transform 0.1s ease;
+  }
+
+  .toolbar-btn.saved {
+    background-color: hsl(122, 39%, 49%);
+  }
+
+  .toolbar-btn.unsaved {
+    background-color: hsl(35, 100%, 50%);
   }
 </style>

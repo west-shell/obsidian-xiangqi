@@ -122,7 +122,7 @@
     const existingShapes = getAllShapes(currentNode);
     currentNode.comments = [...existingAnnotations, ...existingShapes, ...regularComments];
     eventBus.emit("updateUI", null);
-    eventBus.emit("updatePGN", null);
+    eventBus.emit("modified", null);
   }
 
   // ---- 自动调整文本框高度 ----
