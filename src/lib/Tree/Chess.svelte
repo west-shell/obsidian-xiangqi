@@ -4,7 +4,7 @@
   import Toolbar from "./Toolbar.svelte";
   import type { ChessNode, ISettings, NodeMap } from "../../types";
   import type { EventBus } from "../../core/event-bus";
-  import type { DrawShape, cg, Move, Square } from "../../chess";
+  import type { cg, DrawShape, Move, Square } from "../../chess";
   import { onMount, tick } from "svelte";
 
   const SHAPES_RE = /^{([a-i][0-9])([a-i][0-9])?:([gryb])}$/;
@@ -123,12 +123,13 @@
 </div>
 
 <style>
-  :global(.view-content.pgn-view) {
+  :global(.pgn-view) {
     overflow: hidden !important;
     margin: 0 !important;
     padding-top: var(--board-margin-top, 0px) !important;
     padding-bottom: var(--board-margin-bottom, 0px) !important;
   }
+
 
   .tree-view {
     display: flex;
@@ -149,9 +150,7 @@
     display: flex;
     align-items: center;
   }
-  .board-area :global(.xq-wrap) {
-    height: auto !important;
-  }
+
   .tree-view.bottom {
     flex-direction: column;
     align-items: center;

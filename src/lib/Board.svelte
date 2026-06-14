@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
-  import { Chessground, type Api, type Config, type DrawShape, type cg, Chess, type Move, type Square } from "../chess";
+  import { Chess, Chessground } from "../chess";
+  import type { Api, cg, Config, DrawShape, Move, Square } from "../chess";
   import type { EventBus } from "../core/event-bus";
   import type { ISettings } from "../types";
 
@@ -34,6 +35,7 @@
 
   let boardWidth = $derived(boardWidthOverride ?? settings.cellSize * 9);
   let boardHeight = $derived((boardWidth * 10) / 9);
+  // oxlint-disable-next-line no-unassigned-vars
   let boardElement: HTMLDivElement;
   let api: Api | null = null;
   let layoutChangeHandler: (() => void) | null = null;
@@ -249,6 +251,7 @@
   }
   .xq-wrap {
     width: 97%;
+    height: auto;
     align-self: center;
     aspect-ratio: 450 / 500;
     --piece-red: var(--xq-piece-red, var(--color-red));

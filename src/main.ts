@@ -8,7 +8,7 @@ import { initI18n, t } from './i18n';
 import { GenFENRenderChild } from './renderChild/GenFENRenderChild';
 import { ChessRenderChild } from './renderChild/MoveListRenderChild';
 import { TreeRenderChild } from './renderChild/TreeRenderChild';
-import { DEFAULT_SETTINGS, ChessSettingTab } from './settings';
+import { ChessSettingTab, DEFAULT_SETTINGS } from './settings';
 import { applyThemes } from './themes';
 import type { ISettings } from './types';
 import { PGNView } from './view/pgn';

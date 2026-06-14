@@ -134,6 +134,7 @@
   function resetView() {
     updateTreeLayout();
     if (!svgEl || !zoomBehavior) return;
+    if (svgEl.clientWidth === 0 || svgEl.clientHeight === 0) return;
     const padding = 40;
     let minX = Infinity,
       maxX = -Infinity,
@@ -161,9 +162,11 @@
 
   function panToNodeIfNeeded(node: ChessNode) {
     if (!node || !svgEl || node.x === undefined || node.y === undefined) return;
+    const { x: tx, y: ty, k: sc } = zoomTransform;
+    if (!Number.isFinite(tx) || !Number.isFinite(ty) || !Number.isFinite(sc)) return;
     const { clientWidth, clientHeight } = svgEl;
     const padding = 50;
-    let { x: translateX, y: translateY, k: scale } = zoomTransform;
+    let translateX = tx, translateY = ty, scale = sc;
     const nodeScreenX = node.x * spacingX * scale + translateX;
     const nodeScreenY = node.y * spacingY * scale + translateY;
 
@@ -185,12 +188,13 @@
 
   function zoomAtCenter(factor: number) {
     if (!svgEl) return;
-
+    const { x: tx, y: ty, k: sc } = zoomTransform;
+    if (!Number.isFinite(tx) || !Number.isFinite(ty) || !Number.isFinite(sc)) return;
     const w = svgEl.clientWidth;
     const h = svgEl.clientHeight;
     const cx = w / 2;
     const cy = h / 2;
-    let { x: translateX, y: translateY, k: scale } = zoomTransform;
+    let translateX = tx, translateY = ty, scale = sc;
     const prev = scale;
     const next = prev * factor;
     // 计算当前屏幕中心对应的世界坐标（未缩放坐标系）
