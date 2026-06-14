@@ -1,5 +1,5 @@
 import { type Move } from '../../chess';
-import { registerPGNViewModule } from '../../core/module-system';
+import { registerPGNViewModule, registerTreeModule } from '../../core/module-system';
 import { t } from '../../i18n';
 import type { ChessNode } from '../../types';
 import { ConfirmModal } from '../../utils/confirmModal';
@@ -36,7 +36,6 @@ const ActionsModule = {
       host.currentStep++;
       host.updateMainPath();
       eventBus.emit('updateUI');
-      eventBus.emit('updatePGN');
     });
 
     eventBus.on('node-click', (id: string) => {
@@ -152,14 +151,24 @@ const ActionsModule = {
           window.open(`https://xiangqiai.com/#/${fen} moves ${movesOnPath.join('')}`);
           break;
         }
+        case 'reset': {
+          host.data = host.source;
+          eventBus.emit('setViewData');
+          eventBus.emit('updateUI');
+          break;
+        }
+        case 'save': {
+          eventBus.emit('updatePGN');
+          break;
+        }
       }
       eventBus.emit('updateUI');
-      eventBus.emit('updatePGN');
     });
   },
 };
 
 registerPGNViewModule('actions', ActionsModule);
+registerTreeModule('actions', ActionsModule);
 
 function stringifyPGN(root: ChessNode): string {
   const nodeBrothers = genNodeBrothers(root);

@@ -89,3 +89,15 @@ export function createPGNViewModuleRegistry(host: object) {
 export function destroyPGNViewModuleRegistry(host: object) {
   PGNViewModules.destroyRegistry(host);
 }
+
+// 导出 Tree 模块系统
+const TreeModules = createModuleSystem();
+export function registerTreeModule(name: string, module: ChessModule) {
+  TreeModules.register(name, module);
+}
+export function createTreeModuleRegistry(host: object) {
+  return TreeModules.createRegistry(host);
+}
+export function destroyTreeModuleRegistry(host: object) {
+  TreeModules.destroyRegistry(host);
+}

@@ -1,4 +1,4 @@
-import { registerPGNViewModule } from '../../core/module-system';
+import { registerPGNViewModule, registerTreeModule } from '../../core/module-system';
 
 import { PGNParser } from './parser';
 
@@ -44,3 +44,4 @@ const TreeMap = {
 };
 
 registerPGNViewModule('treemap', TreeMap);
+registerTreeModule('treemap', TreeMap);

@@ -1,4 +1,9 @@
-import { registerGenFENModule, registerPGNViewModule, registerXQModule } from './module-system';
+import {
+  registerGenFENModule,
+  registerPGNViewModule,
+  registerTreeModule,
+  registerXQModule,
+} from './module-system';
 
 type EventType = string | symbol;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- pub/sub event system must accept any payload
@@ -47,3 +52,4 @@ export class EventBus {
 registerXQModule('eventBus', EventBus);
 registerGenFENModule('eventBus', EventBus);
 registerPGNViewModule('eventBus', EventBus);
+registerTreeModule('eventBus', EventBus);

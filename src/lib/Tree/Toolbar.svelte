@@ -12,6 +12,7 @@
   onLangChange(() => _lv++);
 
   const buttons = $derived([
+    { title: t("toolbar.reset", _lv), icon: "rotate-ccw", event: "reset" },
     { title: t("toolbar.delete", _lv), icon: "circle-x", event: "remove" },
     { title: t("toolbar.promote", _lv), icon: "arrow-up-wide-narrow", event: "promote" },
     { title: t("toolbar.start", _lv), icon: "arrow-left-to-line", event: "toStart" },
@@ -21,6 +22,7 @@
     { title: t("toolbar.flip", _lv), icon: "flip-vertical", event: "rotate" },
     { title: "皮卡鱼Web", icon: "external-link", event: "openPikafish" },
     { title: t("toolbar.annotate", _lv), icon: "tag", event: "toggle-annotation-menu" },
+    { title: t("toolbar.save", _lv), icon: "save", event: "save" },
   ]);
 
   // 你的 annotation 项目 —— 会放进菜单
