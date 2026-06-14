@@ -24,6 +24,7 @@ export class TreeRenderChild extends MarkdownRenderChild {
     this.settings = this.plugin.settings;
     (this as any).contentEl = containerEl;
     containerEl.classList.add('tree-codeblock');
+    (this as any).saveFile = () => {}; // 代码块不需要保存文件
     createPGNViewModuleRegistry(this);
   }
 
