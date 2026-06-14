@@ -123,10 +123,9 @@
 </div>
 
 <style>
-  :global(.pgn-view) {
+  :global(.view-content.pgn-view) {
     overflow: hidden !important;
     margin: 0 !important;
-    min-height: 300px;
     padding-top: var(--board-margin-top, 0px) !important;
     padding-bottom: var(--board-margin-bottom, 0px) !important;
   }
