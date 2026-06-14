@@ -32,6 +32,13 @@
   // ---- D3 Zoom ----
   let zoomTransform = $state(d3.zoomIdentity);
   let zoomBehavior: d3.ZoomBehavior<SVGSVGElement, unknown>;
+  const TRANSFORM_SAFE = $derived.by(() => {
+    const t = zoomTransform;
+    if (!t || !Number.isFinite(t.x) || !Number.isFinite(t.y) || !Number.isFinite(t.k)) {
+      return 'translate(0,0) scale(1)';
+    }
+    return `translate(${t.x},${t.y}) scale(${t.k})`;
+  });
 
   const spacingX = 22;
   const spacingY = 15;
@@ -276,7 +283,7 @@
 <div class="tree-container">
   <div class="svg-wrapper">
     <svg bind:this={svgEl} width="100%" height="100%" class="tree-svg">
-      <g transform={zoomTransform.toString()}>
+      <g transform={TRANSFORM_SAFE}>
         <!-- 连线 -->
         {#each renderedNodes as node}
           {#each node.children as child}
