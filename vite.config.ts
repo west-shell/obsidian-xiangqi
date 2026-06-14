@@ -54,7 +54,7 @@ export default defineConfig(({ mode }) => {
       outDir: setOutDir(mode),
       emptyOutDir: false,
       minify: isMin,
-      sourcemap: isMin ? false : 'inline',
+      sourcemap: isMin ? false : true,
     },
   };
 });
