@@ -23,8 +23,6 @@ export class TreeRenderChild extends MarkdownRenderChild {
   ) {
     super(containerEl);
     this.settings = this.plugin.settings;
-    // TreeView 等模块取 host.contentEl（PGNView 由 TextFileView 提供）
-    (this as any).contentEl = containerEl;
     createPGNViewModuleRegistry(this);
   }
 
