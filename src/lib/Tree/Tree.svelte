@@ -134,6 +134,7 @@
   function resetView() {
     updateTreeLayout();
     if (!svgEl || !zoomBehavior) return;
+    if (renderedNodes.length === 0) return;
     const padding = 40;
     let minX = Infinity,
       maxX = -Infinity,
