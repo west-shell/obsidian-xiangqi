@@ -16,7 +16,7 @@ interface ThemeDef {
   black: string;
 }
 const tree_red = '#861818';
-const tree_black = '#000080';
+const tree_black = '#0A1C3A';
 const themes: Record<string, ThemeDef> = {
   auto: {
     name: '自动',
