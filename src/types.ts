@@ -41,6 +41,12 @@ export interface ISettings {
   boardMarginBottom: number;
   viewOnly?: boolean;
   rotated?: boolean;
+  codeBlockNames: {
+    xiangqi: string[];
+    xq: string[];
+    tree: string[];
+  };
+  genfenSaveType: 'xiangqi' | 'tree';
 }
 
 export type IOptions = {

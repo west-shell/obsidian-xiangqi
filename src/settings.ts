@@ -1,6 +1,6 @@
 import './settings.css';
 
-import { type App, PluginSettingTab, Setting } from 'obsidian';
+import { type App, Notice, PluginSettingTab, Setting } from 'obsidian';
 
 import { initI18n, t } from './i18n';
 import type ChessPlugin from './main';
@@ -25,6 +25,12 @@ export const DEFAULT_SETTINGS: ISettings = {
   boardMarginBottom: 20,
   viewOnly: false,
   rotated: false,
+  codeBlockNames: {
+    xiangqi: ['xiangqi'],
+    xq: ['xq'],
+    tree: ['tree'],
+  },
+  genfenSaveType: 'xiangqi',
 };
 
 function addSliderWithValue(
@@ -274,6 +280,75 @@ export class ChessSettingTab extends PluginSettingTab {
         this.plugin.refresh();
       },
     );
+
+    // ==================== 代码块名称 ====================
+    new Setting(containerEl).setName(t('codeblock.title')).setDesc(t('codeblock.restartNotice')).setHeading();
+
+    const xiangqiSetting = new Setting(containerEl)
+      .setName(t('codeblock.xiangqiAliases'))
+      .setDesc(t('codeblock.xiangqiAliases.desc') + ' (默认: xiangqi)')
+      .addText(text =>
+        text.setValue(settings.codeBlockNames.xiangqi.join(', ')).onChange(value => {
+          settings.codeBlockNames.xiangqi = value
+            .split(',')
+            .map(s => s.trim())
+            .filter(Boolean);
+        }),
+      )
+      .addButton(button =>
+        button.setIcon('rotate-ccw').onClick(() => {
+          settings.codeBlockNames.xiangqi = ['xiangqi'];
+          xiangqiSetting.controlEl.querySelector('input')!.value = 'xiangqi';
+        }),
+      );
+
+    const treeSetting = new Setting(containerEl)
+      .setName(t('codeblock.treeAliases'))
+      .setDesc(t('codeblock.treeAliases.desc') + ' (默认: tree)')
+      .addText(text =>
+        text.setValue(settings.codeBlockNames.tree.join(', ')).onChange(value => {
+          settings.codeBlockNames.tree = value
+            .split(',')
+            .map(s => s.trim())
+            .filter(Boolean);
+        }),
+      )
+      .addButton(button =>
+        button.setIcon('rotate-ccw').onClick(() => {
+          settings.codeBlockNames.tree = ['tree'];
+          treeSetting.controlEl.querySelector('input')!.value = 'tree';
+        }),
+      );
+
+    const xqSetting = new Setting(containerEl)
+      .setName(t('codeblock.xqAliases'))
+      .setDesc(t('codeblock.xqAliases.desc') + ' (默认: xq)')
+      .addText(text =>
+        text.setValue(settings.codeBlockNames.xq.join(', ')).onChange(value => {
+          settings.codeBlockNames.xq = value
+            .split(',')
+            .map(s => s.trim())
+            .filter(Boolean);
+        }),
+      )
+      .addButton(button =>
+        button.setIcon('rotate-ccw').onClick(() => {
+          settings.codeBlockNames.xq = ['xq'];
+          xqSetting.controlEl.querySelector('input')!.value = 'xq';
+        }),
+      );
+
+    new Setting(containerEl)
+      .setName(t('codeblock.genfenSaveType'))
+      .setDesc(t('codeblock.genfenSaveType.desc'))
+      .addDropdown(dropdown =>
+        dropdown
+          .addOptions({ xiangqi: t('codeblock.modeXiangqi'), tree: t('codeblock.modeBranch') })
+          .setValue(settings.genfenSaveType)
+          .onChange(value => {
+            settings.genfenSaveType = value as 'xiangqi' | 'tree';
+          }),
+      );
 
     containerEl.parentElement?.classList.add('ws-setting-tab');
   }

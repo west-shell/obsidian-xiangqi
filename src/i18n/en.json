@@ -72,5 +72,17 @@
   "pgn.error": "Failed to create PGN file:",
   "menu.markdown": "Open in Markdown view",
   "menu.pgn": "Open in PGN view",
-  "pgn.displayName": "Pgn view"
+  "pgn.displayName": "Pgn view",
+  "codeblock.title": "Code Block Names",
+  "codeblock.restartNotice": "Changes require restarting the plugin or Obsidian to take effect.",
+  "codeblock.xiangqiAliases": "Xiangqi mode",
+  "codeblock.xiangqiAliases.desc": "Custom aliases for xiangqi code block, comma separated",
+  "codeblock.xqAliases": "FEN generation mode",
+  "codeblock.xqAliases.desc": "Custom aliases for FEN generation code block, comma separated",
+  "codeblock.treeAliases": "Branch diagram mode",
+  "codeblock.treeAliases.desc": "Custom aliases for branch diagram code block, comma separated",
+  "codeblock.genfenSaveType": "FEN save type",
+  "codeblock.genfenSaveType.desc": "Code block type when FEN saves",
+  "codeblock.modeXiangqi": "Xiangqi mode",
+  "codeblock.modeBranch": "Branch diagram mode"
 }

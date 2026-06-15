@@ -2,7 +2,7 @@ import '../assets/base.css';
 import '../assets/board.css';
 import '../assets/pieces.css';
 
-import { addIcon, MarkdownView, Plugin, TFile } from 'obsidian';
+import { addIcon, MarkdownView, Notice, Plugin, TFile } from 'obsidian';
 
 import { initI18n, t } from './i18n';
 import { GenFENRenderChild } from './renderChild/GenFENRenderChild';
@@ -23,6 +23,7 @@ export default class ChessPlugin extends Plugin {
     this.addSettingTab(new ChessSettingTab(this.app, this));
 
     applyThemes(this.app, this.settings);
+
     addIcon(
       'xiangqi-icon',
       `
@@ -40,20 +41,8 @@ export default class ChessPlugin extends Plugin {
 </svg>
 `,
     );
-    this.registerMarkdownCodeBlockProcessor('xiangqi', (source, el, ctx) => {
-      const renderChild = new ChessRenderChild(el, ctx, source, this);
-      ctx.addChild(renderChild);
-    });
 
-    this.registerMarkdownCodeBlockProcessor('xq', (source, el, ctx) => {
-      const renderChild = new GenFENRenderChild(el, ctx, source, this);
-      ctx.addChild(renderChild);
-    });
-
-    this.registerMarkdownCodeBlockProcessor('tree', (source, el, ctx) => {
-      const renderChild = new TreeRenderChild(el, ctx, source, this);
-      ctx.addChild(renderChild);
-    });
+    this.registerCodeBlocks();
 
     this.registerView(PGNView.VIEW_TYPE, leaf => new PGNView(leaf, this));
 
@@ -123,6 +112,28 @@ export default class ChessPlugin extends Plugin {
     this.instances.forEach(instance => {
       instance.refresh();
     });
+  }
+
+  registerCodeBlocks() {
+    const { codeBlockNames } = this.settings;
+
+    for (const name of codeBlockNames.xiangqi) {
+      this.registerMarkdownCodeBlockProcessor(name, (source, el, ctx) => {
+        ctx.addChild(new ChessRenderChild(el, ctx, source, this));
+      });
+    }
+
+    for (const name of codeBlockNames.xq) {
+      this.registerMarkdownCodeBlockProcessor(name, (source, el, ctx) => {
+        ctx.addChild(new GenFENRenderChild(el, ctx, source, this));
+      });
+    }
+
+    for (const name of codeBlockNames.tree) {
+      this.registerMarkdownCodeBlockProcessor(name, (source, el, ctx) => {
+        ctx.addChild(new TreeRenderChild(el, ctx, source, this));
+      });
+    }
   }
 
   async changeView(file: TFile, targetViewType: string) {

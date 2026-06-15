@@ -57,7 +57,7 @@ async function onSaveBTNClick(host: IGenFENHost) {
     const lines = fileContent.split('\n');
     let blockLines: string[] = lines.slice(lineStart, lineEnd + 1);
     if (blockLines.length < 2) return fileContent;
-    blockLines[0] = blockLines[0].replace(/^```xq\b.*$/, '```xiangqi');
+    blockLines[0] = blockLines[0].replace(/^```\S+\b.*$/, `\`\`\`${host.plugin.settings.genfenSaveType}`);
     blockLines = [blockLines[0], `[FEN "${fen}"]`, '```'];
     const newContent = [...lines.slice(0, lineStart), ...blockLines, ...lines.slice(lineEnd + 1)].join('\n');
     return newContent;
