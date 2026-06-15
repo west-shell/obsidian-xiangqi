@@ -83,6 +83,6 @@
   "codeblock.treeAliases.desc": "自定义分支图代码块别名，逗号分隔",
   "codeblock.genfenSaveType": "FEN 保存类型",
   "codeblock.genfenSaveType.desc": "FEN 保存时的代码块类型",
-  "codeblock.modeXiangqi": "象棋模式",
+  "codeblock.modeXiangqi": "列表模式",
   "codeblock.modeBranch": "分支图模式"
 }

@@ -83,6 +83,6 @@
   "codeblock.treeAliases.desc": "Custom aliases for branch diagram code block, comma separated",
   "codeblock.genfenSaveType": "FEN save type",
   "codeblock.genfenSaveType.desc": "Code block type when FEN saves",
-  "codeblock.modeXiangqi": "Xiangqi mode",
+  "codeblock.modeXiangqi": "List mode",
   "codeblock.modeBranch": "Branch diagram mode"
 }

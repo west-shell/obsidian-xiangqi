@@ -1,6 +1,6 @@
 import './settings.css';
 
-import { type App, Notice, PluginSettingTab, Setting } from 'obsidian';
+import { type App, PluginSettingTab, Setting } from 'obsidian';
 
 import { initI18n, t } from './i18n';
 import type ChessPlugin from './main';
