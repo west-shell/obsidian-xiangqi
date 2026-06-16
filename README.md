@@ -17,7 +17,7 @@ Likes, coins, and feedback are greatly appreciated.
 
 This plugin registers a custom view for `.pgn` files. Simply open a `.pgn` file in Obsidian to see the rendered board interface instead of plain text.
 
-- **Real-time Read/Write**: Any changes to the game (like making moves, adding variations, or comments) are saved back to the original `.pgn` file instantly and automatically.
+- **Manual Save**: Any changes to the game (like making moves, adding variations, or comments) are saved back to the file when clicking Save button.
 - **Full-featured**: Supports variations, comments, and annotations.
 - **Jump to AI**: Supports packaging the current branch to Pikafish web version for analysis.
 - **View Toggling**: Switch between text view and chess view via the file menu.
@@ -27,7 +27,7 @@ This plugin registers a custom view for `.pgn` files. Simply open a `.pgn` file 
 
 ## Code Block Demo
 
-Two code block names are supported:
+Three code block types are supported:
 
 ---
 
@@ -61,6 +61,39 @@ Two code block names are supported:
 ![FEN Generator](./IMAGE/FEN生成.png)
 
 ---
+
+`tree`: Branch diagram — display game variations as a tree graph
+
+````markdown
+```tree
+1. H2-E2 H9-G7
+2. H0-G2 I9-H9
+```
+````
+
+---
+
+## Settings
+
+### Code Block Names
+
+Customize code block aliases in **Settings > Chess > Code Block Names**:
+
+- **List mode** (xiangqi): Default `xiangqi`, add custom aliases separated by commas
+- **FEN generation mode** (xq): Default `xq`, add custom aliases
+- **Branch diagram mode** (tree): Default `tree`, add custom aliases
+- **FEN save type**: Choose which code block type to save as (List mode / Branch diagram mode)
+
+> **Note**: Changes require restarting the plugin or Obsidian to take effect.
+
+### PGN File View
+
+Enable/disable PGN file view and customize file extensions:
+
+- **Enable PGN file view**: Toggle to register/unregister PGN view
+- **PGN file extensions**: Default `pgn`, add custom extensions separated by commas
+
+> **Note**: Changes require restarting the plugin or Obsidian to take effect.
 
 ## Features
 
