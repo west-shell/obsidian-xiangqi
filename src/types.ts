@@ -47,6 +47,8 @@ export interface ISettings {
     tree: string[];
   };
   genfenSaveType: 'xiangqi' | 'tree';
+  enablePGNView: boolean;
+  pgnFileExtensions: string[];
 }
 
 export type IOptions = {

@@ -44,31 +44,56 @@ export default class ChessPlugin extends Plugin {
 
     this.registerCodeBlocks();
 
-    this.registerView(PGNView.VIEW_TYPE, leaf => new PGNView(leaf, this));
+    if (this.settings.enablePGNView) {
+      this.registerView(PGNView.VIEW_TYPE, leaf => new PGNView(leaf, this));
+      this.registerExtensions(this.settings.pgnFileExtensions, PGNView.VIEW_TYPE);
 
-    this.registerExtensions(['pgn'], PGNView.VIEW_TYPE);
+      this.addRibbonIcon('xiangqi-icon', t('pgn.newFile'), async () => {
+        let baseFileName = '未命名';
+        let fileExtension = `.${this.settings.pgnFileExtensions[0] ?? 'pgn'}`;
+        let fileName = baseFileName + fileExtension;
+        let counter = 0;
 
-    this.addRibbonIcon('xiangqi-icon', t('pgn.newFile'), async () => {
-      let baseFileName = '未命名';
-      let fileExtension = '.pgn';
-      let fileName = baseFileName + fileExtension;
-      let counter = 0;
+        while (await this.app.vault.adapter.exists(fileName)) {
+          counter++;
+          fileName = `${baseFileName} ${counter}${fileExtension}`;
+        }
 
-      // 检查文件是否存在，如果存在则递增文件名
-      while (await this.app.vault.adapter.exists(fileName)) {
-        counter++;
-        fileName = `${baseFileName} ${counter}${fileExtension}`;
-      }
+        const fileContent = '';
 
-      const fileContent = '';
+        try {
+          const newFile = await this.app.vault.create(fileName, fileContent);
+          this.app.workspace.getLeaf(true).openFile(newFile);
+        } catch (error) {
+          console.error(t('pgn.error'), error);
+        }
+      });
 
-      try {
-        const newFile = await this.app.vault.create(fileName, fileContent);
-        this.app.workspace.getLeaf(true).openFile(newFile);
-      } catch (error) {
-        console.error(t('pgn.error'), error);
-      }
-    });
+      this.registerEvent(
+        this.app.workspace.on('file-menu', (menu, file) => {
+          if (!(file instanceof TFile) || !this.settings.pgnFileExtensions.includes(file.extension)) {
+            return;
+          }
+          const currentView = this.app.workspace.getLeaf().view;
+          if (!(currentView instanceof MarkdownView && currentView.file === file)) {
+            menu.addItem(item =>
+              item
+                .setTitle(t('menu.markdown'))
+                .setIcon('file-text')
+                .onClick(() => this.changeView(file, 'markdown')),
+            );
+          }
+          if (!(currentView instanceof PGNView && currentView.file === file)) {
+            menu.addItem(item =>
+              item
+                .setTitle(t('menu.pgn'))
+                .setIcon('xiangqi-icon')
+                .onClick(() => this.changeView(file, PGNView.VIEW_TYPE)),
+            );
+          }
+        }),
+      );
+    }
 
     this.registerEvent(
       this.app.workspace.on('resize', () => {
@@ -79,31 +104,6 @@ export default class ChessPlugin extends Plugin {
     this.registerEvent(
       this.app.workspace.on('css-change', () => {
         applyThemes(this.app, this.settings);
-      }),
-    );
-
-    this.registerEvent(
-      this.app.workspace.on('file-menu', (menu, file) => {
-        if (!(file instanceof TFile) || file.extension !== 'pgn') {
-          return;
-        }
-        const currentView = this.app.workspace.getLeaf().view;
-        if (!(currentView instanceof MarkdownView && currentView.file === file)) {
-          menu.addItem(item =>
-            item
-              .setTitle(t('menu.markdown'))
-              .setIcon('file-text')
-              .onClick(() => this.changeView(file, 'markdown')),
-          );
-        }
-        if (!(currentView instanceof PGNView && currentView.file === file)) {
-          menu.addItem(item =>
-            item
-              .setTitle(t('menu.pgn'))
-              .setIcon('xiangqi-icon')
-              .onClick(() => this.changeView(file, PGNView.VIEW_TYPE)),
-          );
-        }
       }),
     );
   }

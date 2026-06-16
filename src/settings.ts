@@ -31,6 +31,8 @@ export const DEFAULT_SETTINGS: ISettings = {
     tree: ['tree'],
   },
   genfenSaveType: 'xiangqi',
+  enablePGNView: true,
+  pgnFileExtensions: ['pgn'],
 };
 
 function addSliderWithValue(
@@ -282,7 +284,14 @@ export class ChessSettingTab extends PluginSettingTab {
     );
 
     // ==================== 代码块名称 ====================
-    new Setting(containerEl).setName(t('codeblock.title')).setDesc(t('codeblock.restartNotice')).setHeading();
+    // ==================== 重启后生效的设置 ====================
+    new Setting(containerEl)
+      .setName(t('settings.restartRequired.title'))
+      .setDesc(t('settings.restartRequired.desc'))
+      .setHeading();
+
+    // ---- 代码块名称 ----
+    new Setting(containerEl).setName(t('codeblock.title')).setHeading();
 
     const xiangqiSetting = new Setting(containerEl)
       .setName(t('codeblock.xiangqiAliases'))
@@ -293,12 +302,14 @@ export class ChessSettingTab extends PluginSettingTab {
             .split(',')
             .map(s => s.trim())
             .filter(Boolean);
+          void this.plugin.saveSettings();
         }),
       )
       .addButton(button =>
         button.setIcon('rotate-ccw').onClick(() => {
           settings.codeBlockNames.xiangqi = ['xiangqi'];
           xiangqiSetting.controlEl.querySelector('input')!.value = 'xiangqi';
+          void this.plugin.saveSettings();
         }),
       );
 
@@ -311,12 +322,14 @@ export class ChessSettingTab extends PluginSettingTab {
             .split(',')
             .map(s => s.trim())
             .filter(Boolean);
+          void this.plugin.saveSettings();
         }),
       )
       .addButton(button =>
         button.setIcon('rotate-ccw').onClick(() => {
           settings.codeBlockNames.tree = ['tree'];
           treeSetting.controlEl.querySelector('input')!.value = 'tree';
+          void this.plugin.saveSettings();
         }),
       );
 
@@ -329,12 +342,14 @@ export class ChessSettingTab extends PluginSettingTab {
             .split(',')
             .map(s => s.trim())
             .filter(Boolean);
+          void this.plugin.saveSettings();
         }),
       )
       .addButton(button =>
         button.setIcon('rotate-ccw').onClick(() => {
           settings.codeBlockNames.xq = ['xq'];
           xqSetting.controlEl.querySelector('input')!.value = 'xq';
+          void this.plugin.saveSettings();
         }),
       );
 
@@ -347,7 +362,41 @@ export class ChessSettingTab extends PluginSettingTab {
           .setValue(settings.genfenSaveType)
           .onChange(value => {
             settings.genfenSaveType = value as 'xiangqi' | 'tree';
+            void this.plugin.saveSettings();
           }),
+      );
+
+    // ---- PGN 文件视图 ----
+    new Setting(containerEl).setName(t('pgn.title')).setHeading();
+
+    new Setting(containerEl)
+      .setName(t('pgn.enable'))
+      .setDesc(t('pgn.enable.desc'))
+      .addToggle(toggle =>
+        toggle.setValue(settings.enablePGNView).onChange(value => {
+          settings.enablePGNView = value;
+          void this.plugin.saveSettings();
+        }),
+      );
+
+    const pgnExtSetting = new Setting(containerEl)
+      .setName(t('pgn.extensions'))
+      .setDesc(t('pgn.extensions.desc') + ' (默认: pgn)')
+      .addText(text =>
+        text.setValue(settings.pgnFileExtensions.join(', ')).onChange(value => {
+          settings.pgnFileExtensions = value
+            .split(',')
+            .map(s => s.trim())
+            .filter(Boolean);
+          void this.plugin.saveSettings();
+        }),
+      )
+      .addButton(button =>
+        button.setIcon('rotate-ccw').onClick(() => {
+          settings.pgnFileExtensions = ['pgn'];
+          pgnExtSetting.controlEl.querySelector('input')!.value = 'pgn';
+          void this.plugin.saveSettings();
+        }),
       );
 
     containerEl.parentElement?.classList.add('ws-setting-tab');
@@ -355,5 +404,6 @@ export class ChessSettingTab extends PluginSettingTab {
 
   async hide() {
     this.plugin.refresh();
+    void this.plugin.saveSettings();
   }
 }

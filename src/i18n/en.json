@@ -84,5 +84,12 @@
   "codeblock.genfenSaveType": "FEN save type",
   "codeblock.genfenSaveType.desc": "Code block type when FEN saves",
   "codeblock.modeXiangqi": "List mode",
-  "codeblock.modeBranch": "Branch diagram mode"
+  "codeblock.modeBranch": "Branch diagram mode",
+  "settings.restartRequired.title": "Restart Required",
+  "settings.restartRequired.desc": "The following settings require restarting the plugin or Obsidian to take effect.",
+  "pgn.title": "PGN File View",
+  "pgn.enable": "Enable PGN file view",
+  "pgn.enable.desc": "Register PGN file view for opening .pgn files",
+  "pgn.extensions": "PGN file extensions",
+  "pgn.extensions.desc": "Custom file extensions for PGN view, comma separated"
 }
