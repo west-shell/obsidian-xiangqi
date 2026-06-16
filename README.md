@@ -9,48 +9,46 @@ If you like this project, feel free to check out my page on
 [![Bilibili](https://img.shields.io/badge/Bilibili-Bilibili-ff69b4?logo=bilibili&logoColor=white)](https://space.bilibili.com/156446344)  
 Likes, coins, and feedback are greatly appreciated.
 
-## Plugin Overview
+## Overview
 
-**Chinese Chess Plugin for Obsidian** is a Chinese chess rendering engine tailor-made for Obsidian. It supports displaying chess games in FEN and PGN formats and allows move exploration. The plugin offers rich customization options, move navigation, saving functionality, and more.
+**Obsidian Chinese Chess Plugin** is a Chinese chess rendering engine built for Obsidian. It displays chess positions and games in FEN and PGN formats, supports move exploration and variation management. Features include Pikafish analysis links, voice narration, and more.
 
 ## PGN File Support
 
-This plugin registers a custom view for `.pgn` files. Simply open a `.pgn` file in Obsidian to see the rendered board interface instead of plain text.
+Open `.pgn` files directly in Obsidian — the plugin registers a dedicated `.pgn` file view with an interactive board interface.
 
-- **Manual Save**: Any changes to the game (like making moves, adding variations, or comments) are saved back to the file when clicking Save button.
-- **Full-featured**: Supports variations, comments, and annotations.
-- **Jump to AI**: Supports packaging the current branch to Pikafish web version for analysis.
-- **View Toggling**: Switch between text view and chess view via the file menu.
-- **Quick Create**: Create new PGN files via the toolbar button.
+- **Manual Save**: Any changes (moves, variations, comments, annotations) are saved back to the file when clicking Save button
+- **Variation Tree**: Interactive tree graph showing all branches — click nodes to navigate
+- **Comments & Annotations**: Supports branch diagram and board annotation symbols, comments
+- **Mode Toggle**: Switch between icon mode and text mode in branch diagram
+- **Jump to AI**: Package the current branch to Pikafish web version for analysis
+- **Quick Create**: New PGN files from the ribbon button
+- **Custom File Types**: Set specific file types as PGN files
 
-![PGN File](./IMAGE/PGN文件.png)
+![PGN File](./IMAGE/tree.png)
 
-## Code Block Demo
+## Code Blocks
 
-Three code block types are supported:
+Three code block types:
+All code block names are customizable
 
 ---
 
-`xiangqi` : to display a game in a Markdown file. Leave it empty for the default opening.
+`xiangqi`: Display and explore Chinese chess games in Markdown
 
 ````markdown
 ```xiangqi
 1. H2-E2 H9-G7
 2. H0-G2 I9-H9
 3. I0-H0 B9-C7
-....
-30. B2-B9 D9-D8
-31. B9-G9 C2-C7
-32. G7-E7  *
 ```
 ````
 
-![PGN Display](./IMAGE/PGN测试.png)
+![Move List](./IMAGE/list.png)
 
 ---
 
-`xq` : to generate a `xiangqi` code block with a FEN string.
-`xq` content will be replaced with the FEN.
+`xq`: Visual board editor — generates a `xiangqi` block with FEN
 
 ````markdown
 ```xq
@@ -58,7 +56,7 @@ Three code block types are supported:
 ```
 ````
 
-![FEN Generator](./IMAGE/FEN生成.png)
+![FEN Editor](./IMAGE/GenFEN.png)
 
 ---
 
@@ -70,6 +68,8 @@ Three code block types are supported:
 2. H0-G2 I9-H9
 ```
 ````
+
+![Branch Diagram](./IMAGE/tree.png)
 
 ---
 
@@ -97,63 +97,58 @@ Enable/disable PGN file view and customize file extensions:
 
 ## Features
 
-- **Board Display**: Show and review Chinese chess games in notes
+- **Board Rendering**: High-quality chessboard via xiangqiground with drag-and-drop moves
 - **Custom Opening**:
   - Visual editor
   - Clear/Fill board
   - Set first player
   - Save as FEN
 - **PGN Saving**:
-  - Save move history as PGN
-  - Button colors: **gray** (empty), **green** (has PGN), **orange** (edited)
-  - Confirm before saving
-  - If no moves, saving clears PGN
-- **Settings**:
-  - Board theme: Wood, Parchment, Green Felt, Marble, Classic Light, Classic Dark
+  - Save move history as PGN format
+  - Button colors: **gray** (empty), **green** (saved), **orange** (modified)
+  - Confirmation dialog before saving
+- **Customizable Settings**:
+  - Board themes: Wood, Parchment, Green Felt, Marble, Classic Light, Classic Dark
   - 3-layer board background: grid lines + texture + base color
   - Coordinate labels auto-scale with board size
   - Toolbar position: right / bottom
-  - Board size
-  - Show/hide move list and move text
-  - Move text font size
+  - Board size and move text size
+  - Move list display options
   - Auto-scroll to latest move
-  - Optional move narration (not on mobile)
-- **Mobile Friendly**: Manual layout adjustment for small screens
-- **Move Narration**: Optional voice readout of moves
-- **Format Support**: Supports ICCS-style PGN
-- **Jump to AI**: Supports packaging the move list to Pikafish web version for analysis.
-- **View Toggling**: Supports switching between text view and chess view via the file menu.
-- **Quick Create**: Supports creating new PGN files via a toolbar button.
+  - Optional move narration (desktop only)
+- **Board Markers**: Draw arrows and highlights on the board
+- **Jump to AI**: Package move list to Pikafish web version for analysis
+- **Mobile Friendly**: Adjust board size for small screens
 
 ## Usage
 
 ### `xq` Code Block
 
-1. Add the `xq` code block tag
-2. Manually edit the board; use the buttons to clear, fill, or switch first player
-3. Click "Save" to generate a `xiangqi` block with the corresponding FEN
+1. Add the `xq` code block tag to start the editor
+2. Drag pieces or click piece buttons to set up the position
+3. Use clear/fill/turn buttons as needed
+4. Click Save to generate a `xiangqi` code block with the FEN
 
 ### `xiangqi` Code Block
 
-1. Write the moves inside a code block marked with `xiangqi`.
+1. Write your game inside a `xiangqi` code block (optionally with FEN and ICCS moves)
 2. FEN is optional — defaults to the standard starting position. Supports parsing Pikafish web links.
-3. Behavior:
-   - If no manual moves, the move list shows the PGN.
-   - After manual moves, it shows the updated sequence.
-   - Click **Reset** to go back to before manual edits.
-   - Click **Reset** again to return to the initial state.
-
-4. Click **Save** to overwrite the original PGN with current moves.
+3. Controls:
+   - When no manual moves are made, the move list shows the original PGN
+   - After making moves, the list shows your modified sequence
+   - Click **Reset** to revert to before manual edits
+   - Click **Reset** again to return to initial state
+4. Click **Save** to overwrite the original PGN
 
 ### Optional Parameters
 
-| Name              | Value        | Description                                                       |
-| ----------------- | ------------ | ----------------------------------------------------------------- |
-| `fen`             | valid FEN    | Custom starting position; empty = default                         |
-| `protected` / `p` | true / false | When true, the Save button is disabled; default is false          |
-| `rotated` / `r`   | true / false | When true, the board is flipped (Red on bottom); default is false |
+| Name              | Value        | Description                                       |
+| ----------------- | ------------ | ------------------------------------------------- |
+| `fen`             | valid FEN    | Custom starting position; empty = default         |
+| `protected` / `p` | true / false | When true, Save button is disabled; default false |
+| `rotated` / `r`   | true / false | When true, board is flipped (Red on bottom)       |
 
-#### DEMO
+#### Example
 
 ````markdown
 ```xiangqi
@@ -167,23 +162,22 @@ p:true
 ```
 ````
 
-- Colons can be either Chinese or English.
-- `r` and `p` can be uppercase or lowercase.
-- The `fen` value can be with or without quotes, either is fine.
-- PGN moves can be numbered together, not numbered, or written one by one—any format works.
+- Colons can be Chinese or English; `r` and `p` are case-insensitive
+- FEN value works with or without quotes
+- PGN moves can be numbered together, not numbered, or written one by one
 
 ## Installation
 
-This plugin is now available on the official Obsidian plugin marketplace. Search for "Chinese chess" or "xiangqi" to install it.
+This plugin is available on the official Obsidian plugin marketplace. Search for "Chinese chess" or "xiangqi" to install.
 
-1. Open Obsidian.
-2. Go to **Settings**.
-3. Click on **Community plugins**.
-4. Make sure **Restricted mode** is turned off.
-5. Click the **Browse** button.
-6. Search for "Chinese chess" or "xiangqi" in the search bar.
-7. Find this plugin and click **Install**.
-8. After installation, click **Enable**.
+1. Open Obsidian
+2. Go to **Settings**
+3. Click **Community plugins**
+4. Ensure **Restricted mode** is off
+5. Click **Browse**
+6. Search for "Chinese chess" or "xiangqi"
+7. Find this plugin and click **Install**
+8. Click **Enable**
 
 ### Image Board Assets
 
@@ -202,12 +196,11 @@ and place them in the plugin's `assets/` folder:
     └── bamboo.jpg
 ```
 
-> **Note:** These assets are only needed if you use the Wood or Bamboo board
-> themes. Other themes work without them.
+> **Note**: These assets are only needed if you use the Wood or Bamboo board themes. Other themes work without them.
 
 ## Build
 
-1. Clone this repository and its dependency [xiangqiground](https://github.com/west-shell/xiangqiground) and [xiangqi.js](https://github.com/west-shell/xiangqi.js)into the same parent directory:
+1. Clone this repository and its dependencies [xiangqiground](https://github.com/west-shell/xiangqiground) and [xiangqi.js](https://github.com/west-shell/xiangqi.js) into the same parent directory:
 
    ```bash
    git clone https://github.com/west-shell/xiangqiground.git
@@ -236,11 +229,11 @@ and place them in the plugin's `assets/` folder:
    ```bash
    cd ../obsidian-xiangqi
    npm install
-   npm run build        # Dev build (unminified, with sourcemaps, for debugging)
-   npm run build:min    # Minified build (compressed, no sourcemaps, for release)
+   npm run build        # Dev build (unminified, with sourcemaps)
+   npm run build:min    # Minified build (for release)
    ```
 
 ## Donation
 
-If you like this plugin, you can support me with a donation!
+If you like this plugin, feel free to support me!
 ![Donation](./IMAGE/打赏.png)
