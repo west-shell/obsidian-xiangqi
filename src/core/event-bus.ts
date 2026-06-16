@@ -6,8 +6,8 @@ import {
 } from './module-system';
 
 type EventType = string | symbol;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- pub/sub event system must accept any payload
-type Handler = (payload?: any) => void;
+type Payload = string | number | boolean | object;
+type Handler = (payload?: Payload) => void;
 
 export class EventBus {
   private handlers = new Map<EventType, Set<Handler>>();
@@ -31,7 +31,7 @@ export class EventBus {
     set.add(handler);
   }
 
-  emit(event: EventType, payload?: unknown) {
+  emit(event: EventType, payload?: Payload) {
     const set = this.handlers.get(event);
     if (!set) return;
     const hasPayload = arguments.length === 2;
