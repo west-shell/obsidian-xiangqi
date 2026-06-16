@@ -88,7 +88,6 @@ export class ChessSettingTab extends PluginSettingTab {
         .setValue(settings.lang)
         .onChange(v => {
           settings.lang = v as ISettings['lang'];
-          void this.plugin.saveSettings();
           initI18n(v);
           this.display();
         }),
@@ -104,7 +103,6 @@ export class ChessSettingTab extends PluginSettingTab {
         dropdown.addOptions(THEME_OPTIONS);
         dropdown.setValue(settings.theme).onChange(theme => {
           settings.theme = theme as ISettings['theme'];
-          void this.plugin.saveSettings();
           this.plugin.refresh();
         });
       });
@@ -118,7 +116,6 @@ export class ChessSettingTab extends PluginSettingTab {
       'px',
       v => {
         settings.cellSize = v;
-        void this.plugin.saveSettings();
         this.plugin.refresh();
       },
     );
@@ -132,7 +129,6 @@ export class ChessSettingTab extends PluginSettingTab {
           .setValue(settings.position)
           .onChange(position => {
             settings.position = position as 'bottom' | 'right';
-            void this.plugin.saveSettings();
             this.plugin.refresh();
           });
       });
@@ -143,7 +139,6 @@ export class ChessSettingTab extends PluginSettingTab {
       .addToggle(toggle =>
         toggle.setValue(settings.showCoordinateLabels).onChange(value => {
           settings.showCoordinateLabels = value;
-          void this.plugin.saveSettings();
         }),
       );
 
@@ -156,7 +151,6 @@ export class ChessSettingTab extends PluginSettingTab {
       .addToggle(toggle =>
         toggle.setValue(settings.showLastMove).onChange(value => {
           settings.showLastMove = value;
-          void this.plugin.saveSettings();
           this.plugin.refresh();
         }),
       );
@@ -167,7 +161,6 @@ export class ChessSettingTab extends PluginSettingTab {
       .addToggle(toggle =>
         toggle.setValue(settings.showNextMove).onChange(value => {
           settings.showNextMove = value;
-          void this.plugin.saveSettings();
           this.plugin.refresh();
         }),
       );
@@ -178,7 +171,6 @@ export class ChessSettingTab extends PluginSettingTab {
       .addToggle(toggle =>
         toggle.setValue(settings.showTurnBorder).onChange(value => {
           settings.showTurnBorder = value;
-          void this.plugin.saveSettings();
           this.plugin.refresh();
         }),
       );
@@ -190,7 +182,6 @@ export class ChessSettingTab extends PluginSettingTab {
         .addToggle(toggle =>
           toggle.setValue(settings.enableSpeech).onChange(value => {
             settings.enableSpeech = value;
-            void this.plugin.saveSettings();
           }),
         );
     }
@@ -204,7 +195,6 @@ export class ChessSettingTab extends PluginSettingTab {
       .addToggle(toggle =>
         toggle.setValue(settings.showMovelist).onChange(value => {
           settings.showMovelist = value;
-          void this.plugin.saveSettings();
           this.plugin.refresh();
         }),
       );
@@ -215,7 +205,6 @@ export class ChessSettingTab extends PluginSettingTab {
       .addToggle(toggle =>
         toggle.setValue(settings.showMovelistText).onChange(value => {
           settings.showMovelistText = value;
-          void this.plugin.saveSettings();
           this.plugin.refresh();
           this.display();
         }),
@@ -230,7 +219,6 @@ export class ChessSettingTab extends PluginSettingTab {
       'px',
       v => {
         settings.fontSize = v;
-        void this.plugin.saveSettings();
         this.plugin.refresh();
       },
     );
@@ -248,7 +236,6 @@ export class ChessSettingTab extends PluginSettingTab {
           .setValue(settings.autoJump)
           .onChange(async value => {
             settings.autoJump = value as 'never' | 'always' | 'auto';
-            void this.plugin.saveSettings();
           });
       });
 
@@ -264,7 +251,6 @@ export class ChessSettingTab extends PluginSettingTab {
       'px',
       v => {
         settings.boardMarginTop = v;
-        void this.plugin.saveSettings();
         this.plugin.refresh();
       },
     );
@@ -278,7 +264,6 @@ export class ChessSettingTab extends PluginSettingTab {
       'px',
       v => {
         settings.boardMarginBottom = v;
-        void this.plugin.saveSettings();
         this.plugin.refresh();
       },
     );
