@@ -130,6 +130,7 @@
   .tree-view {
     display: flex;
     justify-content: center;
+    margin: 10px;
   }
   .tree-view.right {
     flex-direction: row;
