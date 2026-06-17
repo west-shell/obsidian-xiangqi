@@ -1,10 +1,10 @@
 import '../core/event-bus';
 import '../modules/Source';
-import '../modules/MoveList/ChessBoard';
+import '../modules/List/ChessBoard';
 import '../modules/BoardClick';
-import '../modules/MoveList/History';
-import '../modules/MoveList/Actions';
-import '../modules/MoveList/Speaker';
+import '../modules/List/History';
+import '../modules/List/Actions';
+import '../modules/List/Speaker';
 
 import { type MarkdownPostProcessorContext, MarkdownRenderChild } from 'obsidian';
 

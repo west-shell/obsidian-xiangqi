@@ -1,7 +1,7 @@
 <script lang="ts">
   import Board from "../Board.svelte";
   import Toolbar from "./Toolbar.svelte";
-  import MoveList from "./MoveList.svelte";
+  import List from "./List.svelte";
   import type { IOptions, ISettings } from "../../types";
   import type { EventBus } from "../../core/event-bus";
   import type { Move, Square } from "../../chess";
@@ -49,7 +49,7 @@
   <Board {settings} {fen} {lastMove} {checkColor} {selectedSquare} {eventBus} {rotated} />
   <Toolbar {settings} {eventBus} {modified} {PGN} {isprotected} />
   {#if settings.showMovelist}
-    <MoveList {settings} {currentStep} {moves} {eventBus} />
+    <List {settings} {currentStep} {moves} {eventBus} />
   {/if}
 </div>
 

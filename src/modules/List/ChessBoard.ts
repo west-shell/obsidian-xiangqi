@@ -2,7 +2,7 @@ import { mount, unmount } from 'svelte';
 
 import type { Square } from '../../chess';
 import { registerXQModule } from '../../core/module-system';
-import Chess from '../../lib/Movelist/Chess.svelte';
+import Chess from '../../lib/List/Chess.svelte';
 import type { IXQHost } from '../../types';
 
 const BoardModule = {
