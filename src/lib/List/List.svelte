@@ -14,7 +14,7 @@
   let { settings, currentStep, moves, eventBus }: Props = $props();
 
   let itemRefs: HTMLLIElement[] = [];
-  let ulRef: HTMLUListElement;
+  let ulRef: HTMLUListElement | null = null;
 
   $effect(() => {
     void currentStep;

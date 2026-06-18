@@ -47,19 +47,19 @@ function createModuleSystem() {
 }
 
 // 实例化 XQ 模块系统
-const XQModules = createModuleSystem();
+const ListModules = createModuleSystem();
 
 // 导出 XQ 模块相关函数
-export function registerXQModule(name: string, module: ChessModule) {
-  XQModules.register(name, module);
+export function registerListModule(name: string, module: ChessModule) {
+  ListModules.register(name, module);
 }
 
 export function createXQModuleRegistry(host: object) {
-  return XQModules.createRegistry(host);
+  return ListModules.createRegistry(host);
 }
 
 export function destroyXQModuleRegistry(host: object) {
-  XQModules.destroyRegistry(host);
+  return ListModules.destroyRegistry(host);
 }
 
 // 实例化 GenFEN 模块系统

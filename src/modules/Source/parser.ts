@@ -211,4 +211,14 @@ export class PGNParser {
   public getMap(): Map<string, ChessNode> {
     return this.nodeMap;
   }
+  public getMainLine(): ChessNode[] {
+    const mainLine: ChessNode[] = [];
+    let current = this.rootNode;
+    while (current.children.length > 0) {
+      const mainChild = current.children[0];
+      mainLine.push(mainChild);
+      current = mainChild;
+    }
+    return mainLine;
+  }
 }

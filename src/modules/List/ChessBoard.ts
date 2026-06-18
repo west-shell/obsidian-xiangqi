@@ -1,15 +1,15 @@
 import { mount, unmount } from 'svelte';
 
 import type { Square } from '../../chess';
-import { registerXQModule } from '../../core/module-system';
+import { registerListModule } from '../../core/module-system';
 import Chess from '../../lib/List/Chess.svelte';
-import type { IXQHost } from '../../types';
+import type { IListHost } from '../../types';
 
 const BoardModule = {
-  init(host: IXQHost) {
+  init(host: IListHost) {
     const eventBus = host.eventBus;
 
-    eventBus.on('load', () => {
+    eventBus.on('creatUI', () => {
       host.modified = false;
       const Container = host.containerEl.createEl('div');
       host.Chess = mount(Chess, {
@@ -72,4 +72,4 @@ const BoardModule = {
   },
 };
 
-registerXQModule('board', BoardModule);
+registerListModule('board', BoardModule);

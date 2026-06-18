@@ -1,10 +1,10 @@
 import '../core/event-bus';
-import '../modules/Source';
-import '../modules/List/ChessBoard';
+import '../modules/Source/Source';
 import '../modules/BoardClick';
+import '../modules/List/ChessBoard';
 import '../modules/List/History';
 import '../modules/List/Actions';
-import '../modules/List/Speaker';
+import '../modules/List/Speak';
 
 import { type MarkdownPostProcessorContext, MarkdownRenderChild } from 'obsidian';
 
@@ -30,6 +30,7 @@ export class ChessRenderChild extends MarkdownRenderChild {
   onload(): void {
     this.plugin.instances.add(this);
     this.eventBus.emit('load', 'xq');
+    this.eventBus.emit('creatUI');
   }
 
   refresh(): void {

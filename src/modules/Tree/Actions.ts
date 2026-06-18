@@ -8,6 +8,34 @@ const ActionsModule = {
   init(host: Record<string, any>) {
     const eventBus = host.eventBus;
 
+    host.updateMainPath = function updateMainPath() {
+      const { currentNode, nodeMap } = host;
+      if (!currentNode) {
+        host.currentPath = [];
+        return;
+      }
+
+      // 先向上遍历收集祖先节点（包括当前节点）
+      const ancestors: string[] = [];
+      let node = currentNode;
+      while (node) {
+        ancestors.push(node.id);
+        node = node.parentID ? nodeMap.get(node.parentID) : null;
+      }
+      ancestors.reverse(); // 反转为根到当前节点顺序
+
+      // 向下遍历主线子节点（跳过当前节点）
+      const descendants: string[] = [];
+      node = currentNode.children?.[0] || null;
+      while (node) {
+        descendants.push(node.id);
+        node = node.children?.[0] || null;
+      }
+
+      // 合并路径
+      host.currentPath = [...ancestors, ...descendants];
+    };
+
     eventBus.on('runmove', (move: Move) => {
       const { from, to } = move;
       const currentNode = host.currentNode;
@@ -149,22 +177,18 @@ const ActionsModule = {
           break;
         }
         case 'reset': {
-          host.data = host.source;
-          eventBus.emit('setViewData');
-          eventBus.emit('updateUI');
+          eventBus.emit('reset');
           break;
         }
         case 'save': {
-          const pgn = stringifyPGN(host.root);
-          const content = [host.tags?.trim(), pgn].filter(Boolean).join('\n');
-          host.data = content;
-          host.saveFile();
           eventBus.emit('save');
           break;
         }
       }
       eventBus.emit('updateUI');
     });
+
+    host.stringifyPGN = stringifyPGN;
   },
 };
 

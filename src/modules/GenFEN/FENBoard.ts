@@ -7,7 +7,7 @@ const BoardModule = {
   init(host: Record<string, any>) {
     const eventBus = host.eventBus;
 
-    eventBus.on('load', () => {
+    eventBus.on('creatUI', () => {
       const Container = host.containerEl.createEl('div');
       host.Chess = mount(GenFEN, {
         target: Container,

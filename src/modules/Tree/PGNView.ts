@@ -1,16 +1,30 @@
 import { mount, unmount } from 'svelte';
 
-import { registerPGNViewModule, registerTreeModule } from '../../core/module-system';
-import TreeView from '../../lib/Tree/Chess.svelte';
+import { registerPGNViewModule } from '../../core/module-system';
+import Chess from '../../lib/Tree/Chess.svelte';
+import { PGNParser } from '../Source/parser';
 
 const TreeViewModule = {
   init(host: Record<string, any>) {
     const eventBus = host.eventBus;
 
+    eventBus.on('setViewData', () => {
+      host.markedPos = null;
+      const parser = new PGNParser(host.data);
+      host.parser = parser;
+      host.haveFEN = parser.haveFEN;
+      host.root = parser.getRoot();
+      host.nodeMap = parser.getMap();
+      host.tags = parser.getTags();
+      host.currentNode = host.nodeMap.get('node-root');
+      host.currentTurn = 'red';
+      host.updateMainPath();
+    });
+
     eventBus.on('createUI', () => {
       const Container = host.contentEl;
       Container.classList.add('pgn-view');
-      host.Chess = mount(TreeView, {
+      host.Chess = mount(Chess, {
         target: Container,
         props: {
           nodeMap: host.nodeMap,
@@ -47,6 +61,18 @@ const TreeViewModule = {
       }
     });
 
+    eventBus.on('reset', () => {
+      eventBus.emit('setViewData');
+      eventBus.emit('updateUI');
+    });
+
+    eventBus.on('save', () => {
+      const pgn = host.stringifyPGN(host.root);
+      const content = [host.tags?.trim(), pgn].filter(Boolean).join('\n');
+      host.data = content;
+      host.saveFile();
+    });
+
     eventBus.on('unload', () => {
       unmount(host.Chess);
     });
@@ -54,4 +80,3 @@ const TreeViewModule = {
 };
 
 registerPGNViewModule('Tree', TreeViewModule);
-registerTreeModule('Tree', TreeViewModule);

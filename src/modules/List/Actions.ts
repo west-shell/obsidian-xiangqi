@@ -1,13 +1,13 @@
 import { MarkdownView, Notice } from 'obsidian';
 
 import { Chess, type Move } from '../../chess';
-import { registerXQModule } from '../../core/module-system';
+import { registerListModule } from '../../core/module-system';
 import { t } from '../../i18n';
-import type { ITurn, IXQHost } from '../../types';
+import type { IListHost, ITurn } from '../../types';
 import { ConfirmModal } from '../../utils/confirmModal';
 
 const ActionsModule = {
-  init(host: IXQHost) {
+  init(host: IListHost) {
     const eventBus = host.eventBus;
 
     eventBus.on('runmove', (move: Move) => {
@@ -32,7 +32,7 @@ const ActionsModule = {
     });
 
     eventBus.on('toStart', () => {
-      while (host.currentStep != 0) {
+      while (host.currentStep !== 0) {
         undo(host);
       }
       eventBus.emit('updateUI', 'toStart');
@@ -49,7 +49,7 @@ const ActionsModule = {
 
     eventBus.on('reset', () => {
       if (host.modified) {
-        while (host.currentStep != 0) {
+        while (host.currentStep !== 0) {
           undo(host);
         }
         host.modified = false;
@@ -66,31 +66,31 @@ const ActionsModule = {
       }
     });
 
-    eventBus.on('save', () => {
-      void (async () => {
-        let message = '';
-        if (host.history.length === 0 && host.PGN.length === 0) {
-          new Notice(t('notice.saveEmpty'));
-          return;
-        }
-        if (host.history.length === 0 && host.PGN.length > 0) message = t('confirm.saveClear');
-        if (host.history.length > 0 && host.PGN.length === 0) message = t('confirm.saveNew');
-        if (host.history.length > 0 && host.PGN.length > 0) message = t('confirm.saveOverwrite');
-        const modal = new ConfirmModal(
-          host.plugin.app,
-          t('confirm.saveTitle'),
-          message,
-          t('confirm.saveBtn'),
-          t('confirm.cancel'),
-        );
-        modal.open();
-        const userConfirmed = await modal.promise;
-        if (userConfirmed) {
-          await savePGN(host);
-          new Notice(t('notice.saveSuccess'));
-        }
-        eventBus.emit('updateUI', 'save');
-      })();
+    eventBus.on('save', async () => {
+      let message = '';
+      if (host.history.length === 0 && host.PGN.length === 0) {
+        new Notice(t('notice.saveEmpty'));
+        return;
+      }
+      if (host.history.length === 0 && host.PGN.length > 0) message = t('confirm.saveClear');
+      if (host.history.length > 0 && host.PGN.length === 0) message = t('confirm.saveNew');
+      if (host.history.length > 0 && host.PGN.length > 0) message = t('confirm.saveOverwrite');
+      const modal = new ConfirmModal(
+        host.plugin.app,
+        t('confirm.saveTitle'),
+        message,
+        t('confirm.saveBtn'),
+        t('confirm.cancel'),
+      );
+
+      modal.open();
+      const userConfirmed = await modal.promise;
+
+      if (userConfirmed) {
+        await savePGN(host);
+        new Notice(t('notice.saveSuccess'));
+      }
+      eventBus.emit('updateUI', 'save');
     });
 
     eventBus.on('clickstep', step => {
@@ -109,9 +109,9 @@ const ActionsModule = {
   },
 };
 
-registerXQModule('actions', ActionsModule);
+registerListModule('actions', ActionsModule);
 
-function undo(host: IXQHost) {
+function undo(host: IListHost) {
   if (host.currentStep > 0) {
     host.currentStep--;
     host.fen = replayFen(host);
@@ -119,7 +119,7 @@ function undo(host: IXQHost) {
   }
 }
 
-function redo(host: IXQHost) {
+function redo(host: IListHost) {
   if (!host.modified && host.PGN.length > 0) {
     const nextMove = host.PGN[host.currentStep];
     if (!nextMove) return;
@@ -137,8 +137,8 @@ function redo(host: IXQHost) {
   }
 }
 
-function replayFen(host: IXQHost): string {
-  const chess = new Chess(host.fenRoot);
+function replayFen(host: IListHost): string {
+  const chess = new Chess(host.initFEN);
   const currentMoves = host.modified ? host.history : host.PGN;
   for (let i = 0; i < host.currentStep; i++) {
     const move = currentMoves[i];
@@ -158,7 +158,7 @@ function getTurnFromFen(fen: string): ITurn {
   return fen.split(' ')[1] === 'b' ? 'black' : 'red';
 }
 
-async function savePGN(host: IXQHost) {
+async function savePGN(host: IListHost) {
   const view = host.plugin.app.workspace.getActiveViewOfType(MarkdownView);
   if (!view) return;
   const file = view.file;

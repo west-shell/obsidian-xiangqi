@@ -1,8 +1,9 @@
 import { registerPGNViewModule, registerTreeModule } from '../../core/module-system';
+import type { ITreeHost } from '../../types';
 import { speak } from '../speak';
 
 const SpeakerModule = {
-  init(host: Record<string, any>) {
+  init(host: ITreeHost) {
     const eventBus = host.eventBus;
     let lastSpokenNodeId: string | null = null;
 

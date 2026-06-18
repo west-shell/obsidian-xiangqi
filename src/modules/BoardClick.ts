@@ -1,14 +1,14 @@
-import { Chess } from '../chess';
-import { registerPGNViewModule, registerTreeModule, registerXQModule } from '../core/module-system';
-import type { IXQHost } from '../types';
+import { Chess, type Square } from '../chess';
+import { registerListModule, registerPGNViewModule, registerTreeModule } from '../core/module-system';
+import type { IGenFENHost, IListHost, ITreeHost } from '../types';
 
 const BoardClickModule = {
-  init(host: IXQHost) {
+  init(host: IListHost | ITreeHost | IGenFENHost) {
     const eventBus = host.eventBus;
 
     eventBus.on('click', (clickedKey: string) => {
       if (!host.markedPos) {
-        host.markedPos = clickedKey;
+        host.markedPos = clickedKey as Square;
         eventBus.emit('updateUI');
         return;
       }
@@ -20,7 +20,7 @@ const BoardClickModule = {
           host.markedPos = null;
           eventBus.emit('runmove', move);
         } else {
-          host.markedPos = clickedKey;
+          host.markedPos = clickedKey as Square;
           eventBus.emit('updateUI');
         }
       } catch {
@@ -31,6 +31,6 @@ const BoardClickModule = {
   },
 };
 
-registerXQModule('BoardClick', BoardClickModule);
+registerListModule('BoardClick', BoardClickModule);
 registerPGNViewModule('BoardClick', BoardClickModule);
 registerTreeModule('BoardClick', BoardClickModule);

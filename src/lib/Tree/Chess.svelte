@@ -59,7 +59,7 @@
   );
   let userShapes = $derived(loadShapes(currentNode));
 
-  let treeViewEl: HTMLDivElement;
+  let treeViewEl: HTMLDivElement|null=null;
   let adaptiveBoardWidth = $state(300);
 
   $effect(() => {

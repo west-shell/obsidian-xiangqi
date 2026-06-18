@@ -11,7 +11,7 @@ import { TreeRenderChild } from './renderChild/TreeRenderChild';
 import { ChessSettingTab, DEFAULT_SETTINGS } from './settings';
 import { applyThemes } from './themes';
 import type { ISettings } from './types';
-import { PGNView } from './view/pgn';
+import { PGNView } from './view/PGNView';
 
 export default class ChessPlugin extends Plugin {
   settings: ISettings = DEFAULT_SETTINGS;

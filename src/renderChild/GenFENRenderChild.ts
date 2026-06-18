@@ -1,5 +1,5 @@
 import '../core/event-bus';
-import '../modules/Source';
+import '../modules/Source/Source';
 import '../modules/GenFEN/FENBoard';
 import '../modules/GenFEN/BoardClick';
 import '../modules/GenFEN/Actions';
@@ -29,6 +29,7 @@ export class GenFENRenderChild extends MarkdownRenderChild {
   onload(): void {
     this.plugin.instances.add(this);
     this.eventBus.emit('load', 'fen');
+    this.eventBus.emit('creatUI');
   }
 
   refresh(): void {

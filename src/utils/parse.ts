@@ -5,7 +5,7 @@ import { DEFAULT_FEN } from '../types';
 export function parseSource(source: string): {
   haveFEN: boolean;
   fen: string;
-  fenRoot: string;
+  initFEN: string;
   PGN: Move[];
   firstTurn: ITurn;
   options: IOptions;
@@ -48,7 +48,7 @@ export function parseSource(source: string): {
   return {
     haveFEN,
     fen: chess.fen(),
-    fenRoot: fen,
+    initFEN: fen,
     PGN,
     firstTurn,
     options,
@@ -58,7 +58,7 @@ export function parseSource(source: string): {
 function parsePikafishUrl(source: string): {
   haveFEN: boolean;
   fen: string;
-  fenRoot: string;
+  initFEN: string;
   PGN: Move[];
   firstTurn: ITurn;
 } | null {
@@ -105,7 +105,7 @@ function parsePikafishUrl(source: string): {
   return {
     haveFEN: true,
     fen: chess.fen(),
-    fenRoot: fenPart,
+    initFEN: fenPart,
     PGN,
     firstTurn,
   };
