@@ -1,4 +1,11 @@
 {
+  "theme.auto": "Auto",
+  "theme.light": "Classic Light",
+  "theme.dark": "Classic Dark",
+  "theme.parchment": "Parchment",
+  "theme.green": "Green Felt",
+  "theme.wood": "Wood",
+  "theme.bamboo": "Bamboo",
   "board.title": "Board",
   "board.theme": "Theme",
   "board.theme.desc": "Board color and texture",

@@ -3,6 +3,7 @@ import type { MarkdownPostProcessorContext, MarkdownSectionInformation } from 'o
 import type { Move as XQMove } from './chess';
 import type { EventBus } from './core/event-bus';
 import type ChessPlugin from './main';
+import type { ThemeName } from './themes';
 
 export const DEFAULT_FEN = 'rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w';
 
@@ -24,9 +25,9 @@ export const PIECE_CHARS = {
 } as const;
 
 export interface ISettings {
-  lang: 'auto' | 'en' | 'zh-cn';
+  lang: 'auto' | 'en' | 'zh';
   position: 'bottom' | 'right';
-  theme: 'wood' | 'parchment' | 'green' | 'marble' | 'light' | 'dark' | 'bamboo';
+  theme: ThemeName;
   cellSize: number;
   fontSize: number;
   showCoordinateLabels: boolean;

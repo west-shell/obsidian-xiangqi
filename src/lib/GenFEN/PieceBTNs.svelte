@@ -1,7 +1,6 @@
 <script lang="ts">
   import { type ISettings, PIECE_CHARS } from "../../types";
   import type { EventBus } from "../../core/event-bus";
-  import { setIcon } from "obsidian";
 
   interface Props {
     settings: ISettings;

@@ -4,7 +4,7 @@ import { type App, PluginSettingTab, Setting } from 'obsidian';
 
 import { initI18n, t } from './i18n';
 import type ChessPlugin from './main';
-import { THEME_OPTIONS } from './themes';
+import { THEME_KEYS } from './themes';
 import type { ISettings } from './types';
 
 export const DEFAULT_SETTINGS: ISettings = {
@@ -84,7 +84,7 @@ export class ChessSettingTab extends PluginSettingTab {
 
     new Setting(containerEl).setName('Language / 语言').addDropdown(d =>
       d
-        .addOptions({ auto: 'Auto/跟随软件', en: 'English', 'zh-cn': '中文' })
+        .addOptions({ auto: 'Auto/跟随软件', en: 'English', zh: '中文' })
         .setValue(settings.lang)
         .onChange(v => {
           settings.lang = v as ISettings['lang'];
@@ -100,7 +100,7 @@ export class ChessSettingTab extends PluginSettingTab {
       .setName(t('board.theme'))
       .setDesc(t('board.theme.desc'))
       .addDropdown(dropdown => {
-        dropdown.addOptions(THEME_OPTIONS);
+        dropdown.addOptions(Object.fromEntries(THEME_KEYS.map(k => [k, t(`theme.${k}`)])));
         dropdown.setValue(settings.theme).onChange(theme => {
           settings.theme = theme as ISettings['theme'];
           this.plugin.refresh();

@@ -1,4 +1,11 @@
 {
+  "theme.auto": "自动",
+  "theme.light": "经典浅色",
+  "theme.dark": "经典深色",
+  "theme.parchment": "羊皮纸",
+  "theme.green": "绿绒布",
+  "theme.wood": "木纹",
+  "theme.bamboo": "竹韵",
   "board.title": "棋盘外观",
   "board.theme": "主题",
   "board.theme.desc": "切换棋盘配色与纹理",

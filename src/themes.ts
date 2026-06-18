@@ -3,7 +3,6 @@ import type { App } from 'obsidian';
 import type { ISettings } from './types';
 
 interface ThemeDef {
-  name: string;
   /** 底层背景：CSS颜色值 或 图片路径（相对vault根目录） */
   bg: string;
   /** 纹理叠加，若无则为 "none" */
@@ -19,7 +18,6 @@ const tree_red = '#861818';
 const tree_black = '#0A1C3A';
 const themes: Record<string, ThemeDef> = {
   auto: {
-    name: '自动',
     bg: 'var(--background-primary-alt)',
     texture: 'none',
     grid: 'dark',
@@ -27,7 +25,6 @@ const themes: Record<string, ThemeDef> = {
     black: 'var(--xq-auto-black)',
   },
   light: {
-    name: '经典浅色',
     bg: '#ebe0d5',
     texture: 'none',
     grid: 'dark',
@@ -35,7 +32,6 @@ const themes: Record<string, ThemeDef> = {
     black: tree_black,
   },
   dark: {
-    name: '经典深色',
     bg: '#2d2d2d',
     texture: 'none',
     grid: 'light',
@@ -43,7 +39,6 @@ const themes: Record<string, ThemeDef> = {
     black: tree_black,
   },
   parchment: {
-    name: '羊皮纸',
     bg: '#d0b899b4',
     texture: 'radial-gradient(ellipse at 40% 30%, rgba(180,170,150,0.3) 0%, transparent 70%)',
     grid: 'dark',
@@ -51,7 +46,6 @@ const themes: Record<string, ThemeDef> = {
     black: tree_black,
   },
   green: {
-    name: '绿绒布',
     bg: '#2d5a27',
     texture:
       'repeating-linear-gradient(0deg, rgba(255,255,255,0.04) 0px, rgba(255,255,255,0.04) 1px, transparent 1px, transparent 3px)',
@@ -60,7 +54,6 @@ const themes: Record<string, ThemeDef> = {
     black: tree_black,
   },
   wood: {
-    name: '木纹',
     bg: '.obsidian/plugins/xiangqi/assets/wood.png',
     texture: 'none',
     grid: 'light',
@@ -68,7 +61,6 @@ const themes: Record<string, ThemeDef> = {
     black: tree_black,
   },
   bamboo: {
-    name: '竹韵',
     bg: '.obsidian/plugins/xiangqi/assets/bamboo.jpg',
     texture: 'none',
     grid: 'none',
@@ -77,9 +69,8 @@ const themes: Record<string, ThemeDef> = {
   },
 };
 
-export const THEME_OPTIONS = Object.fromEntries(
-  Object.entries(themes).map(([k, v]) => [k, v.name]),
-) as Record<string, string>;
+export type ThemeName = keyof typeof themes;
+export const THEME_KEYS = Object.keys(themes);
 
 function isImagePath(s: string): boolean {
   return /\.(png|jpe?g|gif|webp|svg|bmp)$/i.test(s);
