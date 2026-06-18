@@ -1,6 +1,6 @@
-import '../assets/base.css';
-import '../assets/board.css';
-import '../assets/pieces.css';
+import './style/base.css';
+import './style/board.css';
+import './style/pieces.css';
 
 import { addIcon, MarkdownView, Plugin, TFile } from 'obsidian';
 

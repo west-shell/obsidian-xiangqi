@@ -1,4 +1,4 @@
-import './settings.css';
+import './style/settings.css';
 
 import { type App, PluginSettingTab, Setting } from 'obsidian';
 
