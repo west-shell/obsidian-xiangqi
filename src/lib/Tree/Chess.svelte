@@ -126,7 +126,12 @@
   :global(.tree-codeblock) .tree-view {
     height: var(--tree-hight, 300px) !important;
   }
-
+  :global(.view-content.pgn-view) {
+    overflow: hidden !important;
+    margin: 0 !important;
+    padding-top: var(--board-margin-top, 0px) !important;
+    padding-bottom: var(--board-margin-bottom, 0px) !important;
+  }
   .tree-view {
     display: flex;
     justify-content: center;
