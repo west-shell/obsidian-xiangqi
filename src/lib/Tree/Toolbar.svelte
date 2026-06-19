@@ -43,8 +43,8 @@
     { title: t("annotation.br", _lv), icon: "star", symbol: "!", event: "annotation" },
   ]);
 
-  function emitEvent(name: string, payload: unknown = null) {
-    eventBus.emit("btn-click", { name, payload });
+  function emitEvent(name: string, data: unknown = null) {
+    eventBus.emit("btn-click", { name, data});
   }
 
   function useSetIcon(el: HTMLElement, icon: string) {

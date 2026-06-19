@@ -9,13 +9,13 @@ const ActionsModule = {
   init(host: IGenFENHost) {
     const eventBus = host.eventBus;
 
-    eventBus.on('clickPieceBTN', (piece: string) => {
+    eventBus.on<string>('clickPieceBTN', piece => {
       if (!piece) return;
       host.selectedPiece = piece;
       host.eventBus.emit('updateUI');
     });
 
-    eventBus.on('btn-click', action => {
+    eventBus.on<string>('btn-click', action => {
       if (!action) return;
       switch (action) {
         case 'turn': {

@@ -6,7 +6,8 @@ const BoardClickModule = {
   init(host: IGenFENHost) {
     const eventBus = host.eventBus;
 
-    eventBus.on('click', (clickedKey: Square) => {
+    eventBus.on<Square>('click', clickedKey => {
+      if (!clickedKey) return;
       const chess = new Chess(host.fen, { skipValidation: true });
 
       if (!host.markedPos && !host.selectedPiece) {
@@ -43,7 +44,7 @@ const BoardClickModule = {
       }
     });
 
-    eventBus.on('fen-updated', (fen: string) => {
+    eventBus.on<string>('fen-updated', fen => {
       if (!fen) return;
       host.fen = fen;
       host.markedPos = null;

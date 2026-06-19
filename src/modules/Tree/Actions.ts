@@ -40,7 +40,9 @@ const ActionsModule = {
       // 合并路径
       host.currentPath = [...ancestors, ...descendants];
     });
-    eventBus.on('runmove', (move: Move) => {
+
+    eventBus.on<Move>('runmove', move => {
+      if (!move) return;
       const { from, to } = move;
       const currentNode = host.currentNode;
       for (let node of currentNode.children) {
@@ -71,17 +73,18 @@ const ActionsModule = {
       eventBus.emit('modified', null);
     });
 
-    eventBus.on('node-click', (id: string) => {
+    eventBus.on<string>('node-click', id => {
+      if (!id) return;
       host.markedPos = null;
       host.currentNode = host.nodeMap.get(id)!;
       host.eventBus.emit('updateMainPath');
       host.eventBus.emit('updateUI');
     });
 
-    eventBus.on('btn-click', async (payload: { name: string; payload: unknown }) => {
+    eventBus.on<{ name: string; data: string }>('btn-click', async payload => {
+      if (!payload) return;
       host.markedPos = null;
-      const { name } = payload;
-      const data = payload.payload as string;
+      const { name, data } = payload;
       switch (name) {
         case 'annotation': {
           if (!host.currentNode) break;

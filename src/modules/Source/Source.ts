@@ -7,7 +7,7 @@ import { PGNParser } from './parser';
 const SourceModule = {
   init(host: IGenFENHost) {
     const eventBus = host.eventBus;
-    eventBus.on('load', (renderChild: string) => {
+    eventBus.on<string>('load', renderChild => {
       const { haveFEN, fen, initFEN, PGN, firstTurn, options } = parseSource(host.source);
       switch (renderChild) {
         case 'tree': {

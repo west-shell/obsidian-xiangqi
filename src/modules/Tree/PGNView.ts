@@ -54,10 +54,10 @@ const TreeViewModule = {
         case 'never':
           break;
         case 'always':
-          eventBus.emit('btn-click', { name: 'toEnd' });
+          eventBus.emit('btn-click', 'toEnd');
           break;
         case 'auto':
-          if (!host.haveFEN) eventBus.emit('btn-click', { name: 'toEnd' });
+          if (!host.haveFEN) eventBus.emit('btn-click', 'toEnd');
           break;
       }
     });

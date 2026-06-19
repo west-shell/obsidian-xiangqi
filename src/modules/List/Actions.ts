@@ -10,7 +10,7 @@ const ActionsModule = {
   init(host: IListHost) {
     const eventBus = host.eventBus;
 
-    eventBus.on('runmove', (move: Move) => {
+    eventBus.on<Move>('runmove', move => {
       if (!move) return;
       if (!host.modified) host.modifiedStep = host.currentStep;
       host.modified = true;
@@ -44,7 +44,7 @@ const ActionsModule = {
       for (let i = 0; i < dif; i++) {
         redo(host);
       }
-      eventBus.emit('updateUI', 'toEnd');
+      eventBus.emit('updateUI');
     });
 
     eventBus.on('reset', () => {
@@ -60,7 +60,7 @@ const ActionsModule = {
           }
         }
         host.modifiedStep = null;
-        eventBus.emit('updateUI', 'reset');
+        eventBus.emit('updateUI');
       } else {
         eventBus.emit('toStart');
       }
@@ -93,7 +93,7 @@ const ActionsModule = {
       eventBus.emit('updateUI', 'save');
     });
 
-    eventBus.on('clickstep', step => {
+    eventBus.on<number>('clickstep', step => {
       if (step === undefined || step === host.currentStep) return;
       host.currentStep = step;
       host.fen = replayFen(host);

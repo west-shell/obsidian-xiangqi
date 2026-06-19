@@ -90,8 +90,8 @@
   });
 
   $effect(() => {
-    eventBus.on("user-shapes-changed", (shapes: DrawShape[]) => {
-      saveShapes(currentNode, shapes);
+    eventBus.on<DrawShape[]>("user-shapes-changed", (shapes) => {
+      saveShapes(currentNode, shapes ?? []);
       eventBus.emit("modified", null);
       eventBus.emit("updateUI", null);
     });

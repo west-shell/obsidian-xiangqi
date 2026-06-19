@@ -6,21 +6,22 @@ const BoardClickModule = {
   init(host: IListHost | ITreeHost | IGenFENHost) {
     const eventBus = host.eventBus;
 
-    eventBus.on('click', (clickedKey: string) => {
+    eventBus.on<Square>('click', clickedKey => {
+      if (!clickedKey) return;
       if (!host.markedPos) {
-        host.markedPos = clickedKey as Square;
+        host.markedPos = clickedKey;
         eventBus.emit('updateUI');
         return;
       }
 
       try {
         const chess = new Chess(host.fen);
-        const move = chess.move({ from: host.markedPos as string, to: clickedKey });
+        const move = chess.move({ from: host.markedPos, to: clickedKey });
         if (move) {
           host.markedPos = null;
           eventBus.emit('runmove', move);
         } else {
-          host.markedPos = clickedKey as Square;
+          host.markedPos = clickedKey;
           eventBus.emit('updateUI');
         }
       } catch {
