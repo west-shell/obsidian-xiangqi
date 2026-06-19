@@ -6,7 +6,7 @@ import {
 } from './module-system';
 
 type EventType = string | symbol;
-type Handler = (payload?: any) => void;
+type Handler = (payload?: any) => void | Promise<void>;
 
 export class EventBus {
   private handlers = new Map<EventType, Set<Handler>>();
