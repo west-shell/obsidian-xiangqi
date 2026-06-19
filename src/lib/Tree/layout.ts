@@ -31,7 +31,8 @@ function insertBySide(
     nonMainAncestor = findFirstNonMainAncestorInArr(target, nodemap);
   }
 
-  const index = arr.indexOf(nonMainAncestor!);
+  if (nonMainAncestor === null) return;
+  const index = arr.indexOf(nonMainAncestor);
   if (index === -1) return;
 
   const insertNodes = Array.isArray(nodes) ? nodes : [nodes];

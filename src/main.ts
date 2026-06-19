@@ -97,7 +97,7 @@ export default class ChessPlugin extends Plugin {
 
     this.registerEvent(
       this.app.workspace.on('resize', () => {
-        (activeDocument ?? document).body.dispatchEvent(new CustomEvent('xq-layout-change'));
+        activeDocument.body.dispatchEvent(new CustomEvent('xq-layout-change'));
       }),
     );
 

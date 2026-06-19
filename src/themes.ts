@@ -84,18 +84,15 @@ export function applyThemes(app: App, settings: ISettings) {
     ? `url('${app.vault.adapter.getResourcePath(t.bg)}') center / cover no-repeat`
     : t.bg;
 
-  (activeDocument ?? document).body.style.setProperty('--xq-board-bg', bg);
-  (activeDocument ?? document).body.style.setProperty('--xq-board-texture', t.texture);
-  (activeDocument ?? document).body.style.setProperty(
+  activeDocument.body.style.setProperty('--xq-board-bg', bg);
+  activeDocument.body.style.setProperty('--xq-board-texture', t.texture);
+  activeDocument.body.style.setProperty(
     '--xq-grid',
     t.grid === 'dark' ? 'var(--xq-grid-dark)' : t.grid === 'light' ? 'var(--xq-grid-light)' : 'none',
   );
-  (activeDocument ?? document).body.style.setProperty(
-    '--xq-coords-display',
-    showCoordinateLabels ? 'flex' : 'none',
-  );
-  (activeDocument ?? document).body.style.setProperty('--xq-piece-red', t.red);
-  (activeDocument ?? document).body.style.setProperty('--xq-piece-black', t.black);
-  (activeDocument ?? document).body.style.setProperty('--board-margin-top', `${boardMarginTop}px`);
-  (activeDocument ?? document).body.style.setProperty('--board-margin-bottom', `${boardMarginBottom}px`);
+  activeDocument.body.style.setProperty('--xq-coords-display', showCoordinateLabels ? 'flex' : 'none');
+  activeDocument.body.style.setProperty('--xq-piece-red', t.red);
+  activeDocument.body.style.setProperty('--xq-piece-black', t.black);
+  activeDocument.body.style.setProperty('--board-margin-top', `${boardMarginTop}px`);
+  activeDocument.body.style.setProperty('--board-margin-bottom', `${boardMarginBottom}px`);
 }

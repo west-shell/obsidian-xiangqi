@@ -167,12 +167,12 @@
         api.state.dom.redraw();
       }
     };
-    (activeDocument ?? document).body.addEventListener("xq-layout-change", layoutChangeHandler);
+    activeDocument.body.addEventListener("xq-layout-change", layoutChangeHandler);
   });
 
   onDestroy(() => {
     if (layoutChangeHandler) {
-      (activeDocument ?? document).body.removeEventListener(
+      activeDocument.body.removeEventListener(
         "xq-layout-change",
         layoutChangeHandler,
       );
