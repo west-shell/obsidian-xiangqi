@@ -31,14 +31,14 @@ export class TreeRenderChild extends MarkdownRenderChild {
   onload(): void {
     this.plugin.instances.add(this);
     const h = this.settings.cellSize * 11;
-    document.body.style.setProperty('--tree-hight', `${h}px`);
+    activeDocument.body.style.setProperty('--tree-hight', `${h}px`);
     this.eventBus.emit('load', 'tree');
     this.eventBus.emit('creatUI');
   }
 
   refresh(): void {
     const h = this.settings.cellSize * 11;
-    document.body.style.setProperty('--tree-hight', `${h}px`);
+    activeDocument.body.style.setProperty('--tree-hight', `${h}px`);
     this.eventBus.emit('updateUI');
   }
 
