@@ -17,9 +17,9 @@ const BoardModule = {
         props: {
           nodeMap: host.nodeMap,
           settings: host.settings,
-          fen: host.currentNode!.fen,
+          fen: host.currentNode.fen,
           eventBus: host.eventBus,
-          currentNode: host.currentNode!,
+          currentNode: host.currentNode,
           currentPath: host.currentPath,
           options: host.options || {},
         },
@@ -44,7 +44,7 @@ const BoardModule = {
       host.Chess?.$set({
         settings: { ...host.settings },
         nodeMap: new Map(host.nodeMap),
-        fen: host.currentNode?.fen ?? '',
+        fen: host.currentNode.fen,
         currentNode: host.currentNode,
         currentPath: host.currentPath,
       });

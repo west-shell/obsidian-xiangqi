@@ -43,7 +43,7 @@ const ActionsModule = {
     eventBus.on('runmove', (move: Move) => {
       const { from, to } = move;
       const currentNode = host.currentNode;
-      for (let node of currentNode!.children) {
+      for (let node of currentNode.children) {
         if (node.move && node.move.from === from && node.move.to === to) {
           host.currentNode = node;
           eventBus.emit('updateMainPath');
@@ -63,7 +63,7 @@ const ActionsModule = {
         comments: [],
       };
       host.nodeMap.set(newNode.id, newNode);
-      host.currentNode!.children.push(newNode);
+      host.currentNode.children.push(newNode);
       host.currentNode = newNode;
       host.currentStep++;
       eventBus.emit('updateMainPath');
