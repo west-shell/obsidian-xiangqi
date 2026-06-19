@@ -54,14 +54,14 @@ const themes: Record<string, ThemeDef> = {
     black: tree_black,
   },
   wood: {
-    bg: '.obsidian/plugins/xiangqi/assets/wood.png',
+    bg: 'plugins/xiangqi/assets/wood.png',
     texture: 'none',
     grid: 'light',
     red: tree_red,
     black: tree_black,
   },
   bamboo: {
-    bg: '.obsidian/plugins/xiangqi/assets/bamboo.jpg',
+    bg: 'plugins/xiangqi/assets/bamboo.jpg',
     texture: 'none',
     grid: 'none',
     red: tree_red,
@@ -81,7 +81,7 @@ export function applyThemes(app: App, settings: ISettings) {
   const t = themes[theme] ?? themes.light;
 
   const bg = isImagePath(t.bg)
-    ? `url('${app.vault.adapter.getResourcePath(t.bg)}') center / cover no-repeat`
+    ? `url('${app.vault.adapter.getResourcePath(app.vault.configDir + '/' + t.bg)}') center / cover no-repeat`
     : t.bg;
 
   activeDocument.body.style.setProperty('--xq-board-bg', bg);

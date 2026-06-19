@@ -23,7 +23,7 @@ const SourceModule = {
           eventBus.emit('updateMainPath');
           break;
         }
-        case 'list':
+        case 'list': {
           const listHost = host as IListHost;
           listHost.haveFEN = haveFEN;
           listHost.fen = fen;
@@ -34,9 +34,12 @@ const SourceModule = {
           listHost.currentStep = 0;
           listHost.options = options;
           break;
-        case 'fen':
+        }
+
+        case 'fen': {
           host.fen = fen;
           break;
+        }
       }
     });
 
