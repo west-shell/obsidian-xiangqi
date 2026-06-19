@@ -15,6 +15,7 @@
 
   $effect(() => {
     eventBus.on("modified", () => { modified = true; });
+    eventBus.on('reset',() => { modified = false; }    )
     eventBus.on("setViewData", () => { modified = false; });
     eventBus.on("save", () => { modified = false; });
   });
