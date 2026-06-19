@@ -2,10 +2,11 @@ import { mount, unmount } from 'svelte';
 
 import { registerPGNViewModule } from '../../core/module-system';
 import Chess from '../../lib/Tree/Chess.svelte';
+import type { IPGNViewHost } from '../../types';
 import { PGNParser } from '../Source/parser';
 
 const TreeViewModule = {
-  init(host: Record<string, any>) {
+  init(host: IPGNViewHost) {
     const eventBus = host.eventBus;
 
     eventBus.on('setViewData', () => {
@@ -16,9 +17,9 @@ const TreeViewModule = {
       host.root = parser.getRoot();
       host.nodeMap = parser.getMap();
       host.tags = parser.getTags();
-      host.currentNode = host.nodeMap.get('node-root');
+      host.currentNode = host.nodeMap.get('node-root')!;
       host.currentTurn = 'red';
-      host.updateMainPath();
+      eventBus.emit('updateMainPath');
     });
 
     eventBus.on('createUI', () => {

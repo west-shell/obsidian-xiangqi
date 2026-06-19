@@ -9,6 +9,7 @@ export type * as cg from '@west-shell/xiangqiground/types';
 export {
   Chess,
   validateFen,
+  type Piece,
   type Color,
   type Move,
   type PieceSymbol,

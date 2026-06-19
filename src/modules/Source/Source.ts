@@ -1,36 +1,38 @@
 import { registerGenFENModule, registerListModule, registerTreeModule } from '../../core/module-system';
-import { DEFAULT_FEN } from '../../types';
+import { DEFAULT_FEN, type IGenFENHost, type IListHost, type ITreeHost } from '../../types';
 import { parseSource } from '../../utils/parse';
 
 import { PGNParser } from './parser';
 
 const SourceModule = {
-  init(host: Record<string, any>) {
+  init(host: IGenFENHost) {
     const eventBus = host.eventBus;
     eventBus.on('load', (renderChild: string) => {
-      if (renderChild === 'tree') {
-        const parser = new PGNParser(host.source);
-        host.parser = parser;
-        host.haveFEN = parser.haveFEN;
-        host.root = parser.getRoot();
-        host.nodeMap = parser.getMap();
-        host.tags = parser.getTags();
-        host.currentNode = host.nodeMap.get('node-root');
-        host.currentTurn = 'red';
-        host.updateMainPath();
-        return;
-      }
       const { haveFEN, fen, initFEN, PGN, firstTurn, options } = parseSource(host.source);
       switch (renderChild) {
-        case 'xq':
-          host.haveFEN = haveFEN;
-          host.fen = fen;
-          host.initFEN = initFEN;
-          host.PGN = PGN;
-          host.history = [...PGN];
-          host.currentTurn = firstTurn;
-          host.currentStep = 0;
-          host.options = options;
+        case 'tree': {
+          const treeHost = host as ITreeHost;
+          const parser = new PGNParser(treeHost.source);
+          treeHost.parser = parser;
+          treeHost.haveFEN = parser.haveFEN;
+          treeHost.root = parser.getRoot();
+          treeHost.nodeMap = parser.getMap();
+          treeHost.tags = parser.getTags();
+          treeHost.currentNode = treeHost.nodeMap.get('node-root')!;
+          treeHost.currentTurn = 'red';
+          eventBus.emit('updateMainPath');
+          break;
+        }
+        case 'list':
+          const listHost = host as IListHost;
+          listHost.haveFEN = haveFEN;
+          listHost.fen = fen;
+          listHost.initFEN = initFEN;
+          listHost.PGN = PGN;
+          listHost.history = [...PGN];
+          listHost.currentTurn = firstTurn;
+          listHost.currentStep = 0;
+          listHost.options = options;
           break;
         case 'fen':
           host.fen = fen;

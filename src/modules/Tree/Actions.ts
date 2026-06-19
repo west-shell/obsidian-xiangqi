@@ -1,14 +1,14 @@
 import { type Move } from '../../chess';
 import { registerPGNViewModule, registerTreeModule } from '../../core/module-system';
 import { t } from '../../i18n';
-import type { ChessNode } from '../../types';
+import type { ChessNode, ITreeHost } from '../../types';
 import { ConfirmModal } from '../../utils/confirmModal';
 
 const ActionsModule = {
-  init(host: Record<string, any>) {
+  init(host: ITreeHost) {
     const eventBus = host.eventBus;
 
-    host.updateMainPath = function updateMainPath() {
+    eventBus.on('updateMainPath', () => {
       const { currentNode, nodeMap } = host;
       if (!currentNode) {
         host.currentPath = [];
@@ -17,10 +17,15 @@ const ActionsModule = {
 
       // 先向上遍历收集祖先节点（包括当前节点）
       const ancestors: string[] = [];
-      let node = currentNode;
+      let node: ChessNode | null = currentNode; // 明确允许 null
       while (node) {
         ancestors.push(node.id);
-        node = node.parentID ? nodeMap.get(node.parentID) : null;
+        if (node.parentID) {
+          const parent = nodeMap.get(node.parentID);
+          node = parent ?? null;
+        } else {
+          node = null;
+        }
       }
       ancestors.reverse(); // 反转为根到当前节点顺序
 
@@ -34,15 +39,14 @@ const ActionsModule = {
 
       // 合并路径
       host.currentPath = [...ancestors, ...descendants];
-    };
-
+    });
     eventBus.on('runmove', (move: Move) => {
       const { from, to } = move;
       const currentNode = host.currentNode;
-      for (let node of currentNode.children) {
+      for (let node of currentNode!.children) {
         if (node.move && node.move.from === from && node.move.to === to) {
           host.currentNode = node;
-          host.updateMainPath();
+          eventBus.emit('updateMainPath');
           eventBus.emit('updateUI');
           return;
         }
@@ -59,18 +63,18 @@ const ActionsModule = {
         comments: [],
       };
       host.nodeMap.set(newNode.id, newNode);
-      host.currentNode.children.push(newNode);
+      host.currentNode!.children.push(newNode);
       host.currentNode = newNode;
       host.currentStep++;
-      host.updateMainPath();
+      eventBus.emit('updateMainPath');
       eventBus.emit('updateUI');
       eventBus.emit('modified', null);
     });
 
     eventBus.on('node-click', (id: string) => {
       host.markedPos = null;
-      host.currentNode = host.nodeMap.get(id);
-      host.updateMainPath();
+      host.currentNode = host.nodeMap.get(id)!;
+      host.eventBus.emit('updateMainPath');
       host.eventBus.emit('updateUI');
     });
 
@@ -115,8 +119,8 @@ const ActionsModule = {
             break;
           }
           const removeNode = host.currentNode;
-          const parentNode = host.nodeMap.get(removeNode.parentID as string);
-          host.currentNode = parentNode;
+          const parentNode = host.nodeMap.get(removeNode.parentID!);
+          host.currentNode = parentNode!;
           if (parentNode) {
             const idx = parentNode.children.indexOf(removeNode);
             if (idx !== -1) parentNode.children.splice(idx, 1);
@@ -126,7 +130,7 @@ const ActionsModule = {
             host.nodeMap.delete(node.id);
           }
           deleteSubtree(removeNode);
-          host.updateMainPath();
+          eventBus.emit('updateMainPath');
           eventBus.emit('node-click', host.currentNode.id);
           eventBus.emit('modified', null);
           break;
@@ -134,7 +138,7 @@ const ActionsModule = {
         case 'promote': {
           if (!host.currentNode.parentID || host.currentNode.id === 'node-root') break;
           let nodeToPromote = host.currentNode;
-          let parent = host.nodeMap.get(nodeToPromote.parentID as string);
+          let parent = host.nodeMap.get(nodeToPromote.parentID!);
           if (!parent) break;
           while (parent.children.length > 0 && parent.children[0].id === nodeToPromote.id) {
             if (!parent.parentID) break;
@@ -142,29 +146,30 @@ const ActionsModule = {
             parent = host.nodeMap.get(parent.parentID);
             if (!parent) break;
           }
-          for (const child of parent.children) child.mainID = null;
-          const idx = parent.children.findIndex((c: ChessNode) => c.id === nodeToPromote.id);
+          for (const child of parent!.children) child.mainID = null;
+          const idx = parent!.children.findIndex((c: ChessNode) => c.id === nodeToPromote.id);
           if (idx > 0) {
-            const item = parent.children[idx];
-            parent.children = [item, ...parent.children.filter((c: ChessNode) => c.id !== item.id)];
+            const item = parent!.children[idx];
+            parent!.children = [item, ...parent!.children.filter((c: ChessNode) => c.id !== item.id)];
             eventBus.emit('modified', null);
           }
-          host.updateMainPath();
+          eventBus.emit('updateMainPath');
           break;
         }
         case 'toStart':
-          host.currentNode = host.nodeMap.get(host.currentPath[0]);
+          host.currentNode = host.nodeMap.get(host.currentPath[0])!;
           break;
         case 'back':
-          if (host.currentNode.parentID) host.currentNode = host.nodeMap.get(host.currentNode.parentID);
+          if (host.currentNode.parentID) host.currentNode = host.nodeMap.get(host.currentNode.parentID)!;
           break;
         case 'next': {
           const ci = host.currentPath.indexOf(host.currentNode.id);
-          if (ci < host.currentPath.length - 1) host.currentNode = host.nodeMap.get(host.currentPath[ci + 1]);
+          if (ci < host.currentPath.length - 1)
+            host.currentNode = host.nodeMap.get(host.currentPath[ci + 1])!;
           break;
         }
         case 'toEnd':
-          host.currentNode = host.nodeMap.get(host.currentPath[host.currentPath.length - 1]);
+          host.currentNode = host.nodeMap.get(host.currentPath[host.currentPath.length - 1])!;
           break;
         case 'openPikafish': {
           const fen = host.root.fen;

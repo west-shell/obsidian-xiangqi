@@ -1,8 +1,9 @@
 import type { MarkdownPostProcessorContext } from 'obsidian';
 
-import type { Square, Move as XQMove } from './chess';
+import type { Move, Square } from './chess';
 import type { EventBus } from './core/event-bus';
 import type ChessPlugin from './main';
+import type { PGNParser } from './modules/Source/parser';
 import type { ThemeName } from './themes';
 
 export const DEFAULT_FEN = 'rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w';
@@ -62,7 +63,7 @@ export type ITurn = 'red' | 'black';
 export type ChessNode = {
   id: string;
   fen: string;
-  move: XQMove | null;
+  move: Move | null;
   side: string | null;
   step?: number;
   x?: number;
@@ -80,7 +81,7 @@ export interface IHost {
   eventBus: EventBus;
   settings: ISettings;
 }
-interface IBlockHost extends IHost {
+export interface IBlockHost extends IHost {
   containerEl: HTMLElement;
   ctx: MarkdownPostProcessorContext;
   source: string;
@@ -92,12 +93,12 @@ export interface IGenFENHost extends IBlockHost {
   markedPos: Square | null;
 }
 
-export interface IListHost extends IBlockHost {
+export interface IListHost extends IGenFENHost {
   fen: string;
   initFEN: string;
+  history: Move[];
+  PGN: Move[];
   currentTurn: ITurn;
-  history: XQMove[];
-  PGN: XQMove[];
   currentStep: number;
   modified: boolean;
   modifiedStep: number | null;
@@ -107,12 +108,15 @@ export interface IListHost extends IBlockHost {
   Chess: any;
 }
 
-export interface ITreeHost extends IBlockHost {
+export interface ITreeHost extends IGenFENHost {
+  parser: PGNParser;
   fen: string;
   tags: string;
   root: ChessNode;
   nodeMap: NodeMap;
-  currentNode: ChessNode | null;
+  currentStep: number;
+  currentTurn: ITurn;
+  currentNode: ChessNode;
   currentPath: string[];
   modified: boolean;
   markedPos: Square | null;
@@ -122,9 +126,8 @@ export interface ITreeHost extends IBlockHost {
   Chess: any;
 }
 
-export interface IPGNViewHost extends IHost {
-  nodeMap: NodeMap;
-  currentNode: ChessNode | null;
-  currentPath: string[];
-  settings: ISettings;
+export interface IPGNViewHost extends ITreeHost {
+  data: string;
+  contentEl: HTMLElement;
+  saveFile: () => void;
 }

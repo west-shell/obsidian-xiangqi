@@ -29,7 +29,7 @@ export class ChessRenderChild extends MarkdownRenderChild {
 
   onload(): void {
     this.plugin.instances.add(this);
-    this.eventBus.emit('load', 'xq');
+    this.eventBus.emit('load', 'list');
     this.eventBus.emit('creatUI');
   }
 

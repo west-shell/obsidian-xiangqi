@@ -1,4 +1,4 @@
-import { Chess, type PieceSymbol, type Square } from '../../chess';
+import { Chess, type Piece, type Square } from '../../chess';
 import { registerGenFENModule } from '../../core/module-system';
 
 const BoardClickModule = {
@@ -34,7 +34,7 @@ const BoardClickModule = {
         chess.remove(clickedKey);
         const color = host.selectedPiece === host.selectedPiece.toUpperCase() ? 'w' : 'b';
         const type = host.selectedPiece.toLowerCase();
-        chess.put({ type: type as PieceSymbol, color }, clickedKey);
+        chess.put({ color, type }, clickedKey);
         host.fen = chess.fen();
         host.selectedPiece = null;
         host.markedPos = null;
