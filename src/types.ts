@@ -77,20 +77,19 @@ export type ChessNode = {
 export type NodeMap = Map<string, ChessNode>;
 
 export interface IHost {
+  containerEl: HTMLElement;
+  ctx: MarkdownPostProcessorContext;
   plugin: ChessPlugin;
   eventBus: EventBus;
   settings: ISettings;
-}
-export interface IBlockHost extends IHost {
-  containerEl: HTMLElement;
-  ctx: MarkdownPostProcessorContext;
   source: string;
 }
 
-export interface IGenFENHost extends IBlockHost {
+export interface IGenFENHost extends IHost {
   fen: string;
   selectedPiece: string | null;
   markedPos: Square | null;
+  Chess: any;
 }
 
 export interface IListHost extends IGenFENHost {
@@ -102,10 +101,8 @@ export interface IListHost extends IGenFENHost {
   currentStep: number;
   modified: boolean;
   modifiedStep: number | null;
-  markedPos: Square | null;
   haveFEN: boolean;
   options: IOptions;
-  Chess: any;
 }
 
 export interface ITreeHost extends IGenFENHost {
@@ -119,11 +116,9 @@ export interface ITreeHost extends IGenFENHost {
   currentNode: ChessNode;
   currentPath: string[];
   modified: boolean;
-  markedPos: Square | null;
   haveFEN: boolean;
   options: IOptions;
   stringifyPGN: (root: ChessNode) => string;
-  Chess: any;
 }
 
 export interface IPGNViewHost extends ITreeHost {

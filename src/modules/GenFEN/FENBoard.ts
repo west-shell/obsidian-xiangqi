@@ -2,9 +2,10 @@ import { mount, unmount } from 'svelte';
 
 import { registerGenFENModule } from '../../core/module-system';
 import GenFEN from '../../lib/GenFEN/GenFEN.svelte';
+import type { IGenFENHost } from '../../types';
 
 const BoardModule = {
-  init(host: Record<string, any>) {
+  init(host: IGenFENHost) {
     const eventBus = host.eventBus;
 
     eventBus.on('creatUI', () => {
