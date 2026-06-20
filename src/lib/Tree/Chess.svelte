@@ -8,8 +8,18 @@
   import { onMount, tick } from "svelte";
 
   const SHAPES_RE = /^{([a-i][0-9])([a-i][0-9])?:([gryb])}$/;
-  const BRUSH_MAP: Record<string, string> = { green: "g", red: "r", blue: "b", yellow: "y" };
-  const BRUSH_REV: Record<string, string> = { g: "green", r: "red", b: "blue", y: "yellow" };
+  const BRUSH_MAP: Record<string, string> = {
+    green: "g",
+    red: "r",
+    blue: "b",
+    yellow: "y",
+  };
+  const BRUSH_REV: Record<string, string> = {
+    g: "green",
+    r: "red",
+    b: "blue",
+    y: "yellow",
+  };
 
   function loadShapes(node: ChessNode): DrawShape[] {
     if (!node.comments) return [];
@@ -18,7 +28,11 @@
       const m = c.match(SHAPES_RE);
       if (m) {
         const brush = BRUSH_REV[m[3]];
-        shapes.push({ orig: m[1] as cg.Key, dest: m[2] as cg.Key | undefined, brush });
+        shapes.push({
+          orig: m[1] as cg.Key,
+          dest: m[2] as cg.Key | undefined,
+          brush,
+        });
       }
     }
     return shapes;
@@ -27,9 +41,18 @@
   /** Convert DrawShape[] to comment strings and save to node */
   function saveShapes(node: ChessNode, shapes: DrawShape[]) {
     const shapeComments = shapes.map(
-      (s) => "{" + s.orig + (s.dest ?? "") + ":" + BRUSH_MAP[s.brush ?? "green"] + "}",
+      (s) =>
+        "{" +
+        s.orig +
+        (s.dest ?? "") +
+        ":" +
+        BRUSH_MAP[s.brush ?? "green"] +
+        "}",
     );
-    node.comments = [...(node.comments ?? []).filter((c) => !SHAPES_RE.test(c)), ...shapeComments];
+    node.comments = [
+      ...(node.comments ?? []).filter((c) => !SHAPES_RE.test(c)),
+      ...shapeComments,
+    ];
   }
   interface Props {
     settings: ISettings;
@@ -40,7 +63,8 @@
     currentPath: string[];
   }
 
-  let { settings, fen, eventBus, nodeMap, currentNode, currentPath }: Props = $props();
+  let { settings, fen, eventBus, nodeMap, currentNode, currentPath }: Props =
+    $props();
 
   let lastMove: [Square, Square] | null = $derived(
     currentNode.move ? [currentNode.move.from, currentNode.move.to] : null,
@@ -48,10 +72,13 @@
   let { position } = $derived(settings);
   let rotated = $state(false);
   let variations = $derived(
-    currentNode.children.map((child) => child.move).filter((m): m is Move => m != null) ?? [],
+    currentNode.children
+      .map((child) => child.move)
+      .filter((m): m is Move => m != null) ?? [],
   );
   let checkColor: "white" | "black" | null | undefined = $derived(
-    currentNode.move && (currentNode.move.isCheck || currentNode.move.isCheckmate)
+    currentNode.move &&
+      (currentNode.move.isCheck || currentNode.move.isCheckmate)
       ? currentNode.move.color === "w"
         ? "black"
         : "white"
@@ -59,7 +86,7 @@
   );
   let userShapes = $derived(loadShapes(currentNode));
 
-  let treeViewEl: HTMLDivElement|null=null;
+  let treeViewEl: HTMLDivElement | null = null;
   let adaptiveBoardWidth = $state(300);
 
   $effect(() => {
@@ -123,8 +150,11 @@
 </div>
 
 <style>
-  :global(.tree-codeblock) .tree-view {
+  :global(.tree-codeblock) .tree-view.right {
     height: var(--tree-hight, 300px) !important;
+  }
+  :global(.tree-codeblock) .tree-view.bottom {
+    height: calc(var(--tree-hight, 300px) * 2) !important;
   }
   :global(.view-content.pgn-view) {
     overflow: hidden !important;
@@ -135,11 +165,12 @@
   .tree-view {
     display: flex;
     justify-content: center;
+    margin: 0;
+    padding: 0;
   }
   .tree-view.right {
     flex-direction: row;
     height: 100%;
-    gap: 2px;
   }
   .tree-view.right :global(.tree-container) {
     flex: 1 1 auto;
@@ -151,7 +182,6 @@
     display: flex;
     align-items: center;
   }
-
   .tree-view.bottom {
     flex-direction: column;
     align-items: center;
