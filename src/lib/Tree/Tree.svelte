@@ -28,6 +28,7 @@
   let textareaEl: HTMLTextAreaElement | undefined = $state();
   let svgEl: SVGSVGElement | undefined = $state();
   let renderedNodes: ChessNode[] = $state([]);
+  let foldedNodes = $state(new Set<string>());
 
   // ---- D3 Zoom ----
   let zoomTransform = $state(d3.zoomIdentity);
@@ -135,7 +136,18 @@
 
   // ---- 布局计算 ----
   function updateTreeLayout() {
-    renderedNodes = calculateTreeLayout(nodeMap);
+    renderedNodes = calculateTreeLayout(nodeMap, foldedNodes);
+  }
+
+  function toggleFold(node: ChessNode) {
+    const cur = foldedNodes.has(node.id);
+    if (cur) {
+      foldedNodes.delete(node.id);
+    } else {
+      foldedNodes.add(node.id);
+    }
+    foldedNodes = new Set(foldedNodes);
+    updateTreeLayout();
   }
 
   function resetView() {
@@ -286,7 +298,8 @@
       <g transform={TRANSFORM_SAFE}>
         <!-- 连线 -->
         {#each renderedNodes as node}
-          {#each node.children as child}
+          {#each node.children as child, idx}
+            {#if !(foldedNodes.has(node.id) && idx > 0)}
             <path
               d={`
               M ${node.x! * spacingX} ${node.y! * spacingY}
@@ -304,6 +317,7 @@
                 : "grayscale(50%) brightness(0.75)"}
               fill="none"
             />
+            {/if}
           {/each}
         {/each}
 
@@ -367,6 +381,23 @@
                 stroke-linejoin="round"
               >
                 {@html iconPaths("message-square-text")}
+              </g>
+            {/if}
+
+            <!-- svelte-ignore a11y_click_events_have_key_events -->
+            <!-- svelte-ignore a11y_no_static_element_interactions -->
+            {#if node.children.length > 1}
+              {@const isLeft = (node.y ?? 0) % 2 === 0}
+              <g transform="translate({isLeft ? -nodeWidth / 2 : nodeWidth / 2}, 0)" style="cursor: pointer" onclick={(e) => { e.stopPropagation(); toggleFold(node); }}>
+                <polygon
+                  points={foldedNodes.has(node.id)
+                    ? (isLeft ? "0,-4 0,4 -3,3 -3,-3" : "0,-4 0,4 3,3 3,-3")
+                    : (isLeft ? "0,-4 0,4 -5,0" : "0,-4 0,4 5,0")}
+                  fill="var(--board-line)"
+                  stroke="var(--board-line)"
+                  stroke-width="1"
+                  stroke-linejoin="round"
+                />
               </g>
             {/if}
           </g>
