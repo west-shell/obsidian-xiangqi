@@ -397,6 +397,10 @@
                   stroke="var(--board-line)"
                   stroke-width="1"
                   stroke-linejoin="round"
+                  opacity={currentPath.includes(node.id) && node.children[0] && !currentPath.includes(node.children[0].id) ? 1.5 : 0.7}
+                  filter={currentPath.includes(node.id) && node.children[0] && !currentPath.includes(node.children[0].id)
+                    ? "brightness(1.5) saturate(1.4) drop-shadow(0 0 1px rgba(255, 255, 255, 0.6))"
+                    : "grayscale(50%) brightness(0.75)"}
                 />
               </g>
             {/if}
