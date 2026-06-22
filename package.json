@@ -15,7 +15,8 @@
     "build:min": "vite build --mode production-min && node -e \"require('fs').copyFileSync('manifest.json', 'build/manifest.json')\"",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "test": "vitest",
-    "test:watch": "vitest watch"
+    "test:watch": "vitest watch",
+    "release": "node scripts/release.mjs"
   },
   "keywords": [
     "obsidian",
