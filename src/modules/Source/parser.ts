@@ -48,7 +48,7 @@ export class PGNParser {
       } else if (this.match('iccs-move')) {
         this.processSAN(this.consume().value);
       } else if (this.match('wxf-move')) {
-        this.consume(); // skip WXF for now
+        this.processWXF(this.consume().value);
       } else if (this.match('left-paren')) {
         this.parseVariation();
       } else if (this.match('comment')) {
@@ -125,6 +125,11 @@ export class PGNParser {
     }
   }
 
+  processWXF(wxf: string) {
+    // xiangqi.js engine now supports Chinese WXF directly (e.g. '炮二平五' → Move)
+    this.processSAN(wxf);
+  }
+
   parseVariation() {
     this.consume(); // consume '('
 
@@ -149,7 +154,7 @@ export class PGNParser {
       if (this.match('iccs-move')) {
         this.processSAN(this.consume().value);
       } else if (this.match('wxf-move')) {
-        this.consume();
+        this.processWXF(this.consume().value);
       } else if (this.match('comment')) {
         this.parseComment();
       } else if (this.match('left-paren')) {
