@@ -7,7 +7,7 @@
   import type { cg, DrawShape, Move, Square } from "../../chess";
   import { onMount, tick } from "svelte";
 
-  const SHAPES_RE = /^{([a-i][0-9])([a-i][0-9])?:([gryb])}$/;
+  const SHAPES_RE = /^([a-i][0-9])([a-i][0-9])?:([gryb])$/;
   const BRUSH_MAP: Record<string, string> = {
     green: "g",
     red: "r",
@@ -42,12 +42,10 @@
   function saveShapes(node: ChessNode, shapes: DrawShape[]) {
     const shapeComments = shapes.map(
       (s) =>
-        "{" +
         s.orig +
         (s.dest ?? "") +
         ":" +
-        BRUSH_MAP[s.brush ?? "green"] +
-        "}",
+        BRUSH_MAP[s.brush ?? "green"],
     );
     node.comments = [
       ...(node.comments ?? []).filter((c) => !SHAPES_RE.test(c)),
