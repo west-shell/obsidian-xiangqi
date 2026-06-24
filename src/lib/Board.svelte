@@ -47,6 +47,7 @@
   let boardElement: HTMLDivElement;
   let api: Api | null = null;
   let layoutChangeHandler: (() => void) | null = null;
+  let resizeObserver: ResizeObserver | null = null;
 
   let turnColor: cg.Color = $derived(
     fen.split(" ")[1] === "b" ? "black" : "white",
@@ -157,23 +158,26 @@
     };
 
     // 等待容器布局完成，避免 bounds 为 0 时 renderCircle 产生 NaN
-    // 但加入超时 fallback：多个 list 同时渲染时可能 ResizeObserver 不触发
+    // 使用 requestAnimationFrame 轮询（比 ResizeObserver 更可靠，能检测隐藏元素布局）
+    // 阅读视图中多个代码块同时渲染时，部分棋盘可能尚未布局
     if (!boardElement.offsetWidth) {
-      const layoutTimeout = new Promise<void>((resolve) => {
-        setTimeout(() => resolve(), 100);
-      });
-      const layoutObserved = new Promise<void>((resolve) => {
-        const ro = new ResizeObserver(() => {
-          if (boardElement.offsetWidth) {
-            ro.disconnect();
-            resolve();
-          }
-        });
-        ro.observe(boardElement);
-      });
-      await Promise.race([layoutObserved, layoutTimeout]);
+      const pollStart = Date.now();
+      while (Date.now() - pollStart < 2000) {
+        await new Promise<void>(resolve => requestAnimationFrame(() => resolve()));
+        if (boardElement.offsetWidth > 0) break;
+      }
     }
     api = Chessground(boardElement, config);
+
+    // Chessground 创建后，监听尺寸变化并强制刷新
+    // 解决滚动到视口时 Chessground 内部 bounds 仍为 0 的问题
+    resizeObserver = new ResizeObserver(() => {
+      if (api) {
+        api.state.dom.bounds.clear();
+        api.state.dom.redraw();
+      }
+    });
+    resizeObserver.observe(boardElement);
 
     layoutChangeHandler = () => {
       if (api) {
@@ -187,6 +191,9 @@
   onDestroy(() => {
     if (layoutChangeHandler) {
       document.body.removeEventListener("xq-layout-change", layoutChangeHandler);
+    }
+    if (resizeObserver) {
+      resizeObserver.disconnect();
     }
     if (api) {
       api.destroy();
