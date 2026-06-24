@@ -14,10 +14,18 @@
   let modified = $state(false);
 
   $effect(() => {
-    eventBus.on("modified", () => { modified = true; });
-    eventBus.on('reset',() => { modified = false; }    )
-    eventBus.on("setViewData", () => { modified = false; });
-    eventBus.on("save", () => { modified = false; });
+    eventBus.on("modified", () => {
+      modified = true;
+    });
+    eventBus.on("setViewData", () => {
+      modified = false;
+    });
+    eventBus.on("load", () => {
+      modified = false;
+    });
+    eventBus.on("save", () => {
+      modified = false;
+    });
   });
 
   let saveBtnClass = $derived(modified ? "unsaved" : "saved");
