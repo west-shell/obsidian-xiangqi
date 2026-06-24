@@ -1,9 +1,9 @@
 import { Chess, type Square } from '../chess';
 import { registerListModule, registerPGNViewModule, registerTreeModule } from '../core/module-system';
-import type { IGenFENHost, IListHost, ITreeHost } from '../types';
+import type { IListHost, IPGNViewHost, ITreeHost } from '../types';
 
 const BoardClickModule = {
-  init(host: IListHost | ITreeHost | IGenFENHost) {
+  init(host: IListHost | ITreeHost | IPGNViewHost) {
     const eventBus = host.eventBus;
 
     eventBus.on<Square>('click', clickedKey => {
