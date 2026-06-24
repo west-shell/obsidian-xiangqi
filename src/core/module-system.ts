@@ -59,7 +59,7 @@ export function createXQModuleRegistry(host: object) {
 }
 
 export function destroyXQModuleRegistry(host: object) {
-  return ListModules.destroyRegistry(host);
+  ListModules.destroyRegistry(host);
 }
 
 // 实例化 GenFEN 模块系统
