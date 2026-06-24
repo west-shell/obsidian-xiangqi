@@ -31,17 +31,7 @@ const BoardModule = {
     });
 
     eventBus.on('ready', () => {
-      if (!host.settings.autoJump) return;
-      switch (host.settings.autoJump) {
-        case 'never':
-          break;
-        case 'always':
-          eventBus.emit('toEnd');
-          break;
-        case 'auto':
-          if (!host.haveFEN) eventBus.emit('toEnd');
-          break;
-      }
+      // autoJump 逻辑已移至 Source.ts 加载阶段，无需再跳转
     });
 
     eventBus.on('updateUI', () => {

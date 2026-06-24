@@ -1,7 +1,15 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
-  import { Chess, Chessground } from "../chess";
-  import type { Api, cg, Config, DrawShape, Move, Square } from "../chess";
+  import {
+    type Api,
+    type cg,
+    Chess,
+    Chessground,
+    type Config,
+    type DrawShape,
+    type Move,
+    type Square,
+  } from "../chess";
   import type { EventBus } from "../core/event-bus";
   import type { ISettings } from "../types";
 
@@ -10,9 +18,9 @@
     fen: string;
     lastMove?: [Square, Square] | null;
     selectedSquare?: Square | null;
-    checkColor?: cg.Color | null;
     eventBus: EventBus;
     rotated: boolean;
+    checkColor?: cg.Color | null;
     variations?: Move[];
     freeMode?: boolean;
     boardWidth?: number;
@@ -24,9 +32,9 @@
     fen,
     lastMove = null,
     selectedSquare = null,
-    checkColor = null,
     eventBus,
     rotated,
+    checkColor = null,
     variations = [],
     freeMode = false,
     boardWidth: boardWidthOverride,
@@ -39,9 +47,14 @@
   let boardElement: HTMLDivElement;
   let api: Api | null = null;
   let layoutChangeHandler: (() => void) | null = null;
-  let turnColor: cg.Color = $derived(fen.split(" ")[1] === "b" ? "black" : "white");
+
+  let turnColor: cg.Color = $derived(
+    fen.split(" ")[1] === "b" ? "black" : "white",
+  );
   let turnClass = $derived(
-    settings.showTurnBorder ? `turn-${fen.split(" ")[1] === "b" ? "black" : "red"}` : "",
+    settings.showTurnBorder
+      ? `turn-${fen.split(" ")[1] === "b" ? "black" : "white"}`
+      : "",
   );
   let _check: cg.Color | false = $derived(checkColor || false);
 
@@ -53,7 +66,9 @@
       for (const move of moves) {
         const orig = move.from;
         const dest = move.to;
-        if (!dests.has(orig)) dests.set(orig, []);
+        if (!dests.has(orig)) {
+          dests.set(orig, []);
+        }
         dests.get(orig)!.push(dest);
       }
       return dests;
@@ -70,7 +85,9 @@
     }));
   }
 
-  let shapes = $derived(settings.showNextMove ? computeVariationShapes(variations) : []);
+  let shapes = $derived(
+    settings.showNextMove ? computeVariationShapes(variations) : [],
+  );
   let dests = $derived(computeDests(fen));
 
   onMount(async () => {
@@ -106,7 +123,6 @@
       orientation: rotated ? "black" : "white",
       turnColor,
       coordinates: true,
-      draggable: { enabled: true },
       viewOnly: settings.viewOnly ?? false,
       movable: freeMode
         ? { free: true, color: "both" }
@@ -116,26 +132,22 @@
             showDests: true,
             dests,
           },
-      highlight: {
-        lastMove: settings.showLastMove,
-        check: true,
-      },
+      highlight: freeMode
+        ? { lastMove: false }
+        : {
+            lastMove: settings.showLastMove,
+          },
       drawable: {
         enabled: true,
         visible: true,
         shapes: userShapes,
         autoShapes: shapes,
-        eraseOnMovablePieceClick: false,
         onChange: (s) => {
           eventBus.emit("user-shapes-changed", s);
         },
       },
       events,
     };
-
-    if (freeMode) {
-      config.draggable = { deleteOnDropOff: true };
-    }
 
     config.check = _check;
 
@@ -167,15 +179,12 @@
         api.state.dom.redraw();
       }
     };
-    activeDocument.body.addEventListener("xq-layout-change", layoutChangeHandler);
+    document.body.addEventListener("xq-layout-change", layoutChangeHandler);
   });
 
   onDestroy(() => {
     if (layoutChangeHandler) {
-      activeDocument.body.removeEventListener(
-        "xq-layout-change",
-        layoutChangeHandler,
-      );
+      document.body.removeEventListener("xq-layout-change", layoutChangeHandler);
     }
     if (api) {
       api.destroy();
@@ -187,8 +196,14 @@
     if (freeMode) {
       api.set({ fen, turnColor, check: _check });
     } else {
-      api.set({ fen, turnColor, movable: { color: turnColor, dests }, check: _check });
+      api.set({
+        fen,
+        turnColor,
+        movable: { color: turnColor, dests },
+        check: _check,
+      });
     }
+    api.selectSquare(null);
   });
 
   $effect(() => {
@@ -198,7 +213,9 @@
 
   $effect(() => {
     if (!api) return;
-    api.set({ lastMove: lastMove ? lastMove : undefined });
+    api.set({
+      lastMove: lastMove ? lastMove : undefined,
+    });
   });
 
   $effect(() => {
@@ -222,29 +239,26 @@
 
   $effect(() => {
     if (!api) return;
-    api.set({
+    const cfg: Config = {
       coordinates: true,
       viewOnly: settings.viewOnly ?? false,
-      highlight: { lastMove: settings.showLastMove },
-    });
+    };
+    if (!freeMode) {
+      cfg.highlight = { lastMove: settings.showLastMove };
+    }
+    api.set(cfg);
   });
 </script>
 
-<div
-  class="board-area {turnClass}"
-  style="width:{boardWidth * 1.12}px ;height:{boardHeight * 1.12}px"
->
+<div class="board-area {turnClass}" style="width:{boardWidth * 1.12}px ;height:{boardHeight * 1.12}px">
   <div bind:this={boardElement} class="xq-wrap"></div>
 </div>
 
 <style>
   .board-area {
-    /* height: 100%; */
     display: flex;
     justify-content: center;
     align-items: center;
-    /* aspect-ratio: 450 / 500; */
-    /* background-color: yellow; */
     background:
       var(--xq-board-texture, none) center / cover no-repeat,
       var(--xq-board-bg, #d0b899);
@@ -252,13 +266,12 @@
   .xq-wrap {
     width: 97%;
     height: auto;
-    align-self: center;
     aspect-ratio: 450 / 500;
     --piece-red: var(--xq-piece-red, var(--color-red));
     --piece-black: var(--xq-piece-black, var(--color-blue));
   }
 
-  .board-area.turn-red {
+  .board-area.turn-white {
     box-shadow: 0 0 0.12em 0.15em var(--xq-piece-red, var(--color-red));
   }
 
