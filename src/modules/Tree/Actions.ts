@@ -81,10 +81,10 @@ const ActionsModule = {
       host.eventBus.emit('updateUI');
     });
 
-    eventBus.on<{ name: string; data: string }>('btn-click', async payload => {
+    eventBus.on<{ name: string; payload: string }>('btn-click', async payload => {
       if (!payload) return;
       host.markedPos = null;
-      const { name, data } = payload;
+      const { name, payload: data } = payload;
       switch (name) {
         case 'annotation': {
           if (!host.currentNode) break;

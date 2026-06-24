@@ -53,8 +53,8 @@
   ];
   let annotations = $derived(buildAnnotations(_lv));
 
-  function emitEvent(name: string, data: unknown = null) {
-    eventBus.emit("btn-click", { name, data});
+  function emitEvent(name: string, payload: unknown = null) {
+    eventBus.emit("btn-click", { name, payload });
   }
 
   function useSetIcon(el: HTMLElement, icon: string) {
