@@ -2,13 +2,13 @@
   import { tick } from "svelte";
   import { scrollToBTN } from "../../utils/utils";
   import type { EventBus } from "../../core/event-bus";
-  import type { Move } from "../../chess";
+  import type { ChessNode } from "../../types";
   import type { ISettings } from "../../types";
 
   interface Props {
     settings: ISettings;
     currentStep: number;
-    moves: Move[];
+    moves: ChessNode[];
     eventBus: EventBus;
   }
   let { settings, currentStep, moves, eventBus }: Props = $props();
@@ -61,7 +61,7 @@
             class:active={currentStep === i + 1}
             onclick={() => eventBus.emit("clickstep", i + 1)}
           >
-            {settings.showMovelistText ? move.zh : "红"}
+            {settings.showMovelistText ? move.move?.zh ?? "" : "红"}
           </span>
           {#if moves[i + 1]}
             <span
@@ -69,7 +69,7 @@
               class:active={currentStep === i + 2}
               onclick={() => eventBus.emit("clickstep", i + 2)}
             >
-              {settings.showMovelistText ? moves[i + 1].zh : "黑"}
+              {settings.showMovelistText ? moves[i + 1].move?.zh ?? "" : "黑"}
             </span>
           {/if}
         </li>

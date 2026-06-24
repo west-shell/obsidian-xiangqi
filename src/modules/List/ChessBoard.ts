@@ -31,15 +31,16 @@ const BoardModule = {
     });
 
     eventBus.on('ready', () => {
-      // autoJump 逻辑已移至 Source.ts 加载阶段，无需再跳转
+      // autoJump 逻辑已移至 Source.ts 加载阶段
     });
 
     eventBus.on('updateUI', () => {
       const currentMoves = host.modified ? host.history : host.PGN;
-      const lastMove = currentMoves[host.currentStep - 1] ?? null;
+      const lastNode = currentMoves[host.currentStep - 1] ?? null;
+      const lastMove = lastNode?.move ? ([lastNode.move.from, lastNode.move.to] as [Square, Square]) : null;
       const checkColor =
-        lastMove && (lastMove.isCheck || lastMove.isCheckmate)
-          ? lastMove.color === 'w'
+        lastNode?.move && (lastNode.move.isCheck || lastNode.move.isCheckmate)
+          ? lastNode.move.color === 'w'
             ? 'black'
             : 'white'
           : null;
@@ -51,7 +52,7 @@ const BoardModule = {
         currentStep: host.currentStep,
         modified: host.modified,
         history: [...host.history],
-        lastMove: lastMove ? ([lastMove.from, lastMove.to] as [Square, Square]) : null,
+        lastMove,
         options: { ...host.options },
       });
     });

@@ -2,9 +2,9 @@
   import Board from "../Board.svelte";
   import Toolbar from "./Toolbar.svelte";
   import List from "./List.svelte";
-  import type { IOptions, ISettings } from "../../types";
+  import type { ChessNode, IOptions, ISettings } from "../../types";
   import type { EventBus } from "../../core/event-bus";
-  import type { Move, Square } from "../../chess";
+  import type { Square } from "../../chess";
   import { onMount, tick } from "svelte";
 
   interface Props {
@@ -15,8 +15,8 @@
     currentStep: number;
     eventBus: EventBus;
     modified: boolean;
-    PGN: Move[];
-    history: Move[];
+    PGN: ChessNode[];
+    history: ChessNode[];
     lastMove: [Square, Square] | null;
     options: IOptions;
   }
@@ -37,16 +37,24 @@
 
   let moves = $derived(modified ? history : PGN);
   let isprotected = $derived(options.protected || false);
-  let rotated = $derived(options.rotated || false);
+  // svelte-ignore state_referenced_locally
+  let rotatedState = $state(options.rotated ?? false);
+  let { position } = $derived(settings);
 
   onMount(async () => {
     await tick();
     eventBus.emit("ready");
   });
+
+  $effect(() => {
+    eventBus.on("rotate", () => {
+      rotatedState = !rotatedState;
+    });
+  });
 </script>
 
 <div class="XQ-container {settings.position}">
-  <Board {settings} {fen} {lastMove} {checkColor} {selectedSquare} {eventBus} {rotated} />
+  <Board {settings} {fen} {lastMove} {checkColor} {selectedSquare} {eventBus} rotated={rotatedState} />
   <Toolbar {settings} {eventBus} {modified} {PGN} {isprotected} />
   {#if settings.showMovelist}
     <List {settings} {currentStep} {moves} {eventBus} />

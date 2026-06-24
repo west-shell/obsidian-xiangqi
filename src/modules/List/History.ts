@@ -1,6 +1,6 @@
 import type { Move } from '../../chess';
 import { registerListModule } from '../../core/module-system';
-import type { IListHost } from '../../types';
+import type { ChessNode, IListHost } from '../../types';
 
 const HistoryModule = {
   init(host: IListHost) {
@@ -18,15 +18,34 @@ const HistoryModule = {
 };
 
 function editHistory(host: IListHost, move: Move) {
-  let { currentStep, history } = host;
+  const { currentStep, nodeMap } = host;
+  const parentNode = currentStep > 0 ? host.history[currentStep - 1] : host.root;
 
-  const existingMove = history[currentStep];
-  if (existingMove && existingMove.from === move.from && existingMove.to === move.to) {
-    return;
+  // 检查父节点下是否已有相同招法
+  for (const child of parentNode.children) {
+    if (child.move?.from === move.from && child.move?.to === move.to) {
+      host.history = [...host.history.slice(0, currentStep), child];
+      return;
+    }
   }
 
-  host.history.splice(currentStep);
-  host.history.push(move);
+  // 创建新节点
+  const id = `node-list-${nodeMap.size}`;
+  const newNode: ChessNode = {
+    id,
+    fen: move.after,
+    move,
+    step: parentNode.step! + 1,
+    side: move.color === 'w' ? 'white' : 'black',
+    parentID: parentNode.id,
+    children: [],
+    comments: [],
+  };
+  nodeMap.set(id, newNode);
+  parentNode.children.unshift(newNode);
+
+  // 更新 history（截断 + 追加）
+  host.history = [...host.history.slice(0, currentStep), newNode];
 }
 
 registerListModule('history', HistoryModule);

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { setIcon } from "obsidian";
   import type { EventBus } from "../../core/event-bus";
-  import type { Move } from "../../chess";
+  import type { ChessNode } from "../../types";
   import type { ISettings } from "../../types";
   import { onLangChange, t } from "../../i18n";
 
@@ -9,7 +9,7 @@
     settings: ISettings;
     eventBus: EventBus;
     modified: boolean;
-    PGN: Move[];
+    PGN: ChessNode[];
     isprotected: boolean;
   }
 
@@ -31,6 +31,7 @@
     { title: t("toolbar.forward", _lv), icon: "arrow-right", event: "redo" },
     { title: t("toolbar.end", _lv), icon: "arrow-right-to-line", event: "toEnd" },
     { title: t("toolbar.flip", _lv), icon: "flip-vertical", event: "rotate" },
+    { title: t("toolbar.delete", _lv), icon: "circle-x", event: "delete" },
     { title: "皮卡鱼Web", icon: "external-link", event: "openPikafish" },
   ]);
 

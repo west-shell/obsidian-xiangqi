@@ -95,14 +95,17 @@ export interface IGenFENHost extends IHost {
 export interface IListHost extends IGenFENHost {
   fen: string;
   initFEN: string;
-  history: Move[];
-  PGN: Move[];
+  history: ChessNode[];
+  PGN: ChessNode[];
   currentTurn: ITurn;
   currentStep: number;
   modified: boolean;
   modifiedStep: number | null;
   haveFEN: boolean;
   options: IOptions;
+  nodeMap: NodeMap;
+  root: ChessNode;
+  stringifyPGN?: (root: ChessNode) => string;
 }
 
 export interface ITreeHost extends IGenFENHost {

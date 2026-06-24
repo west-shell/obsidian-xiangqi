@@ -203,7 +203,7 @@ const ActionsModule = {
 registerPGNViewModule('actions', ActionsModule);
 registerTreeModule('actions', ActionsModule);
 
-function stringifyPGN(root: ChessNode): string {
+export function stringifyPGN(root: ChessNode): string {
   const nodeBrothers = genNodeBrothers(root);
 
   function genNodeBrothers(root: ChessNode): Map<ChessNode, ChessNode[]> {

@@ -1,10 +1,10 @@
 import { MarkdownView, Notice } from 'obsidian';
 
-import { Chess, type Move } from '../../chess';
+import type { Move } from '../../chess';
 import { registerListModule } from '../../core/module-system';
 import { t } from '../../i18n';
-import type { IListHost, ITurn } from '../../types';
-import { ConfirmModal } from '../../utils/confirmModal';
+import type { ChessNode, IListHost, ITurn } from '../../types';
+import { SaveConfirmModal } from '../../utils/confirmModal';
 
 const ActionsModule = {
   init(host: IListHost) {
@@ -32,33 +32,28 @@ const ActionsModule = {
     });
 
     eventBus.on('toStart', () => {
-      while (host.currentStep !== 0) {
-        undo(host);
-      }
+      host.currentStep = 0;
+      host.fen = host.root.fen;
+      host.currentTurn = getTurnFromFen(host.fen);
       eventBus.emit('updateUI');
     });
 
     eventBus.on('toEnd', () => {
-      const step = host.modified ? host.history.length : host.PGN.length;
-      const dif = step - host.currentStep;
-      for (let i = 0; i < dif; i++) {
-        redo(host);
-      }
+      const line = host.modified ? host.history : host.PGN;
+      host.currentStep = line.length;
+      const last = line[line.length - 1];
+      host.fen = last ? last.fen : host.root.fen;
+      host.currentTurn = getTurnFromFen(host.fen);
       eventBus.emit('updateUI');
     });
 
     eventBus.on('reset', () => {
       if (host.modified) {
-        while (host.currentStep !== 0) {
-          undo(host);
-        }
-        host.modified = false;
+        host.currentStep = 0;
+        host.fen = host.root.fen;
+        host.currentTurn = getTurnFromFen(host.fen);
         host.history = [];
-        if (host.modifiedStep) {
-          for (let i = 0; i < host.modifiedStep; i++) {
-            redo(host);
-          }
-        }
+        host.modified = false;
         host.modifiedStep = null;
         eventBus.emit('updateUI');
       } else {
@@ -66,28 +61,32 @@ const ActionsModule = {
       }
     });
 
+    eventBus.on('delete', () => {
+      if (host.currentStep === 0) return;
+      host.history = host.history.slice(0, host.currentStep - 1);
+      host.currentStep = host.history.length;
+      host.fen = host.currentStep > 0 ? host.history[host.currentStep - 1].fen : host.root.fen;
+      host.currentTurn = getTurnFromFen(host.fen);
+      host.modified = true;
+      eventBus.emit('updateUI');
+    });
+
     eventBus.on('save', async () => {
-      let message = '';
       if (host.history.length === 0 && host.PGN.length === 0) {
         new Notice(t('notice.saveEmpty'));
         return;
       }
-      if (host.history.length === 0 && host.PGN.length > 0) message = t('confirm.saveClear');
-      if (host.history.length > 0 && host.PGN.length === 0) message = t('confirm.saveNew');
-      if (host.history.length > 0 && host.PGN.length > 0) message = t('confirm.saveOverwrite');
-      const modal = new ConfirmModal(
-        host.plugin.app,
-        t('confirm.saveTitle'),
-        message,
-        t('confirm.saveBtn'),
-        t('confirm.cancel'),
-      );
-
+      const hasBranches =
+        host.history.some(n => n.children.length > 1) || host.PGN.some(n => n.children.length > 1);
+      const modal = new SaveConfirmModal(host.plugin.app, hasBranches, t);
       modal.open();
-      const userConfirmed = await modal.promise;
+      const saveMode = await modal.promise;
 
-      if (userConfirmed) {
+      if (saveMode === 'overwrite') {
         await savePGN(host);
+        new Notice(t('notice.saveSuccess'));
+      } else if (saveMode === 'update') {
+        await saveAll(host);
         new Notice(t('notice.saveSuccess'));
       }
       eventBus.emit('updateUI');
@@ -96,15 +95,24 @@ const ActionsModule = {
     eventBus.on<number>('clickstep', step => {
       if (step === undefined || step === host.currentStep) return;
       host.currentStep = step;
-      host.fen = replayFen(host);
+      const line = host.modified ? host.history : host.PGN;
+      host.fen = step > 0 ? line[step - 1].fen : host.root.fen;
       host.currentTurn = getTurnFromFen(host.fen);
       eventBus.emit('updateUI');
     });
 
     eventBus.on('rotate', () => {
-      if (!host.options) host.options = { rotated: true };
-      else host.options.rotated = !host.options.rotated;
       eventBus.emit('updateUI');
+    });
+
+    eventBus.on('openPikafish', () => {
+      const fen = host.root.fen;
+      const line = host.modified ? host.history : host.PGN;
+      const movesOnPath = line
+        .map(n => n.move?.iccs?.replace(/-/g, '').toLowerCase())
+        .filter(Boolean)
+        .join('');
+      window.open(`https://xiangqiai.com/#/${fen} moves ${movesOnPath}`);
     });
   },
 };
@@ -114,77 +122,71 @@ registerListModule('actions', ActionsModule);
 function undo(host: IListHost) {
   if (host.currentStep > 0) {
     host.currentStep--;
-    host.fen = replayFen(host);
+    host.fen = host.currentStep > 0 ? host.history[host.currentStep - 1].fen : host.root.fen;
     host.currentTurn = getTurnFromFen(host.fen);
   }
 }
 
 function redo(host: IListHost) {
-  if (!host.modified && host.PGN.length > 0) {
-    const nextMove = host.PGN[host.currentStep];
-    if (!nextMove) return;
-    host.eventBus.emit('edithistory', nextMove);
-    host.currentStep++;
-    host.fen = nextMove.after;
-    host.currentTurn = getTurnFromFen(host.fen);
-  } else {
-    if (host.history.length < host.currentStep) return;
-    const moveToRedo = host.history[host.currentStep];
-    if (!moveToRedo) return;
-    host.currentStep++;
-    host.fen = moveToRedo.after;
-    host.currentTurn = getTurnFromFen(host.fen);
-  }
-}
-
-function replayFen(host: IListHost): string {
-  const chess = new Chess(host.initFEN);
-  const currentMoves = host.modified ? host.history : host.PGN;
-  for (let i = 0; i < host.currentStep; i++) {
-    const move = currentMoves[i];
-    if (!move) break;
-    try {
-      chess.move(move.iccs);
-    } catch {
-      // fallback: try lan (ICCS format, e.g. "h2e2")
-      // console.log(`Failed to apply move ${move.zh}, trying ICCS format...`);
-      chess.move(move.zh);
+  const line = host.modified ? host.history : host.PGN;
+  if (host.currentStep < line.length) {
+    const next = line[host.currentStep];
+    if (!host.modified) {
+      host.eventBus.emit('edithistory', next.move);
     }
+    host.currentStep++;
+    host.fen = next.fen;
+    host.currentTurn = getTurnFromFen(host.fen);
   }
-  return chess.fen();
 }
 
 function getTurnFromFen(fen: string): ITurn {
   return fen.split(' ')[1] === 'b' ? 'black' : 'white';
 }
 
-async function savePGN(host: IListHost) {
-  const view = host.plugin.app.workspace.getActiveViewOfType(MarkdownView);
-  if (!view) return;
-  const file = view.file;
-  if (!file) return;
+function buildPgnText(nodes: ChessNode[]): string {
+  if (nodes.length === 0) return '';
+  const moves = nodes.map(n => n.move?.iccs ?? '').filter(Boolean);
+  const lines: string[] = [];
+  for (let i = 0; i < moves.length; i += 2) {
+    const line = `${Math.ceil((i + 1) / 2)}. ${moves[i]} ${moves[i + 1] || ''}`.trim();
+    lines.push(line);
+  }
+  return lines.join('\n');
+}
 
-  host.plugin.app.vault.process(file, fileContent => {
+function buildOptionsTags(opts: { protected?: boolean; rotated?: boolean }): string[] {
+  const tags: string[] = [];
+  if (opts.protected !== undefined) tags.push(`[Protected "${opts.protected}"]`);
+  if (opts.rotated !== undefined) tags.push(`[Rotated "${opts.rotated}"]`);
+  return tags;
+}
+
+async function savePGN(host: IListHost) {
+  const pgnText = buildPgnText(host.history);
+  const tagLines = buildOptionsTags(host.options);
+  await writeBlock(host, [tagLines.join('\n'), pgnText].filter(Boolean).join('\n'));
+}
+
+async function saveAll(host: IListHost) {
+  const pgnText = host.stringifyPGN?.(host.root) ?? buildPgnText(host.history);
+  const tagLines = buildOptionsTags(host.options);
+  await writeBlock(host, [tagLines.join('\n'), pgnText].filter(Boolean).join('\n'));
+}
+
+async function writeBlock(host: IListHost, newContent: string) {
+  const view = host.plugin.app.workspace.getActiveViewOfType(MarkdownView);
+  if (!view?.file) return;
+
+  host.plugin.app.vault.process(view.file, fileContent => {
     const section = host.ctx.getSectionInfo(host.containerEl);
     if (!section) return fileContent;
     const { lineStart, lineEnd } = section;
     const lines = fileContent.split('\n');
-    let blockLines: string[] = lines.slice(lineStart, lineEnd + 1);
+    const blockLines = lines.slice(lineStart, lineEnd + 1);
     if (blockLines.length < 2) return fileContent;
 
-    blockLines = blockLines.filter(line => !/\b[A-I][0-9]+[-+][A-I][0-9]+\b/.test(line));
-
-    if (host.currentStep > 0) {
-      const moves = host.history.slice(0, host.currentStep).map((move: Move) => move.iccs ?? '');
-      const pgnLines: string[] = [];
-      for (let i = 0; i < moves.length; i += 2) {
-        const line = `${Math.ceil((i + 1) / 2)}. ${moves[i]} ${moves[i + 1] || ''}`.trim();
-        pgnLines.push(line);
-      }
-      blockLines.splice(blockLines.length - 1, 0, pgnLines.join('\n'));
-    }
-
-    const newContent = [...lines.slice(0, lineStart), ...blockLines, ...lines.slice(lineEnd + 1)].join('\n');
-    return newContent;
+    const updated = [blockLines[0], newContent, blockLines[blockLines.length - 1]];
+    return [...lines.slice(0, lineStart), ...updated, ...lines.slice(lineEnd + 1)].join('\n');
   });
 }

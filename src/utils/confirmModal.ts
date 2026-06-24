@@ -21,26 +21,21 @@ export class ConfirmModal extends Modal {
   onOpen() {
     const { contentEl } = this;
 
-    // 标题
     new Setting(contentEl).setName(this.title).setHeading();
 
-    // 消息内容
     contentEl.createEl('p', { text: this.message });
 
-    // 按钮容器
     const buttonContainer = contentEl.createDiv('modal-button-container');
 
-    // 确认按钮（使用 Obsidian 的主色调样式）
     const confirmBtn = buttonContainer.createEl('button', {
       text: this.confirmText,
-      cls: 'mod-cta', // Obsidian 的强调按钮样式
+      cls: 'mod-cta',
     });
     confirmBtn.addEventListener('click', () => {
       this.resolvePromise(true);
       this.close();
     });
 
-    // 取消按钮
     const cancelBtn = buttonContainer.createEl('button', {
       text: this.cancelText,
     });
@@ -49,12 +44,116 @@ export class ConfirmModal extends Modal {
       this.close();
     });
 
-    // 回车键确认，ESC 键取消
     confirmBtn.focus();
     this.scope.register([], 'Enter', () => {
       this.resolvePromise(true);
       this.close();
     });
+  }
+
+  onClose() {
+    const { contentEl } = this;
+    contentEl.empty();
+  }
+}
+
+/**
+ * 保存选项弹窗：有分支时显示覆盖/更新，无分支时简单确认。
+ */
+export class SaveConfirmModal extends Modal {
+  private resolvePromise: (value: 'overwrite' | 'update' | false) => void;
+  public promise: Promise<'overwrite' | 'update' | false>;
+
+  constructor(
+    app: App,
+    private hasBranches: boolean,
+    private _t: (key: string) => string = k => k,
+  ) {
+    super(app);
+    this.resolvePromise = () => {};
+    this.promise = new Promise(resolve => {
+      this.resolvePromise = resolve;
+    });
+  }
+
+  onOpen() {
+    const { contentEl } = this;
+    const t = this._t;
+
+    if (this.hasBranches) {
+      // 有分支：显示覆盖 / 更新 两个选项
+      new Setting(contentEl).setName(t('confirm.saveWithBranch')).setHeading();
+      contentEl.createEl('p', { text: t('confirm.chooseMode') });
+
+      const buttonContainer = contentEl.createDiv('modal-button-container');
+      buttonContainer.style.display = 'flex';
+      buttonContainer.style.flexDirection = 'column';
+      buttonContainer.style.gap = '8px';
+      buttonContainer.style.marginTop = '12px';
+
+      const makeBtn = (text: string, desc: string, value: 'overwrite' | 'update') => {
+        const btn = buttonContainer.createEl('button', {
+          cls: 'mod-cta',
+        });
+        btn.style.padding = '10px 16px';
+        btn.style.cursor = 'pointer';
+        btn.innerHTML = `<strong>${text}</strong><br><span style="font-size:0.85em;opacity:0.7">${desc}</span>`;
+        btn.addEventListener('click', () => {
+          this.resolvePromise(value);
+          this.close();
+        });
+      };
+
+      makeBtn(t('confirm.overwrite'), t('confirm.overwrite.desc'), 'overwrite');
+      makeBtn(t('confirm.update'), t('confirm.update.desc'), 'update');
+
+      const cancelBtn = buttonContainer.createEl('button', {
+        text: t('confirm.cancel'),
+      });
+      cancelBtn.style.marginTop = '4px';
+      cancelBtn.addEventListener('click', () => {
+        this.resolvePromise(false);
+        this.close();
+      });
+
+      this.scope.register([], 'Escape', () => {
+        this.resolvePromise(false);
+        this.close();
+      });
+    } else {
+      // 无分支：简单确认/取消
+      new Setting(contentEl).setName(t('confirm.saveTitle')).setHeading();
+      contentEl.createEl('p', { text: t('confirm.saveConfirm') });
+
+      const buttonContainer = contentEl.createDiv('modal-button-container');
+
+      const saveBtn = buttonContainer.createEl('button', {
+        text: t('confirm.saveBtn'),
+        cls: 'mod-cta',
+      });
+      saveBtn.addEventListener('click', () => {
+        this.resolvePromise('overwrite');
+        this.close();
+      });
+
+      const cancelBtn = buttonContainer.createEl('button', {
+        text: t('confirm.cancel'),
+      });
+      cancelBtn.addEventListener('click', () => {
+        this.resolvePromise(false);
+        this.close();
+      });
+
+      saveBtn.focus();
+      this.scope.register([], 'Enter', () => {
+        this.resolvePromise('overwrite');
+        this.close();
+      });
+      this.scope.register([], 'Escape', () => {
+        this.resolvePromise(false);
+        this.close();
+      });
+    }
   }
 
   onClose() {

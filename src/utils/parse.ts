@@ -55,7 +55,7 @@ export function parseSource(source: string): {
   };
 }
 
-function parsePikafishUrl(source: string): {
+export function parsePikafishUrl(source: string): {
   haveFEN: boolean;
   fen: string;
   initFEN: string;
@@ -124,15 +124,21 @@ function extractICCSMoves(source: string): string[] {
 
 export function parseOption(source: string): IOptions {
   const options: IOptions = {};
-  const optionPatterns = [
+  // 旧格式: p:true / r:false / protected:true / Rotated：false
+  const oldPatterns: { key: string; regex: RegExp }[] = [
     { key: 'protected', regex: /\b(protected|P)\s*[:：]\s*(true|false)\s*/i },
     { key: 'rotated', regex: /\b(rotated|r)\s*[:：]\s*(true|false)\s*/i },
   ];
-  optionPatterns.forEach(({ key, regex }) => {
+  // 新格式: [Protected "true"] / [Rotated "false"]
+  const tagPatterns: { key: string; regex: RegExp }[] = [
+    { key: 'protected', regex: /\[(?:Protected|P)\s+"(true|false)"\]/i },
+    { key: 'rotated', regex: /\[(?:Rotated|R)\s+"(true|false)"\]/i },
+  ];
+  for (const { key, regex } of [...oldPatterns, ...tagPatterns]) {
     const match = source.match(regex);
-    if (match) {
-      options[key as keyof IOptions] = match[2].toLowerCase() === 'true';
+    if (match && options[key as keyof IOptions] === undefined) {
+      options[key as keyof IOptions] = match[match.length - 1].toLowerCase() === 'true';
     }
-  });
+  }
   return options;
 }
