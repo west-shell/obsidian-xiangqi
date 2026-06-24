@@ -110,6 +110,14 @@
             try {
               const move = chessEngine!.move({ from: orig, to: dest });
               if (move) {
+                // 同步更新 Chessground 的 turn/movable，
+                // 避免依赖异步 $effect 可能延迟或丢失更新
+                const newTurn: cg.Color = chessEngine!.turn() === "b" ? "black" : "white";
+                api?.set({
+                  fen: move.after,
+                  turnColor: newTurn,
+                  movable: { color: newTurn, dests: computeDests(move.after) },
+                });
                 eventBus.emit("runmove", move);
               } else {
                 api?.cancelMove();
