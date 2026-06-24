@@ -18,7 +18,7 @@ const TreeViewModule = {
       host.nodeMap = parser.getMap();
       host.tags = parser.getTags();
       host.currentNode = host.nodeMap.get('node-root')!;
-      host.currentTurn = 'red';
+      host.currentTurn = 'white';
       eventBus.emit('updateMainPath');
     });
 

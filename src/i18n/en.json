@@ -57,7 +57,6 @@
   "genfen.clear": "Clear",
   "genfen.fill": "Fill",
   "genfen.save": "Save",
-  "annotation.r+": "Red advantage",
   "annotation.b+": "Black advantage",
   "annotation.eq": "Equal",
   "annotation.key": "Key move",
@@ -98,5 +97,6 @@
   "pgn.enable": "Enable PGN file view",
   "pgn.enable.desc": "Register PGN file view for opening .pgn files",
   "pgn.extensions": "PGN file extensions",
-  "pgn.extensions.desc": "Custom file extensions for PGN view, comma separated"
+  "pgn.extensions.desc": "Custom file extensions for PGN view, comma separated",
+  "annotation.w+": "White advantage"
 }

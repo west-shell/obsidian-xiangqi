@@ -45,7 +45,7 @@
   let buttons = $derived(buildButtons(_lv));
 
   const buildAnnotations = (v: number) => [
-    { title: t("annotation.r+", v), icon: "thumbs-up", symbol: "R+", event: "annotation" },
+    { title: t("annotation.w+", v), icon: "thumbs-up", symbol: "W+", event: "annotation" },
     { title: t("annotation.b+", v), icon: "thumbs-down", symbol: "B+", event: "annotation" },
     { title: t("annotation.eq", v), icon: "handshake", symbol: "=", event: "annotation" },
     { title: t("annotation.key", v), icon: "bookmark", symbol: "?", event: "annotation" },

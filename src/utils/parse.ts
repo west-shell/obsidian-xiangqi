@@ -28,7 +28,7 @@ export function parseSource(source: string): {
     if (parts.length < 2) fen += ' w';
   }
 
-  const firstTurn: ITurn = fen.split(' ')[1] === 'b' ? 'black' : 'red';
+  const firstTurn: ITurn = fen.split(' ')[1] === 'b' ? 'black' : 'white';
 
   // parse ICCS moves from source using xiangqi.js
   const iccsStrings = extractICCSMoves(source);
@@ -78,7 +78,7 @@ function parsePikafishUrl(source: string): {
 
   const fenParts = fenPart.trim().split(/\s+/);
   if (fenParts.length < 2) fenPart += ' w';
-  const firstTurn: ITurn = fenPart.split(' ')[1] === 'b' ? 'black' : 'red';
+  const firstTurn: ITurn = fenPart.split(' ')[1] === 'b' ? 'black' : 'white';
 
   const chess = new Chess(fenPart);
   let PGN: Move[] = [];

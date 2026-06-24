@@ -83,7 +83,7 @@ export class PGNParser {
   }
 
   createNode(move: Move, fen: string): ChessNode {
-    const side = move.color === 'w' ? 'red' : 'black';
+    const side = move.color === 'w' ? 'white' : 'black';
     const node: ChessNode = {
       id: `node-${this.nodeId++}`,
       fen,
@@ -119,7 +119,7 @@ export class PGNParser {
       this.currentNode.children.push(newNode);
       this.currentNode = newNode;
       this.currentStep++;
-      this.currentSide = move.color === 'w' ? 'red' : 'black';
+      this.currentSide = move.color === 'w' ? 'white' : 'black';
     } catch {
       /* invalid move */
     }

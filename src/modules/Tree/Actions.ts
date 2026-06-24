@@ -58,7 +58,7 @@ const ActionsModule = {
         fen: move.after,
         move,
         step: host.currentStep,
-        side: move.color === 'w' ? 'red' : 'black',
+        side: move.color === 'w' ? 'white' : 'black',
         parentID: host.currentNode.id,
         children: [],
         mainID: null,
@@ -90,7 +90,7 @@ const ActionsModule = {
           if (!host.currentNode) break;
           const node = host.currentNode;
           if (!node.comments) node.comments = [];
-          const ALL_ANNOTATIONS = ['R+', 'B+', '=', '?', '!', '1-0', '0-1', '1/2-1/2'];
+          const ALL_ANNOTATIONS = ['W+', 'B+', '=', '?', '!', '1-0', '0-1', '1/2-1/2'];
           if (ALL_ANNOTATIONS.includes(data)) {
             const idx = node.comments.indexOf(data);
             if (idx !== -1) node.comments.splice(idx, 1);
@@ -221,7 +221,7 @@ function stringifyPGN(root: ChessNode): string {
 
   function walk(node: ChessNode, stepNum: number): string {
     let result = '';
-    if (node.side === 'red') result += `${stepNum}. ${node.move!.iccs}`;
+    if (node.side === 'white') result += `${stepNum}. ${node.move!.iccs}`;
     else if (node.side === 'black') result += `${node.move!.iccs}`;
     if (node.comments?.length) {
       for (const c of node.comments) result += `{${c}}`;
@@ -229,13 +229,13 @@ function stringifyPGN(root: ChessNode): string {
     const brothers = nodeBrothers.get(node);
     if (brothers?.length) {
       for (const brother of brothers) {
-        if (brother.side === 'red') result += ` (${walk(brother, stepNum)})`;
+        if (brother.side === 'white') result += ` (${walk(brother, stepNum)})`;
         else result += ` (${stepNum}. ... ${walk(brother, stepNum)})`;
       }
     }
     if (node.children[0]) {
       const next = node.children[0];
-      result += ` ${walk(next, next.side === 'red' ? stepNum + 1 : stepNum)}`;
+      result += ` ${walk(next, next.side === 'white' ? stepNum + 1 : stepNum)}`;
     }
     return result;
   }

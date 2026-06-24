@@ -19,7 +19,7 @@ const SourceModule = {
           treeHost.nodeMap = parser.getMap();
           treeHost.tags = parser.getTags();
           treeHost.currentNode = treeHost.nodeMap.get('node-root')!;
-          treeHost.currentTurn = 'red';
+          treeHost.currentTurn = 'white';
           eventBus.emit('updateMainPath');
 
           // 根据 autoJump 设置决定初始节点位置

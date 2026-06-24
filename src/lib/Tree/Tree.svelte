@@ -47,12 +47,12 @@
   const nodeHeight = 11;
 
   const ANNOTATION_DEFINITIONS: Record<string, { symbol: string; color: string; icon?: string }> = {
-    "R+": { symbol: "红优", color: "var(--piece-red)", icon: iconPaths("thumbs-up") },
+    "W+": { symbol: "白优", color: "var(--piece-red)", icon: iconPaths("thumbs-up") },
     "B+": { symbol: "黑优", color: "var(--piece-black)", icon: iconPaths("thumbs-down") },
     "=": { symbol: "均势", color: "green", icon: iconPaths("handshake") },
     "?": { symbol: "问题", color: "var(--text-warning)", icon: iconPaths("bookmark") },
     "!": { symbol: "妙手", color: "var(--color-yellow)", icon: iconPaths("star") },
-    "R#": { symbol: "红胜", color: "red", icon: iconPaths("thumbs-up") },
+    "W#": { symbol: "白胜", color: "red", icon: iconPaths("thumbs-up") },
     "B#": { symbol: "黑胜", color: "black", icon: iconPaths("thumbs-up") },
     "=#": { symbol: "和棋", color: "gray", icon: iconPaths("handshake") },
   };
@@ -358,7 +358,7 @@
                 height={nodeHeight}
                 rx="2.5"
                 ry="2.5"
-                fill={node.side === "red"
+                fill={node.side === "white"
                   ? "var(--piece-red)"
                   : node.side === "black"
                     ? "var(--piece-black)"

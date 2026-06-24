@@ -155,7 +155,7 @@ function replayFen(host: IListHost): string {
 }
 
 function getTurnFromFen(fen: string): ITurn {
-  return fen.split(' ')[1] === 'b' ? 'black' : 'red';
+  return fen.split(' ')[1] === 'b' ? 'black' : 'white';
 }
 
 async function savePGN(host: IListHost) {

@@ -58,7 +58,7 @@ export type IOptions = {
   rotated?: boolean;
 };
 
-export type ITurn = 'red' | 'black';
+export type ITurn = 'white' | 'black';
 
 export type ChessNode = {
   id: string;
