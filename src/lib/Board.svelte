@@ -58,7 +58,7 @@
   );
   let _check: cg.Color | false = $derived(checkColor || false);
   // 响应式 chess 引擎实例，确保 move 回调始终使用最新 fen
-  let chessEngine = $state(new Chess(fen));
+  let chessEngine = $state<Chess | null>(null);
   $effect(() => {
     chessEngine = new Chess(fen);
   });
@@ -108,7 +108,7 @@
       : {
           move: (orig, dest) => {
             try {
-              const move = chessEngine.move({ from: orig, to: dest });
+              const move = chessEngine!.move({ from: orig, to: dest });
               if (move) {
                 eventBus.emit("runmove", move);
               } else {
