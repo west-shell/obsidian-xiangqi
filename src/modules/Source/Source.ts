@@ -21,6 +21,15 @@ const SourceModule = {
           treeHost.currentNode = treeHost.nodeMap.get('node-root')!;
           treeHost.currentTurn = 'red';
           eventBus.emit('updateMainPath');
+
+          // 根据 autoJump 设置决定初始节点位置
+          const shouldJump =
+            host.settings.autoJump === 'always' || (host.settings.autoJump === 'auto' && !treeHost.haveFEN);
+          if (shouldJump && treeHost.currentPath.length > 0) {
+            treeHost.currentNode = treeHost.nodeMap.get(
+              treeHost.currentPath[treeHost.currentPath.length - 1],
+            )!;
+          }
           break;
         }
         case 'list': {
