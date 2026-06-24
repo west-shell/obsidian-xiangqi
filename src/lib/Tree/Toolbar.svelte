@@ -22,26 +22,28 @@
 
   let saveBtnClass = $derived(modified ? "unsaved" : "saved");
 
-  const buttons = $derived([
-    { title: t("toolbar.reset", _lv), icon: "rotate-ccw", event: "reset" },
-    { title: t("toolbar.delete", _lv), icon: "circle-x", event: "remove" },
-    { title: t("toolbar.promote", _lv), icon: "arrow-up-wide-narrow", event: "promote" },
-    { title: t("toolbar.start", _lv), icon: "arrow-left-to-line", event: "toStart" },
-    { title: t("toolbar.back", _lv), icon: "arrow-left", event: "back" },
-    { title: t("toolbar.forward", _lv), icon: "arrow-right", event: "next" },
-    { title: t("toolbar.end", _lv), icon: "arrow-right-to-line", event: "toEnd" },
-    { title: t("toolbar.flip", _lv), icon: "flip-vertical", event: "rotate" },
+  const buildButtons = (v: number) => [
+    { title: t("toolbar.reset", v), icon: "rotate-ccw", event: "reset" },
+    { title: t("toolbar.delete", v), icon: "circle-x", event: "remove" },
+    { title: t("toolbar.promote", v), icon: "arrow-up-wide-narrow", event: "promote" },
+    { title: t("toolbar.start", v), icon: "arrow-left-to-line", event: "toStart" },
+    { title: t("toolbar.back", v), icon: "arrow-left", event: "back" },
+    { title: t("toolbar.forward", v), icon: "arrow-right", event: "next" },
+    { title: t("toolbar.end", v), icon: "arrow-right-to-line", event: "toEnd" },
+    { title: t("toolbar.flip", v), icon: "flip-vertical", event: "rotate" },
     { title: "皮卡鱼Web", icon: "external-link", event: "openPikafish" },
-    { title: t("toolbar.annotate", _lv), icon: "tag", event: "toggle-annotation-menu" },
-  ]);
+    { title: t("toolbar.annotate", v), icon: "tag", event: "toggle-annotation-menu" },
+  ];
+  let buttons = $derived(buildButtons(_lv));
 
-  const annotations = $derived([
-    { title: t("annotation.r+", _lv), icon: "thumbs-up", symbol: "R+", event: "annotation" },
-    { title: t("annotation.b+", _lv), icon: "thumbs-down", symbol: "B+", event: "annotation" },
-    { title: t("annotation.eq", _lv), icon: "handshake", symbol: "=", event: "annotation" },
-    { title: t("annotation.key", _lv), icon: "bookmark", symbol: "?", event: "annotation" },
-    { title: t("annotation.br", _lv), icon: "star", symbol: "!", event: "annotation" },
-  ]);
+  const buildAnnotations = (v: number) => [
+    { title: t("annotation.r+", v), icon: "thumbs-up", symbol: "R+", event: "annotation" },
+    { title: t("annotation.b+", v), icon: "thumbs-down", symbol: "B+", event: "annotation" },
+    { title: t("annotation.eq", v), icon: "handshake", symbol: "=", event: "annotation" },
+    { title: t("annotation.key", v), icon: "bookmark", symbol: "?", event: "annotation" },
+    { title: t("annotation.br", v), icon: "star", symbol: "!", event: "annotation" },
+  ];
+  let annotations = $derived(buildAnnotations(_lv));
 
   function emitEvent(name: string, data: unknown = null) {
     eventBus.emit("btn-click", { name, data});
