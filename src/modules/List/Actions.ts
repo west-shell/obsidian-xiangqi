@@ -12,6 +12,26 @@ const ActionsModule = {
 
     eventBus.on<Move>('runmove', move => {
       if (!move) return;
+      // 先检查当前节点下是否已有相同招法
+      const parentNode = host.currentStep > 0 ? host.history[host.currentStep - 1] : host.root;
+      for (const child of parentNode.children) {
+        if (child.move?.from === move.from && child.move?.to === move.to) {
+          // 已有该招法，直接跳转到它
+          const idx = parentNode.children.indexOf(child);
+          if (idx > 0) {
+            parentNode.children.splice(idx, 1);
+            parentNode.children.unshift(child);
+          }
+          host.history = [...host.history.slice(0, host.currentStep), child];
+          host.currentStep++;
+          host.fen = child.fen;
+          host.currentTurn = getTurnFromFen(host.fen);
+          host.modified = true;
+          eventBus.emit('updateUI');
+          return;
+        }
+      }
+      // 新招法
       if (!host.modified) host.modifiedStep = host.currentStep;
       host.modified = true;
       eventBus.emit('edithistory', move);
@@ -48,17 +68,8 @@ const ActionsModule = {
     });
 
     eventBus.on('reset', () => {
-      if (host.modified) {
-        host.currentStep = 0;
-        host.fen = host.root.fen;
-        host.currentTurn = getTurnFromFen(host.fen);
-        host.history = [];
-        host.modified = false;
-        host.modifiedStep = null;
-        eventBus.emit('updateUI');
-      } else {
-        eventBus.emit('toStart');
-      }
+      eventBus.emit('load', 'list');
+      eventBus.emit('updateUI');
     });
 
     eventBus.on('delete', () => {
@@ -77,7 +88,9 @@ const ActionsModule = {
         return;
       }
       const hasBranches =
-        host.history.some(n => n.children.length > 1) || host.PGN.some(n => n.children.length > 1);
+        host.history.some(n => n.children.length > 1) ||
+        host.PGN.some(n => n.children.length > 1) ||
+        host.root.children.length > 1;
       const modal = new SaveConfirmModal(host.plugin.app, hasBranches, t);
       modal.open();
       const saveMode = await modal.promise;
@@ -164,14 +177,24 @@ function buildOptionsTags(opts: { protected?: boolean; rotated?: boolean }): str
 
 async function savePGN(host: IListHost) {
   const pgnText = buildPgnText(host.history);
-  const tagLines = buildOptionsTags(host.options);
-  await writeBlock(host, [tagLines.join('\n'), pgnText].filter(Boolean).join('\n'));
+  const allTags = serializeTags(host.tags, host.options);
+  await writeBlock(host, [allTags, pgnText].filter(Boolean).join('\n'));
 }
 
 async function saveAll(host: IListHost) {
   const pgnText = host.stringifyPGN?.(host.root) ?? buildPgnText(host.history);
-  const tagLines = buildOptionsTags(host.options);
-  await writeBlock(host, [tagLines.join('\n'), pgnText].filter(Boolean).join('\n'));
+  const allTags = serializeTags(host.tags, host.options);
+  await writeBlock(host, [allTags, pgnText].filter(Boolean).join('\n'));
+}
+
+function serializeTags(
+  tags: Map<string, string> | undefined,
+  opts: { protected?: boolean; rotated?: boolean },
+): string {
+  const map = new Map(tags ?? []);
+  if (opts.protected !== undefined) map.set('Protected', String(opts.protected));
+  if (opts.rotated !== undefined) map.set('Rotated', String(opts.rotated));
+  return [...map.entries()].map(([k, v]) => `[${k} "${v}"]`).join('\n');
 }
 
 async function writeBlock(host: IListHost, newContent: string) {

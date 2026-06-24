@@ -82,6 +82,7 @@ const SourceModule = {
           listHost.PGN = parser.getMainLine();
           listHost.history = [...listHost.PGN];
           listHost.stringifyPGN = stringifyPGN;
+          listHost.tags = new Map(parser.tags);
           listHost.currentTurn = 'white';
           listHost.initFEN = parser.getRoot().fen;
 

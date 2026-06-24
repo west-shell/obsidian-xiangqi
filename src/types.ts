@@ -106,6 +106,7 @@ export interface IListHost extends IGenFENHost {
   nodeMap: NodeMap;
   root: ChessNode;
   stringifyPGN?: (root: ChessNode) => string;
+  tags?: Map<string, string>;
 }
 
 export interface ITreeHost extends IGenFENHost {
