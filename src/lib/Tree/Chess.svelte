@@ -74,14 +74,14 @@
       .map((child) => child.move)
       .filter((m): m is Move => m != null) ?? [],
   );
-  let checkColor: "white" | "black" | null | undefined = $derived(
+  let checkColor = $derived(
     currentNode.move &&
       (currentNode.move.isCheck || currentNode.move.isCheckmate)
       ? currentNode.move.color === "w"
         ? "black"
         : "white"
       : null,
-  );
+  ) as "white" | "black" | null;
   let userShapes = $derived(loadShapes(currentNode));
 
   let treeViewEl: HTMLDivElement | null = null;
