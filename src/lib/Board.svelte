@@ -57,6 +57,11 @@
       : "",
   );
   let _check: cg.Color | false = $derived(checkColor || false);
+  // 响应式 chess 引擎实例，确保 move 回调始终使用最新 fen
+  let chessEngine = $state(new Chess(fen));
+  $effect(() => {
+    chessEngine = new Chess(fen);
+  });
 
   function computeDests(fen: string): Map<cg.Key, cg.Key[]> {
     try {
@@ -103,8 +108,7 @@
       : {
           move: (orig, dest) => {
             try {
-              const chess = new Chess(fen);
-              const move = chess.move({ from: orig, to: dest });
+              const move = chessEngine.move({ from: orig, to: dest });
               if (move) {
                 eventBus.emit("runmove", move);
               } else {
