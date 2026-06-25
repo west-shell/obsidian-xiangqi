@@ -1,8 +1,7 @@
 <script lang="ts">
   import { setIcon } from "obsidian";
   import type { EventBus } from "../../core/event-bus";
-  import type { ChessNode } from "../../types";
-  import type { ISettings } from "../../types";
+  import type { ChessNode, ISettings } from "../../types";
   import { onLangChange, t } from "../../i18n";
 
   interface Props {

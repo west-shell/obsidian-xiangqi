@@ -2,8 +2,7 @@
   import { tick } from "svelte";
   import { scrollToBTN } from "../../utils/utils";
   import type { EventBus } from "../../core/event-bus";
-  import type { ChessNode } from "../../types";
-  import type { ISettings } from "../../types";
+  import type { ChessNode, ISettings } from "../../types";
 
   interface Props {
     settings: ISettings;
