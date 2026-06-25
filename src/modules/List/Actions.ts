@@ -95,10 +95,10 @@ const ActionsModule = {
       modal.open();
       const saveMode = await modal.promise;
 
-      if (saveMode === 'overwrite') {
+      if (saveMode === 'save') {
         await savePGN(host);
         new Notice(t('notice.saveSuccess'));
-      } else if (saveMode === 'update') {
+      } else if (saveMode === 'saveAll') {
         await saveAll(host);
         new Notice(t('notice.saveSuccess'));
       }
