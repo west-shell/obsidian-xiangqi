@@ -23,7 +23,7 @@
 </div>
 
 <style>
-  .XQ-container { --red: #861818; --black: #000080; margin: 10px; }
+  .XQ-container { --red: #861818; --black: #000080; }
   .XQ-container.right { display: flex; flex-direction: row; gap: 2px; }
   .XQ-container.bottom { display: flex; flex-direction: column; }
 </style>

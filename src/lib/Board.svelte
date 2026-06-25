@@ -23,7 +23,6 @@
     checkColor?: cg.Color | null;
     variations?: Move[];
     freeMode?: boolean;
-    boardWidth?: number;
     userShapes?: DrawShape[];
   }
 
@@ -37,12 +36,9 @@
     checkColor = null,
     variations = [],
     freeMode = false,
-    boardWidth: boardWidthOverride,
     userShapes = [],
   }: Props = $props();
 
-  let boardWidth = $derived(boardWidthOverride ?? settings.cellSize * 9);
-  let boardHeight = $derived((boardWidth * 10) / 9);
   // oxlint-disable-next-line no-unassigned-vars
   let boardElement: HTMLDivElement;
   let api: Api | null = null;
@@ -255,12 +251,15 @@
   });
 </script>
 
-<div class="board-area {turnClass}" style="width:{boardWidth * 1.12}px ;height:{boardHeight * 1.12}px">
+<div class="board-area {turnClass}" style="--xq-cell-size:{settings.cellSize}px">
   <div bind:this={boardElement} class="xq-wrap"></div>
 </div>
 
 <style>
   .board-area {
+    --bw: var(--board-width, calc(var(--xq-cell-size, 50px) * 9));
+    width: calc(var(--bw) * 1.12);
+    height: calc(var(--bw) * 1.12 * 10 / 9);
     display: flex;
     justify-content: center;
     align-items: center;

@@ -1,5 +1,5 @@
 import { registerGenFENModule, registerListModule, registerTreeModule } from '../../core/module-system';
-import { DEFAULT_FEN, type IGenFENHost, type IListHost, type ITreeHost, type IOptions } from '../../types';
+import { DEFAULT_FEN, type IGenFENHost, type IListHost, type IOptions, type ITreeHost } from '../../types';
 import { parseOption, parsePikafishUrl } from '../../utils/parse';
 import { stringifyPGN } from '../Tree/Actions';
 
