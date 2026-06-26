@@ -251,15 +251,16 @@
   });
 </script>
 
-<div class="board-area {turnClass}" style="--xq-cell-size:{settings.cellSize}px">
+<div class="board-wrapper {turnClass}" style="--xq-cell-size:{settings.cellSize}px">
   <div bind:this={boardElement} class="xq-wrap"></div>
 </div>
 
 <style>
-  .board-area {
+  .board-wrapper {
     --bw: var(--board-width, calc(var(--xq-cell-size, 50px) * 9));
     width: calc(var(--bw) * 1.12);
     height: calc(var(--bw) * 1.12 * 10 / 9);
+    padding: 0;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -269,17 +270,17 @@
   }
   .xq-wrap {
     width: 97%;
-    height: auto;
-    aspect-ratio: 450 / 500;
+    aspect-ratio: 9 / 10;
+    flex-shrink: 0;
     --piece-red: var(--xq-piece-red, var(--color-red));
     --piece-black: var(--xq-piece-black, var(--color-blue));
   }
 
-  .board-area.turn-white {
+  .board-wrapper.turn-white {
     box-shadow: 0 0 0.12em 0.15em var(--xq-piece-red, var(--color-red));
   }
 
-  .board-area.turn-black {
+  .board-wrapper.turn-black {
     box-shadow: 0 0 0.15em 0.15em var(--xq-piece-black, var(--color-blue));
   }
 </style>

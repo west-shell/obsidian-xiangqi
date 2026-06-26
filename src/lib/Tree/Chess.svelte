@@ -41,11 +41,7 @@
   /** Convert DrawShape[] to comment strings and save to node */
   function saveShapes(node: ChessNode, shapes: DrawShape[]) {
     const shapeComments = shapes.map(
-      (s) =>
-        s.orig +
-        (s.dest ?? "") +
-        ":" +
-        BRUSH_MAP[s.brush ?? "green"],
+      (s) => s.orig + (s.dest ?? "") + ":" + BRUSH_MAP[s.brush ?? "green"],
     );
     node.comments = [
       ...(node.comments ?? []).filter((c) => !SHAPES_RE.test(c)),
@@ -129,19 +125,21 @@
   });
 </script>
 
-<div class="tree-view {position}" bind:this={treeViewEl} style="--adaptive-board-width:{adaptiveBoardWidth}px">
-  <div class="board-area">
-    <Board
-      {settings}
-      {fen}
-      {lastMove}
-      {checkColor}
-      {eventBus}
-      {rotated}
-      {variations}
-      {userShapes}
-    />
-  </div>
+<div
+  class="tree-view {position}"
+  bind:this={treeViewEl}
+  style="--adaptive-board-width:{adaptiveBoardWidth}px"
+>
+  <Board
+    {settings}
+    {fen}
+    {lastMove}
+    {checkColor}
+    {eventBus}
+    {rotated}
+    {variations}
+    {userShapes}
+  />
   <Toolbar {eventBus} />
   <Tree {nodeMap} {eventBus} {currentNode} {currentPath} />
 </div>
@@ -176,11 +174,6 @@
     flex: 1 1 auto;
     min-width: 25%;
     max-width: 50%;
-  }
-  .board-area {
-    flex: 0 0 auto;
-    display: flex;
-    align-items: center;
   }
   .tree-view.bottom {
     flex-direction: column;
