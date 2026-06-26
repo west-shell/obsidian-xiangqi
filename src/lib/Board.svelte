@@ -259,7 +259,9 @@
   .board-wrapper {
     --bw: var(--board-width, calc(var(--xq-cell-size, 50px) * 9));
     width: var(--bw);
+    height: calc(var(--bw) * 10 / 9);
     position: relative;
+    flex-shrink: 0;
   }
   .xq-wrap {
     aspect-ratio: 9 / 10;
