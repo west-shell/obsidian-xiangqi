@@ -128,7 +128,7 @@
 <div
   class="tree-view {position}"
   bind:this={treeViewEl}
-  style="--adaptive-board-width:{adaptiveBoardWidth}px"
+  style="--xq-cell-size:{settings.cellSize}px;--adaptive-board-width:{adaptiveBoardWidth}px"
 >
   <Board
     {settings}
@@ -146,10 +146,10 @@
 
 <style>
   :global(.tree-codeblock) .tree-view.right {
-    height: var(--tree-hight, 300px) !important;
+    height: calc(var(--xq-cell-size, 50px) * 11) !important;
   }
   :global(.tree-codeblock) .tree-view.bottom {
-    height: calc(var(--tree-hight, 300px) * 1.5) !important;
+    height: calc(var(--xq-cell-size, 50px) * 16.5) !important;
   }
   :global(.view-content.pgn-view) .tree-view {
     --board-width: var(--adaptive-board-width, 300px);
