@@ -82,10 +82,17 @@
 
   let treeViewEl: HTMLDivElement | null = null;
   let adaptiveBoardWidth = $state(300);
+  let isPgnView = $state(false);
 
   $effect(() => {
     const el = treeViewEl;
     if (!el) return;
+    isPgnView = !!el.closest('.view-content.pgn-view');
+  });
+
+  $effect(() => {
+    const el = treeViewEl;
+    if (!el || !isPgnView) return;
     const pos = position;
     const ro = new ResizeObserver(() => {
       const rect = el.getBoundingClientRect();
