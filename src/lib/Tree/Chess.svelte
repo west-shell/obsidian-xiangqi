@@ -146,10 +146,10 @@
 
 <style>
   :global(.tree-codeblock) .tree-view.right {
-    height: calc(var(--xq-cell-size, 50px) * 11) !important;
+    height: calc(var(--xq-cell-size, 50px) * 10) !important;
   }
   :global(.tree-codeblock) .tree-view.bottom {
-    height: calc(var(--xq-cell-size, 50px) * 16.5) !important;
+    height: calc(var(--xq-cell-size, 50px) * 20) !important;
   }
   :global(.view-content.pgn-view) .tree-view {
     --board-width: var(--adaptive-board-width, 300px);
