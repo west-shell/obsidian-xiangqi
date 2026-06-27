@@ -2,14 +2,14 @@ import './style/base.css';
 import './style/board.css';
 import './style/pieces.css';
 
-import { addIcon, MarkdownView, Plugin, TFile } from 'obsidian';
+import { MarkdownView, Plugin, TFile } from 'obsidian';
 
 import { initI18n, t } from './i18n';
 import { GenFENRenderChild } from './renderChild/GenFENRenderChild';
 import { ChessRenderChild } from './renderChild/ListRenderChild';
 import { TreeRenderChild } from './renderChild/TreeRenderChild';
 import { ChessSettingTab, DEFAULT_SETTINGS } from './settings';
-import { applyThemes, ensureBoardAssets } from './themes';
+import { applyThemes, ensureBoardAssets, registerIcon } from './themes';
 import type { ISettings } from './types';
 import { PGNView } from './view/PGNView';
 
@@ -26,23 +26,7 @@ export default class ChessPlugin extends Plugin {
     await ensureBoardAssets(this.app);
     applyThemes(this.app, this.settings);
 
-    addIcon(
-      'xiangqi-icon',
-      `
-<svg viewBox="0 0 80 80">
-  <circle cx="40" cy="40" r="38"
-    fill="var(--background-primary-alt)"
-    stroke="var(--text-normal)"
-    stroke-width="4" />
-  <text x="50%" y="58%"
-    dominant-baseline="middle"
-    text-anchor="middle"
-    font-size="60"
-    fill="var(--text-normal)"
-    font-weight="bold">象</text>
-</svg>
-`,
-    );
+    registerIcon();
 
     this.registerCodeBlocks();
 

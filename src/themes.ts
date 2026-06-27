@@ -1,4 +1,4 @@
-import type { App } from 'obsidian';
+import { type App, addIcon } from 'obsidian';
 
 import bambooB64 from '../assets/bamboo.jpg?base64';
 import woodB64 from '../assets/wood.jpg?base64';
@@ -137,6 +137,26 @@ export async function ensureBoardAssets(app: App): Promise<void> {
       console.error(`[xiangqi] 写入背景图失败: ${img.path}`, err);
     }
   }
+}
+
+export function registerIcon() {
+  addIcon(
+    'xiangqi-icon',
+    `
+<svg viewBox="0 0 80 80">
+  <circle cx="40" cy="40" r="38"
+    fill="var(--background-primary-alt)"
+    stroke="var(--text-normal)"
+    stroke-width="4" />
+  <text x="50%" y="58%"
+    dominant-baseline="middle"
+    text-anchor="middle"
+    font-size="60"
+    fill="var(--text-normal)"
+    font-weight="bold">象</text>
+</svg>
+`,
+  );
 }
 
 export function applyThemes(app: App, settings: ISettings) {
