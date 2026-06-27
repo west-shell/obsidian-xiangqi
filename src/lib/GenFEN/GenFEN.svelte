@@ -17,13 +17,34 @@
 </script>
 
 <div class="XQ-container {settings.position}">
-  <Board settings={{...settings, showLastMove: false}} {fen} {eventBus} rotated={false} freeMode={true} />
+  <Board
+    settings={{ ...settings, showLastMove: false }}
+    {fen}
+    {eventBus}
+    rotated={false}
+    freeMode={true}
+  />
   <PieceBTNs {settings} {fen} {eventBus} {position} {selectedPiece} />
-  <Toolbar {eventBus} {position} currentTurn={fen.split(' ')[1] === 'b' ? 'black' : 'white'} />
+  <Toolbar
+    {eventBus}
+    {position}
+    currentTurn={fen.split(" ")[1] === "b" ? "black" : "white"}
+  />
 </div>
 
 <style>
-  .XQ-container { --red: #861818; --black: #000080; }
-  .XQ-container.right { display: flex; flex-direction: row; gap: 2px; }
-  .XQ-container.bottom { display: flex; flex-direction: column; }
+  .XQ-container {
+    --red: #861818;
+    --black: #000080;
+    margin: 1rem 0;
+  }
+  .XQ-container.right {
+    display: flex;
+    flex-direction: row;
+    gap: 2px;
+  }
+  .XQ-container.bottom {
+    display: flex;
+    flex-direction: column;
+  }
 </style>

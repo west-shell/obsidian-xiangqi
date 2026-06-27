@@ -151,6 +151,9 @@
   :global(.tree-codeblock) .tree-view.bottom {
     height: calc(var(--xq-cell-size, 50px) * 20) !important;
   }
+  :global(.tree-codeblock) .tree-view {
+    margin: 1rem 0;
+  }
   :global(.view-content.pgn-view) .tree-view {
     --board-width: var(--adaptive-board-width, 300px);
   }

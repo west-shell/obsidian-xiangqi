@@ -54,7 +54,15 @@
 </script>
 
 <div class="XQ-container {settings.position}">
-  <Board {settings} {fen} {lastMove} {checkColor} {selectedSquare} {eventBus} rotated={rotatedState} />
+  <Board
+    {settings}
+    {fen}
+    {lastMove}
+    {checkColor}
+    {selectedSquare}
+    {eventBus}
+    rotated={rotatedState}
+  />
   <Toolbar {settings} {eventBus} {modified} {PGN} {isprotected} />
   {#if settings.showMovelist}
     <List {settings} {currentStep} {moves} {eventBus} />
@@ -65,6 +73,7 @@
   .XQ-container {
     --red: #861818;
     --black: #000080;
+    margin: 1rem 0;
   }
 
   .XQ-container.right {
