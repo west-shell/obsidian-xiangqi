@@ -47,12 +47,7 @@
   );
 </script>
 
-<div
-  class={`piece-btn-container ${position}`}
-  style="--height: {10 * settings.cellSize}px;
-    --width: {9 * settings.cellSize}px;
-    --font-size: {settings.cellSize * 0.3}px;"
->
+<div class={`piece-btn-container ${position}`}>
   {#each Object.entries(PIECE_CHARS) as [piece, name]}
     <button
       class={`piece-btn ${position} ${isRed(piece) ? "red-piece" : "black-piece"}`}
@@ -75,18 +70,18 @@
     grid-template-columns: 1fr;
     grid-template-rows: repeat(14, 1fr);
     flex-direction: column;
-    height: var(--height);
+    height: calc(var(--xq-cell-size, 50px) * 10);
     width: fit-content;
     align-items: stretch;
     display: flex;
-    justify-content: space-between; /* 平均分布 */
+    justify-content: space-between;
   }
 
   .piece-btn-container.bottom {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     grid-template-rows: repeat(2, 1fr);
-    width: var(--width);
+    width: calc(var(--xq-cell-size, 50px) * 9);
     height: auto;
     justify-content: center;
   }
@@ -99,7 +94,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: var(--font-size);
+    font-size: calc(var(--xq-cell-size, 50px) * 0.3);
     border: 1.5px solid rgba(0, 0, 0, 0.35);
     margin: 1px 0;
     transition:
@@ -109,10 +104,10 @@
 
   .piece-btn.bottom {
     padding: 0;
-    width: calc(var(--width) / 7);
+    width: calc(var(--xq-cell-size, 50px) * 9 / 7);
     border-radius: 4px;
     cursor: pointer;
-    font-size: var(--font-size);
+    font-size: calc(var(--xq-cell-size, 50px) * 0.3);
     border: 1.5px solid rgba(0, 0, 0, 0.35);
     transition:
       box-shadow 0.15s,

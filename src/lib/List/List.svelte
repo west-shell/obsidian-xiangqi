@@ -34,12 +34,7 @@
 
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
-<div
-  class="move-container {settings.position}"
-  style="--height: {10* settings.cellSize}px;
-    --width: {10.08 * settings.cellSize}px;
-    --fontsize: {settings.fontSize}px;"
->
+<div class="move-container {settings.position}">
   <ul class="move-list {settings.position}" bind:this={ulRef}>
     <li class="start" bind:this={itemRefs[0]}>
       <span class="roundnum">0</span>
@@ -80,7 +75,7 @@
 <style>
   /* ========== 基础容器样式 ========== */
   .move-container {
-    font-size: var(--fontsize);
+    font-size: var(--xq-font-size, 12px);
     padding: 0;
     margin: 0;
   }
@@ -98,7 +93,7 @@
   /* ========== 右侧垂直布局 (right) ========== */
   .move-list.right {
     flex-direction: column;
-    height: var(--height);
+    height: calc(var(--xq-cell-size, 50px) * 10);
     overflow-y: auto;
     overflow-x: hidden;
     flex-wrap: nowrap;
@@ -169,7 +164,7 @@
 
   /* ========== 底部水平布局 (bottom) - 竖向文字 ========== */
   .move-list.bottom {
-    width: var(--width);
+    width: calc(var(--xq-cell-size, 50px) * 10.08);
     overflow-x: auto;
     overflow-y: hidden;
     flex-wrap: nowrap;

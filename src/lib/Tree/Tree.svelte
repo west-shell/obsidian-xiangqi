@@ -306,7 +306,7 @@
               L ${(child.x! - 0.3 * Math.sign(child.x! - node.x!)) * spacingX} ${node.y! * spacingY}
               L ${child.x! * spacingX} ${child.y! * spacingY}
               `}
-              stroke="var(--board-line)"
+              stroke="var(--xq-board-line)"
               stroke-linejoin="round"
               stroke-width={currentPath.includes(node.id) && currentPath.includes(child.id)
                 ? 1.5
@@ -363,7 +363,7 @@
                   : node.side === "black"
                     ? "var(--piece-black)"
                     : "green"}
-                stroke="var(--board-line)"
+                stroke="var(--xq-board-line)"
               />
               <text dy="3.5" text-anchor="middle" fill="white" font-size="9px">
                 {node.move?.piece ? pieceLabel(node.move) : "始"}
@@ -393,8 +393,8 @@
                   points={foldedNodes.has(node.id)
                     ? (isLeft ? "0,-4 0,4 -3,3 -3,-3" : "0,-4 0,4 3,3 3,-3")
                     : (isLeft ? "0,-4 0,4 -5,0" : "0,-4 0,4 5,0")}
-                  fill="var(--board-line)"
-                  stroke="var(--board-line)"
+                  fill="var(--xq-board-line)"
+                  stroke="var(--xq-board-line)"
                   stroke-width="1"
                   stroke-linejoin="round"
                   opacity={currentPath.includes(node.id) && node.children[0] && !currentPath.includes(node.children[0].id) ? 1.5 : 0.7}
@@ -434,8 +434,8 @@
     flex-direction: column;
     height: 100%;
     overflow: hidden;
-    --board-background: var(--background-primary-alt);
-    --board-line: var(--text-normal);
+    --xq-board-background: var(--background-primary-alt);
+    --xq-board-line: var(--text-normal);
     --piece-red: var(--xq-piece-red, var(--color-red));
     --piece-black: var(--xq-piece-black, var(--color-blue));
     --text-color: var(--text-normal);
@@ -444,7 +444,7 @@
   .svg-wrapper {
     flex: 1 1 auto;
     overflow: hidden;
-    background-color: var(--board-background);
+    background-color: var(--xq-board-background);
     position: relative;
     width: 100%;
     height: 100%;

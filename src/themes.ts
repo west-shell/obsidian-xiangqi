@@ -140,13 +140,15 @@ export async function ensureBoardAssets(app: App): Promise<void> {
 }
 
 export function applyThemes(app: App, settings: ISettings) {
-  const { theme, boardMarginTop, boardMarginBottom, showCoordinateLabels } = settings;
+  const { theme, cellSize, boardMarginTop, boardMarginBottom, showCoordinateLabels } = settings;
   const t = themes[theme] ?? themes.light;
 
   const bg = isImagePath(t.bg)
     ? `url('${app.vault.adapter.getResourcePath(app.vault.configDir + '/' + t.bg)}') center / cover no-repeat`
     : t.bg;
 
+  activeDocument.body.style.setProperty('--xq-cell-size', `${cellSize}px`);
+  activeDocument.body.style.setProperty('--xq-font-size', `${settings.fontSize}px`);
   activeDocument.body.style.setProperty('--xq-board-bg', bg);
   activeDocument.body.style.setProperty('--xq-board-texture', t.texture);
   activeDocument.body.style.setProperty(
@@ -156,6 +158,6 @@ export function applyThemes(app: App, settings: ISettings) {
   activeDocument.body.style.setProperty('--xq-coords-display', showCoordinateLabels ? 'flex' : 'none');
   activeDocument.body.style.setProperty('--xq-piece-red', t.red);
   activeDocument.body.style.setProperty('--xq-piece-black', t.black);
-  activeDocument.body.style.setProperty('--board-margin-top', `${boardMarginTop}px`);
-  activeDocument.body.style.setProperty('--board-margin-bottom', `${boardMarginBottom}px`);
+  activeDocument.body.style.setProperty('--xq-board-margin-top', `${boardMarginTop}px`);
+  activeDocument.body.style.setProperty('--xq-board-margin-bottom', `${boardMarginBottom}px`);
 }

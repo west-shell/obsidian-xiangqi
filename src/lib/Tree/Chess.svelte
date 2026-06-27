@@ -128,7 +128,7 @@
 <div
   class="tree-view {position}"
   bind:this={treeViewEl}
-  style="--xq-cell-size:{settings.cellSize}px;--adaptive-board-width:{adaptiveBoardWidth}px"
+  style="--adaptive-board-width:{adaptiveBoardWidth}px"
 >
   <Board
     {settings}
@@ -155,13 +155,13 @@
     margin: 1rem 0;
   }
   :global(.view-content.pgn-view) .tree-view {
-    --board-width: var(--adaptive-board-width, 300px);
+    --xq-board-width: var(--adaptive-board-width, 300px);
   }
   :global(.view-content.pgn-view) {
     overflow: hidden !important;
     margin: 0 !important;
-    padding-top: var(--board-margin-top, 0px) !important;
-    padding-bottom: var(--board-margin-bottom, 0px) !important;
+    padding-top: var(--xq-board-margin-top, 0px) !important;
+    padding-bottom: var(--xq-board-margin-bottom, 0px) !important;
   }
   .tree-view {
     display: flex;

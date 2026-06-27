@@ -251,13 +251,13 @@
   });
 </script>
 
-<div class="board-wrapper" style="--xq-cell-size:{settings.cellSize}px">
+  <div class="board-wrapper">
   <div bind:this={boardElement} class="xq-wrap {turnClass}"></div>
 </div>
 
 <style>
   .board-wrapper {
-    --bw: var(--board-width, calc(var(--xq-cell-size, 50px) * 9));
+    --bw: var(--xq-board-width, calc(var(--xq-cell-size, 50px) * 9));
     width: var(--bw);
     position: relative;
   }
