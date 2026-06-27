@@ -92,7 +92,7 @@
       if (pos === "right") {
         const availWidth = rect.width * 0.6;
         const availHeight = rect.height;
-        const byHeight = (availHeight * 8) / 10;
+        const byHeight = (availHeight * 9) / 10;
         adaptiveBoardWidth = Math.min(availWidth, byHeight);
       } else {
         const availWidth = rect.width;
