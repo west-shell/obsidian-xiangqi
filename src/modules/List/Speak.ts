@@ -7,13 +7,10 @@ const SpeakerModule = {
     const eventBus = host.eventBus;
 
     eventBus.on('updateUI', () => {
-      if (
-        host.settings.enableSpeech &&
-        window.speechSynthesis &&
-        host.currentStep > 0 &&
-        host.history[host.currentStep - 1]
-      ) {
-        speak(host.history[host.currentStep - 1]);
+      const currentNode = host.history[host.currentStep - 1];
+
+      if (host.settings.enableSpeech && window.speechSynthesis && currentNode?.move) {
+        speak(currentNode.move);
       }
     });
   },
