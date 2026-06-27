@@ -1,10 +1,23 @@
 import type { App } from 'obsidian';
 
+import bambooB64 from '../assets/bamboo.jpg?base64';
+import woodB64 from '../assets/wood.jpg?base64';
+
 import type { ISettings } from './types';
 
+/** 棋盘背景图片：路径相对 vault configDir（.obsidian），base64 为内嵌兜底数据 */
+interface BgImage {
+  /** 相对 .obsidian 的路径，例如 plugins/xiangqi/assets/wood.jpg */
+  path: string;
+  /** 构建期内嵌的 base64（无 data: 前缀），缺失时用于写盘还原 */
+  base64: string;
+}
+
 interface ThemeDef {
-  /** 底层背景：CSS颜色值 或 图片路径（相对vault根目录） */
+  /** 底层背景：CSS颜色值 或 图片路径（相对 .obsidian configDir） */
   bg: string;
+  /** 图片型背景的兜底数据；非图片背景留空 */
+  bgImage?: BgImage;
   /** 纹理叠加，若无则为 "none" */
   texture: string;
   /** 网格线: 'dark' | 'light' | 'none'（图片背景可关闭网格） */
@@ -54,7 +67,8 @@ const themes: Record<string, ThemeDef> = {
     black: tree_black,
   },
   wood: {
-    bg: 'plugins/xiangqi/assets/wood.png',
+    bg: 'plugins/xiangqi/assets/wood.jpg',
+    bgImage: { path: 'plugins/xiangqi/assets/wood.jpg', base64: woodB64 },
     texture: 'none',
     grid: 'light',
     red: tree_red,
@@ -62,6 +76,7 @@ const themes: Record<string, ThemeDef> = {
   },
   bamboo: {
     bg: 'plugins/xiangqi/assets/bamboo.jpg',
+    bgImage: { path: 'plugins/xiangqi/assets/bamboo.jpg', base64: bambooB64 },
     texture: 'none',
     grid: 'none',
     red: tree_red,
@@ -74,6 +89,54 @@ export const THEME_KEYS = Object.keys(themes);
 
 function isImagePath(s: string): boolean {
   return /\.(png|jpe?g|gif|webp|svg|bmp)$/i.test(s);
+}
+
+/** base64 字符串 -> ArrayBuffer（writeBinary 需要） */
+function base64ToArrayBuffer(b64: string): ArrayBuffer {
+  const bin = atob(b64);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return bytes.buffer;
+}
+
+/** 确保指定目录路径存在（含中间目录），configDir 之外的祖先目录假定已存在 */
+async function ensureDir(
+  adapter: { exists(p: string): Promise<boolean>; mkdir(p: string): Promise<void> },
+  dir: string,
+) {
+  const parts = dir.split('/').filter(Boolean);
+  let cur = '';
+  for (const part of parts) {
+    cur = cur ? `${cur}/${part}` : part;
+    if (!(await adapter.exists(cur))) {
+      await adapter.mkdir(cur);
+    }
+  }
+}
+
+/**
+ * 检查所有图片型主题背景是否已在本地存在；缺失则用内嵌 base64 解码写盘。
+ * 幂等：已存在的文件不重写。写盘失败仅记录日志，不影响其它主题。
+ */
+export async function ensureBoardAssets(app: App): Promise<void> {
+  const adapter = app.vault.adapter;
+  const configDir = app.vault.configDir;
+  for (const def of Object.values(themes)) {
+    const img = def.bgImage;
+    if (!img) continue;
+    const fullPath = `${configDir}/${img.path}`;
+    try {
+      if (await adapter.exists(fullPath)) continue;
+      // writeBinary 不会自动创建中间目录，需先确保 assets/ 目录存在
+      const slash = img.path.lastIndexOf('/');
+      if (slash > 0) {
+        await ensureDir(adapter, `${configDir}/${img.path.slice(0, slash)}`);
+      }
+      await adapter.writeBinary(fullPath, base64ToArrayBuffer(img.base64));
+    } catch (err) {
+      console.error(`[xiangqi] 写入背景图失败: ${img.path}`, err);
+    }
+  }
 }
 
 export function applyThemes(app: App, settings: ISettings) {
