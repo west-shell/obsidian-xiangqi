@@ -441,11 +441,11 @@
     --text-color: var(--text-normal);
   }
 
-  :global(.tree-view.right) .tree-container {
+  :global(.tree-codeblock .tree-view.right) .tree-container {
     height: calc(var(--xq-cell-size, 50px) * 10);
   }
 
-  :global(.tree-view.bottom) .tree-container {
+  :global(.tree-codeblock .tree-view.bottom) .tree-container {
     height: calc(var(--xq-cell-size, 50px) * 6);
   }
 
