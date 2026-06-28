@@ -178,24 +178,6 @@ p:true
 7. 找到本插件并点击 **安装**
 8. 安装完成后点击 **启用**
 
-### 图片棋盘资源
-
-**木质**和**竹纹**棋盘主题使用图片纹理。安装插件后，需要从
-[最新 Release](https://github.com/west-shell/obsidian-xiangqi/releases/latest)
-下载 `assets/wood.png` 和 `assets/bamboo.jpg`，放入插件的 `assets/` 目录：
-
-```
-.obsidian/plugins/xiangqi/
-├── main.js
-├── manifest.json
-├── styles.css
-└── assets/
-    ├── wood.png
-    └── bamboo.jpg
-```
-
-> **注意**：只有使用木质或竹纹主题时才需要这些资源文件，其他主题无需下载。
-
 ## 构建
 
 1. 克隆本项目及其依赖 [xiangqiground](https://github.com/west-shell/xiangqiground) 和 [xiangqi.js](https://github.com/west-shell/xiangqi.js) 到同一目录：
