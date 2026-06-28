@@ -145,14 +145,14 @@
 </div>
 
 <style>
-  :global(.tree-codeblock) .tree-view.right {
-    height: calc(var(--xq-cell-size, 50px) * 10) !important;
-  }
-  :global(.tree-codeblock) .tree-view.bottom {
-    height: calc(var(--xq-cell-size, 50px) * 20) !important;
-  }
   :global(.tree-codeblock) .tree-view {
     margin: 1rem 0;
+  }
+  :global(.tree-codeblock) .tree-view.right {
+    justify-content: flex-start;
+  }
+  :global(.tree-codeblock) .tree-view.bottom {
+    align-items: stretch;
   }
   :global(.view-content.pgn-view) .tree-view {
     --xq-board-width: var(--adaptive-board-width, 300px);
