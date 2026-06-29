@@ -464,8 +464,8 @@
     </div>
 
     <div class="slider" class:active={sliderMouseDown}>
-      <button class="slider-btn slider-to-start" onclick={() => eventBus.emit('btn-click', { name: 'toStart', payload: null })}>⏮</button>
-      <button class="slider-btn slider-prev" onclick={() => eventBus.emit('btn-click', { name: 'back', payload: null })}>◀</button>
+      <button class="slider-btn slider-to-start" aria-label="To start" use:useSetIcon={"minus"} onclick={() => eventBus.emit('btn-click', { name: 'toStart', payload: null })}></button>
+      <button class="slider-btn slider-prev" aria-label="Previous" use:useSetIcon={"arrow-up"} onclick={() => eventBus.emit('btn-click', { name: 'back', payload: null })}></button>
       <!-- svelte-ignore a11y_click_events_have_key_events -->
       <!-- svelte-ignore a11y_no_static_element_interactions -->
       <div
@@ -480,8 +480,8 @@
           <span class="slider-label" style="top: {sliderPercent}%" onmousedown={handleSliderAreaMouseDown}>{sliderText}</span>
         {/if}
       </div>
-      <button class="slider-btn slider-next" onclick={() => eventBus.emit('btn-click', { name: 'next', payload: null })}>▶</button>
-      <button class="slider-btn slider-to-end" onclick={() => eventBus.emit('btn-click', { name: 'toEnd', payload: null })}>⏭</button>
+      <button class="slider-btn slider-next" aria-label="Next" use:useSetIcon={"arrow-down"} onclick={() => eventBus.emit('btn-click', { name: 'next', payload: null })}></button>
+      <button class="slider-btn slider-to-end" aria-label="To end" use:useSetIcon={"minus"} onclick={() => eventBus.emit('btn-click', { name: 'toEnd', payload: null })}></button>
     </div>
   </div>
 
@@ -573,8 +573,13 @@
     align-items: center;
     justify-content: center;
     padding: 0;
-    margin: 2px 0;
+    margin: 0;
     transition: color 0.2s, background 0.2s;
+  }
+  .slider-btn + .slider-btn {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    margin-top: -1px;
   }
   .slider-btn:hover {
     color: var(--text-normal);
