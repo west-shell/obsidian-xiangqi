@@ -375,12 +375,12 @@
           <!-- svelte-ignore a11y_no_static_element_interactions -->
           <g
             class="node-group"
-            transform="translate({node.x! * spacingX} {node.y! * spacingY})"
+            transform="translate({node.x! * spacingX} {node.y! * spacingY}){node.id === currentNode?.id ? ' scale(1.35)' : ''}"
             opacity={currentPath.includes(node.id) ? 1 : 0.8}
             filter={!currentPath.includes(node.id)
               ? "grayscale(100%) brightness(0.75)"
               : node.id === currentNode?.id
-                ? "brightness(1.5) saturate(1.4) drop-shadow(0 0 1px rgba(255, 255, 255, 0.6))"
+                ? "drop-shadow(0 0 4px var(--interactive-accent))"
                 : undefined}
             stroke-width={node.id === currentNode?.id ? 1 : 0.5}
             onclick={() => eventBus.emit("node-click", node.id)}
