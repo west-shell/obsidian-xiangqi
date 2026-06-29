@@ -259,14 +259,14 @@
   let sliderPercent = $derived.by(() => {
     if (!currentNode || currentPath.length <= 1) return 0;
     const idx = currentPath.indexOf(currentNode.id);
-    if (idx < 0) return 0;
+    if (idx === -1) return 0;
     return (idx / (currentPath.length - 1)) * 100;
   });
 
   let sliderText = $derived.by(() => {
     if (!currentNode || currentPath.length <= 1) return "";
     const idx = currentPath.indexOf(currentNode.id);
-    return idx >= 0 ? `${idx + 1}/${currentPath.length}` : "";
+    return idx !== -1 ? `${idx + 1}/${currentPath.length}` : "";
   });
 
   const zoomBTN = [
@@ -464,7 +464,8 @@
     </div>
 
     <div class="slider" class:active={sliderMouseDown}>
-      <button class="slider-btn prev" onclick={() => eventBus.emit('btn-click', { name: 'back', payload: null })}>▲</button>
+      <button class="slider-btn slider-to-start" onclick={() => eventBus.emit('btn-click', { name: 'toStart', payload: null })}>⏮</button>
+      <button class="slider-btn slider-prev" onclick={() => eventBus.emit('btn-click', { name: 'back', payload: null })}>◀</button>
       <!-- svelte-ignore a11y_click_events_have_key_events -->
       <!-- svelte-ignore a11y_no_static_element_interactions -->
       <div
@@ -472,9 +473,15 @@
         class="slider-inner"
         onmousedown={handleSliderAreaMouseDown}
       >
-        <span class="slider-thumb" style="top: {sliderPercent}%">{sliderText}</span>
+        <span class="slider-thumb" style="top: {sliderPercent}%"></span>
+        {#if sliderText}
+          <!-- svelte-ignore a11y_click_events_have_key_events -->
+          <!-- svelte-ignore a11y_no_static_element_interactions -->
+          <span class="slider-label" style="top: {sliderPercent}%" onmousedown={handleSliderAreaMouseDown}>{sliderText}</span>
+        {/if}
       </div>
-      <button class="slider-btn next" onclick={() => eventBus.emit('btn-click', { name: 'next', payload: null })}>▼</button>
+      <button class="slider-btn slider-next" onclick={() => eventBus.emit('btn-click', { name: 'next', payload: null })}>▶</button>
+      <button class="slider-btn slider-to-end" onclick={() => eventBus.emit('btn-click', { name: 'toEnd', payload: null })}>⏭</button>
     </div>
   </div>
 
@@ -522,7 +529,7 @@
   .toolbar {
     position: absolute;
     top: 0.5rem;
-    right: calc(0.5rem + 25px);
+    left: 0.5rem;
     display: flex;
     gap: 0;
     margin: 0;
@@ -543,37 +550,39 @@
     top: 0;
     right: 0;
     bottom: 0;
-    width: 25px;
-    background: var(--background-secondary);
-    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
+    width: 6px;
+    background: var(--background-modifier-border);
     z-index: 2;
     display: flex;
     flex-direction: column;
     align-items: center;
+    border-radius: 3px;
+    margin: 6px;
   }
 
   .slider-btn {
-    height: 25px;
-    width: 25px;
-    background: none;
-    border: none;
+    width: 16px;
+    height: 16px;
+    background: var(--background-secondary);
+    border: 1px solid var(--background-modifier-border);
+    border-radius: 3px;
     color: var(--text-muted);
-    font-size: 0.7em;
+    font-size: 0.55em;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 0;
-    transition: color 0.2s;
+    margin: 2px 0;
+    transition: color 0.2s, background 0.2s;
   }
   .slider-btn:hover {
     color: var(--text-normal);
+    background: var(--background-modifier-hover);
   }
   .slider-btn:active {
     color: var(--text-on-accent);
-  }
-  .slider-btn.next {
-    margin-top: auto;
+    background: var(--interactive-accent);
   }
 
   .slider-inner {
@@ -585,25 +594,46 @@
 
   .slider-thumb {
     position: absolute;
-    left: 0;
-    right: 0;
-    height: 20px;
-    margin-top: -10px;
-    background: var(--background-modifier-hover);
-    color: var(--text-muted);
-    font-size: 0.65em;
-    line-height: 20px;
-    text-align: center;
-    transition: top 0.2s, background 0.2s;
-    border-radius: 2px;
+    left: -2px;
+    right: -2px;
+    height: 6px;
+    margin-top: -3px;
+    background: var(--interactive-accent);
+    border-radius: 3px;
+    transition: top 0.2s;
   }
   .slider.active .slider-thumb {
     transition: none;
   }
-  .slider-inner:hover .slider-thumb,
-  .slider.active .slider-thumb {
+
+  .slider-label {
+    position: absolute;
+    right: calc(100% + 8px);
+    height: 18px;
+    margin-top: -9px;
     background: var(--interactive-accent);
     color: var(--text-on-accent);
+    font-size: 0.6em;
+    line-height: 18px;
+    text-align: center;
+    padding: 0 4px;
+    border-radius: 3px;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: top 0.2s;
+  }
+  .slider.active .slider-label {
+    transition: none;
+  }
+  .slider-label::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: -4px;
+    transform: translateY(-50%);
+    border: 4px solid transparent;
+    border-left-color: var(--interactive-accent);
+    border-right: none;
   }
 
   .tree-svg {

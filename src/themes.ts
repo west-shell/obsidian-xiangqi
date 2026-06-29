@@ -1,4 +1,4 @@
-import { type App, addIcon } from 'obsidian';
+import { addIcon, type App } from 'obsidian';
 
 import bambooB64 from '../assets/bamboo.jpg?base64';
 import woodB64 from '../assets/wood.jpg?base64';
