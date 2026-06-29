@@ -89,7 +89,9 @@ export default class ChessPlugin extends Plugin {
 
     this.registerEvent(
       this.app.workspace.on('css-change', () => {
-        applyThemes(this.app, this.settings);
+        if (this.settings.theme === 'auto') {
+          applyThemes(this.app, this.settings);
+        }
       }),
     );
   }

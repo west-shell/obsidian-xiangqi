@@ -102,7 +102,7 @@
       saveTimeout = undefined;
     }
     if (layoutChangeHandler) {
-      document.body.removeEventListener('layout-change', layoutChangeHandler);
+      activeDocument.body.removeEventListener('layout-change', layoutChangeHandler);
       layoutChangeHandler = null;
     }
   });
@@ -298,7 +298,7 @@
     resetView();
 
     layoutChangeHandler = () => resetView();
-    document.body.addEventListener('layout-change', layoutChangeHandler);
+    activeDocument.body.addEventListener('layout-change', layoutChangeHandler);
 
     const handleSliderMouseMove = (evt: MouseEvent) => {
       if (!sliderMouseDown) return;
@@ -307,11 +307,11 @@
     const handleSliderMouseUp = () => {
       sliderMouseDown = false;
     };
-    document.addEventListener("mousemove", handleSliderMouseMove);
-    document.addEventListener("mouseup", handleSliderMouseUp);
+    activeDocument.addEventListener("mousemove", handleSliderMouseMove);
+    activeDocument.addEventListener("mouseup", handleSliderMouseUp);
     onDestroy(() => {
-      document.removeEventListener("mousemove", handleSliderMouseMove);
-      document.removeEventListener("mouseup", handleSliderMouseUp);
+      activeDocument.removeEventListener("mousemove", handleSliderMouseMove);
+      activeDocument.removeEventListener("mouseup", handleSliderMouseUp);
     });
   });
 
