@@ -81,6 +81,15 @@ const ActionsModule = {
       host.eventBus.emit('updateUI');
     });
 
+    eventBus.on<string>('slider-navigate', id => {
+      if (!id) return;
+      const node = host.nodeMap.get(id);
+      if (!node) return;
+      host.markedPos = null;
+      host.currentNode = node;
+      host.eventBus.emit('updateUI');
+    });
+
     eventBus.on<{ name: string; payload: string }>('btn-click', async payload => {
       if (!payload) return;
       host.markedPos = null;

@@ -236,6 +236,39 @@
     zoomAtCenter(1 / ZOOM_STEP);
   }
 
+  let sliderMouseDown = $state(false);
+  let sliderInnerEl: HTMLDivElement | undefined = $state();
+
+  function handleSliderAreaMouseDown(evt: MouseEvent) {
+    if (evt.button !== 0) return;
+    sliderMouseDown = true;
+    navigateFromSliderY(evt.clientY);
+  }
+
+  function navigateFromSliderY(clientY: number) {
+    if (!sliderInnerEl || currentPath.length <= 1) return;
+    const { top, height } = sliderInnerEl.getBoundingClientRect();
+    const percent = Math.min(1, Math.max(0, (clientY - top) / height));
+    const idx = Math.round(percent * (currentPath.length - 1));
+    const targetId = currentPath[idx];
+    if (targetId && targetId !== currentNode?.id) {
+      eventBus.emit("slider-navigate", targetId);
+    }
+  }
+
+  let sliderPercent = $derived.by(() => {
+    if (!currentNode || currentPath.length <= 1) return 0;
+    const idx = currentPath.indexOf(currentNode.id);
+    if (idx < 0) return 0;
+    return (idx / (currentPath.length - 1)) * 100;
+  });
+
+  let sliderText = $derived.by(() => {
+    if (!currentNode || currentPath.length <= 1) return "";
+    const idx = currentPath.indexOf(currentNode.id);
+    return idx >= 0 ? `${idx + 1}/${currentPath.length}` : "";
+  });
+
   const zoomBTN = [
     { title: "放大", icon: "plus", event: zoomIn },
     { title: "缩小", icon: "minus", event: zoomOut },
@@ -266,6 +299,20 @@
 
     layoutChangeHandler = () => resetView();
     document.body.addEventListener('layout-change', layoutChangeHandler);
+
+    const handleSliderMouseMove = (evt: MouseEvent) => {
+      if (!sliderMouseDown) return;
+      navigateFromSliderY(evt.clientY);
+    };
+    const handleSliderMouseUp = () => {
+      sliderMouseDown = false;
+    };
+    document.addEventListener("mousemove", handleSliderMouseMove);
+    document.addEventListener("mouseup", handleSliderMouseUp);
+    onDestroy(() => {
+      document.removeEventListener("mousemove", handleSliderMouseMove);
+      document.removeEventListener("mouseup", handleSliderMouseUp);
+    });
   });
 
   // ---- 响应式更新 ----
@@ -415,6 +462,20 @@
         ></button>
       {/each}
     </div>
+
+    <div class="slider" class:active={sliderMouseDown}>
+      <button class="slider-btn prev" onclick={() => eventBus.emit('btn-click', { name: 'back', payload: null })}>▲</button>
+      <!-- svelte-ignore a11y_click_events_have_key_events -->
+      <!-- svelte-ignore a11y_no_static_element_interactions -->
+      <div
+        bind:this={sliderInnerEl}
+        class="slider-inner"
+        onmousedown={handleSliderAreaMouseDown}
+      >
+        <span class="slider-thumb" style="top: {sliderPercent}%">{sliderText}</span>
+      </div>
+      <button class="slider-btn next" onclick={() => eventBus.emit('btn-click', { name: 'next', payload: null })}>▼</button>
+    </div>
   </div>
 
   <textarea
@@ -461,7 +522,7 @@
   .toolbar {
     position: absolute;
     top: 0.5rem;
-    right: 0.5rem;
+    right: calc(0.5rem + 25px);
     display: flex;
     gap: 0;
     margin: 0;
@@ -475,6 +536,74 @@
     height: 30px;
     padding: 0;
     margin: 0;
+  }
+
+  .slider {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 25px;
+    background: var(--background-secondary);
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .slider-btn {
+    height: 25px;
+    width: 25px;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 0.7em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: color 0.2s;
+  }
+  .slider-btn:hover {
+    color: var(--text-normal);
+  }
+  .slider-btn:active {
+    color: var(--text-on-accent);
+  }
+  .slider-btn.next {
+    margin-top: auto;
+  }
+
+  .slider-inner {
+    flex: 1 1 auto;
+    width: 100%;
+    position: relative;
+    cursor: pointer;
+  }
+
+  .slider-thumb {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 20px;
+    margin-top: -10px;
+    background: var(--background-modifier-hover);
+    color: var(--text-muted);
+    font-size: 0.65em;
+    line-height: 20px;
+    text-align: center;
+    transition: top 0.2s, background 0.2s;
+    border-radius: 2px;
+  }
+  .slider.active .slider-thumb {
+    transition: none;
+  }
+  .slider-inner:hover .slider-thumb,
+  .slider.active .slider-thumb {
+    background: var(--interactive-accent);
+    color: var(--text-on-accent);
   }
 
   .tree-svg {
