@@ -20,6 +20,8 @@ const ActionsModule = {
       switch (action) {
         case 'turn': {
           const parts = host.fen.split(' ');
+          // 确保至少有 turn 字段，避免空 fen 拼出非法值
+          while (parts.length < 2) parts.push('w');
           parts[1] = parts[1] === 'w' ? 'b' : 'w';
           host.fen = parts.join(' ');
           break;

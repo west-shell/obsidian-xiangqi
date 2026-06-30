@@ -1,6 +1,6 @@
 import { registerGenFENModule, registerListModule, registerTreeModule } from '../../core/module-system';
 import { DEFAULT_FEN, type IGenFENHost, type IListHost, type IOptions, type ITreeHost } from '../../types';
-import { parseOption, parsePikafishUrl } from '../../utils/parse';
+import { parseOption, parsePikafishUrl, parseSource } from '../../utils/parse';
 import { stringifyPGN } from '../Tree/Actions';
 
 import { PGNParser } from './parser';
@@ -102,7 +102,9 @@ const SourceModule = {
         }
 
         case 'fen': {
-          host.fen = host.source;
+          // 从 source 中提取合法 FEN；source 为空或非法时回退到默认初始局面
+          const parsed = parseSource(host.source);
+          host.fen = parsed.fen;
           break;
         }
       }

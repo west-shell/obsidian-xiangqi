@@ -52,7 +52,7 @@
     cursor: pointer;
   }
 
-  .red {
+  .white {
     background-color: var(--xq-piece-red);
     color: white;
   }
