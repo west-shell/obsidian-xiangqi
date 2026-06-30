@@ -9,7 +9,13 @@
     position?: string;
     selectedPiece: string | null;
   }
-  let { settings, fen, eventBus, position = "", selectedPiece }: Props = $props();
+  let {
+    settings,
+    fen,
+    eventBus,
+    position = "",
+    selectedPiece,
+  }: Props = $props();
 
   const MAX_COUNT: Record<string, number> = {
     K: 1,
@@ -43,7 +49,12 @@
   );
 
   let count = $derived(
-    Object.fromEntries(Object.keys(MAX_COUNT).map((p) => [p, MAX_COUNT[p] - (pieceCount[p] || 0)])),
+    Object.fromEntries(
+      Object.keys(MAX_COUNT).map((p) => [
+        p,
+        MAX_COUNT[p] - (pieceCount[p] || 0),
+      ]),
+    ),
   );
 </script>
 
@@ -70,7 +81,6 @@
     grid-template-columns: 1fr;
     grid-template-rows: repeat(14, 1fr);
     flex-direction: column;
-    height: calc(var(--xq-cell-size, 50px) * 10);
     width: fit-content;
     align-items: stretch;
     display: flex;
@@ -83,20 +93,19 @@
     grid-template-rows: repeat(2, 1fr);
     width: calc(var(--xq-cell-size, 50px) * 9);
     height: auto;
-    justify-content: center;
+    justify-content: left;
   }
 
   .piece-btn.right {
     flex: 1;
     width: 100%;
+    height: calc(var(--xq-cell-size, 50px) * 10 / 14);
     border-radius: 4px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: calc(var(--xq-cell-size, 50px) * 0.3);
-    border: 1.5px solid rgba(0, 0, 0, 0.35);
-    margin: 1px 0;
+    font-size: max(8px, calc(var(--xq-cell-size, 50px) * 0.3));
     transition:
       box-shadow 0.15s,
       border-color 0.15s;
@@ -129,7 +138,8 @@
   .active {
     border-color: #ffd700;
     box-shadow: 0 0 0 2px #ffd700;
-    filter: brightness(1.5) saturate(1.4) drop-shadow(0 0 6px rgba(255, 255, 255, 0.6));
+    filter: brightness(1.5) saturate(1.4)
+      drop-shadow(0 0 6px rgba(255, 255, 255, 0.6));
   }
 
   .empty {

@@ -108,7 +108,8 @@
               if (move) {
                 // 同步更新 Chessground 的 turn/movable，
                 // 避免依赖异步 $effect 可能延迟或丢失更新
-                const newTurn: cg.Color = chessEngine!.turn() === "b" ? "black" : "white";
+                const newTurn: cg.Color =
+                  chessEngine!.turn() === "b" ? "black" : "white";
                 api?.set({
                   fen: move.after,
                   turnColor: newTurn,
@@ -180,12 +181,18 @@
         api.state.dom.redraw();
       }
     };
-    activeDocument.body.addEventListener("xq-layout-change", layoutChangeHandler);
+    activeDocument.body.addEventListener(
+      "xq-layout-change",
+      layoutChangeHandler,
+    );
   });
 
   onDestroy(() => {
     if (layoutChangeHandler) {
-      activeDocument.body.removeEventListener("xq-layout-change", layoutChangeHandler);
+      activeDocument.body.removeEventListener(
+        "xq-layout-change",
+        layoutChangeHandler,
+      );
     }
     if (api) {
       api.destroy();
@@ -251,7 +258,7 @@
   });
 </script>
 
-  <div class="board-wrapper">
+<div class="board-wrapper">
   <div bind:this={boardElement} class="xq-wrap {turnClass}"></div>
 </div>
 
@@ -260,6 +267,7 @@
     --bw: var(--xq-board-width, calc(var(--xq-cell-size, 50px) * 9));
     width: var(--bw);
     position: relative;
+    margin:1.5px;
   }
   .xq-wrap {
     aspect-ratio: 9 / 10;
