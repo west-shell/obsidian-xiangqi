@@ -269,7 +269,7 @@
   let sliderText = $derived.by(() => {
     if (!currentNode || currentPath.length <= 1) return "";
     const idx = currentPath.indexOf(currentNode.id);
-    return idx !== -1 ? `${idx + 1}/${currentPath.length}` : "";
+    return idx !== -1 ? `${idx}/${currentPath.length-1}` : "";
   });
 
   const zoomBTN = [
