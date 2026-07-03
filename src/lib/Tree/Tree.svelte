@@ -124,7 +124,13 @@
     const regularComments = commentsText.split("\n").filter((c) => c.trim() !== "");
     const existingAnnotations = getAllAnnotations(currentNode);
     const existingShapes = getAllShapes(currentNode);
-    currentNode.comments = [...existingAnnotations, ...existingShapes, ...regularComments];
+    const newComments = [...existingAnnotations, ...existingShapes, ...regularComments];
+    const oldComments = currentNode.comments ?? [];
+    const changed =
+      newComments.length !== oldComments.length ||
+      newComments.some((c, i) => c !== oldComments[i]);
+    if (!changed) return;
+    currentNode.comments = newComments;
     eventBus.emit("updateUI", null);
     eventBus.emit("modified", null);
   }
