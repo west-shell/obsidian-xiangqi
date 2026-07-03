@@ -4,10 +4,10 @@ import type { IListHost, IPGNViewHost, ITreeHost } from '../types';
 
 type TryMovePayload = { from: Square; to: Square };
 
-function tryMove(host: IListHost | ITreeHost | IPGNViewHost, from: Square, to: Square): void {
+function tryMove(chess: Chess, host: IListHost | ITreeHost | IPGNViewHost, from: Square, to: Square): void {
   const eventBus = host.eventBus;
   try {
-    const chess = new Chess(host.fen);
+    chess.load(host.fen);
     const move = chess.move({ from, to });
     if (move) {
       host.markedPos = null;
@@ -25,6 +25,7 @@ function tryMove(host: IListHost | ITreeHost | IPGNViewHost, from: Square, to: S
 const BoardClickModule = {
   init(host: IListHost | ITreeHost | IPGNViewHost) {
     const eventBus = host.eventBus;
+    const chess = new Chess();
 
     eventBus.on<Square>('click', clickedKey => {
       if (!clickedKey) return;
@@ -33,12 +34,12 @@ const BoardClickModule = {
         eventBus.emit('updateUI');
         return;
       }
-      tryMove(host, host.markedPos, clickedKey);
+      tryMove(chess, host, host.markedPos, clickedKey);
     });
 
     eventBus.on<TryMovePayload>('trymove', payload => {
       if (!payload) return;
-      tryMove(host, payload.from, payload.to);
+      tryMove(chess, host, payload.from, payload.to);
     });
   },
 };

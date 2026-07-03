@@ -53,10 +53,11 @@
       : "",
   );
   let _check: cg.Color | false = $derived(checkColor || false);
+  const chess = new Chess();
 
   function computeDests(fen: string): Map<cg.Key, cg.Key[]> {
     try {
-      const chess = new Chess(fen);
+      chess.load(fen);
       const dests = new Map<cg.Key, cg.Key[]>();
       const moves = chess.moves({ verbose: true }) as Move[];
       for (const move of moves) {
