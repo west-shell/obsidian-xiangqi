@@ -48,6 +48,7 @@ const ActionsModule = {
       for (let node of currentNode.children) {
         if (node.move && node.move.from === from && node.move.to === to) {
           host.currentNode = node;
+          host.fen = node.fen;
           eventBus.emit('updateMainPath');
           eventBus.emit('updateUI');
           return;
@@ -67,6 +68,7 @@ const ActionsModule = {
       host.nodeMap.set(newNode.id, newNode);
       host.currentNode.children.push(newNode);
       host.currentNode = newNode;
+      host.fen = move.after;
       host.currentStep++;
       eventBus.emit('updateMainPath');
       eventBus.emit('updateUI');
@@ -77,6 +79,7 @@ const ActionsModule = {
       if (!id) return;
       host.markedPos = null;
       host.currentNode = host.nodeMap.get(id)!;
+      host.fen = host.currentNode.fen;
       host.eventBus.emit('updateMainPath');
       host.eventBus.emit('updateUI');
     });
@@ -87,6 +90,7 @@ const ActionsModule = {
       if (!node) return;
       host.markedPos = null;
       host.currentNode = node;
+      host.fen = node.fen;
       host.eventBus.emit('updateUI');
     });
 
@@ -133,6 +137,7 @@ const ActionsModule = {
           const removeNode = host.currentNode;
           const parentNode = host.nodeMap.get(removeNode.parentID!);
           host.currentNode = parentNode!;
+          host.fen = host.currentNode.fen;
           if (parentNode) {
             const idx = parentNode.children.indexOf(removeNode);
             if (idx !== -1) parentNode.children.splice(idx, 1);
@@ -170,18 +175,25 @@ const ActionsModule = {
         }
         case 'toStart':
           host.currentNode = host.nodeMap.get(host.currentPath[0])!;
+          host.fen = host.currentNode.fen;
           break;
         case 'back':
-          if (host.currentNode.parentID) host.currentNode = host.nodeMap.get(host.currentNode.parentID)!;
+          if (host.currentNode.parentID) {
+            host.currentNode = host.nodeMap.get(host.currentNode.parentID)!;
+            host.fen = host.currentNode.fen;
+          }
           break;
         case 'next': {
           const ci = host.currentPath.indexOf(host.currentNode.id);
-          if (ci < host.currentPath.length - 1)
+          if (ci < host.currentPath.length - 1) {
             host.currentNode = host.nodeMap.get(host.currentPath[ci + 1])!;
+            host.fen = host.currentNode.fen;
+          }
           break;
         }
         case 'toEnd':
           host.currentNode = host.nodeMap.get(host.currentPath[host.currentPath.length - 1])!;
+          host.fen = host.currentNode.fen;
           break;
         case 'openPikafish': {
           const fen = host.root.fen;
