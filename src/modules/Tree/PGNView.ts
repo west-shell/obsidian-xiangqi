@@ -24,6 +24,10 @@ const TreeViewModule = {
     });
 
     eventBus.on('createUI', () => {
+      if (host.Chess) {
+        unmount(host.Chess);
+        host.Chess = null;
+      }
       const Container = host.contentEl;
       Container.classList.add('pgn-view');
       host.Chess = mount(Chess, {

@@ -152,7 +152,7 @@
     api = Chessground(boardElement, config);
 
     layoutChangeHandler = () => {
-      if (api) {
+      if (api && boardElement.offsetWidth) {
         api.state.dom.bounds.clear();
         api.state.dom.redraw();
       }
