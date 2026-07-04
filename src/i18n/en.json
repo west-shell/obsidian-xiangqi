@@ -76,7 +76,7 @@
   "confirm.saveAll": "Save All",
   "confirm.saveMsg": "Save the game?",
   "confirm.deleteTitle": "Confirm Delete",
-  "confirm.deleteMsg": "Are you sure you want to delete the entire game? This cannot be undone.",
+  "confirm.deleteMsg": "Delete the entire game?",
   "confirm.yes": "Yes",
   "tree.placeholder": "Add comment",
   "pgn.newFile": "New PGN file",
