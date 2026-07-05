@@ -107,6 +107,7 @@ export default tseslint.config(
       '@typescript-eslint/no-extra-non-null-assertion': 'error',
       '@typescript-eslint/no-unnecessary-type-constraint': 'error',
       '@typescript-eslint/unbound-method': 'off',
+      '@typescript-eslint/no-deprecated': 'off',
 
       'unicorn/consistent-empty-array-spread': 'error',
       'unicorn/consistent-existence-index-check': 'error',
