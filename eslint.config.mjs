@@ -70,7 +70,6 @@ export default tseslint.config(
       'no-constant-binary-expression': 'error',
 
       eqeqeq: ['error', 'always', { null: 'ignore' }],
-      'no-duplicate-imports': 'off',
       'no-unused-expressions': ['error', { allowShortCircuit: true, enforceForJSX: true }],
       'no-unused-vars': 'off',
       'no-useless-concat': 'error',
