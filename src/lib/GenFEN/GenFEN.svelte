@@ -24,7 +24,7 @@
     rotated={false}
     freeMode={true}
   />
-  <PieceBTNs {settings} {fen} {eventBus} {position} {selectedPiece} />
+  <PieceBTNs {fen} {eventBus} {position} {selectedPiece} />
   <Toolbar
     {eventBus}
     {position}

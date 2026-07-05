@@ -46,7 +46,7 @@ const BoardModule = {
             ? "black"
             : "white"
           : null;
-      host.Chess?.$set({
+      host.Chess?.$set?.({
         settings: { ...host.settings },
         fen: host.fen,
         checkColor,
@@ -60,7 +60,7 @@ const BoardModule = {
     });
 
     eventBus.on("unload", () => {
-      void unmount(host.Chess);
+      if (host.Chess) void unmount(host.Chess);
     });
   },
 };

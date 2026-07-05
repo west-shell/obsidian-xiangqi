@@ -1,21 +1,14 @@
 <script lang="ts">
-  import { type ISettings, PIECE_CHARS } from "../../types";
+  import { PIECE_CHARS } from "../../types";
   import type { EventBus } from "../../core/event-bus";
 
   interface Props {
-    settings: ISettings;
     fen: string;
     eventBus: EventBus;
     position?: string;
     selectedPiece: string | null;
   }
-  let {
-    settings, // eslint-disable-line @typescript-eslint/no-unused-vars
-    fen,
-    eventBus,
-    position = "",
-    selectedPiece,
-  }: Props = $props();
+  let { fen, eventBus, position = "", selectedPiece }: Props = $props();
 
   const MAX_COUNT: Record<string, number> = {
     K: 1,
@@ -34,7 +27,6 @@
     p: 5,
   };
 
-  // 判断是否为红方棋子（大写字母）
   const isRed = (piece: string) => piece === piece.toUpperCase();
 
   let pieceCount = $derived(

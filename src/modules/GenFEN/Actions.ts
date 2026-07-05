@@ -15,6 +15,7 @@ const ActionsModule = {
         host.selectedPiece = null;
       } else {
         host.selectedPiece = piece;
+        host.markedPos = null;
       }
       host.eventBus.emit("updateUI");
     });

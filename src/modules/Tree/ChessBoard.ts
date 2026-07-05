@@ -31,7 +31,7 @@ const BoardModule = {
     });
 
     eventBus.on("updateUI", () => {
-      host.Chess?.$set({
+      host.Chess?.$set?.({
         settings: { ...host.settings },
         nodeMap: new Map(host.nodeMap),
         fen: host.currentNode.fen,
@@ -77,7 +77,7 @@ const BoardModule = {
     });
 
     eventBus.on("unload", () => {
-      void unmount(host.Chess);
+      if (host.Chess) void unmount(host.Chess);
     });
   },
 };
