@@ -1,9 +1,19 @@
-import { registerGenFENModule, registerListModule, registerTreeModule } from '../../core/module-system';
-import { DEFAULT_FEN, type IGenFENHost, type IListHost, type IOptions, type ITreeHost } from '../../types';
-import { parseOption, parsePikafishUrl, parseSource } from '../../utils/parse';
-import { stringifyPGN } from '../Tree/Actions';
+import {
+  registerGenFENModule,
+  registerListModule,
+  registerTreeModule,
+} from "../../core/module-system";
+import {
+  DEFAULT_FEN,
+  type IGenFENHost,
+  type IListHost,
+  type IOptions,
+  type ITreeHost,
+} from "../../types";
+import { parseOption, parsePikafishUrl, parseSource } from "../../utils/parse";
+import { stringifyPGN } from "../Tree/Actions";
 
-import { PGNParser } from './parser';
+import { PGNParser } from "./parser";
 
 /**
  * 将 pikafish URL 转为 PGNParser 可解析的 PGN 文本
@@ -13,11 +23,13 @@ function pikafishToPgn(source: string): string | null {
   if (!data) return null;
   const { initFEN, PGN } = data;
   const lines: string[] = [`[FEN "${initFEN}"]`];
-  const moves = PGN.map(m => m.iccs ?? '').filter(Boolean);
+  const moves = PGN.map((m) => m.iccs ?? "").filter(Boolean);
   for (let i = 0; i < moves.length; i += 2) {
-    lines.push(`${Math.ceil((i + 1) / 2)}. ${moves[i]} ${moves[i + 1] || ''}`.trim());
+    lines.push(
+      `${Math.ceil((i + 1) / 2)}. ${moves[i]} ${moves[i + 1] || ""}`.trim(),
+    );
   }
-  return lines.join('\n');
+  return lines.join("\n");
 }
 
 /**
@@ -30,26 +42,28 @@ function prepareSource(raw: string): { options: IOptions; clean: string } {
   const options = parseOption(source);
   // 删掉旧格式行
   let clean = source
-    .replace(/^[pr]\s*[:：].*$/gim, '')
-    .replace(/^(?:protected|rotated)\s*[:：].*$/gim, '')
+    .replace(/^[pr]\s*[:：].*$/gim, "")
+    .replace(/^(?:protected|rotated)\s*[:：].*$/gim, "")
     .trim();
   // 注入 PGN tag（仅当 source 中曾存在）
   const tags: string[] = [];
-  if (options.protected !== undefined) tags.push(`[Protected "${options.protected}"]`);
-  if (options.rotated !== undefined) tags.push(`[Rotated "${options.rotated}"]`);
-  if (tags.length > 0) clean = tags.join('\n') + '\n' + clean;
+  if (options.protected !== undefined)
+    tags.push(`[Protected "${options.protected}"]`);
+  if (options.rotated !== undefined)
+    tags.push(`[Rotated "${options.rotated}"]`);
+  if (tags.length > 0) clean = tags.join("\n") + "\n" + clean;
   return { options, clean };
 }
 
 const SourceModule = {
   init(host: IGenFENHost) {
     const eventBus = host.eventBus;
-    eventBus.on<string>('load', renderChild => {
+    eventBus.on<string>("load", (renderChild) => {
       // 先提取选项，删除旧格式行，注入 PGN tag
       const { options, clean: cleanSource } = prepareSource(host.source);
 
       switch (renderChild) {
-        case 'tree': {
+        case "tree": {
           const treeHost = host as ITreeHost;
           treeHost.options = options;
           const parser = new PGNParser(cleanSource);
@@ -58,13 +72,14 @@ const SourceModule = {
           treeHost.root = parser.getRoot();
           treeHost.nodeMap = parser.getMap();
           treeHost.tags = parser.getTags();
-          treeHost.currentNode = treeHost.nodeMap.get('node-root')!;
-          treeHost.currentTurn = 'white';
-          eventBus.emit('updateMainPath');
+          treeHost.currentNode = treeHost.nodeMap.get("node-root")!;
+          treeHost.currentTurn = "white";
+          eventBus.emit("updateMainPath");
 
           // 根据 autoJump 设置决定初始节点位置
           const shouldJump =
-            host.settings.autoJump === 'always' || (host.settings.autoJump === 'auto' && !treeHost.haveFEN);
+            host.settings.autoJump === "always" ||
+            (host.settings.autoJump === "auto" && !treeHost.haveFEN);
           if (shouldJump && treeHost.currentPath.length > 0) {
             treeHost.currentNode = treeHost.nodeMap.get(
               treeHost.currentPath[treeHost.currentPath.length - 1],
@@ -72,7 +87,7 @@ const SourceModule = {
           }
           break;
         }
-        case 'list': {
+        case "list": {
           const listHost = host as IListHost;
           const parser = new PGNParser(cleanSource);
           listHost.nodeMap = parser.getMap();
@@ -83,12 +98,13 @@ const SourceModule = {
           listHost.history = [...listHost.PGN];
           listHost.stringifyPGN = stringifyPGN;
           listHost.tags = new Map(parser.tags);
-          listHost.currentTurn = 'white';
+          listHost.currentTurn = "white";
           listHost.initFEN = parser.getRoot().fen;
 
           // 根据 autoJump 设置决定初始步数和棋盘局面
           const shouldJump =
-            host.settings.autoJump === 'always' || (host.settings.autoJump === 'auto' && !listHost.haveFEN);
+            host.settings.autoJump === "always" ||
+            (host.settings.autoJump === "auto" && !listHost.haveFEN);
           if (shouldJump) {
             const mainLine = parser.getMainLine();
             const last = mainLine[mainLine.length - 1];
@@ -101,7 +117,7 @@ const SourceModule = {
           break;
         }
 
-        case 'fen': {
+        case "fen": {
           // 从 source 中提取合法 FEN；source 为空或非法时回退到默认初始局面
           const parsed = parseSource(host.source);
           host.fen = parsed.fen;
@@ -110,12 +126,12 @@ const SourceModule = {
       }
     });
 
-    eventBus.on('full', () => {
+    eventBus.on("full", () => {
       host.fen = DEFAULT_FEN;
     });
   },
 };
 
-registerGenFENModule('source', SourceModule);
-registerListModule('source', SourceModule);
-registerTreeModule('source', SourceModule);
+registerGenFENModule("source", SourceModule);
+registerListModule("source", SourceModule);
+registerTreeModule("source", SourceModule);

@@ -21,7 +21,7 @@
 </script>
 
 <div class={`getFENT-toolbar-container ${position}`}>
-  {#each buttons as { title, text, action, color }}
+  {#each buttons as { title, text, action, color }, i (i)}
     <button
       {title}
       class={`toolbar-btn ${color ? currentTurn : ""}`}

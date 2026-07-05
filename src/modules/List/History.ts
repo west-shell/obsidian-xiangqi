@@ -1,17 +1,17 @@
-import type { Move } from '../../chess';
-import { registerListModule } from '../../core/module-system';
-import type { ChessNode, IListHost } from '../../types';
+import type { Move } from "../../chess";
+import { registerListModule } from "../../core/module-system";
+import type { ChessNode, IListHost } from "../../types";
 
 const HistoryModule = {
   init(host: IListHost) {
     const eventBus = host.eventBus;
 
-    eventBus.on('load', () => {
+    eventBus.on("load", () => {
       host.modified = false;
     });
 
-    eventBus.on('edithistory', (payload?: unknown) => {
-      if (!payload || typeof payload !== 'object') return;
+    eventBus.on("edithistory", (payload?: unknown) => {
+      if (!payload || typeof payload !== "object") return;
       editHistory(host, payload as Move);
     });
   },
@@ -19,7 +19,8 @@ const HistoryModule = {
 
 function editHistory(host: IListHost, move: Move) {
   const { currentStep, nodeMap } = host;
-  const parentNode = currentStep > 0 ? host.history[currentStep - 1] : host.root;
+  const parentNode =
+    currentStep > 0 ? host.history[currentStep - 1] : host.root;
 
   // 检查父节点下是否已有相同招法
   for (const child of parentNode.children) {
@@ -36,7 +37,7 @@ function editHistory(host: IListHost, move: Move) {
     fen: move.after,
     move,
     step: parentNode.step! + 1,
-    side: move.color === 'w' ? 'white' : 'black',
+    side: move.color === "w" ? "white" : "black",
     parentID: parentNode.id,
     children: [],
     comments: [],
@@ -48,4 +49,4 @@ function editHistory(host: IListHost, move: Move) {
   host.history = [...host.history.slice(0, currentStep), newNode];
 }
 
-registerListModule('history', HistoryModule);
+registerListModule("history", HistoryModule);

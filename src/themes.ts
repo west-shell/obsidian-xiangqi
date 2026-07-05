@@ -1,9 +1,9 @@
-import { addIcon, type App } from 'obsidian';
+import { addIcon, type App } from "obsidian";
 
-import bambooB64 from '../assets/bamboo.jpg?base64';
-import woodB64 from '../assets/wood.jpg?base64';
+import bambooB64 from "../assets/bamboo.jpg?base64";
+import woodB64 from "../assets/wood.jpg?base64";
 
-import type { ISettings } from './types';
+import type { ISettings } from "./types";
 
 /** 棋盘背景图片：路径相对 vault configDir（.obsidian），base64 为内嵌兜底数据 */
 interface BgImage {
@@ -21,64 +21,65 @@ interface ThemeDef {
   /** 纹理叠加，若无则为 "none" */
   texture: string;
   /** 网格线: 'dark' | 'light' | 'none'（图片背景可关闭网格） */
-  grid: 'dark' | 'light' | 'none';
+  grid: "dark" | "light" | "none";
   /** 红方棋子色 */
   red: string;
   /** 黑方棋子色 */
   black: string;
 }
-const tree_red = '#861818';
-const tree_black = '#0A1C3A';
+const tree_red = "#861818";
+const tree_black = "#0A1C3A";
 const themes: Record<string, ThemeDef> = {
   auto: {
-    bg: 'var(--background-primary-alt)',
-    texture: 'none',
-    grid: 'dark',
-    red: 'var(--xq-auto-red)',
-    black: 'var(--xq-auto-black)',
+    bg: "var(--background-primary-alt)",
+    texture: "none",
+    grid: "dark",
+    red: "var(--xq-auto-red)",
+    black: "var(--xq-auto-black)",
   },
   light: {
-    bg: '#ebe0d5',
-    texture: 'none',
-    grid: 'dark',
+    bg: "#ebe0d5",
+    texture: "none",
+    grid: "dark",
     red: tree_red,
     black: tree_black,
   },
   dark: {
-    bg: '#2d2d2d',
-    texture: 'none',
-    grid: 'light',
+    bg: "#2d2d2d",
+    texture: "none",
+    grid: "light",
     red: tree_red,
     black: tree_black,
   },
   parchment: {
-    bg: '#d0b899b4',
-    texture: 'radial-gradient(ellipse at 40% 30%, rgba(180,170,150,0.3) 0%, transparent 70%)',
-    grid: 'dark',
+    bg: "#d0b899b4",
+    texture:
+      "radial-gradient(ellipse at 40% 30%, rgba(180,170,150,0.3) 0%, transparent 70%)",
+    grid: "dark",
     red: tree_red,
     black: tree_black,
   },
   green: {
-    bg: '#2d5a27',
+    bg: "#2d5a27",
     texture:
-      'repeating-linear-gradient(0deg, rgba(255,255,255,0.04) 0px, rgba(255,255,255,0.04) 1px, transparent 1px, transparent 3px)',
-    grid: 'light',
+      "repeating-linear-gradient(0deg, rgba(255,255,255,0.04) 0px, rgba(255,255,255,0.04) 1px, transparent 1px, transparent 3px)",
+    grid: "light",
     red: tree_red,
     black: tree_black,
   },
   wood: {
-    bg: 'plugins/xiangqi/assets/wood.jpg',
-    bgImage: { path: 'plugins/xiangqi/assets/wood.jpg', base64: woodB64 },
-    texture: 'none',
-    grid: 'light',
+    bg: "plugins/xiangqi/assets/wood.jpg",
+    bgImage: { path: "plugins/xiangqi/assets/wood.jpg", base64: woodB64 },
+    texture: "none",
+    grid: "light",
     red: tree_red,
     black: tree_black,
   },
   bamboo: {
-    bg: 'plugins/xiangqi/assets/bamboo.jpg',
-    bgImage: { path: 'plugins/xiangqi/assets/bamboo.jpg', base64: bambooB64 },
-    texture: 'none',
-    grid: 'none',
+    bg: "plugins/xiangqi/assets/bamboo.jpg",
+    bgImage: { path: "plugins/xiangqi/assets/bamboo.jpg", base64: bambooB64 },
+    texture: "none",
+    grid: "none",
     red: tree_red,
     black: tree_black,
   },
@@ -101,11 +102,14 @@ function base64ToArrayBuffer(b64: string): ArrayBuffer {
 
 /** 确保指定目录路径存在（含中间目录），configDir 之外的祖先目录假定已存在 */
 async function ensureDir(
-  adapter: { exists(p: string): Promise<boolean>; mkdir(p: string): Promise<void> },
+  adapter: {
+    exists(p: string): Promise<boolean>;
+    mkdir(p: string): Promise<void>;
+  },
   dir: string,
 ) {
-  const parts = dir.split('/').filter(Boolean);
-  let cur = '';
+  const parts = dir.split("/").filter(Boolean);
+  let cur = "";
   for (const part of parts) {
     cur = cur ? `${cur}/${part}` : part;
     if (!(await adapter.exists(cur))) {
@@ -128,7 +132,7 @@ export async function ensureBoardAssets(app: App): Promise<void> {
     try {
       if (await adapter.exists(fullPath)) continue;
       // writeBinary 不会自动创建中间目录，需先确保 assets/ 目录存在
-      const slash = img.path.lastIndexOf('/');
+      const slash = img.path.lastIndexOf("/");
       if (slash > 0) {
         await ensureDir(adapter, `${configDir}/${img.path.slice(0, slash)}`);
       }
@@ -141,7 +145,7 @@ export async function ensureBoardAssets(app: App): Promise<void> {
 
 export function registerIcon() {
   addIcon(
-    'xiangqi-icon',
+    "xiangqi-icon",
     `
 <svg viewBox="0 0 80 80">
   <circle cx="40" cy="40" r="38"
@@ -160,24 +164,46 @@ export function registerIcon() {
 }
 
 export function applyThemes(app: App, settings: ISettings) {
-  const { theme, cellSize, boardMarginTop, boardMarginBottom, showCoordinateLabels } = settings;
+  const {
+    theme,
+    cellSize,
+    boardMarginTop,
+    boardMarginBottom,
+    showCoordinateLabels,
+  } = settings;
   const t = themes[theme] ?? themes.light;
 
   const bg = isImagePath(t.bg)
-    ? `url('${app.vault.adapter.getResourcePath(app.vault.configDir + '/' + t.bg)}') center / cover no-repeat`
+    ? `url('${app.vault.adapter.getResourcePath(app.vault.configDir + "/" + t.bg)}') center / cover no-repeat`
     : t.bg;
 
-  activeDocument.body.style.setProperty('--xq-cell-size', `${cellSize}px`);
-  activeDocument.body.style.setProperty('--xq-font-size', `${settings.fontSize}px`);
-  activeDocument.body.style.setProperty('--xq-board-bg', bg);
-  activeDocument.body.style.setProperty('--xq-board-texture', t.texture);
+  activeDocument.body.style.setProperty("--xq-cell-size", `${cellSize}px`);
   activeDocument.body.style.setProperty(
-    '--xq-grid',
-    t.grid === 'dark' ? 'var(--xq-grid-dark)' : t.grid === 'light' ? 'var(--xq-grid-light)' : 'none',
+    "--xq-font-size",
+    `${settings.fontSize}px`,
   );
-  activeDocument.body.style.setProperty('--xq-coords-display', showCoordinateLabels ? 'flex' : 'none');
-  activeDocument.body.style.setProperty('--xq-piece-red', t.red);
-  activeDocument.body.style.setProperty('--xq-piece-black', t.black);
-  activeDocument.body.style.setProperty('--xq-board-margin-top', `${boardMarginTop}px`);
-  activeDocument.body.style.setProperty('--xq-board-margin-bottom', `${boardMarginBottom}px`);
+  activeDocument.body.style.setProperty("--xq-board-bg", bg);
+  activeDocument.body.style.setProperty("--xq-board-texture", t.texture);
+  activeDocument.body.style.setProperty(
+    "--xq-grid",
+    t.grid === "dark"
+      ? "var(--xq-grid-dark)"
+      : t.grid === "light"
+        ? "var(--xq-grid-light)"
+        : "none",
+  );
+  activeDocument.body.style.setProperty(
+    "--xq-coords-display",
+    showCoordinateLabels ? "flex" : "none",
+  );
+  activeDocument.body.style.setProperty("--xq-piece-red", t.red);
+  activeDocument.body.style.setProperty("--xq-piece-black", t.black);
+  activeDocument.body.style.setProperty(
+    "--xq-board-margin-top",
+    `${boardMarginTop}px`,
+  );
+  activeDocument.body.style.setProperty(
+    "--xq-board-margin-bottom",
+    `${boardMarginBottom}px`,
+  );
 }

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onDestroy, onMount, tick } from "svelte";
+  import { SvelteSet } from "svelte/reactivity";
   import type { EventBus } from "../../core/event-bus";
   import { type ChessNode, type NodeMap, PIECE_CHARS } from "../../types";
   import { t } from "../../i18n";
@@ -22,21 +23,31 @@
     currentPath: string[];
   }
 
-  let { nodeMap, eventBus, currentNode = $bindable(), currentPath }: Props = $props();
+  let {
+    nodeMap,
+    eventBus,
+    currentNode = $bindable(),
+    currentPath,
+  }: Props = $props();
 
   let commentsText = $state("");
   let textareaEl: HTMLTextAreaElement | undefined = $state();
   let svgEl: SVGSVGElement | undefined = $state();
   let renderedNodes: ChessNode[] = $state([]);
-  let foldedNodes = $state(new Set<string>());
+  let foldedNodes = new SvelteSet<string>();
 
   // ---- D3 Zoom ----
   let zoomTransform = $state(d3.zoomIdentity);
   let zoomBehavior: d3.ZoomBehavior<SVGSVGElement, unknown>;
   const TRANSFORM_SAFE = $derived.by(() => {
     const t = zoomTransform;
-    if (!t || !Number.isFinite(t.x) || !Number.isFinite(t.y) || !Number.isFinite(t.k)) {
-      return 'translate(0,0) scale(1)';
+    if (
+      !t ||
+      !Number.isFinite(t.x) ||
+      !Number.isFinite(t.y) ||
+      !Number.isFinite(t.k)
+    ) {
+      return "translate(0,0) scale(1)";
     }
     return `translate(${t.x},${t.y}) scale(${t.k})`;
   });
@@ -46,12 +57,31 @@
   const nodeWidth = 13;
   const nodeHeight = 11;
 
-  const ANNOTATION_DEFINITIONS: Record<string, { symbol: string; color: string; icon?: string }> = {
-    "W+": { symbol: "白优", color: "var(--piece-red)", icon: iconPaths("thumbs-up") },
-    "B+": { symbol: "黑优", color: "var(--piece-black)", icon: iconPaths("thumbs-down") },
+  const ANNOTATION_DEFINITIONS: Record<
+    string,
+    { symbol: string; color: string; icon?: string }
+  > = {
+    "W+": {
+      symbol: "白优",
+      color: "var(--piece-red)",
+      icon: iconPaths("thumbs-up"),
+    },
+    "B+": {
+      symbol: "黑优",
+      color: "var(--piece-black)",
+      icon: iconPaths("thumbs-down"),
+    },
     "=": { symbol: "均势", color: "green", icon: iconPaths("handshake") },
-    "?": { symbol: "问题", color: "var(--text-warning)", icon: iconPaths("bookmark") },
-    "!": { symbol: "妙手", color: "var(--color-yellow)", icon: iconPaths("star") },
+    "?": {
+      symbol: "问题",
+      color: "var(--text-warning)",
+      icon: iconPaths("bookmark"),
+    },
+    "!": {
+      symbol: "妙手",
+      color: "var(--color-yellow)",
+      icon: iconPaths("star"),
+    },
     "W#": { symbol: "白胜", color: "red", icon: iconPaths("thumbs-up") },
     "B#": { symbol: "黑胜", color: "black", icon: iconPaths("thumbs-up") },
     "=#": { symbol: "和棋", color: "gray", icon: iconPaths("handshake") },
@@ -73,7 +103,9 @@
 
   function getRegularComments(node: ChessNode): string[] {
     return (
-      node.comments?.filter((c) => !ALL_ANNOTATION_KEYS.includes(c) && !SHAPES_RE.test(c)) ?? []
+      node.comments?.filter(
+        (c) => !ALL_ANNOTATION_KEYS.includes(c) && !SHAPES_RE.test(c),
+      ) ?? []
     );
   }
 
@@ -103,11 +135,16 @@
       saveTimeout = undefined;
     }
     if (layoutChangeHandler) {
-      activeDocument.body.removeEventListener('layout-change', layoutChangeHandler);
+      activeDocument.body.removeEventListener(
+        "layout-change",
+        layoutChangeHandler,
+      );
       layoutChangeHandler = null;
     }
-    if (handleSliderMouseMove) activeDocument.removeEventListener("mousemove", handleSliderMouseMove);
-    if (handleSliderMouseUp) activeDocument.removeEventListener("mouseup", handleSliderMouseUp);
+    if (handleSliderMouseMove)
+      activeDocument.removeEventListener("mousemove", handleSliderMouseMove);
+    if (handleSliderMouseUp)
+      activeDocument.removeEventListener("mouseup", handleSliderMouseUp);
   });
 
   // 离开时立即保存
@@ -121,10 +158,16 @@
 
   function saveComments() {
     if (!currentNode) return;
-    const regularComments = commentsText.split("\n").filter((c) => c.trim() !== "");
+    const regularComments = commentsText
+      .split("\n")
+      .filter((c) => c.trim() !== "");
     const existingAnnotations = getAllAnnotations(currentNode);
     const existingShapes = getAllShapes(currentNode);
-    const newComments = [...existingAnnotations, ...existingShapes, ...regularComments];
+    const newComments = [
+      ...existingAnnotations,
+      ...existingShapes,
+      ...regularComments,
+    ];
     const oldComments = currentNode.comments ?? [];
     const changed =
       newComments.length !== oldComments.length ||
@@ -139,7 +182,10 @@
   function adjustTextareaHeight() {
     if (!textareaEl) return;
     textareaEl.classList.add("auto-height");
-    textareaEl.style.setProperty("--textarea-height", `${textareaEl.scrollHeight}px`);
+    textareaEl.style.setProperty(
+      "--textarea-height",
+      `${textareaEl.scrollHeight}px`,
+    );
     textareaEl.classList.remove("auto-height");
   }
 
@@ -155,7 +201,6 @@
     } else {
       foldedNodes.add(node.id);
     }
-    foldedNodes = new Set(foldedNodes);
     updateTreeLayout();
   }
 
@@ -175,7 +220,13 @@
       minY = Math.min(minY, n.y);
       maxY = Math.max(maxY, n.y);
     }
-    if (!Number.isFinite(minX) || !Number.isFinite(maxX) || !Number.isFinite(minY) || !Number.isFinite(maxY)) return;
+    if (
+      !Number.isFinite(minX) ||
+      !Number.isFinite(maxX) ||
+      !Number.isFinite(minY) ||
+      !Number.isFinite(maxY)
+    )
+      return;
     const treeWidth = (maxX - minX) * spacingX;
     const treeHeight = (maxY - minY) * spacingY;
     const { clientWidth, clientHeight } = svgEl;
@@ -191,20 +242,25 @@
   function panToNodeIfNeeded(node: ChessNode) {
     if (!node || !svgEl || node.x === undefined || node.y === undefined) return;
     const { x: tx, y: ty, k: sc } = zoomTransform;
-    if (!Number.isFinite(tx) || !Number.isFinite(ty) || !Number.isFinite(sc)) return;
+    if (!Number.isFinite(tx) || !Number.isFinite(ty) || !Number.isFinite(sc))
+      return;
     const { clientWidth, clientHeight } = svgEl;
     const padding = 50;
-    let translateX = tx, translateY = ty, scale = sc;
+    let translateX = tx,
+      translateY = ty,
+      scale = sc;
     const nodeScreenX = node.x * spacingX * scale + translateX;
     const nodeScreenY = node.y * spacingY * scale + translateY;
 
     let dx = 0,
       dy = 0;
     if (nodeScreenX < padding) dx = padding - nodeScreenX;
-    else if (nodeScreenX > clientWidth - padding) dx = clientWidth - padding - nodeScreenX;
+    else if (nodeScreenX > clientWidth - padding)
+      dx = clientWidth - padding - nodeScreenX;
 
     if (nodeScreenY < padding) dy = padding - nodeScreenY;
-    else if (nodeScreenY > clientHeight - padding) dy = clientHeight - padding - nodeScreenY;
+    else if (nodeScreenY > clientHeight - padding)
+      dy = clientHeight - padding - nodeScreenY;
 
     if (dx || dy) {
       translateX += dx;
@@ -217,12 +273,15 @@
   function zoomAtCenter(factor: number) {
     if (!svgEl) return;
     const { x: tx, y: ty, k: sc } = zoomTransform;
-    if (!Number.isFinite(tx) || !Number.isFinite(ty) || !Number.isFinite(sc)) return;
+    if (!Number.isFinite(tx) || !Number.isFinite(ty) || !Number.isFinite(sc))
+      return;
     const w = svgEl.clientWidth;
     const h = svgEl.clientHeight;
     const cx = w / 2;
     const cy = h / 2;
-    let translateX = tx, translateY = ty, scale = sc;
+    let translateX = tx,
+      translateY = ty,
+      scale = sc;
     const prev = scale;
     const next = prev * factor;
     // 计算当前屏幕中心对应的世界坐标（未缩放坐标系）
@@ -275,7 +334,7 @@
   let sliderText = $derived.by(() => {
     if (!currentNode || currentPath.length <= 1) return "";
     const idx = currentPath.indexOf(currentNode.id);
-    return idx !== -1 ? `${idx}/${currentPath.length-1}` : "";
+    return idx !== -1 ? `${idx}/${currentPath.length - 1}` : "";
   });
 
   const zoomBTN = [
@@ -310,14 +369,17 @@
     activeDocument.addEventListener("mouseup", handleSliderMouseUp);
 
     layoutChangeHandler = () => resetView();
-    activeDocument.body.addEventListener('layout-change', layoutChangeHandler);
+    activeDocument.body.addEventListener("layout-change", layoutChangeHandler);
 
-    tick().then(() => new Promise(requestAnimationFrame)).then(() => {
-      if (!svgEl || svgEl.clientWidth === 0 || svgEl.clientHeight === 0) return;
-      d3.select(svgEl).call(zoomBehavior);
-      resetView();
-      return undefined;
-    });
+    tick()
+      .then(() => new Promise(requestAnimationFrame))
+      .then(() => {
+        if (!svgEl || svgEl.clientWidth === 0 || svgEl.clientHeight === 0)
+          return;
+        d3.select(svgEl).call(zoomBehavior);
+        resetView();
+        return undefined;
+      });
   });
 
   // ---- 响应式更新 ----
@@ -330,15 +392,15 @@
     const node = currentNode;
     commentsText = getRegularComments(node).join("\n");
 
-    // oxlint-disable-next-line promise/always-return
-    tick().then(() => {
+    void tick().then(() => {
       if (textareaEl) adjustTextareaHeight();
       panToNodeIfNeeded(node);
+      return undefined;
     });
   });
 
   $effect(() => {
-    // oxlint-disable-next-line no-unused-expressions
+    // eslint-disable-next-line no-unused-expressions, @typescript-eslint/no-unused-expressions
     nodeMap.size;
     updateTreeLayout();
   });
@@ -349,46 +411,70 @@
     <svg bind:this={svgEl} width="100%" height="100%" class="tree-svg">
       <g transform={TRANSFORM_SAFE}>
         <!-- 连线 -->
-        {#each renderedNodes as node}
-          {#each node.children as child, idx}
+        {#each renderedNodes as node (node.id)}
+          {#each node.children as child, idx (child.id)}
             {#if !(foldedNodes.has(node.id) && idx > 0)}
-            <path
-              d={`
+              <path
+                d={`
               M ${node.x! * spacingX} ${node.y! * spacingY}
               L ${(child.x! - 0.3 * Math.sign(child.x! - node.x!)) * spacingX} ${node.y! * spacingY}
               L ${child.x! * spacingX} ${child.y! * spacingY}
               `}
-              stroke="var(--xq-board-line)"
-              stroke-linejoin="round"
-              stroke-width={currentPath.includes(node.id) && currentPath.includes(child.id)
-                ? 1.5
-                : 1}
-              opacity={currentPath.includes(node.id) && currentPath.includes(child.id) ? 1.5 : 0.7}
-              filter={currentPath.includes(node.id) && currentPath.includes(child.id)
-                ? "brightness(1.5) saturate(1.4) drop-shadow(0 0 1px rgba(255, 255, 255, 0.6))"
-                : "grayscale(50%) brightness(0.75)"}
-              fill="none"
-            />
+                stroke="var(--xq-board-line)"
+                stroke-linejoin="round"
+                stroke-width={currentPath.includes(node.id) &&
+                currentPath.includes(child.id)
+                  ? 1.5
+                  : 1}
+                opacity={currentPath.includes(node.id) &&
+                currentPath.includes(child.id)
+                  ? 1.5
+                  : 0.7}
+                filter={currentPath.includes(node.id) &&
+                currentPath.includes(child.id)
+                  ? "brightness(1.5) saturate(1.4) drop-shadow(0 0 1px rgba(255, 255, 255, 0.6))"
+                  : "grayscale(50%) brightness(0.75)"}
+                fill="none"
+              />
             {/if}
           {/each}
         {/each}
 
-        {#each renderedNodes as node}
+        {#each renderedNodes as node (node.id)}
           {#if node.children.length > 1}
             {@const isLeft = (node.y ?? 0) % 2 === 0}
             <!-- svelte-ignore a11y_click_events_have_key_events -->
             <!-- svelte-ignore a11y_no_static_element_interactions -->
-            <g transform="translate({node.x! * spacingX + (isLeft ? -nodeWidth / 2 : nodeWidth / 2)} {node.y! * spacingY})" style="cursor: pointer" onclick={(e) => { e.stopPropagation(); toggleFold(node); }}>
+            <g
+              transform="translate({node.x! * spacingX +
+                (isLeft ? -nodeWidth / 2 : nodeWidth / 2)} {node.y! *
+                spacingY})"
+              style="cursor: pointer"
+              onclick={(e) => {
+                e.stopPropagation();
+                toggleFold(node);
+              }}
+            >
               <polygon
                 points={foldedNodes.has(node.id)
-                  ? (isLeft ? "0,-4 0,4 -3,3 -3,-3" : "0,-4 0,4 3,3 3,-3")
-                  : (isLeft ? "0,-4 0,4 -5,0" : "0,-4 0,4 5,0")}
+                  ? isLeft
+                    ? "0,-4 0,4 -3,3 -3,-3"
+                    : "0,-4 0,4 3,3 3,-3"
+                  : isLeft
+                    ? "0,-4 0,4 -5,0"
+                    : "0,-4 0,4 5,0"}
                 fill="var(--xq-board-line)"
                 stroke="var(--xq-board-line)"
                 stroke-width="1"
                 stroke-linejoin="round"
-                opacity={currentPath.includes(node.id) && node.children[0] && !currentPath.includes(node.children[0].id) ? 1.5 : 0.7}
-                filter={currentPath.includes(node.id) && node.children[0] && !currentPath.includes(node.children[0].id)
+                opacity={currentPath.includes(node.id) &&
+                node.children[0] &&
+                !currentPath.includes(node.children[0].id)
+                  ? 1.5
+                  : 0.7}
+                filter={currentPath.includes(node.id) &&
+                node.children[0] &&
+                !currentPath.includes(node.children[0].id)
                   ? "brightness(1.5) saturate(1.4) drop-shadow(0 0 1px rgba(255, 255, 255, 0.6))"
                   : "grayscale(50%) brightness(0.75)"}
               />
@@ -403,7 +489,8 @@
           <!-- svelte-ignore a11y_no_static_element_interactions -->
           <g
             class="node-group"
-            transform="translate({node.x! * spacingX} {node.y! * spacingY}){node.id === currentNode?.id ? ' scale(1.35)' : ''}"
+            transform="translate({node.x! * spacingX} {node.y! *
+              spacingY}){node.id === currentNode?.id ? ' scale(1.35)' : ''}"
             opacity={currentPath.includes(node.id) ? 1 : 0.8}
             filter={!currentPath.includes(node.id)
               ? "grayscale(100%) brightness(0.75)"
@@ -417,12 +504,15 @@
               {@const def = ANNOTATION_DEFINITIONS[primaryAnnotation]}
               <g
                 transform="translate(-7.2 -7.2) scale(0.6)"
-                fill={node.side === "white" ? "var(--piece-red)" : "var(--piece-black)"}
+                fill={node.side === "white"
+                  ? "var(--piece-red)"
+                  : "var(--piece-black)"}
                 stroke="currentColor"
                 stroke-width="1.5"
                 stroke-linecap="round"
                 stroke-linejoin="round"
               >
+                <!-- eslint-disable-next-line svelte/no-at-html-tags -->
                 {@html def.icon}
               </g>
             {:else}
@@ -447,10 +537,14 @@
           </g>
         {/each}
 
-        {#each renderedNodes as node}
+        {#each renderedNodes as node (node.id)}
           {#if getRegularComments(node).length > 0}
             <g
-              transform="translate({node.x! * spacingX + 0.35 * nodeWidth} {node.y! * spacingY - 0.7 * nodeHeight}){node.id === currentNode?.id ? ' scale(1.35)' : ''}"
+              transform="translate({node.x! * spacingX +
+                0.35 * nodeWidth} {node.y! * spacingY -
+                0.7 * nodeHeight}){node.id === currentNode?.id
+                ? ' scale(1.35)'
+                : ''}"
               opacity={currentPath.includes(node.id) ? 1 : 0.8}
               style="pointer-events: none"
             >
@@ -462,6 +556,7 @@
                 stroke-linecap="round"
                 stroke-linejoin="round"
               >
+                <!-- eslint-disable-next-line svelte/no-at-html-tags -->
                 {@html iconPaths("message-square-text")}
               </g>
             </g>
@@ -471,31 +566,65 @@
     </svg>
 
     <div class="toolbar">
-      {#each zoomBTN as { title, icon, event }}
-        <button class="toolbar-btn" aria-label={title} use:useSetIcon={icon} onclick={event}
+      {#each zoomBTN as { title, icon, event }, i (i)}
+        <button
+          class="toolbar-btn"
+          aria-label={title}
+          use:useSetIcon={icon}
+          onclick={event}
         ></button>
       {/each}
     </div>
 
     <div class="slider" class:active={sliderMouseDown}>
-      <button class="slider-btn slider-to-start" aria-label="To start" use:useSetIcon={"minus"} onclick={() => eventBus.emit('btn-click', { name: 'toStart', payload: null })}></button>
-      <button class="slider-btn slider-prev" aria-label="Previous" use:useSetIcon={"arrow-up"} onclick={() => eventBus.emit('btn-click', { name: 'back', payload: null })}></button>
-      <!-- svelte-ignore a11y_click_events_have_key_events -->
-      <!-- svelte-ignore a11y_no_static_element_interactions -->
+      <button
+        class="slider-btn slider-to-start"
+        aria-label="To start"
+        use:useSetIcon={"minus"}
+        onclick={() =>
+          eventBus.emit("btn-click", { name: "toStart", payload: null })}
+      ></button>
+      <button
+        class="slider-btn slider-prev"
+        aria-label="Previous"
+        use:useSetIcon={"arrow-up"}
+        onclick={() =>
+          eventBus.emit("btn-click", { name: "back", payload: null })}
+      ></button>
       <div
+        role="slider"
+        tabindex={-1}
+        aria-valuenow={sliderPercent}
+        aria-valuemin={0}
+        aria-valuemax={100}
         bind:this={sliderInnerEl}
         class="slider-inner"
         onmousedown={handleSliderAreaMouseDown}
       >
         <span class="slider-thumb" style="top: {sliderPercent}%"></span>
         {#if sliderText}
-          <!-- svelte-ignore a11y_click_events_have_key_events -->
-          <!-- svelte-ignore a11y_no_static_element_interactions -->
-          <span class="slider-label" style="top: {sliderPercent}%" onmousedown={handleSliderAreaMouseDown}>{sliderText}</span>
+          <span
+            role="presentation"
+            class="slider-label"
+            style="top: {sliderPercent}%"
+            onmousedown={handleSliderAreaMouseDown}>{sliderText}</span
+          >
         {/if}
       </div>
-      <button class="slider-btn slider-next" aria-label="Next" use:useSetIcon={"arrow-down"} onclick={() => eventBus.emit('btn-click', { name: 'next', payload: null })}></button>
-      <button class="slider-btn slider-to-end" aria-label="To end" use:useSetIcon={"minus"} onclick={() => eventBus.emit('btn-click', { name: 'toEnd', payload: null })}></button>
+      <button
+        class="slider-btn slider-next"
+        aria-label="Next"
+        use:useSetIcon={"arrow-down"}
+        onclick={() =>
+          eventBus.emit("btn-click", { name: "next", payload: null })}
+      ></button>
+      <button
+        class="slider-btn slider-to-end"
+        aria-label="To end"
+        use:useSetIcon={"minus"}
+        onclick={() =>
+          eventBus.emit("btn-click", { name: "toEnd", payload: null })}
+      ></button>
     </div>
   </div>
 
@@ -506,8 +635,7 @@
     bind:this={textareaEl}
     oninput={handleCommentsInput}
     onblur={handleCommentsBlur}
-    rows="1"
-  ></textarea>
+    rows="1"></textarea>
 </div>
 
 <style>
@@ -588,7 +716,9 @@
     justify-content: center;
     padding: 0;
     margin: 0;
-    transition: color 0.2s, background 0.2s;
+    transition:
+      color 0.2s,
+      background 0.2s;
   }
   .slider-btn + .slider-btn {
     border-top-left-radius: 0;
@@ -645,7 +775,7 @@
     transition: none;
   }
   .slider-label::after {
-    content: '';
+    content: "";
     position: absolute;
     top: 50%;
     right: -4px;

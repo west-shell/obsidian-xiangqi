@@ -1,8 +1,8 @@
-import { Chess, type Move } from '../../chess';
-import type { ChessNode } from '../../types';
-import { DEFAULT_FEN } from '../../types';
+import { Chess, type Move } from "../../chess";
+import type { ChessNode } from "../../types";
+import { DEFAULT_FEN } from "../../types";
 
-import { type Token, tokenize, type TokenType } from './Tokenizer';
+import { type Token, tokenize, type TokenType } from "./Tokenizer";
 
 export class PGNParser {
   haveFEN: boolean = false;
@@ -19,7 +19,7 @@ export class PGNParser {
 
   constructor(input: string | Token[]) {
     this.nodeMap = new Map<string, ChessNode>();
-    this.tokens = typeof input === 'string' ? tokenize(input) : input;
+    this.tokens = typeof input === "string" ? tokenize(input) : input;
     this.currentIndex = 0;
     this.nodeId = 1;
 
@@ -42,18 +42,18 @@ export class PGNParser {
     this.currentNode = this.rootNode;
     this.currentSide = null;
 
-    while (!this.match('eof')) {
-      if (this.match('tag')) {
+    while (!this.match("eof")) {
+      if (this.match("tag")) {
         this.parseTag();
-      } else if (this.match('iccs-move')) {
+      } else if (this.match("iccs-move")) {
         this.processSAN(this.consume().value);
-      } else if (this.match('wxf-move')) {
+      } else if (this.match("wxf-move")) {
         this.processWXF(this.consume().value);
-      } else if (this.match('left-paren')) {
+      } else if (this.match("left-paren")) {
         this.parseVariation();
-      } else if (this.match('comment')) {
+      } else if (this.match("comment")) {
         this.parseComment();
-      } else if (this.match('result')) {
+      } else if (this.match("result")) {
         this.parseResult();
       } else {
         this.consume();
@@ -71,7 +71,7 @@ export class PGNParser {
     const [, tagName, tagValue] = match;
     this.tags.set(tagName, tagValue);
 
-    if (tagName.toUpperCase() === 'FEN') {
+    if (tagName.toUpperCase() === "FEN") {
       this.haveFEN = true;
       try {
         this.chess.load(tagValue.trim());
@@ -83,7 +83,7 @@ export class PGNParser {
   }
 
   createNode(move: Move, fen: string): ChessNode {
-    const side = move.color === 'w' ? 'white' : 'black';
+    const side = move.color === "w" ? "white" : "black";
     const node: ChessNode = {
       id: `node-${this.nodeId++}`,
       fen,
@@ -119,7 +119,7 @@ export class PGNParser {
       this.currentNode.children.push(newNode);
       this.currentNode = newNode;
       this.currentStep++;
-      this.currentSide = move.color === 'w' ? 'white' : 'black';
+      this.currentSide = move.color === "w" ? "white" : "black";
     } catch {
       /* invalid move */
     }
@@ -135,8 +135,8 @@ export class PGNParser {
 
     const variationParentID = this.currentNode.parentID;
     if (!variationParentID) {
-      while (!this.match('right-paren') && !this.match('eof')) this.consume();
-      if (this.match('right-paren')) this.consume();
+      while (!this.match("right-paren") && !this.match("eof")) this.consume();
+      if (this.match("right-paren")) this.consume();
       return;
     }
     const variationBase = this.nodeMap.get(variationParentID)!;
@@ -150,16 +150,16 @@ export class PGNParser {
     this.currentStep = variationBase.step!;
     this.currentSide = variationBase.side;
 
-    while (!this.match('right-paren') && !this.match('eof')) {
-      if (this.match('iccs-move')) {
+    while (!this.match("right-paren") && !this.match("eof")) {
+      if (this.match("iccs-move")) {
         this.processSAN(this.consume().value);
-      } else if (this.match('wxf-move')) {
+      } else if (this.match("wxf-move")) {
         this.processWXF(this.consume().value);
-      } else if (this.match('comment')) {
+      } else if (this.match("comment")) {
         this.parseComment();
-      } else if (this.match('left-paren')) {
+      } else if (this.match("left-paren")) {
         this.parseVariation();
-      } else if (this.match('result')) {
+      } else if (this.match("result")) {
         this.consume();
         break;
       } else {
@@ -167,7 +167,7 @@ export class PGNParser {
       }
     }
 
-    if (this.match('right-paren')) this.consume();
+    if (this.match("right-paren")) this.consume();
 
     this.currentNode = prevState.node;
     this.currentStep = prevState.step;
@@ -176,30 +176,30 @@ export class PGNParser {
 
   parseComment() {
     const token = this.consume();
-    const comment = token.value.replace(/^{|}$/g, '').replace(/^;/, '').trim();
+    const comment = token.value.replace(/^{|}$/g, "").replace(/^;/, "").trim();
 
-    if (!this.currentNode.comments) this.currentNode.comments = [];
+    this.currentNode.comments ??= [];
     this.currentNode.comments.push(comment);
   }
 
   parseResult() {
     const token = this.consume();
-    let result = '';
+    let result = "";
     switch (token.value) {
-      case '1-0':
-        result = 'R+';
+      case "1-0":
+        result = "R+";
         break;
-      case '0-1':
-        result = 'B+';
+      case "0-1":
+        result = "B+";
         break;
-      case '1/2-1/2':
-        result = '=';
+      case "1/2-1/2":
+        result = "=";
         break;
-      case '*':
-        result = '?';
+      case "*":
+        result = "?";
         break;
     }
-    if (!this.currentNode.comments) this.currentNode.comments = [];
+    this.currentNode.comments ??= [];
     this.currentNode.comments.push(result);
   }
 
@@ -208,7 +208,7 @@ export class PGNParser {
     for (const [key, value] of this.tags.entries()) {
       lines.push(`[${key} "${value}"]`);
     }
-    return lines.join('\n');
+    return lines.join("\n");
   }
   public getRoot(): ChessNode {
     return this.rootNode;

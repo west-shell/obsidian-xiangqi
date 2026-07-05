@@ -39,6 +39,7 @@
   let isprotected = $derived(options.protected || false);
   // svelte-ignore state_referenced_locally
   let rotatedState = $state(options.rotated ?? false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let { position } = $derived(settings);
 
   onMount(async () => {

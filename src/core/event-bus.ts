@@ -3,17 +3,17 @@ import {
   registerListModule,
   registerPGNViewModule,
   registerTreeModule,
-} from './module-system';
+} from "./module-system";
 
 type EventType = string | symbol;
 type Handler<T = unknown> = (payload?: T) => void | Promise<void>;
 
 export class EventBus {
-  private handlers = new Map<EventType, Set<Handler<any>>>();
+  private readonly handlers = new Map<EventType, Set<Handler>>();
 
   constructor(public host: object) {}
 
-  static init(host: Record<string, any>): void {
+  static init(host: Record<string, unknown>): void {
     host.eventBus = new EventBus(host);
   }
 
@@ -33,7 +33,7 @@ export class EventBus {
       set = new Set();
       this.handlers.set(event, set);
     }
-    set.add(handler as Handler<any>);
+    set.add(handler as Handler);
   }
 
   /**
@@ -52,8 +52,11 @@ export class EventBus {
         const result = hasPayload ? handler(payload) : handler();
         // 如果是 Promise，自动处理错误
         if (result instanceof Promise) {
-          result.catch(error => {
-            console.error(`Error in event handler for "${String(event)}":`, error);
+          result.catch((error) => {
+            console.error(
+              `Error in event handler for "${String(event)}":`,
+              error,
+            );
           });
         }
       } catch (error) {
@@ -66,7 +69,7 @@ export class EventBus {
    * 移除事件监听
    */
   off<T = unknown>(event: EventType, handler: Handler<T>): void {
-    this.handlers.get(event)?.delete(handler as Handler<any>);
+    this.handlers.get(event)?.delete(handler as Handler);
   }
 
   /**
@@ -96,7 +99,7 @@ export class EventBus {
 }
 
 // 注册模块
-registerListModule('eventBus', EventBus);
-registerGenFENModule('eventBus', EventBus);
-registerPGNViewModule('eventBus', EventBus);
-registerTreeModule('eventBus', EventBus);
+registerListModule("eventBus", EventBus);
+registerGenFENModule("eventBus", EventBus);
+registerPGNViewModule("eventBus", EventBus);
+registerTreeModule("eventBus", EventBus);

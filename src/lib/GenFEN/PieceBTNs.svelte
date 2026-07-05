@@ -10,7 +10,7 @@
     selectedPiece: string | null;
   }
   let {
-    settings,
+    settings, // eslint-disable-line @typescript-eslint/no-unused-vars
     fen,
     eventBus,
     position = "",
@@ -59,7 +59,7 @@
 </script>
 
 <div class={`piece-btn-container ${position}`}>
-  {#each Object.entries(PIECE_CHARS) as [piece, name]}
+  {#each Object.entries(PIECE_CHARS) as [piece, name] (piece)}
     <button
       class={`piece-btn ${position} ${isRed(piece) ? "red-piece" : "black-piece"}`}
       class:empty={count[piece] === 0}

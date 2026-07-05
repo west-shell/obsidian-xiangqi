@@ -33,23 +33,60 @@
   const buildButtons = (v: number) => [
     { title: t("toolbar.reset", v), icon: "rotate-ccw", event: "reset" },
     { title: t("toolbar.delete", v), icon: "circle-x", event: "remove" },
-    { title: t("toolbar.promote", v), icon: "arrow-up-wide-narrow", event: "promote" },
-    { title: t("toolbar.start", v), icon: "arrow-left-to-line", event: "toStart" },
+    {
+      title: t("toolbar.promote", v),
+      icon: "arrow-up-wide-narrow",
+      event: "promote",
+    },
+    {
+      title: t("toolbar.start", v),
+      icon: "arrow-left-to-line",
+      event: "toStart",
+    },
     { title: t("toolbar.back", v), icon: "arrow-left", event: "back" },
     { title: t("toolbar.forward", v), icon: "arrow-right", event: "next" },
     { title: t("toolbar.end", v), icon: "arrow-right-to-line", event: "toEnd" },
     { title: t("toolbar.flip", v), icon: "flip-vertical", event: "rotate" },
     { title: "皮卡鱼Web", icon: "external-link", event: "openPikafish" },
-    { title: t("toolbar.annotate", v), icon: "tag", event: "toggle-annotation-menu" },
+    {
+      title: t("toolbar.annotate", v),
+      icon: "tag",
+      event: "toggle-annotation-menu",
+    },
   ];
   let buttons = $derived(buildButtons(_lv));
 
   const buildAnnotations = (v: number) => [
-    { title: t("annotation.w+", v), icon: "thumbs-up", symbol: "W+", event: "annotation" },
-    { title: t("annotation.b+", v), icon: "thumbs-down", symbol: "B+", event: "annotation" },
-    { title: t("annotation.eq", v), icon: "handshake", symbol: "=", event: "annotation" },
-    { title: t("annotation.key", v), icon: "bookmark", symbol: "?", event: "annotation" },
-    { title: t("annotation.br", v), icon: "star", symbol: "!", event: "annotation" },
+    {
+      title: t("annotation.w+", v),
+      icon: "thumbs-up",
+      symbol: "W+",
+      event: "annotation",
+    },
+    {
+      title: t("annotation.b+", v),
+      icon: "thumbs-down",
+      symbol: "B+",
+      event: "annotation",
+    },
+    {
+      title: t("annotation.eq", v),
+      icon: "handshake",
+      symbol: "=",
+      event: "annotation",
+    },
+    {
+      title: t("annotation.key", v),
+      icon: "bookmark",
+      symbol: "?",
+      event: "annotation",
+    },
+    {
+      title: t("annotation.br", v),
+      icon: "star",
+      symbol: "!",
+      event: "annotation",
+    },
   ];
   let annotations = $derived(buildAnnotations(_lv));
 
@@ -81,7 +118,7 @@
 </script>
 
 <div class="toolbar-container">
-  {#each buttons as { title, icon, event }}
+  {#each buttons as { title, icon, event }, i (i)}
     <button
       class="toolbar-btn"
       aria-label={title}

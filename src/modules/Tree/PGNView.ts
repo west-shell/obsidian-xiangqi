@@ -1,15 +1,15 @@
-import { mount, unmount } from 'svelte';
+import { mount, unmount } from "svelte";
 
-import { registerPGNViewModule } from '../../core/module-system';
-import Chess from '../../lib/Tree/Chess.svelte';
-import type { IPGNViewHost } from '../../types';
-import { PGNParser } from '../Source/parser';
+import { registerPGNViewModule } from "../../core/module-system";
+import Chess from "../../lib/Tree/Chess.svelte";
+import type { IPGNViewHost } from "../../types";
+import { PGNParser } from "../Source/parser";
 
 const TreeViewModule = {
   init(host: IPGNViewHost) {
     const eventBus = host.eventBus;
 
-    eventBus.on('setViewData', () => {
+    eventBus.on("setViewData", () => {
       host.markedPos = null;
       const parser = new PGNParser(host.data);
       host.parser = parser;
@@ -17,19 +17,19 @@ const TreeViewModule = {
       host.root = parser.getRoot();
       host.nodeMap = parser.getMap();
       host.tags = parser.getTags();
-      host.currentNode = host.nodeMap.get('node-root')!;
+      host.currentNode = host.nodeMap.get("node-root")!;
       host.fen = host.currentNode.fen;
-      host.currentTurn = 'white';
-      eventBus.emit('updateMainPath');
+      host.currentTurn = "white";
+      eventBus.emit("updateMainPath");
     });
 
-    eventBus.on('createUI', () => {
+    eventBus.on("createUI", () => {
       if (host.Chess) {
-        unmount(host.Chess);
+        void unmount(host.Chess);
         host.Chess = null;
       }
       const Container = host.contentEl;
-      Container.classList.add('pgn-view');
+      Container.classList.add("pgn-view");
       host.Chess = mount(Chess, {
         target: Container,
         props: {
@@ -43,46 +43,46 @@ const TreeViewModule = {
       });
     });
 
-    eventBus.on('updateUI', () => {
+    eventBus.on("updateUI", () => {
       host.Chess?.$set({
         settings: { ...host.settings },
         nodeMap: new Map(host.nodeMap),
-        fen: host.currentNode?.fen ?? '',
+        fen: host.currentNode?.fen ?? "",
         currentNode: host.currentNode,
         currentPath: host.currentPath,
       });
     });
 
-    eventBus.on('ready', () => {
+    eventBus.on("ready", () => {
       if (!host.settings.autoJump) return;
       switch (host.settings.autoJump) {
-        case 'never':
+        case "never":
           break;
-        case 'always':
-          eventBus.emit('btn-click', 'toEnd');
+        case "always":
+          eventBus.emit("btn-click", "toEnd");
           break;
-        case 'auto':
-          if (!host.haveFEN) eventBus.emit('btn-click', 'toEnd');
+        case "auto":
+          if (!host.haveFEN) eventBus.emit("btn-click", "toEnd");
           break;
       }
     });
 
-    eventBus.on('reset', () => {
-      eventBus.emit('setViewData');
-      eventBus.emit('updateUI');
+    eventBus.on("reset", () => {
+      eventBus.emit("setViewData");
+      eventBus.emit("updateUI");
     });
 
-    eventBus.on('save', () => {
+    eventBus.on("save", () => {
       const pgn = host.stringifyPGN(host.root);
-      const content = [host.tags?.trim(), pgn].filter(Boolean).join('\n');
+      const content = [host.tags?.trim(), pgn].filter(Boolean).join("\n");
       host.data = content;
       host.saveFile();
     });
 
-    eventBus.on('unload', () => {
-      unmount(host.Chess);
+    eventBus.on("unload", () => {
+      void unmount(host.Chess);
     });
   },
 };
 
-registerPGNViewModule('Tree', TreeViewModule);
+registerPGNViewModule("Tree", TreeViewModule);

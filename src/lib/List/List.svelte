@@ -46,7 +46,7 @@
         {settings.showMovelistText ? "= 开 局 =" : "开 局"}
       </span>
     </li>
-    {#each moves as move, i}
+    {#each moves as move, i (move.id)}
       {#if i % 2 === 0}
         <li class="round" bind:this={itemRefs[i / 2 + 1]}>
           <span class="roundnum">{i / 2 + 1}</span>
@@ -55,7 +55,7 @@
             class:active={currentStep === i + 1}
             onclick={() => eventBus.emit("clickstep", i + 1)}
           >
-            {settings.showMovelistText ? move.move?.zh ?? "" : "红"}
+            {settings.showMovelistText ? (move.move?.zh ?? "") : "红"}
           </span>
           {#if moves[i + 1]}
             <span
@@ -63,7 +63,7 @@
               class:active={currentStep === i + 2}
               onclick={() => eventBus.emit("clickstep", i + 2)}
             >
-              {settings.showMovelistText ? moves[i + 1].move?.zh ?? "" : "黑"}
+              {settings.showMovelistText ? (moves[i + 1].move?.zh ?? "") : "黑"}
             </span>
           {/if}
         </li>

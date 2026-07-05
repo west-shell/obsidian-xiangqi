@@ -4,7 +4,10 @@
  * @param element 目标元素
  * @param container 可滚动容器
  */
-export function scrollToBTN(element: HTMLElement | null, container: HTMLElement | null): void {
+export function scrollToBTN(
+  element: HTMLElement | null,
+  container: HTMLElement | null,
+): void {
   if (!element || !container) return;
 
   const elementRect = element.getBoundingClientRect();
@@ -15,10 +18,13 @@ export function scrollToBTN(element: HTMLElement | null, container: HTMLElement 
   if (hasVerticalScrollbar) {
     const offsetTop = elementRect.top - containerRect.top;
     const targetScrollTop =
-      container.scrollTop + offsetTop - container.clientHeight / 2 + element.offsetHeight / 2;
+      container.scrollTop +
+      offsetTop -
+      container.clientHeight / 2 +
+      element.offsetHeight / 2;
     container.scrollTo({
       top: targetScrollTop,
-      behavior: 'smooth',
+      behavior: "smooth",
     });
   }
 
@@ -27,10 +33,13 @@ export function scrollToBTN(element: HTMLElement | null, container: HTMLElement 
   if (hasHorizontalScrollbar) {
     const offsetLeft = elementRect.left - containerRect.left;
     const targetScrollLeft =
-      container.scrollLeft + offsetLeft - container.clientWidth / 2 + element.offsetWidth / 2;
+      container.scrollLeft +
+      offsetLeft -
+      container.clientWidth / 2 +
+      element.offsetWidth / 2;
     container.scrollTo({
       left: targetScrollLeft,
-      behavior: 'smooth',
+      behavior: "smooth",
     });
   }
 }

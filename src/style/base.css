@@ -183,19 +183,37 @@ piece.fading {
 
 /* Interactive board square colors */
 xq-board square.move-dest {
-  background: radial-gradient(rgba(20, 85, 30, 0.5) 22%, #208530 0, rgba(0, 0, 0, 0.3) 0, rgba(0, 0, 0, 0) 0);
+  background: radial-gradient(
+    rgba(20, 85, 30, 0.5) 22%,
+    #208530 0,
+    rgba(0, 0, 0, 0.3) 0,
+    rgba(0, 0, 0, 0) 0
+  );
 }
 
 xq-board square.premove-dest {
-  background: radial-gradient(rgba(20, 30, 85, 0.5) 22%, #203085 0, rgba(0, 0, 0, 0.3) 0, rgba(0, 0, 0, 0) 0);
+  background: radial-gradient(
+    rgba(20, 30, 85, 0.5) 22%,
+    #203085 0,
+    rgba(0, 0, 0, 0.3) 0,
+    rgba(0, 0, 0, 0) 0
+  );
 }
 
 xq-board square.oc.move-dest {
-  background: radial-gradient(transparent 0%, transparent 75%, rgba(20, 85, 0, 0.5) 75%);
+  background: radial-gradient(
+    transparent 0%,
+    transparent 75%,
+    rgba(20, 85, 0, 0.5) 75%
+  );
 }
 
 xq-board square.oc.premove-dest {
-  background: radial-gradient(transparent 0%, transparent 80%, rgba(20, 30, 85, 0.2) 80%);
+  background: radial-gradient(
+    transparent 0%,
+    transparent 80%,
+    rgba(20, 30, 85, 0.2) 80%
+  );
 }
 
 xq-board square.move-dest:hover,
@@ -209,11 +227,16 @@ xq-board square.premove-dest.hover {
 }
 
 .turn-red xq-board square.last-move-orig {
-  background: linear-gradient(var(--piece-black, #44c), var(--piece-black, #44c)) center / 30% 30% no-repeat;
+  background: linear-gradient(
+      var(--piece-black, #44c),
+      var(--piece-black, #44c)
+    )
+    center / 30% 30% no-repeat;
 }
 
 .turn-black xq-board square.last-move-orig {
-  background: linear-gradient(var(--piece-red, #c44), var(--piece-red, #c44)) center / 30% 30% no-repeat;
+  background: linear-gradient(var(--piece-red, #c44), var(--piece-red, #c44))
+    center / 30% 30% no-repeat;
 }
 
 .turn-red xq-board square.last-move-dest {
@@ -227,12 +250,20 @@ xq-board square.premove-dest.hover {
 
 .turn-black xq-board square.last-move-dest {
   /* background-color: rgba(20, 85, 30, 0.5); */
-  background: radial-gradient(transparent 0%, transparent 75%, var(--piece-red, rgba(204, 68, 68, 0.5)) 75%);
+  background: radial-gradient(
+    transparent 0%,
+    transparent 75%,
+    var(--piece-red, rgba(204, 68, 68, 0.5)) 75%
+  );
 }
 
 xq-board square.selected {
   /* background-color: rgba(20, 85, 30, 0.5); */
-  background: radial-gradient(transparent 0%, transparent 75%, rgba(20, 85, 0, 1) 75%);
+  background: radial-gradient(
+    transparent 0%,
+    transparent 75%,
+    rgba(20, 85, 0, 1) 75%
+  );
 }
 
 xq-board square.check {

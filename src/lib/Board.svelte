@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
+  import { SvelteMap } from "svelte/reactivity";
   import {
     type Api,
     type cg,
@@ -55,10 +56,10 @@
   let _check: cg.Color | false = $derived(checkColor || false);
   const chess = new Chess();
 
-  function computeDests(fen: string): Map<cg.Key, cg.Key[]> {
+  function computeDests(fen: string): SvelteMap<cg.Key, cg.Key[]> {
     try {
       chess.load(fen);
-      const dests = new Map<cg.Key, cg.Key[]>();
+      const dests = new SvelteMap<cg.Key, cg.Key[]>();
       const moves = chess.moves({ verbose: true }) as Move[];
       for (const move of moves) {
         const orig = move.from;
@@ -70,7 +71,7 @@
       }
       return dests;
     } catch {
-      return new Map();
+      return new SvelteMap();
     }
   }
 
@@ -100,7 +101,10 @@
       : {
           move: (orig, dest) => {
             api?.cancelMove();
-            eventBus.emit("trymove", { from: orig as Square, to: dest as Square });
+            eventBus.emit("trymove", {
+              from: orig as Square,
+              to: dest as Square,
+            });
           },
         };
 
@@ -243,7 +247,7 @@
     --bw: var(--xq-board-width, calc(var(--xq-cell-size, 50px) * 9));
     width: var(--bw);
     position: relative;
-    margin:1.5px;
+    margin: 1.5px;
   }
   .xq-wrap {
     aspect-ratio: 9 / 10;

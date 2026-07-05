@@ -7,7 +7,7 @@
  *   - 用轮廓行走消除重叠
  */
 
-import type { ChessNode, NodeMap } from '../../types';
+import type { ChessNode, NodeMap } from "../../types";
 
 // ─── 内部节点 ───────────────────────
 
@@ -41,7 +41,11 @@ interface LowEntry {
 
 // ─── 构建内部树 ────────────────────
 
-function buildWNode(node: ChessNode, parent: WNode | null, foldedNodes: Set<string>): WNode {
+function buildWNode(
+  node: ChessNode,
+  parent: WNode | null,
+  foldedNodes: Set<string>,
+): WNode {
   const wn: WNode = {
     node,
     parent,
@@ -81,7 +85,11 @@ function nodeBottom(w: WNode): number {
 
 // ─── 核心布局 ───────────────────────
 
-function layoutChildren(w: WNode, y: number, spacingFn: (a: WNode, b: WNode) => number): void {
+function layoutChildren(
+  w: WNode,
+  y: number,
+  spacingFn: (a: WNode, b: WNode) => number,
+): void {
   w.y = y;
 
   // 偶数层：把 trunk(firstChild) 移到数组末尾 → 分支往左排
@@ -106,7 +114,12 @@ function layoutChildren(w: WNode, y: number, spacingFn: (a: WNode, b: WNode) => 
   positionRoot(w);
 }
 
-function separate(w: WNode, i: number, lows: LowEntry, spacingFn: (a: WNode, b: WNode) => number): void {
+function separate(
+  w: WNode,
+  i: number,
+  lows: LowEntry,
+  spacingFn: (a: WNode, b: WNode) => number,
+): void {
   const lSib = w.children[i - 1];
   const cur = w.children[i];
 
@@ -158,7 +171,12 @@ function moveSubtree(subtree: WNode, dist: number): void {
   subtree.rExtRelX += dist;
 }
 
-function distributeExtra(w: WNode, curI: number, leftI: number, dist: number): void {
+function distributeExtra(
+  w: WNode,
+  curI: number,
+  leftI: number,
+  dist: number,
+): void {
   const n = curI - leftI;
   if (n > 1) {
     const delta = dist / n;
@@ -236,7 +254,11 @@ function setRThr(w: WNode, i: number, rContour: WNode, rSumMods: number): void {
 
 // ─── lows 链表 ─────────────────────
 
-function updateLows(lowY: number, index: number, lastLows: LowEntry | null): LowEntry {
+function updateLows(
+  lowY: number,
+  index: number,
+  lastLows: LowEntry | null,
+): LowEntry {
   while (lastLows !== null && lowY >= lastLows.lowY) lastLows = lastLows.next;
   return { lowY, index, next: lastLows };
 }
@@ -267,8 +289,11 @@ function resolveX(w: WNode, prevSum?: number, parentX?: number): void {
  * 输出：ChessNode 数组，每个节点有 x（水平位置）、y（深度）。
  * 渲染时用 x * spacingX、y * spacingY 转为像素坐标。
  */
-export function calculateTreeLayout(nodeMap: NodeMap, foldedNodes: Set<string>): ChessNode[] {
-  const root = nodeMap.get('node-root');
+export function calculateTreeLayout(
+  nodeMap: NodeMap,
+  foldedNodes: Set<string>,
+): ChessNode[] {
+  const root = nodeMap.get("node-root");
   if (!root) return [];
 
   // 1) 建树

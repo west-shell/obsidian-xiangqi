@@ -1,15 +1,21 @@
-import '../core/event-bus';
-import '../modules/Source/Source';
-import '../modules/GenFEN/FENBoard';
-import '../modules/GenFEN/BoardClick';
-import '../modules/GenFEN/Actions';
+import "../core/event-bus";
+import "../modules/Source/Source";
+import "../modules/GenFEN/FENBoard";
+import "../modules/GenFEN/BoardClick";
+import "../modules/GenFEN/Actions";
 
-import { type MarkdownPostProcessorContext, MarkdownRenderChild } from 'obsidian';
+import {
+  type MarkdownPostProcessorContext,
+  MarkdownRenderChild,
+} from "obsidian";
 
-import type { EventBus } from '../core/event-bus';
-import { createGenFENModuleRegistry, type ModuleRegistry } from '../core/module-system';
-import type ChessPlugin from '../main';
-import type { ISettings } from '../types';
+import type { EventBus } from "../core/event-bus";
+import {
+  createGenFENModuleRegistry,
+  type ModuleRegistry,
+} from "../core/module-system";
+import type ChessPlugin from "../main";
+import type { ISettings } from "../types";
 
 export class GenFENRenderChild extends MarkdownRenderChild {
   settings: ISettings;
@@ -28,16 +34,16 @@ export class GenFENRenderChild extends MarkdownRenderChild {
 
   onload(): void {
     this.plugin.instances.add(this);
-    this.eventBus.emit('load', 'fen');
-    this.eventBus.emit('creatUI');
+    this.eventBus.emit("load", "fen");
+    this.eventBus.emit("creatUI");
   }
 
   refresh(): void {
-    this.eventBus.emit('updateUI');
+    this.eventBus.emit("updateUI");
   }
 
   onunload(): void {
     this.plugin.instances.delete(this);
-    this.eventBus.emit('unload');
+    this.eventBus.emit("unload");
   }
 }
