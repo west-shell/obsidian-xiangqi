@@ -27,7 +27,7 @@
   ],
   "author": "weshell",
   "authorUrl": "https://space.bilibili.com/156446344",
-  "license": "MIT",
+  "license": "GPL-3.0",
   "devDependencies": {
     "@eslint/js": "^9.39.4",
     "@sveltejs/vite-plugin-svelte": "^6.2.1",
