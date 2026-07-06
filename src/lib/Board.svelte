@@ -470,10 +470,9 @@
     margin: 1.5px;
   }
   .xq-wrap :global(xq-board) {
-    background-image: none !important;
     background:
       var(--xq-board-texture, none) center / cover no-repeat,
-      var(--xq-board-bg, #d0b899) !important;
+      var(--xq-board-bg, #d0b899);
   }
   .xq-wrap {
     aspect-ratio: 9 / 10;
