@@ -2,6 +2,7 @@
 
 ![Version](https://img.shields.io/github/v/release/west-shell/obsidian-xiangqi)
 [![License](https://img.shields.io/github/license/west-shell/obsidian-xiangqi)](./LICENSE)
+[![PayPal](https://img.shields.io/badge/PayPal-Sponsor-blue?logo=paypal)](https://paypal.com/paypalme/weshell1988)
 
 [English](./README.md) | [中文](./README.zh.md)
 
@@ -24,13 +25,27 @@ Open `.pgn` files directly in Obsidian — the plugin registers a dedicated `.pg
 - **Jump to AI**: Package the current branch to Pikafish web version for analysis
 - **Quick Create**: New PGN files from the ribbon button
 - **Custom File Types**: Set specific file types as PGN files
+- **Context Menu**: Right-click PGN files to switch between PGN view and Markdown view
 
-![PGN File](./IMAGE/tree.png)
+> **Note**: `.pgn` files only support single games. For multi-game PGN files, use AI to add code block markers and convert to Markdown format:
+>
+> ````markdown
+> ```xiangqi
+> [Event "Game 1"]
+> 1. H2-E2 H9-G7 2. H0-G2 I9-H9 1-0
+> ```
+>
+> ```xiangqi
+> [Event "Game 2"]
+> 1. B0-E2 B9-C7 2. G0-F8 H9-G7 1/2-1/2
+> ```
+> ````
+
+![PGN File](./IMAGE/PGN.png)
 
 ## Code Blocks
 
-Three code block types:
-All code block names are customizable
+Three code block types — all code block names are customizable.
 
 ---
 
@@ -44,7 +59,7 @@ All code block names are customizable
 ```
 ````
 
-![Move List](./IMAGE/list.png)
+![Move List](./IMAGE/List.png)
 
 ---
 
@@ -56,7 +71,7 @@ All code block names are customizable
 ```
 ````
 
-![FEN Editor](./IMAGE/GenFEN.png)
+![FEN Editor](./IMAGE/FEN.png)
 
 ---
 
@@ -69,11 +84,37 @@ All code block names are customizable
 ```
 ````
 
-![Branch Diagram](./IMAGE/tree.png)
+![Branch Diagram](./IMAGE/Tree.png)
 
 ---
 
 ## Settings
+
+### Board Appearance
+
+- **Theme**: Wood, Parchment, Green Felt, Marble, Classic Light, Classic Dark
+- **Cell Size**: Adjustable board cell size (15–100 px)
+- **Layout**: Toolbar position — right / bottom
+- **Coordinate Labels**: Show/hide board coordinates
+
+### Game Hints
+
+- **Last Move Highlight**: Highlight the last move on the board
+- **Legal Moves**: Show legal move destinations
+- **Turn Border**: Highlight the current player's turn
+- **Move Narration**: Optional speech synthesis for moves (desktop only)
+
+### Move List
+
+- **Show Move List**: Toggle move list visibility
+- **Show Move Text**: Toggle text notation in move list
+- **Font Size**: Adjustable move text size (10–25 px)
+- **Auto Jump**: Jump to latest position — never / always / auto
+
+### Board Margins
+
+- **Top Margin**: Adjustable top margin (0–100 px)
+- **Bottom Margin**: Adjustable bottom margin (0–100 px)
 
 ### Code Block Names
 
@@ -107,15 +148,7 @@ Enable/disable PGN file view and customize file extensions:
   - Save move history as PGN format
   - Button colors: **gray** (empty), **green** (saved), **orange** (modified)
   - Confirmation dialog before saving
-- **Customizable Settings**:
-  - Board themes: Wood, Parchment, Green Felt, Marble, Classic Light, Classic Dark
-  - 3-layer board background: grid lines + texture + base color
-  - Coordinate labels auto-scale with board size
-  - Toolbar position: right / bottom
-  - Board size and move text size
-  - Move list display options
-  - Auto-scroll to latest move
-  - Optional move narration (desktop only)
+- **i18n**: Supports English and Chinese UI
 - **Board Markers**: Draw arrows and highlights on the board
 - **Jump to AI**: Package move list to Pikafish web version for analysis
 - **Mobile Friendly**: Adjust board size for small screens
@@ -139,6 +172,13 @@ Enable/disable PGN file view and customize file extensions:
    - Click **Reset** to revert to before manual edits
    - Click **Reset** again to return to initial state
 4. Click **Save** to overwrite the original PGN
+
+### `tree` Code Block
+
+1. Write your game inside a `tree` code block (same format as `xiangqi`)
+2. The variation tree displays all branches graphically
+3. Click any node to navigate to that position
+4. Switch between icon mode and text mode for node labels
 
 ### Optional Parameters
 
@@ -217,4 +257,7 @@ This plugin is available on the official Obsidian plugin marketplace. Search for
 ## Donation
 
 If you like this plugin, feel free to support me!
+
+[![PayPal](https://img.shields.io/badge/PayPal-Sponsor-blue?logo=paypal)](https://paypal.com/paypalme/weshell1988)
+
 ![Donation](./IMAGE/打赏.png)
