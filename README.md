@@ -1,7 +1,7 @@
 # Chinese chess
 
 ![Version](https://img.shields.io/github/v/release/west-shell/obsidian-xiangqi)
-[![License](https://img.shields.io/github/license/west-shell/obsidian-xiangqi)](./LICENSE)
+[![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-blue)](./LICENSE)
 [![PayPal](https://img.shields.io/badge/PayPal-Sponsor-blue?logo=paypal)](https://paypal.com/paypalme/weshell1988)
 
 [English](./README.md) | [中文](./README.zh.md)
