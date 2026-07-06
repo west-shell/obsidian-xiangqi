@@ -1,6 +1,6 @@
-import "@west-shell/xiangqiground/assets/chessground.base.css";
-import "@west-shell/xiangqiground/assets/chessground.board.css";
-import "@west-shell/xiangqiground/assets/chessground.xq.css";
+import "@west-shell/xiangqiground/assets/xiangqiground.base.css";
+import "@west-shell/xiangqiground/assets/xiangqiground.board.css";
+import "@west-shell/xiangqiground/assets/xiangqiground.piece.css";
 
 import { MarkdownView, Plugin, TFile } from "obsidian";
 

@@ -253,9 +253,6 @@
     aspect-ratio: 9 / 10;
     flex-shrink: 0;
     border-radius: 2px;
-    background:
-      var(--xq-board-texture, none) center / cover no-repeat,
-      var(--xq-board-bg, #d0b899);
     --piece-red: var(--xq-piece-red, var(--color-red));
     --piece-black: var(--xq-piece-black, var(--color-blue));
   }

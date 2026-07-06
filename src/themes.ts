@@ -27,6 +27,11 @@ interface ThemeDef {
   /** 黑方棋子色 */
   black: string;
 }
+const GRID_COLORS: Record<"dark" | "light" | "none", string> = {
+  dark: "#555",
+  light: "#ccc",
+  none: "transparent",
+};
 const tree_red = "#861818";
 const tree_black = "#0A1C3A";
 const themes: Record<string, ThemeDef> = {
@@ -185,12 +190,8 @@ export function applyThemes(app: App, settings: ISettings) {
   activeDocument.body.style.setProperty("--xq-board-bg", bg);
   activeDocument.body.style.setProperty("--xq-board-texture", t.texture);
   activeDocument.body.style.setProperty(
-    "--xq-grid",
-    t.grid === "dark"
-      ? "var(--xq-grid-dark)"
-      : t.grid === "light"
-        ? "var(--xq-grid-light)"
-        : "none",
+    "--xq-grid-color",
+    GRID_COLORS[t.grid] ?? GRID_COLORS.dark,
   );
   activeDocument.body.style.setProperty(
     "--xq-coords-display",
