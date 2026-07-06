@@ -88,6 +88,12 @@ Three code block types — all code block names are customizable.
 
 ---
 
+## Mobile Usage
+
+For the best experience on mobile devices, it's recommended to install the Full Screen Toggle plugin ([donkeypacific/obsidian-full-screen-cross-platform-plugin](https://github.com/donkeypacific/obsidian-full-screen-cross-platform-plugin)) or similar fullscreen plugins and adjust the top/bottom margins in **Settings > Chess > Board Margins** to optimize the board display area.
+
+![Mobile](./IMAGE/Mobile.jpg)
+
 ## Settings
 
 ### Board Appearance

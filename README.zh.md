@@ -88,6 +88,12 @@
 
 ---
 
+## 移动端使用建议
+
+移动端建议安装 Full Screen Toggle 插件（[donkeypacific/obsidian-full-screen-cross-platform-plugin](https://github.com/donkeypacific/obsidian-full-screen-cross-platform-plugin)）或类似全屏插件，并在 **设置 > Chess > 棋盘边距** 中调节上下边距，以获得最佳的棋盘显示效果。
+
+![移动端](./IMAGE/Mobile.jpg)
+
 ## 设置
 
 ### 棋盘外观
