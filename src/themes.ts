@@ -3,7 +3,6 @@ import { addIcon, type App } from "obsidian";
 import bambooB64 from "../assets/bamboo.jpg?base64";
 import woodB64 from "../assets/wood.jpg?base64";
 
-import { GRID_DARK_B64, GRID_LIGHT_B64 } from "./grid-b64";
 import type { ISettings } from "./types";
 
 /** 棋盘背景图片：路径相对 vault configDir（.obsidian），base64 为内嵌兜底数据 */
@@ -186,12 +185,8 @@ export function applyThemes(app: App, settings: ISettings) {
   activeDocument.body.style.setProperty("--xq-board-bg", bg);
   activeDocument.body.style.setProperty("--xq-board-texture", t.texture);
   activeDocument.body.style.setProperty(
-    "--xq-grid",
-    t.grid === "dark"
-      ? `url('data:image/svg+xml;base64,${GRID_DARK_B64}')`
-      : t.grid === "light"
-        ? `url('data:image/svg+xml;base64,${GRID_LIGHT_B64}')`
-        : "none",
+    "--xq-grid-color",
+    t.grid === "dark" ? "#555" : t.grid === "light" ? "#ccc" : "transparent",
   );
   activeDocument.body.style.setProperty(
     "--xq-coords-display",

@@ -1,5 +1,4 @@
 import "@west-shell/xiangqiground/assets/xiangqiground.base.css";
-import "@west-shell/xiangqiground/assets/xiangqiground.board.css";
 import "@west-shell/xiangqiground/assets/xiangqiground.piece.css";
 
 import { MarkdownView, Plugin, TFile } from "obsidian";
