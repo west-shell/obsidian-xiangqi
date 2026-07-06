@@ -3,6 +3,7 @@ import { addIcon, type App } from "obsidian";
 import bambooB64 from "../assets/bamboo.jpg?base64";
 import woodB64 from "../assets/wood.jpg?base64";
 
+import { GRID_DARK_B64, GRID_LIGHT_B64 } from "./grid-b64";
 import type { ISettings } from "./types";
 
 /** 棋盘背景图片：路径相对 vault configDir（.obsidian），base64 为内嵌兜底数据 */
@@ -27,11 +28,6 @@ interface ThemeDef {
   /** 黑方棋子色 */
   black: string;
 }
-const GRID_COLORS: Record<"dark" | "light" | "none", string> = {
-  dark: "#555",
-  light: "#ccc",
-  none: "transparent",
-};
 const tree_red = "#861818";
 const tree_black = "#0A1C3A";
 const themes: Record<string, ThemeDef> = {
@@ -190,8 +186,12 @@ export function applyThemes(app: App, settings: ISettings) {
   activeDocument.body.style.setProperty("--xq-board-bg", bg);
   activeDocument.body.style.setProperty("--xq-board-texture", t.texture);
   activeDocument.body.style.setProperty(
-    "--xq-grid-color",
-    GRID_COLORS[t.grid] ?? GRID_COLORS.dark,
+    "--xq-grid",
+    t.grid === "dark"
+      ? `url('data:image/svg+xml;base64,${GRID_DARK_B64}')`
+      : t.grid === "light"
+        ? `url('data:image/svg+xml;base64,${GRID_LIGHT_B64}')`
+        : "none",
   );
   activeDocument.body.style.setProperty(
     "--xq-coords-display",

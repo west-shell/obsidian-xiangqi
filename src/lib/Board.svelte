@@ -249,6 +249,13 @@
     position: relative;
     margin: 1.5px;
   }
+  .xq-wrap :global(xq-board) {
+    background-image: none !important;
+    background:
+      var(--xq-grid, none) center / 100% 100% no-repeat,
+      var(--xq-board-texture, none) center / cover no-repeat,
+      var(--xq-board-bg, #d0b899) !important;
+  }
   .xq-wrap {
     aspect-ratio: 9 / 10;
     flex-shrink: 0;
