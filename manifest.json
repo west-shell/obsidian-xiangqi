@@ -5,6 +5,9 @@
   "description": "Variation tree viewer and editor for Chinese chess (Xiangqi).",
   "author": "weshell",
   "authorUrl": "https://github.com/west-shell",
+  "fundingUrl": {
+    "PayPal": "https://www.paypal.com/paypalme/weshell1988"
+  },
   "minAppVersion": "1.5.0",
   "isDesktopOnly": false
 }
