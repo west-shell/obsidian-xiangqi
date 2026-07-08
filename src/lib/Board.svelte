@@ -205,6 +205,7 @@
   $effect(() => {
     if (!api) return;
     api.set({ orientation: rotated ? "black" : "white" });
+    injectGridSVG(boardElement);
   });
 
   $effect(() => {
