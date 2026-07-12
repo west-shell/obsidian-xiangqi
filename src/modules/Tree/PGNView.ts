@@ -19,7 +19,8 @@ const TreeViewModule = {
       host.tags = parser.getTags();
       host.currentNode = host.nodeMap.get("node-root")!;
       host.fen = host.currentNode.fen;
-      host.currentTurn = "white";
+      host.currentTurn =
+        host.currentNode.fen.split(" ")[1] === "b" ? "black" : "white";
       eventBus.emit("updateMainPath");
     });
 

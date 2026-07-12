@@ -73,7 +73,8 @@ const SourceModule = {
           treeHost.nodeMap = parser.getMap();
           treeHost.tags = parser.getTags();
           treeHost.currentNode = treeHost.nodeMap.get("node-root")!;
-          treeHost.currentTurn = "white";
+          treeHost.fen = treeHost.currentNode.fen;
+          treeHost.currentTurn = getTurnFromFen(treeHost.currentNode.fen);
           eventBus.emit("updateMainPath");
 
           // 根据 autoJump 设置决定初始节点位置
@@ -84,6 +85,7 @@ const SourceModule = {
             treeHost.currentNode = treeHost.nodeMap.get(
               treeHost.currentPath[treeHost.currentPath.length - 1],
             )!;
+            treeHost.fen = treeHost.currentNode.fen;
           }
           break;
         }
@@ -98,7 +100,7 @@ const SourceModule = {
           listHost.history = [...listHost.PGN];
           listHost.stringifyPGN = stringifyPGN;
           listHost.tags = new Map(parser.tags);
-          listHost.currentTurn = "white";
+          listHost.currentTurn = getTurnFromFen(parser.getRoot().fen);
           listHost.initFEN = parser.getRoot().fen;
 
           // 根据 autoJump 设置决定初始步数和棋盘局面
@@ -135,3 +137,7 @@ const SourceModule = {
 registerGenFENModule("source", SourceModule);
 registerListModule("source", SourceModule);
 registerTreeModule("source", SourceModule);
+
+function getTurnFromFen(fen: string): "white" | "black" {
+  return fen.split(" ")[1] === "b" ? "black" : "white";
+}
