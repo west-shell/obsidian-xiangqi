@@ -300,7 +300,7 @@ export function calculateTreeLayout(
   const wRoot = buildWNode(root, null, foldedNodes);
 
   // 2) 布局
-  layoutChildren(wRoot, 0, () => 0.15);
+  layoutChildren(wRoot, 0, () => 0.2);
 
   // 3) 解析 x
   resolveX(wRoot);
