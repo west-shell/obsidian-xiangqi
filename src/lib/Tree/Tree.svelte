@@ -337,9 +337,19 @@
     return idx !== -1 ? `${idx}/${currentPath.length - 1}` : "";
   });
 
-  const zoomBTN = [
+  function toggleCurrentFold() {
+    if (!currentNode || currentNode.children.length <= 1) return;
+    toggleFold(currentNode);
+  }
+
+  const toolbarBTN = [
     { title: "放大", icon: "plus", event: zoomIn },
     { title: "缩小", icon: "minus", event: zoomOut },
+    {
+      title: t("tree.fold"),
+      icon: "chevrons-right-left",
+      event: toggleCurrentFold,
+    },
     { title: "重置", icon: "rotate-ccw", event: resetView },
   ];
   function useSetIcon(el: HTMLElement, icon: string) {
@@ -566,12 +576,12 @@
     </svg>
 
     <div class="toolbar">
-      {#each zoomBTN as { title, icon, event }, i (i)}
+      {#each toolbarBTN as btn, i (i)}
         <button
           class="toolbar-btn"
-          aria-label={title}
-          use:useSetIcon={icon}
-          onclick={event}
+          aria-label={btn.title}
+          use:useSetIcon={btn.icon}
+          onclick={btn.event}
         ></button>
       {/each}
     </div>

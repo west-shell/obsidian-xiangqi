@@ -80,6 +80,7 @@
   "confirm.deleteMsg": "确定要删除整盘棋局吗？",
   "confirm.yes": "确定",
   "tree.placeholder": "添加注释",
+  "tree.fold": "折叠",
   "pgn.newFile": "新建 PGN 文件",
   "pgn.error": "创建 PGN 文件失败:",
   "menu.markdown": "用 Markdown 视图打开",

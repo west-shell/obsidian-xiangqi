@@ -79,6 +79,7 @@
   "confirm.deleteMsg": "Delete the entire game?",
   "confirm.yes": "Yes",
   "tree.placeholder": "Add comment",
+  "tree.fold": "Fold",
   "pgn.newFile": "New PGN file",
   "pgn.error": "Failed to create PGN file:",
   "menu.markdown": "Open in Markdown view",
