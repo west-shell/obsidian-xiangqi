@@ -185,6 +185,7 @@ Enable/disable PGN file view and customize file extensions:
 2. The variation tree displays all branches graphically
 3. Click any node to navigate to that position
 4. Switch between icon mode and text mode for node labels
+5. Click the fold button (triangle) on a node with multiple children to collapse/expand its variations
 
 ### Optional Parameters
 

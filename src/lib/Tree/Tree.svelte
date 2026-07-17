@@ -52,7 +52,7 @@
     return `translate(${t.x},${t.y}) scale(${t.k})`;
   });
 
-  const spacingX = 22;
+  const spacingX = 16;
   const spacingY = 15;
   const nodeWidth = 13;
   const nodeHeight = 11;
@@ -448,7 +448,7 @@
             <g
               transform="translate({node.x! * spacingX +
                 (isLeft ? -nodeWidth / 2 : nodeWidth / 2)} {node.y! *
-                spacingY})"
+                spacingY}){node.id === currentNode?.id ? ' scale(1.35)' : ''}"
               style="cursor: pointer"
               onclick={(e) => {
                 e.stopPropagation();
