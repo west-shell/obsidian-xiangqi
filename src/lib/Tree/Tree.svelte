@@ -52,9 +52,9 @@
     return `translate(${t.x},${t.y}) scale(${t.k})`;
   });
 
-  const spacingX = 18;
+  let nodeMode = $state(0);
+  let spacingX = $derived(nodeMode === 0 ? 18 : 22);
   const spacingY = 15;
-  const nodeWidth = 13;
   const nodeHeight = 11;
 
   const ANNOTATION_DEFINITIONS: Record<
@@ -342,6 +342,18 @@
     toggleFold(currentNode);
   }
 
+  const MODE_ICONS = ["club", "align-justify"];
+  function cycleNodeMode() {
+    nodeMode = (nodeMode + 1) % 2;
+  }
+  let modeIcon = $derived(MODE_ICONS[nodeMode]);
+
+  function getNodeWidth(node: ChessNode): number {
+    if (nodeMode === 0) return 13;
+    const zh = node.move?.zh ?? "始";
+    return Math.max(13, zh.length * 5.5);
+  }
+
   const toolbarBTN = [
     { title: "放大", icon: "plus", event: zoomIn },
     { title: "缩小", icon: "minus", event: zoomOut },
@@ -453,12 +465,15 @@
         {#each renderedNodes as node (node.id)}
           {#if node.children.length > 1}
             {@const isLeft = (node.y ?? 0) % 2 === 0}
+            {@const nw = getNodeWidth(node)}
             <!-- svelte-ignore a11y_click_events_have_key_events -->
             <!-- svelte-ignore a11y_no_static_element_interactions -->
             <g
               transform="translate({node.x! * spacingX +
-                (isLeft ? -nodeWidth / 2 : nodeWidth / 2)} {node.y! *
-                spacingY}){node.id === currentNode?.id ? ' scale(1.2)' : ''}"
+                (isLeft ? -nw / 2 : nw / 2)} {node.y! * spacingY}){node.id ===
+              currentNode?.id
+                ? ' scale(1.2)'
+                : ''}"
               style="cursor: pointer"
               onclick={(e) => {
                 e.stopPropagation();
@@ -495,6 +510,7 @@
         <!-- 节点 -->
         {#each renderedNodes as node (node.id)}
           {@const primaryAnnotation = getPrimaryAnnotation(node)}
+          {@const nw = getNodeWidth(node)}
           <!-- svelte-ignore a11y_click_events_have_key_events -->
           <!-- svelte-ignore a11y_no_static_element_interactions -->
           <g
@@ -512,6 +528,20 @@
           >
             {#if primaryAnnotation}
               {@const def = ANNOTATION_DEFINITIONS[primaryAnnotation]}
+              <rect
+                x={-nw / 2}
+                y={-nodeHeight / 2}
+                width={nw}
+                height={nodeHeight}
+                rx="2.5"
+                ry="2.5"
+                fill={node.side === "white"
+                  ? "var(--piece-red)"
+                  : node.side === "black"
+                    ? "var(--piece-black)"
+                    : "green"}
+                stroke="var(--xq-board-line)"
+              />
               <g
                 transform="translate(-7.2 -7.2) scale(0.6)"
                 fill={node.side === "white"
@@ -527,9 +557,9 @@
               </g>
             {:else}
               <rect
-                x={-nodeWidth / 2}
+                x={-nw / 2}
                 y={-nodeHeight / 2}
-                width={nodeWidth}
+                width={nw}
                 height={nodeHeight}
                 rx="2.5"
                 ry="2.5"
@@ -540,18 +570,35 @@
                     : "green"}
                 stroke="var(--xq-board-line)"
               />
-              <text dy="3.5" text-anchor="middle" fill="white" font-size="9px">
-                {node.move?.piece ? pieceLabel(node.move) : "始"}
-              </text>
+              {#if nodeMode === 0}
+                <text
+                  dy="3.5"
+                  text-anchor="middle"
+                  fill="white"
+                  font-size="9px"
+                >
+                  {node.move?.piece ? pieceLabel(node.move) : "始"}
+                </text>
+              {:else}
+                <text
+                  dominant-baseline="central"
+                  text-anchor="middle"
+                  fill="white"
+                  font-size="5px"
+                >
+                  {node.move?.zh ?? "始"}
+                </text>
+              {/if}
             {/if}
           </g>
         {/each}
 
         {#each renderedNodes as node (node.id)}
           {#if getRegularComments(node).length > 0}
+            {@const nw = getNodeWidth(node)}
             <g
-              transform="translate({node.x! * spacingX +
-                0.35 * nodeWidth} {node.y! * spacingY -
+              transform="translate({node.x! * spacingX + 0.35 * nw} {node.y! *
+                spacingY -
                 0.7 * nodeHeight}){node.id === currentNode?.id
                 ? ' scale(1.35)'
                 : ''}"
@@ -584,6 +631,12 @@
           onclick={btn.event}
         ></button>
       {/each}
+      <button
+        class="toolbar-btn"
+        aria-label="切换模式"
+        use:useSetIcon={modeIcon}
+        onclick={cycleNodeMode}
+      ></button>
     </div>
 
     <div class="slider" class:active={sliderMouseDown}>
