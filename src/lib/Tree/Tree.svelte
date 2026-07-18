@@ -490,7 +490,7 @@
                     : "0,-4 0,4 5,0"}
                 fill="var(--xq-board-line)"
                 stroke="var(--xq-board-line)"
-                stroke-width="1"
+                stroke-width="1.5"
                 stroke-linejoin="round"
                 opacity={currentPath.includes(node.id) &&
                 node.children[0] &&
@@ -543,7 +543,7 @@
                 stroke="var(--xq-board-line)"
               />
               <g
-                transform="translate(-7.2 -7.2) scale(0.6)"
+                transform="translate(-4, -4) scale(0.333)"
                 fill={node.side === "white"
                   ? "var(--piece-red)"
                   : "var(--piece-black)"}
