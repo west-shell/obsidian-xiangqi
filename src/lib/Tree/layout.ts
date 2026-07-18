@@ -94,8 +94,7 @@ function layoutChildren(
 
   // 偶数层：把 trunk(firstChild) 移到数组末尾 → 分支往左排
   if (w.depth % 2 === 0 && w.children.length > 1) {
-    const first = w.children.shift()!;
-    w.children.push(first);
+    w.children.reverse();
   }
 
   const kids = w.children;
