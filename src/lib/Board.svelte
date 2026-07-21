@@ -52,6 +52,16 @@
   let api: Api | null = null;
   let layoutChangeHandler: (() => void) | null = null;
 
+  function handleWheel(e: WheelEvent) {
+    if (Math.abs(e.deltaY) < Math.abs(e.deltaX)) return;
+    e.preventDefault();
+    if (e.deltaY > 0) {
+      eventBus.emit("btn-click", { name: "next" });
+    } else if (e.deltaY < 0) {
+      eventBus.emit("btn-click", { name: "back" });
+    }
+  }
+
   let turnColor: cg.Color = $derived(
     fen.split(" ")[1] === "b" ? "black" : "white",
   );
@@ -247,7 +257,7 @@
   });
 </script>
 
-<div class="board-wrapper">
+<div class="board-wrapper" onwheel={handleWheel}>
   <div bind:this={boardElement} class="xq-wrap {turnClass}"></div>
 </div>
 

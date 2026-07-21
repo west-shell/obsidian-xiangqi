@@ -4,7 +4,7 @@ import "../modules/Tree/PGNView";
 import "../modules/Tree/Actions";
 import "../modules/Tree/Speak";
 
-import { TextFileView, type WorkspaceLeaf } from "obsidian";
+import { Scope, TextFileView, type WorkspaceLeaf } from "obsidian";
 
 import { type EventBus } from "../core/event-bus";
 import {
@@ -45,6 +45,24 @@ export class PGNView extends TextFileView {
     await super.onOpen();
     this.plugin.instances.add(this);
     this.contentEl.empty();
+
+    this.scope = new Scope(this.app.scope);
+    this.scope.register([], "ArrowUp", () => {
+      this.eventBus.emit("btn-click", { name: "back" });
+      return false;
+    });
+    this.scope.register([], "ArrowDown", () => {
+      this.eventBus.emit("btn-click", { name: "next" });
+      return false;
+    });
+    this.scope.register([], "ArrowLeft", () => {
+      this.eventBus.emit("btn-click", { name: "toStart" });
+      return false;
+    });
+    this.scope.register([], "ArrowRight", () => {
+      this.eventBus.emit("btn-click", { name: "toEnd" });
+      return false;
+    });
   }
 
   refresh() {
