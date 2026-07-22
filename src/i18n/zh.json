@@ -119,5 +119,6 @@
   "save.saveEvalPrompt.desc": "保存时提示是否包含引擎评估数据",
   "toolbar.analyze": "分析",
   "toolbar.stop": "停止",
-  "toolbar.analyzeBatch": "批量分析"
+  "toolbar.analyzeBatch": "批量分析",
+  "toolbar.cancelBatch": "取消批量"
 }

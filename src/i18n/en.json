@@ -118,5 +118,6 @@
   "save.saveEvalPrompt.desc": "Prompt whether to include engine evaluation data when saving",
   "toolbar.analyze": "Analyze",
   "toolbar.stop": "Stop",
-  "toolbar.analyzeBatch": "Batch analyze"
+  "toolbar.analyzeBatch": "Batch analyze",
+  "toolbar.cancelBatch": "Cancel batch"
 }
