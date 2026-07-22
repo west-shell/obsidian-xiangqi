@@ -13,7 +13,9 @@ function initEngine(host: object) {
 
   let analyzing = false;
   let batchCancelled = false;
+  let engineFileExists = false;
   let pendingNodeId: string | null = null;
+  let stopped = false;
   let lastResult: {
     bestmove: string;
     ponder?: string;
@@ -69,6 +71,19 @@ function initEngine(host: object) {
   });
 
   eventBus.on("engine-analyze", async () => {
+    if (!engineFileExists) {
+      if (!(await engine.checkFileExists())) {
+        engine.openDownloadModal();
+        return;
+      }
+      engineFileExists = true;
+    }
+    try {
+      await engine.ensureReady();
+    } catch (e) {
+      console.error("[Engine] ensureReady failed:", e);
+      return;
+    }
     const nodeId = h.currentNode.id;
     if (analyzing) {
       pendingNodeId = nodeId;
@@ -79,11 +94,12 @@ function initEngine(host: object) {
     if (!node) return;
     if (node.eval && node.eval.depth >= settings.engineDepth) return;
     analyzing = true;
+    stopped = false;
+    applyOptions();
     eventBus.emit("engine-busy");
     try {
-      await engine.ensureReady();
-      applyOptions();
       const result = await engine.analyze(node.fen, settings.engineDepth);
+      if (stopped) return;
       if (result && result.score != null) {
         const score = toWhiteView(result.score, result.scoreType, node.fen);
         const nodeEval: NodeEval = {
@@ -107,17 +123,13 @@ function initEngine(host: object) {
       }
       eventBus.emit("engine-result", result);
     } catch (err) {
-      console.error("[Engine] analysis failed:", err);
-      if (pendingNodeId) {
-        pendingNodeId = null;
-        analyzing = false;
-        eventBus.emit("engine-analyze");
-        return;
-      }
+      if (stopped) return;
+      console.error("[Engine] analyze failed:", err);
       eventBus.emit("engine-result", null);
+      return;
     } finally {
       analyzing = false;
-      if (pendingNodeId) {
+      if (!stopped && pendingNodeId) {
         pendingNodeId = null;
         eventBus.emit("engine-analyze");
       }
@@ -125,13 +137,26 @@ function initEngine(host: object) {
   });
 
   eventBus.on("engine-analyze-batch", async () => {
-    if (analyzing) return;
-    analyzing = true;
-    batchCancelled = false;
-    eventBus.emit("engine-busy");
+    if (!engineFileExists) {
+      if (!(await engine.checkFileExists())) {
+        engine.openDownloadModal();
+        return;
+      }
+      engineFileExists = true;
+    }
     try {
       await engine.ensureReady();
-      applyOptions();
+    } catch (e) {
+      console.error("[Engine] ensureReady failed:", e);
+      return;
+    }
+    if (analyzing) return;
+    analyzing = true;
+    stopped = false;
+    batchCancelled = false;
+    applyOptions();
+    eventBus.emit("engine-busy");
+    try {
       const queue: string[] = [];
       const nodeMap = h.nodeMap;
       for (const [, node] of nodeMap) {
@@ -140,11 +165,12 @@ function initEngine(host: object) {
         }
       }
       for (const nodeId of queue) {
-        if (batchCancelled) break;
+        if (batchCancelled || stopped) break;
         const node = nodeMap.get(nodeId);
         if (!node) continue;
         try {
           const result = await engine.analyze(node.fen, settings.engineDepth);
+          if (stopped || batchCancelled) break;
           if (result && result.score != null) {
             const score = toWhiteView(result.score, result.scoreType, node.fen);
             node.eval = {
@@ -160,6 +186,7 @@ function initEngine(host: object) {
           break;
         }
       }
+      if (stopped) return;
       const currentNodeEval = h.currentNode?.eval;
       if (currentNodeEval?.bestmove) {
         h.eventBus.emit("engine-result", {
@@ -177,12 +204,18 @@ function initEngine(host: object) {
       }
       h.eventBus.emit("updateUI");
       h.eventBus.emit("engine-batch-done");
+    } catch {
+      if (!stopped) {
+        eventBus.emit("engine-batch-done");
+      }
+      return;
     } finally {
       analyzing = false;
     }
   });
 
   eventBus.on("engine-stop", () => {
+    stopped = true;
     batchCancelled = true;
     engine.stop();
     analyzing = false;

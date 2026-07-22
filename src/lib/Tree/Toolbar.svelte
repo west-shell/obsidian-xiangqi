@@ -48,6 +48,8 @@
     });
     eventBus.on("engine-stop", () => {
       batchAnalyzing = false;
+      autoAnalyze = false;
+      engineBusy = false;
     });
   });
 
@@ -58,9 +60,11 @@
   });
 
   function toggleAutoAnalyze() {
-    autoAnalyze = !autoAnalyze;
-    if (!autoAnalyze) {
+    if (autoAnalyze) {
+      autoAnalyze = false;
       eventBus.emit("engine-stop");
+    } else {
+      autoAnalyze = true;
     }
   }
 
@@ -195,6 +199,7 @@
     use:useSetIcon={batchAnalyzing ? "circle-stop" : "workflow"}
     onclick={() => {
       if (batchAnalyzing) {
+        batchAnalyzing = false;
         eventBus.emit("engine-stop");
       } else {
         batchAnalyzing = true;

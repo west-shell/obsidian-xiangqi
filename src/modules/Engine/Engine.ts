@@ -1,4 +1,10 @@
 import type ChessPlugin from "../../main";
+import { DownloadModal } from "../../utils/confirmModal";
+import { t } from "../../i18n";
+
+const BASE_URL =
+  "https://raw.githubusercontent.com/west-shell/obsidian-xiangqi/main/assets/pikafish";
+const ENGINE_FILES = ["pikafish.js", "pikafish.wasm", "pikafish.data"] as const;
 
 export interface EngineResult {
   bestmove: string;
@@ -31,17 +37,84 @@ export class XiangqiEngine {
     await this.initWorker();
   }
 
+  async checkFileExists(): Promise<boolean> {
+    const adapter = this.plugin.app.vault.adapter;
+    const baseDir = `${this.plugin.app.vault.configDir}/plugins/xiangqi`;
+    for (const file of ENGINE_FILES) {
+      if (!(await adapter.exists(`${baseDir}/${file}`))) return false;
+    }
+    return true;
+  }
+
+  openDownloadModal(): void {
+    const adapter = this.plugin.app.vault.adapter;
+    const baseDir = `${this.plugin.app.vault.configDir}/plugins/xiangqi`;
+
+    const downloadNext = (index: number) => {
+      if (index >= ENGINE_FILES.length) return;
+      const file = ENGINE_FILES[index];
+      const url = `${BASE_URL}/${file}`;
+      const destPath = `${baseDir}/${file}`;
+
+      const modal = new DownloadModal(
+        this.plugin.app,
+        t("engine.downloadFile", 0).replace("{file}", file),
+        url,
+        t("engine.downloadBtn", 0),
+        t("engine.downloadCancel", 0),
+      );
+      modal.open();
+      modal.promise.then(async (confirmed) => {
+        if (!confirmed) return;
+        modal.showProgress();
+        try {
+          const resp = await fetch(url, {
+            signal: modal.abortController.signal,
+          });
+          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+          const contentLength = Number(resp.headers.get("content-length")) || 0;
+          const reader = resp.body?.getReader();
+          if (!reader) throw new Error("No response body");
+          const chunks: Uint8Array[] = [];
+          let loaded = 0;
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            chunks.push(value);
+            loaded += value.length;
+            if (contentLength > 0) {
+              modal.setProgress(loaded, contentLength);
+            }
+          }
+          const buffer = new Uint8Array(loaded);
+          let offset = 0;
+          for (const chunk of chunks) {
+            buffer.set(chunk, offset);
+            offset += chunk.length;
+          }
+          if (file === "pikafish.js") {
+            await adapter.write(destPath, new TextDecoder().decode(buffer));
+          } else {
+            await adapter.writeBinary(destPath, buffer.buffer);
+          }
+          modal.done();
+          downloadNext(index + 1);
+        } catch (err) {
+          modal.error(String(err));
+        }
+      });
+    };
+
+    downloadNext(0);
+  }
+
   private async loadPikafishSource(): Promise<string> {
     if (this.pikafishJs) return this.pikafishJs;
     if (!this.plugin) throw new Error("Plugin not set");
     const adapter = this.plugin.app.vault.adapter;
     const baseDir = `${this.plugin.app.vault.configDir}/plugins/xiangqi`;
-    try {
-      this.pikafishJs = await adapter.read(`${baseDir}/pikafish.js`);
-      return this.pikafishJs;
-    } catch {
-      throw new Error("pikafish.js not found in plugin directory");
-    }
+    this.pikafishJs = await adapter.read(`${baseDir}/pikafish.js`);
+    return this.pikafishJs;
   }
 
   private async initWorker(): Promise<void> {
@@ -50,19 +123,8 @@ export class XiangqiEngine {
     const adapter = this.plugin!.app.vault.adapter;
     const baseDir = `${this.plugin!.app.vault.configDir}/plugins/xiangqi`;
 
-    let wasmBuffer: ArrayBuffer;
-    try {
-      wasmBuffer = await adapter.readBinary(`${baseDir}/pikafish.wasm`);
-    } catch {
-      wasmBuffer = new ArrayBuffer(0);
-    }
-
-    let dataBuffer: ArrayBuffer;
-    try {
-      dataBuffer = await adapter.readBinary(`${baseDir}/pikafish.data`);
-    } catch {
-      dataBuffer = new ArrayBuffer(0);
-    }
+    const wasmBuffer = await adapter.readBinary(`${baseDir}/pikafish.wasm`);
+    const dataBuffer = await adapter.readBinary(`${baseDir}/pikafish.data`);
 
     const workerCode = `
 self.addEventListener('unhandledrejection', function(e) {
@@ -155,9 +217,7 @@ self.onmessage = function(e) {
         reject(new Error(err.message || "Engine error"));
       };
 
-      const transferList: ArrayBuffer[] = [];
-      if (wasmBuffer.byteLength > 0) transferList.push(wasmBuffer);
-      if (dataBuffer.byteLength > 0) transferList.push(dataBuffer);
+      const transferList: ArrayBuffer[] = [wasmBuffer, dataBuffer];
       this.worker!.postMessage(
         { type: "wasm", buffer: wasmBuffer, dataBuffer },
         transferList,

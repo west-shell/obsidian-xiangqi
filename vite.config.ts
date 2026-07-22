@@ -14,25 +14,6 @@ const setOutDir = (mode: string) => {
   }
 };
 
-function copyPikafish(): Plugin {
-  return {
-    name: 'copy-pikafish',
-    writeBundle(options) {
-      const outDir = options.dir || setOutDir('production');
-      const srcDir = path.resolve(__dirname, 'assets/pikafish');
-      const destDir = path.resolve(outDir);
-      if (!fs.existsSync(srcDir)) return;
-      for (const file of ['pikafish.js', 'pikafish.wasm', 'pikafish.data']) {
-        const src = path.join(srcDir, file);
-        const dest = path.join(destDir, file);
-        if (fs.existsSync(src)) {
-          fs.copyFileSync(src, dest);
-        }
-      }
-    },
-  };
-}
-
 /**
  * base64-asset — 把以 `?base64` 结尾的导入（如 `../assets/wood.png?base64`）
  * 在构建期读取为 base64 字符串并作为 JS 模块默认导出，从而把图片内嵌进 main.js，
@@ -69,7 +50,6 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [
       base64Asset(),
-      copyPikafish(),
       svelte({
         compilerOptions: {
           compatibility: {
