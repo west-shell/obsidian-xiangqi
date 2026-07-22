@@ -121,7 +121,7 @@
   "toolbar.stop": "停止",
   "toolbar.analyzeBatch": "批量分析",
   "toolbar.cancelBatch": "取消批量",
-  "engine.downloadFile": "引擎文件不存在：{file}",
+  "engine.downloadFile": "引擎文件不存在：",
   "engine.downloadBtn": "下载",
   "engine.downloadCancel": "取消",
   "engine.downloadFailed": "下载失败，请检查网络",

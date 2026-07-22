@@ -120,7 +120,7 @@
   "toolbar.stop": "Stop",
   "toolbar.analyzeBatch": "Batch analyze",
   "toolbar.cancelBatch": "Cancel batch",
-  "engine.downloadFile": "Engine file not found: {file}",
+  "engine.downloadFile": "Engine file not found:",
   "engine.downloadBtn": "Download",
   "engine.downloadCancel": "Cancel",
   "engine.downloadFailed": "Download failed, please check network",

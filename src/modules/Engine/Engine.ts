@@ -60,7 +60,7 @@ export class XiangqiEngine {
     }));
     const modal = new DownloadModal(
       this.plugin.app,
-      t("engine.downloadFile", 0).replace("{file}", missingFiles.join("、")),
+      t("engine.downloadFile", 0),
       files,
       t("engine.downloadBtn", 0),
       t("engine.downloadCancel", 0),
