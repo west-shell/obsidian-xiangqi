@@ -392,9 +392,13 @@
       const x2 =
         v2 === Infinity ? edgeR : v2 === -Infinity ? edgeL : midX + v2 * scaleX;
       const color =
-        v2 === Infinity || (isFinite(v2) && v2 >= 0) ? "#4CAF50" : "#f44336";
+        v2 === Infinity || (Number.isFinite(v2) && v2 >= 0)
+          ? "#4CAF50"
+          : "#f44336";
       const color1 =
-        v1 === Infinity || (isFinite(v1) && v1 >= 0) ? "#4CAF50" : "#f44336";
+        v1 === Infinity || (Number.isFinite(v1) && v1 >= 0)
+          ? "#4CAF50"
+          : "#f44336";
       if (color1 !== color) {
         segments.push({
           x1,
