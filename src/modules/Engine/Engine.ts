@@ -64,11 +64,11 @@ export class XiangqiEngine {
         t("engine.downloadCancel", 0),
       );
       modal.open();
-      modal.promise.then(async (confirmed) => {
+      const doDownload = async (confirmed: boolean) => {
         if (!confirmed) return;
         modal.showProgress();
         try {
-          const resp = await fetch(url, {
+          const resp = await window.fetch(url, {
             signal: modal.abortController.signal,
           });
           if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
@@ -102,7 +102,8 @@ export class XiangqiEngine {
         } catch (err) {
           modal.error(String(err));
         }
-      });
+      };
+      void modal.promise.then(doDownload);
     };
 
     downloadNext(0);

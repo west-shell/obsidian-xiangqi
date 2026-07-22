@@ -177,8 +177,7 @@ export class DownloadModal extends Modal {
       cls: "download-progress",
     });
     this.progressBar.value = 0;
-    this.progressBar.style.width = "100%";
-    this.progressBar.style.display = "none";
+    this.progressBar.setCssProps({ width: "100%", display: "none" });
 
     this.statusEl = contentEl.createEl("p", {
       cls: "download-status",
@@ -206,7 +205,7 @@ export class DownloadModal extends Modal {
   }
 
   showProgress() {
-    this.progressBar.style.display = "block";
+    this.progressBar.setCssProps({ display: "block" });
     const downloadBtn = this.contentEl.querySelector(
       "button.mod-cta",
     ) as HTMLButtonElement;
@@ -229,7 +228,7 @@ export class DownloadModal extends Modal {
   error(msg: string) {
     this.statusEl.textContent = msg;
     const buttons = this.contentEl.querySelectorAll("button");
-    buttons.forEach((b) => ((b).disabled = false));
+    buttons.forEach((b) => (b.disabled = false));
   }
 
   onClose() {
