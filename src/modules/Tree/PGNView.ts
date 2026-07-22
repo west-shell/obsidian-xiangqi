@@ -1,9 +1,11 @@
+import { Modal, Setting } from "obsidian";
 import { mount, unmount } from "svelte";
 
 import { registerPGNViewModule } from "../../core/module-system";
 import Chess from "../../lib/Tree/Chess.svelte";
-import type { IPGNViewHost } from "../../types";
+import type { ChessNode, IPGNViewHost } from "../../types";
 import { PGNParser } from "../Source/parser";
+import { t } from "../../i18n";
 
 const TreeViewModule = {
   init(host: IPGNViewHost) {
@@ -73,8 +75,11 @@ const TreeViewModule = {
       eventBus.emit("updateUI");
     });
 
-    eventBus.on("save", () => {
-      const pgn = host.stringifyPGN(host.root);
+    eventBus.on("save", async () => {
+      const includeEval = await promptSaveEval(host);
+      if (includeEval === null) return;
+
+      const pgn = host.stringifyPGN(host.root, includeEval);
       const content = [host.tags?.trim(), pgn].filter(Boolean).join("\n");
       host.data = content;
       host.saveFile();
@@ -87,3 +92,62 @@ const TreeViewModule = {
 };
 
 registerPGNViewModule("Tree", TreeViewModule);
+
+function hasEvalInTree(root: ChessNode): boolean {
+  const stack: ChessNode[] = [root];
+  while (stack.length) {
+    const node = stack.pop()!;
+    if (node.eval) return true;
+    stack.push(...node.children);
+  }
+  return false;
+}
+
+async function promptSaveEval(host: IPGNViewHost): Promise<boolean | null> {
+  if (!hasEvalInTree(host.root)) return true;
+
+  if (!host.settings.saveEvalPrompt) {
+    return host.settings.saveEvalByDefault;
+  }
+
+  let includeEval = host.settings.saveEvalByDefault;
+  const modal = new Modal(host.plugin.app);
+  let resolve: (value: boolean | null) => void;
+  const promise = new Promise<boolean | null>((r) => {
+    resolve = r;
+  });
+
+  modal.onOpen = () => {
+    const { contentEl } = modal;
+    new Setting(contentEl).setName(t("confirm.saveTitle")).setHeading();
+    new Setting(contentEl)
+      .setName(t("confirm.saveEval"))
+      .addToggle((toggle) => {
+        toggle.setValue(includeEval).onChange((val) => {
+          includeEval = val;
+        });
+      });
+
+    const btnContainer = contentEl.createDiv("modal-button-container");
+    const saveBtn = btnContainer.createEl("button", {
+      text: t("confirm.saveBtn"),
+      cls: "mod-cta",
+    });
+    saveBtn.addEventListener("click", () => {
+      resolve(includeEval);
+      modal.close();
+    });
+    const cancelBtn = btnContainer.createEl("button", {
+      text: t("confirm.cancel"),
+    });
+    cancelBtn.addEventListener("click", () => {
+      resolve(null);
+      modal.close();
+    });
+  };
+  modal.onClose = () => {
+    modal.contentEl.empty();
+  };
+  modal.open();
+  return promise;
+}
