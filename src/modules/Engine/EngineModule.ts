@@ -93,7 +93,17 @@ function initEngine(host: object) {
     }
     const node = h.nodeMap.get(nodeId);
     if (!node) return;
-    if (node.eval && node.eval.depth >= settings.engineDepth) return;
+    if (node.eval && node.eval.depth >= settings.engineDepth) {
+      eventBus.emit("engine-busy");
+      eventBus.emit("engine-result", {
+        bestmove: node.eval.bestmove,
+        ponder: node.eval.ponder,
+        score: node.eval.score,
+        depth: node.eval.depth,
+        scoreType: node.eval.scoreType,
+      });
+      return;
+    }
     analyzing = true;
     stopped = false;
     applyOptions();
