@@ -183,6 +183,17 @@ function initEngine(host: object) {
                 result.bestmove !== "(none)" ? result.bestmove : undefined,
               ponder: result.ponder,
             };
+            if (h.currentNode.id === nodeId) {
+              h.currentNode = node;
+              h.eventBus.emit("engine-result", {
+                bestmove: result.bestmove,
+                ponder: result.ponder,
+                score,
+                depth: result.depth,
+                scoreType: result.scoreType,
+              });
+            }
+            h.eventBus.emit("updateUI");
           }
         } catch {
           break;
