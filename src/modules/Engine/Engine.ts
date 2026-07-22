@@ -73,11 +73,20 @@ export class XiangqiEngine {
         const destPath = `${baseDir}/${file}`;
         modal.showProgress(i);
         try {
+          let contentLength = 0;
+          try {
+            const headResp = await window.fetch(url, { method: "HEAD" });
+            contentLength = Number(headResp.headers.get("content-length")) || 0;
+          } catch {
+            /* ignore */
+          }
           const resp = await window.fetch(url, {
             signal: modal.abortController.signal,
           });
           if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-          const contentLength = Number(resp.headers.get("content-length")) || 0;
+          if (contentLength === 0) {
+            contentLength = Number(resp.headers.get("content-length")) || 0;
+          }
           const reader = resp.body?.getReader();
           if (!reader) throw new Error("No response body");
           const chunks: Uint8Array[] = [];
@@ -87,9 +96,7 @@ export class XiangqiEngine {
             if (done) break;
             chunks.push(value);
             loaded += value.length;
-            if (contentLength > 0) {
-              modal.setProgress(i, loaded, contentLength);
-            }
+            modal.setProgress(i, loaded, contentLength);
           }
           const buffer = new Uint8Array(loaded);
           let offset = 0;

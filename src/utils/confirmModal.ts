@@ -231,10 +231,15 @@ export class DownloadModal extends Modal {
   setProgress(index: number, loaded: number, total: number) {
     const row = this.fileRows[index];
     if (!row) return;
-    row.bar.value = loaded;
-    row.bar.max = total;
     const mb = (n: number) => (n / 1024 / 1024).toFixed(1);
-    row.status.textContent = `${mb(loaded)} / ${mb(total)} MB`;
+    if (total > 0) {
+      row.bar.value = loaded;
+      row.bar.max = total;
+      row.status.textContent = `${mb(loaded)} / ${mb(total)} MB`;
+    } else {
+      row.bar.removeAttribute("value");
+      row.status.textContent = `${mb(loaded)} MB`;
+    }
   }
 
   done(index: number) {
