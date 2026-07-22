@@ -123,5 +123,6 @@
   "engine.downloadFile": "Engine file not found: {file}",
   "engine.downloadBtn": "Download",
   "engine.downloadCancel": "Cancel",
-  "engine.downloadFailed": "Download failed, please check network"
+  "engine.downloadFailed": "Download failed, please check network",
+  "engine.retry": "Retry"
 }

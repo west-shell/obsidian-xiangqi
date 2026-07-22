@@ -1,4 +1,5 @@
 import { type App, Modal, Setting } from "obsidian";
+import { t } from "../i18n";
 
 export class SaveConfirmModal extends Modal {
   private resolvePromise: (value: "save" | "saveAll" | "cancel") => void;
@@ -253,9 +254,27 @@ export class DownloadModal extends Modal {
   error(index: number, msg: string) {
     const row = this.fileRows[index];
     if (!row) return;
-    row.status.textContent = msg;
+    row.status.textContent = "";
+    const retryLink = row.status.createEl("a", {
+      text: msg + " - " + t("engine.retry", 0),
+      attr: { href: "#", target: "_blank" },
+    });
+    retryLink.addEventListener("click", (e) => {
+      e.preventDefault();
+      this.retry(index);
+    });
+    row.bar.setCssProps({ display: "none" });
     const buttons = this.contentEl.querySelectorAll("button");
     buttons.forEach((b) => (b.disabled = false));
+  }
+
+  private retry(index: number) {
+    const row = this.fileRows[index];
+    if (!row) return;
+    row.status.empty();
+    row.nameSpan.textContent = row.name;
+    row.bar.setCssProps({ display: "block" });
+    this.resolvePromise(true);
   }
 
   onClose() {
