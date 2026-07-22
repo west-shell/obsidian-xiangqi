@@ -143,11 +143,10 @@ export class DownloadModal extends Modal {
   private readonly fileRows: {
     name: string;
     url: string;
-    bar: HTMLProgressElement;
     status: HTMLSpanElement;
     nameSpan: HTMLSpanElement;
   }[] = [];
-  public abortController: AbortController = new AbortController();
+  private downloadBtn!: HTMLButtonElement;
 
   constructor(
     app: App,
@@ -183,16 +182,11 @@ export class DownloadModal extends Modal {
       });
       row.appendText("）");
 
-      const bar = contentEl.createEl("progress", { cls: "download-progress" });
-      bar.value = 0;
-      bar.setCssProps({ width: "100%", display: "none" });
-
       const status = contentEl.createSpan({ cls: "download-status", text: "" });
 
       this.fileRows.push({
         name: file.name,
         url: file.url,
-        bar,
         status,
         nameSpan,
       });
@@ -200,11 +194,11 @@ export class DownloadModal extends Modal {
 
     const btnContainer = contentEl.createDiv("modal-button-container");
 
-    const downloadBtn = btnContainer.createEl("button", {
+    this.downloadBtn = btnContainer.createEl("button", {
       text: this.confirmText,
       cls: "mod-cta",
     });
-    downloadBtn.addEventListener("click", () => {
+    this.downloadBtn.addEventListener("click", () => {
       this.resolvePromise(true);
     });
 
@@ -212,7 +206,6 @@ export class DownloadModal extends Modal {
       text: this.cancelText,
     });
     cancelBtn.addEventListener("click", () => {
-      this.abortController.abort();
       this.resolvePromise(false);
       this.close();
     });
@@ -221,32 +214,14 @@ export class DownloadModal extends Modal {
   showProgress(index: number) {
     const row = this.fileRows[index];
     if (!row) return;
-    row.bar.setCssProps({ display: "block" });
-    const downloadBtn = this.contentEl.querySelector(
-      "button.mod-cta",
-    ) as HTMLButtonElement;
-    if (downloadBtn) downloadBtn.disabled = true;
-  }
-
-  setProgress(index: number, loaded: number, total: number) {
-    const row = this.fileRows[index];
-    if (!row) return;
-    const mb = (n: number) => (n / 1024 / 1024).toFixed(1);
-    if (total > 0) {
-      row.bar.value = loaded;
-      row.bar.max = total;
-      row.status.textContent = `${mb(loaded)} / ${mb(total)} MB`;
-    } else {
-      row.bar.removeAttribute("value");
-      row.status.textContent = `${mb(loaded)} MB`;
-    }
+    row.status.textContent = "⏳";
+    this.downloadBtn.disabled = true;
   }
 
   done(index: number) {
     const row = this.fileRows[index];
     if (!row) return;
     row.nameSpan.textContent = row.name + " ✓";
-    row.bar.setCssProps({ display: "none" });
     row.status.textContent = "";
     const allDone = this.fileRows.every((r) =>
       r.nameSpan.textContent?.includes("✓"),
@@ -268,9 +243,7 @@ export class DownloadModal extends Modal {
       e.preventDefault();
       this.retry(index);
     });
-    row.bar.setCssProps({ display: "none" });
-    const buttons = this.contentEl.querySelectorAll("button");
-    buttons.forEach((b) => (b.disabled = false));
+    this.downloadBtn.disabled = false;
   }
 
   private retry(index: number) {
@@ -278,7 +251,6 @@ export class DownloadModal extends Modal {
     if (!row) return;
     row.status.empty();
     row.nameSpan.textContent = row.name;
-    row.bar.setCssProps({ display: "block" });
     this.resolvePromise(true);
   }
 
