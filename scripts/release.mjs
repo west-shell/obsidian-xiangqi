@@ -7,21 +7,14 @@ if (!['patch', 'minor', 'major'].includes(type)) {
   process.exit(1);
 }
 
+execSync(`npm version ${type} --no-git-tag-version`, { stdio: 'inherit' });
+
 const pkg = JSON.parse(readFileSync('package.json', 'utf8'));
 const mfst = JSON.parse(readFileSync('manifest.json', 'utf8'));
-const [mj, mn, pt] = pkg.version.split('.').map(Number);
-
-let ver;
-if (type === 'patch') ver = `${mj}.${mn}.${pt + 1}`;
-else if (type === 'minor') ver = `${mj}.${mn + 1}.0`;
-else ver = `${mj + 1}.0.0`;
-
-pkg.version = ver;
-mfst.version = ver;
-writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
+mfst.version = pkg.version;
 writeFileSync('manifest.json', JSON.stringify(mfst, null, 2) + '\n');
 
-console.log(`Release: ${ver}`);
+console.log(`Release: ${pkg.version}`);
 execSync('git add -A', { stdio: 'inherit' });
-execSync(`git commit -m "${ver}"`, { stdio: 'inherit' });
-execSync(`git tag ${ver}`, { stdio: 'inherit' });
+execSync(`git commit -m "${pkg.version}"`, { stdio: 'inherit' });
+execSync(`git tag ${pkg.version}`, { stdio: 'inherit' });
