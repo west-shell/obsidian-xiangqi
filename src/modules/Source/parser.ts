@@ -1,5 +1,5 @@
 import { Chess, type Move } from "../../chess";
-import type { ChessNode, NodeEval } from "../../types";
+import type { ChessNode } from "../../types";
 import { DEFAULT_FEN } from "../../types";
 
 import { type Token, tokenize, type TokenType } from "./Tokenizer";

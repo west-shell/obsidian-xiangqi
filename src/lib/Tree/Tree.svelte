@@ -354,7 +354,8 @@
   let evalChartMax = $derived.by(() => {
     let max = 0;
     for (const v of evalChartData) {
-      if (v !== null && isFinite(v) && Math.abs(v) > max) max = Math.abs(v);
+      if (v !== null && Number.isFinite(v) && Math.abs(v) > max)
+        max = Math.abs(v);
     }
     return max || 1;
   });
