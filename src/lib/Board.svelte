@@ -32,6 +32,8 @@
     variations?: Move[];
     freeMode?: boolean;
     userShapes?: DrawShape[];
+    engineBestMove?: { from: Square; to: Square } | null;
+    enginePonder?: { from: Square; to: Square } | null;
   }
 
   let {
@@ -45,6 +47,8 @@
     variations = [],
     freeMode = false,
     userShapes = [],
+    engineBestMove = null,
+    enginePonder = null,
   }: Props = $props();
 
   // oxlint-disable-next-line no-unassigned-vars
@@ -100,9 +104,18 @@
     }));
   }
 
-  let shapes = $derived(
-    settings.showNextMove ? computeVariationShapes(variations) : [],
-  );
+  let engineShapes: DrawShape[] = $derived([
+    ...(engineBestMove
+      ? [{ orig: engineBestMove.from, dest: engineBestMove.to, brush: "green" }]
+      : []),
+    ...(enginePonder
+      ? [{ orig: enginePonder.from, dest: enginePonder.to, brush: "yellow" }]
+      : []),
+  ]);
+  let shapes = $derived([
+    ...(settings.showNextMove ? computeVariationShapes(variations) : []),
+    ...engineShapes,
+  ]);
   let dests = $derived(computeDests(fen));
 
   onMount(async () => {

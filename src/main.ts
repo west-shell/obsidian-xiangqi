@@ -11,6 +11,7 @@ import { ChessSettingTab, DEFAULT_SETTINGS } from "./settings";
 import { applyThemes, ensureBoardAssets, registerIcon } from "./themes";
 import type { ISettings } from "./types";
 import { PGNView } from "./view/PGNView";
+import "./modules/Engine/EngineModule";
 
 export default class ChessPlugin extends Plugin {
   settings: ISettings = DEFAULT_SETTINGS;

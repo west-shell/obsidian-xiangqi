@@ -104,5 +104,18 @@
   "pgn.enable.desc": "Register PGN file view for opening .pgn files",
   "pgn.extensions": "PGN file extensions",
   "pgn.extensions.desc": "Custom file extensions for PGN view, comma separated",
-  "annotation.w+": "Advantage"
+  "annotation.w+": "Advantage",
+  "engine.title": "Engine",
+  "engine.depth": "Search Depth",
+  "engine.depth.desc": "Engine analysis search depth (1-30). Higher depth = more accurate but slower",
+  "engine.skillLevel": "Skill Level",
+  "engine.skillLevel.desc": "Engine playing strength (0-20). 20 is strongest",
+  "save.title": "Save",
+  "save.saveEval": "Save eval by default",
+  "save.saveEval.desc": "Automatically save evaluation results to the game record after analysis",
+  "save.saveEvalPrompt": "Save eval prompt",
+  "save.saveEvalPrompt.desc": "Prompt whether to include engine evaluation data when saving",
+  "toolbar.analyze": "Analyze",
+  "toolbar.stop": "Stop",
+  "toolbar.analyzeBatch": "Batch analyze"
 }

@@ -52,6 +52,7 @@ const ActionsModule = {
         if (node.move && node.move.from === from && node.move.to === to) {
           host.currentNode = node;
           host.fen = node.fen;
+          emitNodeEval(host);
           eventBus.emit("updateMainPath");
           eventBus.emit("updateUI");
           return;
@@ -73,6 +74,7 @@ const ActionsModule = {
       host.currentNode = newNode;
       host.fen = move.after;
       host.currentStep++;
+      emitNodeEval(host);
       eventBus.emit("updateMainPath");
       eventBus.emit("updateUI");
       eventBus.emit("modified", null);
@@ -83,6 +85,7 @@ const ActionsModule = {
       host.markedPos = null;
       host.currentNode = host.nodeMap.get(id)!;
       host.fen = host.currentNode.fen;
+      emitNodeEval(host);
       host.eventBus.emit("updateMainPath");
       host.eventBus.emit("updateUI");
     });
@@ -94,6 +97,7 @@ const ActionsModule = {
       host.markedPos = null;
       host.currentNode = node;
       host.fen = node.fen;
+      emitNodeEval(host);
       host.eventBus.emit("updateUI");
     });
 
@@ -249,18 +253,20 @@ const ActionsModule = {
             break;
           }
         }
+        emitNodeEval(host);
         eventBus.emit("updateUI");
       },
     );
 
-    host.stringifyPGN = stringifyPGN;
+    host.stringifyPGN = (root: ChessNode, includeEval = true) =>
+      stringifyPGN(root, includeEval);
   },
 };
 
 registerPGNViewModule("actions", ActionsModule);
 registerTreeModule("actions", ActionsModule);
 
-export function stringifyPGN(root: ChessNode): string {
+export function stringifyPGN(root: ChessNode, includeEval = true): string {
   const nodeBrothers = genNodeBrothers(root);
 
   function genNodeBrothers(root: ChessNode): Map<ChessNode, ChessNode[]> {
@@ -283,6 +289,19 @@ export function stringifyPGN(root: ChessNode): string {
     if (node.comments?.length) {
       for (const c of node.comments) result += `{${c}}`;
     }
+    if (includeEval && node.eval) {
+      const absScore = Math.abs(node.eval.score);
+      const evalStr =
+        node.eval.scoreType === "mate"
+          ? `m${node.eval.score >= 0 ? "+" : "-"}${absScore}`
+          : `${node.eval.score >= 0 ? "+" : "-"}${(absScore / 100).toFixed(2)}`;
+      let annotation = `%e:${evalStr}`;
+      if (node.eval.bestmove) {
+        annotation += `,${node.eval.bestmove}`;
+        if (node.eval.ponder) annotation += `,${node.eval.ponder}`;
+      }
+      result += `{${annotation}}`;
+    }
     const brothers = nodeBrothers.get(node);
     if (brothers?.length) {
       for (const brother of brothers) {
@@ -297,4 +316,19 @@ export function stringifyPGN(root: ChessNode): string {
     return result;
   }
   return walk(root, 0);
+}
+
+function emitNodeEval(host: ITreeHost) {
+  const ev = host.currentNode?.eval;
+  if (ev?.bestmove) {
+    host.eventBus.emit("engine-result", {
+      bestmove: ev.bestmove,
+      ponder: ev.ponder,
+      score: ev.score,
+      depth: ev.depth,
+      scoreType: ev.scoreType,
+    });
+  } else {
+    host.eventBus.emit("clear-engine-bestmove");
+  }
 }

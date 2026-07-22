@@ -105,5 +105,18 @@
   "pgn.enable.desc": "注册 PGN 文件视图以打开 .pgn 文件",
   "pgn.extensions": "PGN 文件扩展名",
   "pgn.extensions.desc": "自定义 PGN 视图的文件扩展名，逗号分隔",
-  "annotation.w+": "优势"
+  "annotation.w+": "优势",
+  "engine.title": "引擎",
+  "engine.depth": "搜索深度",
+  "engine.depth.desc": "引擎分析时的搜索深度（1-30），深度越高分析越精确但耗时越长",
+  "engine.skillLevel": "技能等级",
+  "engine.skillLevel.desc": "引擎的棋力等级（0-20），20为最强",
+  "save.title": "保存",
+  "save.saveEval": "默认保存评估",
+  "save.saveEval.desc": "分析后自动将评估结果保存到棋谱中",
+  "save.saveEvalPrompt": "保存评估提示",
+  "save.saveEvalPrompt.desc": "保存时提示是否包含引擎评估数据",
+  "toolbar.analyze": "分析",
+  "toolbar.stop": "停止",
+  "toolbar.analyzeBatch": "批量分析"
 }

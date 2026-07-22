@@ -33,6 +33,10 @@ export const DEFAULT_SETTINGS: ISettings = {
   genfenSaveType: "xiangqi",
   enablePGNView: true,
   pgnFileExtensions: ["pgn"],
+  engineDepth: 18,
+  engineSkillLevel: 20,
+  saveEvalByDefault: true,
+  saveEvalPrompt: true,
 };
 
 function addSliderWithValue(
@@ -245,6 +249,58 @@ export class ChessSettingTab extends PluginSettingTab {
             settings.autoJump = value as "never" | "always" | "auto";
           });
       });
+
+    // ---- 引擎 ----
+    new Setting(containerEl).setName(t("engine.title")).setHeading();
+
+    addSliderWithValue(
+      containerEl,
+      t("engine.depth"),
+      t("engine.depth.desc"),
+      settings.engineDepth,
+      { min: 1, max: 30, step: 1 },
+      "",
+      (v) => {
+        settings.engineDepth = v;
+        void this.plugin.saveSettings();
+      },
+    );
+
+    addSliderWithValue(
+      containerEl,
+      t("engine.skillLevel"),
+      t("engine.skillLevel.desc"),
+      settings.engineSkillLevel,
+      { min: 0, max: 20, step: 1 },
+      "",
+      (v) => {
+        settings.engineSkillLevel = v;
+        void this.plugin.saveSettings();
+      },
+    );
+
+    // ---- 保存 ----
+    new Setting(containerEl).setName(t("save.title")).setHeading();
+
+    new Setting(containerEl)
+      .setName(t("save.saveEval"))
+      .setDesc(t("save.saveEval.desc"))
+      .addToggle((toggle) =>
+        toggle.setValue(settings.saveEvalByDefault).onChange((value) => {
+          settings.saveEvalByDefault = value;
+          void this.plugin.saveSettings();
+        }),
+      );
+
+    new Setting(containerEl)
+      .setName(t("save.saveEvalPrompt"))
+      .setDesc(t("save.saveEvalPrompt.desc"))
+      .addToggle((toggle) =>
+        toggle.setValue(settings.saveEvalPrompt).onChange((value) => {
+          settings.saveEvalPrompt = value;
+          void this.plugin.saveSettings();
+        }),
+      );
 
     // ---- 边距 ----
     new Setting(containerEl).setName(t("margin.title")).setHeading();

@@ -52,6 +52,10 @@ export interface ISettings {
   genfenSaveType: "xiangqi" | "tree";
   enablePGNView: boolean;
   pgnFileExtensions: string[];
+  engineDepth: number;
+  engineSkillLevel: number;
+  saveEvalByDefault: boolean;
+  saveEvalPrompt: boolean;
 }
 
 export type IOptions = {
@@ -60,6 +64,14 @@ export type IOptions = {
 };
 
 export type ITurn = "white" | "black";
+
+export type NodeEval = {
+  score: number;
+  scoreType: "cp" | "mate";
+  depth: number;
+  bestmove?: string;
+  ponder?: string;
+};
 
 export type ChessNode = {
   id: string;
@@ -73,6 +85,7 @@ export type ChessNode = {
   mainID?: string | null;
   children: ChessNode[];
   comments?: string[];
+  eval?: NodeEval;
 };
 
 export type NodeMap = Map<string, ChessNode>;
@@ -128,7 +141,7 @@ export interface ITreeHost extends IGenFENHost {
   modified: boolean;
   haveFEN: boolean;
   options: IOptions;
-  stringifyPGN: (root: ChessNode) => string;
+  stringifyPGN: (root: ChessNode, includeEval?: boolean) => string;
 }
 
 export interface IPGNViewHost extends ITreeHost {

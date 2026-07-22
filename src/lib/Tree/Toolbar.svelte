@@ -5,8 +5,9 @@
 
   interface Props {
     eventBus: EventBus;
+    fen?: string;
   }
-  let { eventBus }: Props = $props();
+  let { eventBus, fen = "" }: Props = $props();
 
   let _lv = $state(0);
   onLangChange(() => _lv++);
@@ -29,6 +30,34 @@
   });
 
   let saveBtnClass = $derived(modified ? "unsaved" : "saved");
+
+  let autoAnalyze = $state(false);
+  let engineBusy = $state(false);
+
+  $effect(() => {
+    eventBus.on("engine-busy", () => {
+      engineBusy = true;
+    });
+    eventBus.on("engine-result", () => {
+      engineBusy = false;
+    });
+    eventBus.on("engine-batch-done", () => {
+      engineBusy = false;
+    });
+  });
+
+  $effect(() => {
+    if (autoAnalyze && fen) {
+      eventBus.emit("engine-analyze");
+    }
+  });
+
+  function toggleAutoAnalyze() {
+    autoAnalyze = !autoAnalyze;
+    if (!autoAnalyze) {
+      eventBus.emit("engine-stop");
+    }
+  }
 
   const buildButtons = (v: number) => [
     { title: t("toolbar.reset", v), icon: "rotate-ccw", event: "reset" },
@@ -96,6 +125,11 @@
 
   function useSetIcon(el: HTMLElement, icon: string) {
     setIcon(el, icon);
+    return {
+      update(newIcon: string) {
+        setIcon(el, newIcon);
+      },
+    };
   }
 
   function useSetSaveIcon(el: HTMLElement) {
@@ -134,6 +168,25 @@
       }}
     ></button>
   {/each}
+
+  <button
+    class="toolbar-btn engine-btn"
+    class:active={autoAnalyze}
+    class:analyzing={engineBusy}
+    aria-label={autoAnalyze
+      ? t("toolbar.stop", _lv)
+      : t("toolbar.analyze", _lv)}
+    use:useSetIcon={autoAnalyze ? "circle-stop" : "brain"}
+    onclick={toggleAutoAnalyze}
+  ></button>
+
+  <button
+    class="toolbar-btn engine-btn"
+    class:analyzing={engineBusy}
+    aria-label={t("toolbar.analyzeBatch", _lv)}
+    use:useSetIcon={"workflow"}
+    onclick={() => eventBus.emit("engine-analyze-batch")}
+  ></button>
 
   <button
     class="toolbar-btn {saveBtnClass}"
@@ -195,5 +248,24 @@
 
   .toolbar-btn.unsaved {
     background-color: hsl(35, 100%, 50%);
+  }
+
+  .engine-btn.analyzing {
+    animation: engine-pulse 1.2s ease-in-out infinite;
+  }
+
+  .engine-btn.active {
+    background-color: var(--interactive-accent);
+    color: var(--text-on-accent);
+  }
+
+  @keyframes engine-pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.4;
+    }
   }
 </style>

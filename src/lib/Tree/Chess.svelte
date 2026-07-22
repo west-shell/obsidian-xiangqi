@@ -79,6 +79,8 @@
       : null,
   ) as "white" | "black" | null;
   let userShapes = $derived(loadShapes(currentNode));
+  let engineBestMove: { from: Square; to: Square } | null = $state(null);
+  let enginePonder: { from: Square; to: Square } | null = $state(null);
 
   let treeViewEl: HTMLDivElement | null = null;
   let adaptiveBoardWidth = $state(300);
@@ -111,6 +113,36 @@
   });
 
   $effect(() => {
+    eventBus.on<{
+      bestmove: string;
+      ponder?: string;
+      score?: number;
+      depth?: number;
+    } | null>("engine-result", (result) => {
+      if (result) {
+        const from = result.bestmove.slice(0, 2) as Square;
+        const to = result.bestmove.slice(2, 4) as Square;
+        engineBestMove = { from, to };
+        if (result.ponder) {
+          enginePonder = {
+            from: result.ponder.slice(0, 2) as Square,
+            to: result.ponder.slice(2, 4) as Square,
+          };
+        } else {
+          enginePonder = null;
+        }
+      } else {
+        engineBestMove = null;
+        enginePonder = null;
+      }
+    });
+    eventBus.on("clear-engine-bestmove", () => {
+      engineBestMove = null;
+      enginePonder = null;
+    });
+  });
+
+  $effect(() => {
     eventBus.on<DrawShape[]>("user-shapes-changed", (shapes) => {
       saveShapes(currentNode, shapes ?? []);
       eventBus.emit("modified", null);
@@ -139,8 +171,10 @@
     {rotated}
     {variations}
     {userShapes}
+    {engineBestMove}
+    {enginePonder}
   />
-  <Toolbar {eventBus} />
+  <Toolbar {eventBus} {fen} />
   <Tree {nodeMap} {eventBus} {currentNode} {currentPath} />
 </div>
 

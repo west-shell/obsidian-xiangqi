@@ -1,8 +1,10 @@
 import { Chess, type Move } from "../../chess";
-import type { ChessNode } from "../../types";
+import type { ChessNode, NodeEval } from "../../types";
 import { DEFAULT_FEN } from "../../types";
 
 import { type Token, tokenize, type TokenType } from "./Tokenizer";
+
+const EVAL_RE = /^%e:([m+-]?)(\d+(?:\.\d+)?),?([a-i0-9]+)?,?([a-i0-9]+)?$/;
 
 export class PGNParser {
   haveFEN: boolean = false;
@@ -177,6 +179,36 @@ export class PGNParser {
   parseComment() {
     const token = this.consume();
     const comment = token.value.replace(/^{|}$/g, "").replace(/^;/, "").trim();
+
+    const evalMatch = comment.match(EVAL_RE);
+    if (evalMatch) {
+      const prefix = evalMatch[1];
+      const numStr = evalMatch[2];
+      const bestmove = evalMatch[3] || undefined;
+      const ponder = evalMatch[4] || undefined;
+      let scoreType: "cp" | "mate" = "cp";
+      let score: number;
+      if (prefix === "m") {
+        scoreType = "mate";
+        score = numStr.startsWith("-")
+          ? -Number.parseInt(numStr.slice(1))
+          : Number.parseInt(numStr);
+      } else {
+        score =
+          prefix === "-"
+            ? -Number.parseFloat(numStr) * 100
+            : Number.parseFloat(numStr) * 100;
+      }
+      if (prefix === "+" && !numStr.startsWith("-")) {
+        score = Number.parseFloat(numStr) * 100;
+      } else if (prefix === "-") {
+        score = -Number.parseFloat(numStr) * 100;
+      } else if (!prefix) {
+        score = Number.parseFloat(numStr) * 100;
+      }
+      this.currentNode.eval = { score, scoreType, depth: 0, bestmove, ponder };
+      return;
+    }
 
     this.currentNode.comments ??= [];
     this.currentNode.comments.push(comment);

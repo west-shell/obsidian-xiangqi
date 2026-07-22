@@ -3,7 +3,7 @@
   import { SvelteSet } from "svelte/reactivity";
   import type { EventBus } from "../../core/event-bus";
   import { type ChessNode, type NodeMap, PIECE_CHARS } from "../../types";
-  import { t } from "../../i18n";
+  import { onLangChange, t } from "../../i18n";
   import { calculateTreeLayout } from "./layout";
   import { iconPaths } from "../../utils/icon";
   import { setIcon } from "obsidian";
@@ -29,6 +29,9 @@
     currentNode = $bindable(),
     currentPath,
   }: Props = $props();
+
+  let _lv = $state(0);
+  onLangChange(() => _lv++);
 
   let commentsText = $state("");
   let textareaEl: HTMLTextAreaElement | undefined = $state();
@@ -337,6 +340,82 @@
     return idx !== -1 ? `${idx}/${currentPath.length - 1}` : "";
   });
 
+  let evalChartData = $derived.by(() => {
+    if (currentPath.length === 0) return [];
+    return currentPath.map((id) => {
+      const n = nodeMap.get(id);
+      if (!n?.eval) return null;
+      if (n.eval.scoreType === "mate")
+        return n.eval.score >= 0 ? Infinity : -Infinity;
+      return n.eval.score;
+    });
+  });
+
+  let evalChartMax = $derived.by(() => {
+    let max = 0;
+    for (const v of evalChartData) {
+      if (v !== null && isFinite(v) && Math.abs(v) > max) max = Math.abs(v);
+    }
+    return max || 1;
+  });
+
+  let evalChartSegments = $derived.by(() => {
+    const data = evalChartData;
+    const hasAny = data.some((v) => v !== null);
+    if (!hasAny || currentPath.length <= 1) return null;
+    const w = 20;
+    const midX = w / 2;
+    const maxAbs = evalChartMax;
+    const scaleX = (w - 2) / 2 / maxAbs;
+    const edgeR = w - 1;
+    const edgeL = 1;
+    const segments: {
+      x1: number;
+      y1: number;
+      x2: number;
+      y2: number;
+      color: string;
+    }[] = [];
+    const validIndices: number[] = [];
+    for (let i = 0; i < data.length; i++) {
+      if (data[i] === null) continue;
+      validIndices.push(i);
+    }
+    for (let j = 0; j < validIndices.length - 1; j++) {
+      const i1 = validIndices[j];
+      const i2 = validIndices[j + 1];
+      const v1 = data[i1]!;
+      const v2 = data[i2]!;
+      const x1 =
+        v1 === Infinity ? edgeR : v1 === -Infinity ? edgeL : midX + v1 * scaleX;
+      const x2 =
+        v2 === Infinity ? edgeR : v2 === -Infinity ? edgeL : midX + v2 * scaleX;
+      const color =
+        v2 === Infinity || (isFinite(v2) && v2 >= 0) ? "#4CAF50" : "#f44336";
+      const color1 =
+        v1 === Infinity || (isFinite(v1) && v1 >= 0) ? "#4CAF50" : "#f44336";
+      if (color1 !== color) {
+        segments.push({
+          x1,
+          y1: i1,
+          x2: midX,
+          y2: i1 + (i2 - i1) * 0.5,
+          color: color1,
+        });
+        segments.push({
+          x1: midX,
+          y1: i1 + (i2 - i1) * 0.5,
+          x2,
+          y2: i2,
+          color,
+        });
+      } else {
+        segments.push({ x1, y1: i1, x2, y2: i2, color });
+      }
+    }
+    return { w, h: currentPath.length - 1, midX, segments };
+  });
+
   function toggleCurrentFold() {
     if (!currentNode || currentNode.children.length <= 1) return;
     toggleFold(currentNode);
@@ -430,6 +509,42 @@
 
 <div class="tree-container">
   <div class="svg-wrapper">
+    {#if nodeMap.get(currentNode?.id ?? "")?.eval}
+      {@const ce = nodeMap.get(currentNode!.id)!.eval!}
+      {@const isPositive =
+        ce.score > 0 || (ce.scoreType === "mate" && ce.score >= 0)}
+      {@const evalColor = isPositive
+        ? "rgba(76, 175, 80, 0.8)"
+        : "rgba(244, 67, 54, 0.8)"}
+      {@const fillPercent =
+        ce.scoreType === "mate"
+          ? 50
+          : Math.min(Math.abs(ce.score) / 300, 1) * 50}
+      {@const evalText =
+        ce.scoreType === "mate"
+          ? (ce.score >= 0 ? "+" : "-") + "M"
+          : (ce.score > 0 ? "+" : "") + (ce.score / 100).toFixed(1)}
+      <div class="eval-sidebar">
+        <div class="eval-bar">
+          {#if isPositive}
+            <div
+              class="eval-fill"
+              style="height: {fillPercent}%; top: {50 -
+                fillPercent}%; background: {evalColor}"
+            ></div>
+          {:else}
+            <div
+              class="eval-fill"
+              style="height: {fillPercent}%; top: 50%; background: {evalColor}"
+            ></div>
+          {/if}
+          <div class="eval-center-line"></div>
+          <span class="eval-label" style="background: {evalColor}"
+            >{evalText}</span
+          >
+        </div>
+      </div>
+    {/if}
     <svg bind:this={svgEl} width="100%" height="100%" class="tree-svg">
       <g transform={TRANSFORM_SAFE}>
         <!-- 连线 -->
@@ -590,6 +705,30 @@
                 </text>
               {/if}
             {/if}
+            {#if node.eval}
+              {@const intensity =
+                node.eval.scoreType === "mate"
+                  ? 1
+                  : Math.min(Math.abs(node.eval.score) / 300, 1)}
+              {@const color =
+                node.eval.score > 0 ||
+                (node.eval.scoreType === "mate" && node.eval.score >= 0)
+                  ? `rgba(76, 175, 80, ${0.6 + intensity * 0.4})`
+                  : node.eval.score < 0 ||
+                      (node.eval.scoreType === "mate" && node.eval.score < 0)
+                    ? `rgba(244, 67, 54, ${0.6 + intensity * 0.4})`
+                    : `rgba(136, 136, 136, 0.6)`}
+              {@const barWidth = 2 + intensity * (nw - 4)}
+              <rect
+                x={-barWidth / 2}
+                y={nodeHeight / 2 - 0.5}
+                width={barWidth}
+                height="1.5"
+                rx="0.5"
+                fill={color}
+                style="pointer-events: none"
+              />
+            {/if}
           </g>
         {/each}
 
@@ -639,7 +778,11 @@
       ></button>
     </div>
 
-    <div class="slider" class:active={sliderMouseDown}>
+    <div
+      class="slider"
+      class:active={sliderMouseDown}
+      class:has-eval={!!evalChartSegments}
+    >
       <button
         class="slider-btn slider-to-start"
         aria-label="To start"
@@ -664,6 +807,36 @@
         class="slider-inner"
         onmousedown={handleSliderAreaMouseDown}
       >
+        {#if evalChartSegments}
+          <svg
+            width={evalChartSegments.w}
+            height="100%"
+            viewBox="0 0 {evalChartSegments.w} {evalChartSegments.h}"
+            preserveAspectRatio="none"
+            class="eval-chart-bg"
+          >
+            <line
+              x1={evalChartSegments.midX}
+              y1="0"
+              x2={evalChartSegments.midX}
+              y2={evalChartSegments.h}
+              stroke="var(--text-faint)"
+              stroke-width="0.5"
+              vector-effect="non-scaling-stroke"
+            />
+            {#each evalChartSegments.segments as seg}
+              <line
+                x1={seg.x1}
+                y1={seg.y1}
+                x2={seg.x2}
+                y2={seg.y2}
+                stroke={seg.color}
+                stroke-width="1"
+                vector-effect="non-scaling-stroke"
+              />
+            {/each}
+          </svg>
+        {/if}
         <span class="slider-thumb" style="top: {sliderPercent}%"></span>
         {#if sliderText}
           <span
@@ -731,6 +904,64 @@
     height: 100%;
   }
 
+  .eval-sidebar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  .eval-bar {
+    position: relative;
+    flex: 1 1 auto;
+    width: 4px;
+    background: var(--background-modifier-border);
+    border-radius: 2px;
+  }
+
+  .eval-fill {
+    position: absolute;
+    left: 0;
+    right: 0;
+    border-radius: 2px;
+    transition:
+      height 0.3s ease,
+      top 0.3s ease,
+      background 0.3s ease;
+  }
+
+  .eval-center-line {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 0;
+  }
+
+  .eval-label {
+    position: absolute;
+    top: 50%;
+    left: calc(100% + 4px);
+    height: 18px;
+    margin-top: -9px;
+    background: var(--interactive-accent);
+    color: var(--text-on-accent);
+    font-size: 0.6em;
+    line-height: 18px;
+    text-align: center;
+    padding: 0 4px;
+    border-radius: 3px;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
   .toolbar {
     position: absolute;
     top: 0.5rem;
@@ -763,6 +994,21 @@
     align-items: center;
     border-radius: 3px;
     margin: 6px;
+  }
+
+  .slider.has-eval {
+    width: 20px;
+    background: var(--background-primary-alt);
+    border: 1px solid var(--background-modifier-border);
+  }
+
+  .eval-chart-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
   }
 
   .slider-btn {
