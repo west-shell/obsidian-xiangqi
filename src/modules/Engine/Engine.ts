@@ -104,7 +104,11 @@ export class XiangqiEngine {
           }
           modal.done(i);
         } catch (err) {
-          modal.error(i, String(err));
+          const msg =
+            err instanceof TypeError
+              ? t("engine.downloadFailed", 0)
+              : String(err);
+          modal.error(i, msg);
           return;
         }
       }
