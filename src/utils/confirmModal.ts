@@ -143,7 +143,8 @@ export class DownloadModal extends Modal {
     name: string;
     url: string;
     bar: HTMLProgressElement;
-    status: HTMLElement;
+    status: HTMLSpanElement;
+    nameSpan: HTMLSpanElement;
   }[] = [];
   public abortController: AbortController = new AbortController();
 
@@ -169,7 +170,7 @@ export class DownloadModal extends Modal {
     for (const file of this.files) {
       const row = contentEl.createEl("p");
 
-      row.createSpan({ text: file.name });
+      const nameSpan = row.createSpan({ text: file.name });
       row.appendText("（");
       const link = row.createEl("a", {
         text: "GitHub",
@@ -185,12 +186,15 @@ export class DownloadModal extends Modal {
       bar.value = 0;
       bar.setCssProps({ width: "100%", display: "none" });
 
-      const status = contentEl.createEl("p", {
-        cls: "download-status",
-        text: "",
-      });
+      const status = contentEl.createSpan({ cls: "download-status", text: "" });
 
-      this.fileRows.push({ name: file.name, url: file.url, bar, status });
+      this.fileRows.push({
+        name: file.name,
+        url: file.url,
+        bar,
+        status,
+        nameSpan,
+      });
     }
 
     const btnContainer = contentEl.createDiv("modal-button-container");
@@ -235,9 +239,12 @@ export class DownloadModal extends Modal {
   done(index: number) {
     const row = this.fileRows[index];
     if (!row) return;
-    row.status.textContent = "✓";
-    row.bar.value = row.bar.max;
-    const allDone = this.fileRows.every((r) => r.status.textContent === "✓");
+    row.nameSpan.textContent = row.name + " ✓";
+    row.bar.setCssProps({ display: "none" });
+    row.status.textContent = "";
+    const allDone = this.fileRows.every((r) =>
+      r.nameSpan.textContent?.includes("✓"),
+    );
     if (allDone) {
       window.setTimeout(() => this.close(), 500);
     }
