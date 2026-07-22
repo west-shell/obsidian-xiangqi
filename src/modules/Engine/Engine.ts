@@ -37,26 +37,29 @@ export class XiangqiEngine {
     await this.initWorker();
   }
 
-  async checkFileExists(): Promise<boolean> {
+  async checkFileExists(): Promise<string[]> {
     const adapter = this.plugin.app.vault.adapter;
     const baseDir = `${this.plugin.app.vault.configDir}/plugins/xiangqi`;
+    const missing: string[] = [];
     for (const file of ENGINE_FILES) {
-      if (!(await adapter.exists(`${baseDir}/${file}`))) return false;
+      if (!(await adapter.exists(`${baseDir}/${file}`))) {
+        missing.push(file);
+      }
     }
-    return true;
+    return missing;
   }
 
-  openDownloadModal(): void {
+  openDownloadModal(missingFiles: string[]): void {
     const adapter = this.plugin.app.vault.adapter;
     const baseDir = `${this.plugin.app.vault.configDir}/plugins/xiangqi`;
 
-    const files = ENGINE_FILES.map((f) => ({
+    const files = missingFiles.map((f) => ({
       name: f,
       url: `${BASE_URL}/${f}`,
     }));
     const modal = new DownloadModal(
       this.plugin.app,
-      t("engine.downloadFile", 0).replace("{file}", ""),
+      t("engine.downloadFile", 0).replace("{file}", missingFiles.join("、")),
       files,
       t("engine.downloadBtn", 0),
       t("engine.downloadCancel", 0),
