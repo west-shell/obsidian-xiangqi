@@ -829,7 +829,7 @@
               stroke-width="0.5"
               vector-effect="non-scaling-stroke"
             />
-            {#each evalChartSegments.segments as seg}
+            {#each evalChartSegments.segments as seg, i (i)}
               <line
                 x1={seg.x1}
                 y1={seg.y1}

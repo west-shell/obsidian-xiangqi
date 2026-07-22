@@ -8,6 +8,6 @@
   "fundingUrl": {
     "PayPal": "https://www.paypal.com/paypalme/weshell1988"
   },
-  "minAppVersion": "1.5.0",
+  "minAppVersion": "1.5.7",
   "isDesktopOnly": false
 }
