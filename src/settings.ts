@@ -35,7 +35,7 @@ export const DEFAULT_SETTINGS: ISettings = {
   pgnFileExtensions: ["pgn"],
   engineDepth: 18,
   engineSkillLevel: 20,
-  saveEvalByDefault: true,
+  saveEvalByDefault: false,
   saveEvalPrompt: true,
 };
 
