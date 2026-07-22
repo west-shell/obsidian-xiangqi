@@ -139,15 +139,18 @@ export class ConfirmModal extends Modal {
 export class DownloadModal extends Modal {
   private resolvePromise: (value: boolean) => void;
   public promise: Promise<boolean>;
-  private progressBar!: HTMLProgressElement;
-  private statusEl!: HTMLElement;
-  private fileNameEl!: HTMLElement;
+  private readonly fileRows: {
+    name: string;
+    url: string;
+    bar: HTMLProgressElement;
+    status: HTMLElement;
+  }[] = [];
   public abortController: AbortController = new AbortController();
 
   constructor(
     app: App,
-    private readonly fileNames: string[],
-    private readonly downloadUrl: string,
+    private readonly title: string,
+    private readonly files: { name: string; url: string }[],
     private readonly confirmText: string,
     private readonly cancelText: string,
   ) {
@@ -161,28 +164,34 @@ export class DownloadModal extends Modal {
   onOpen() {
     const { contentEl } = this;
 
-    this.fileNameEl = contentEl.createEl("p", {
-      text: this.fileNames.join("、"),
-    });
-    const link = this.fileNameEl.createEl("a", {
-      text: "GitHub",
-      attr: { href: this.downloadUrl, target: "_blank" },
-    });
-    link.addEventListener("click", (e) => {
-      e.preventDefault();
-      window.open(this.downloadUrl, "_blank");
-    });
+    contentEl.createEl("p", { text: this.title });
 
-    this.progressBar = contentEl.createEl("progress", {
-      cls: "download-progress",
-    });
-    this.progressBar.value = 0;
-    this.progressBar.setCssProps({ width: "100%", display: "none" });
+    for (const file of this.files) {
+      const row = contentEl.createEl("p");
 
-    this.statusEl = contentEl.createEl("p", {
-      cls: "download-status",
-      text: "",
-    });
+      row.createSpan({ text: file.name });
+      row.appendText("（");
+      const link = row.createEl("a", {
+        text: "GitHub",
+        attr: { href: file.url, target: "_blank" },
+      });
+      link.addEventListener("click", (e) => {
+        e.preventDefault();
+        window.open(file.url, "_blank");
+      });
+      row.appendText("）");
+
+      const bar = contentEl.createEl("progress", { cls: "download-progress" });
+      bar.value = 0;
+      bar.setCssProps({ width: "100%", display: "none" });
+
+      const status = contentEl.createEl("p", {
+        cls: "download-status",
+        text: "",
+      });
+
+      this.fileRows.push({ name: file.name, url: file.url, bar, status });
+    }
 
     const btnContainer = contentEl.createDiv("modal-button-container");
 
@@ -204,46 +213,40 @@ export class DownloadModal extends Modal {
     });
   }
 
-  setCurrentFile(name: string) {
-    const link = this.fileNameEl.querySelector("a");
-    const gitHubText = link?.textContent ?? "GitHub";
-    this.fileNameEl.empty();
-    this.fileNameEl.createSpan({ text: name + "、" });
-    this.fileNameEl.appendText("（");
-    const newLink = this.fileNameEl.createEl("a", {
-      text: gitHubText,
-      attr: { href: this.downloadUrl, target: "_blank" },
-    });
-    newLink.addEventListener("click", (e) => {
-      e.preventDefault();
-      window.open(this.downloadUrl, "_blank");
-    });
-    this.fileNameEl.appendText("）");
-  }
-
-  showProgress() {
-    this.progressBar.setCssProps({ display: "block" });
+  showProgress(index: number) {
+    const row = this.fileRows[index];
+    if (!row) return;
+    row.bar.setCssProps({ display: "block" });
     const downloadBtn = this.contentEl.querySelector(
       "button.mod-cta",
     ) as HTMLButtonElement;
     if (downloadBtn) downloadBtn.disabled = true;
   }
 
-  setProgress(loaded: number, total: number) {
-    this.progressBar.value = loaded;
-    this.progressBar.max = total;
+  setProgress(index: number, loaded: number, total: number) {
+    const row = this.fileRows[index];
+    if (!row) return;
+    row.bar.value = loaded;
+    row.bar.max = total;
     const mb = (n: number) => (n / 1024 / 1024).toFixed(1);
-    this.statusEl.textContent = `${mb(loaded)} / ${mb(total)} MB`;
+    row.status.textContent = `${mb(loaded)} / ${mb(total)} MB`;
   }
 
-  done() {
-    this.statusEl.textContent = "✓";
-    this.progressBar.value = this.progressBar.max;
-    window.setTimeout(() => this.close(), 500);
+  done(index: number) {
+    const row = this.fileRows[index];
+    if (!row) return;
+    row.status.textContent = "✓";
+    row.bar.value = row.bar.max;
+    const allDone = this.fileRows.every((r) => r.status.textContent === "✓");
+    if (allDone) {
+      window.setTimeout(() => this.close(), 500);
+    }
   }
 
-  error(msg: string) {
-    this.statusEl.textContent = msg;
+  error(index: number, msg: string) {
+    const row = this.fileRows[index];
+    if (!row) return;
+    row.status.textContent = msg;
     const buttons = this.contentEl.querySelectorAll("button");
     buttons.forEach((b) => (b.disabled = false));
   }

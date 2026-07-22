@@ -50,21 +50,25 @@ export class XiangqiEngine {
     const adapter = this.plugin.app.vault.adapter;
     const baseDir = `${this.plugin.app.vault.configDir}/plugins/xiangqi`;
 
+    const files = ENGINE_FILES.map((f) => ({
+      name: f,
+      url: `${BASE_URL}/${f}`,
+    }));
     const modal = new DownloadModal(
       this.plugin.app,
-      [...ENGINE_FILES],
-      BASE_URL,
+      t("engine.downloadFile", 0).replace("{file}", ""),
+      files,
       t("engine.downloadBtn", 0),
       t("engine.downloadCancel", 0),
     );
     modal.open();
     const doDownload = async (confirmed: boolean) => {
       if (!confirmed) return;
-      modal.showProgress();
-      for (const file of ENGINE_FILES) {
+      for (let i = 0; i < ENGINE_FILES.length; i++) {
+        const file = ENGINE_FILES[i];
         const url = `${BASE_URL}/${file}`;
         const destPath = `${baseDir}/${file}`;
-        modal.setCurrentFile(file);
+        modal.showProgress(i);
         try {
           const resp = await window.fetch(url, {
             signal: modal.abortController.signal,
@@ -81,7 +85,7 @@ export class XiangqiEngine {
             chunks.push(value);
             loaded += value.length;
             if (contentLength > 0) {
-              modal.setProgress(loaded, contentLength);
+              modal.setProgress(i, loaded, contentLength);
             }
           }
           const buffer = new Uint8Array(loaded);
@@ -95,12 +99,12 @@ export class XiangqiEngine {
           } else {
             await adapter.writeBinary(destPath, buffer.buffer);
           }
+          modal.done(i);
         } catch (err) {
-          modal.error(String(err));
+          modal.error(i, String(err));
           return;
         }
       }
-      modal.done();
     };
     void modal.promise.then(doDownload);
   }
