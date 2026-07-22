@@ -76,6 +76,7 @@
   "confirm.saveMain": "保存主线",
   "confirm.saveAll": "保存全部",
   "confirm.saveMsg": "是否保存当前棋谱？",
+  "confirm.saveEval": "包含引擎评估",
   "confirm.deleteTitle": "确认删除",
   "confirm.deleteMsg": "确定要删除整盘棋局吗？",
   "confirm.yes": "确定",

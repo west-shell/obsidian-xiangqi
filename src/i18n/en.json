@@ -75,6 +75,7 @@
   "confirm.saveMain": "Save Main Line",
   "confirm.saveAll": "Save All",
   "confirm.saveMsg": "Save the game?",
+  "confirm.saveEval": "Include engine evaluation",
   "confirm.deleteTitle": "Confirm Delete",
   "confirm.deleteMsg": "Delete the entire game?",
   "confirm.yes": "Yes",
