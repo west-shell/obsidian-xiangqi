@@ -141,11 +141,12 @@ export class DownloadModal extends Modal {
   public promise: Promise<boolean>;
   private progressBar!: HTMLProgressElement;
   private statusEl!: HTMLElement;
+  private fileNameEl!: HTMLElement;
   public abortController: AbortController = new AbortController();
 
   constructor(
     app: App,
-    private readonly fileName: string,
+    private readonly fileNames: string[],
     private readonly downloadUrl: string,
     private readonly confirmText: string,
     private readonly cancelText: string,
@@ -160,10 +161,10 @@ export class DownloadModal extends Modal {
   onOpen() {
     const { contentEl } = this;
 
-    const fileLine = contentEl.createEl("p");
-    fileLine.createSpan({ text: this.fileName });
-    fileLine.appendText("（");
-    const link = fileLine.createEl("a", {
+    this.fileNameEl = contentEl.createEl("p", {
+      text: this.fileNames.join("、"),
+    });
+    const link = this.fileNameEl.createEl("a", {
       text: "GitHub",
       attr: { href: this.downloadUrl, target: "_blank" },
     });
@@ -171,7 +172,6 @@ export class DownloadModal extends Modal {
       e.preventDefault();
       window.open(this.downloadUrl, "_blank");
     });
-    fileLine.appendText("）");
 
     this.progressBar = contentEl.createEl("progress", {
       cls: "download-progress",
@@ -202,6 +202,23 @@ export class DownloadModal extends Modal {
       this.resolvePromise(false);
       this.close();
     });
+  }
+
+  setCurrentFile(name: string) {
+    const link = this.fileNameEl.querySelector("a");
+    const gitHubText = link?.textContent ?? "GitHub";
+    this.fileNameEl.empty();
+    this.fileNameEl.createSpan({ text: name + "、" });
+    this.fileNameEl.appendText("（");
+    const newLink = this.fileNameEl.createEl("a", {
+      text: gitHubText,
+      attr: { href: this.downloadUrl, target: "_blank" },
+    });
+    newLink.addEventListener("click", (e) => {
+      e.preventDefault();
+      window.open(this.downloadUrl, "_blank");
+    });
+    this.fileNameEl.appendText("）");
   }
 
   showProgress() {

@@ -50,23 +50,21 @@ export class XiangqiEngine {
     const adapter = this.plugin.app.vault.adapter;
     const baseDir = `${this.plugin.app.vault.configDir}/plugins/xiangqi`;
 
-    const downloadNext = (index: number) => {
-      if (index >= ENGINE_FILES.length) return;
-      const file = ENGINE_FILES[index];
-      const url = `${BASE_URL}/${file}`;
-      const destPath = `${baseDir}/${file}`;
-
-      const modal = new DownloadModal(
-        this.plugin.app,
-        t("engine.downloadFile", 0).replace("{file}", file),
-        url,
-        t("engine.downloadBtn", 0),
-        t("engine.downloadCancel", 0),
-      );
-      modal.open();
-      const doDownload = async (confirmed: boolean) => {
-        if (!confirmed) return;
-        modal.showProgress();
+    const modal = new DownloadModal(
+      this.plugin.app,
+      [...ENGINE_FILES],
+      BASE_URL,
+      t("engine.downloadBtn", 0),
+      t("engine.downloadCancel", 0),
+    );
+    modal.open();
+    const doDownload = async (confirmed: boolean) => {
+      if (!confirmed) return;
+      modal.showProgress();
+      for (const file of ENGINE_FILES) {
+        const url = `${BASE_URL}/${file}`;
+        const destPath = `${baseDir}/${file}`;
+        modal.setCurrentFile(file);
         try {
           const resp = await window.fetch(url, {
             signal: modal.abortController.signal,
@@ -97,16 +95,14 @@ export class XiangqiEngine {
           } else {
             await adapter.writeBinary(destPath, buffer.buffer);
           }
-          modal.done();
-          downloadNext(index + 1);
         } catch (err) {
           modal.error(String(err));
+          return;
         }
-      };
-      void modal.promise.then(doDownload);
+      }
+      modal.done();
     };
-
-    downloadNext(0);
+    void modal.promise.then(doDownload);
   }
 
   private async loadPikafishSource(): Promise<string> {
