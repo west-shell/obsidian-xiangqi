@@ -169,13 +169,20 @@ function initEngine(host: object) {
     applyOptions();
     eventBus.emit("engine-busy");
     try {
-      const queue: string[] = [];
+      const pathSet = new Set<string>(h.currentPath);
+      const pathQueue: string[] = [];
+      const restQueue: string[] = [];
       const nodeMap = h.nodeMap;
       for (const [, node] of nodeMap) {
         if (!node.eval || node.eval.depth < settings.engineDepth) {
-          queue.push(node.id);
+          if (pathSet.has(node.id)) {
+            pathQueue.push(node.id);
+          } else {
+            restQueue.push(node.id);
+          }
         }
       }
+      const queue = pathQueue.concat(restQueue);
       for (const nodeId of queue) {
         if (batchCancelled || stopped) break;
         const node = nodeMap.get(nodeId);
