@@ -124,6 +124,6 @@
   "engine.downloadFile": "引擎文件不存在：",
   "engine.downloadBtn": "下载",
   "engine.downloadCancel": "取消",
-  "engine.downloadFailed": "下载失败，请检查网络",
+  "engine.downloadFailed": "下载失败，可手动下载文件放到本插件根目录",
   "engine.retry": "重试"
 }
