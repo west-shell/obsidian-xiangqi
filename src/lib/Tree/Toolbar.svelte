@@ -188,7 +188,7 @@
   <button
     class="toolbar-btn engine-btn"
     class:active={autoAnalyze}
-    class:analyzing={engineBusy}
+    class:busy={engineBusy}
     aria-label={autoAnalyze
       ? t("toolbar.stop", _lv)
       : t("toolbar.analyze", _lv)}
@@ -198,7 +198,7 @@
 
   <button
     class="toolbar-btn engine-btn"
-    class:analyzing={engineBusy && !batchAnalyzing}
+    class:busy={engineBusy && !batchAnalyzing}
     class:batch-analyzing={batchAnalyzing}
     aria-label={batchAnalyzing
       ? t("toolbar.cancelBatch", _lv)
@@ -276,19 +276,19 @@
     background-color: hsl(35, 100%, 50%);
   }
 
-  .engine-btn.analyzing {
+  .engine-btn.active {
+    background-color: var(--interactive-accent);
+    color: var(--text-on-accent);
+  }
+
+  .engine-btn.active.busy {
     animation: engine-pulse 1.2s ease-in-out infinite;
   }
 
   .engine-btn.batch-analyzing {
+    background-color: var(--interactive-accent);
+    color: var(--text-on-accent);
     animation: engine-pulse 1.2s ease-in-out infinite;
-    background-color: var(--interactive-accent);
-    color: var(--text-on-accent);
-  }
-
-  .engine-btn.active {
-    background-color: var(--interactive-accent);
-    color: var(--text-on-accent);
   }
 
   @keyframes engine-pulse {
