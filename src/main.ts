@@ -39,7 +39,9 @@ export default class ChessPlugin extends Plugin {
 
       this.addRibbonIcon("xiangqi-icon", t("pgn.newFile"), async () => {
         let baseFileName = "未命名";
-        let fileExtension = `.${this.settings.pgnFileExtensions[0] ?? "pgn"}`;
+        const rawExtension = this.settings.pgnFileExtensions[0] ?? "pgn";
+        const safeExtension = rawExtension.replace(/[^a-zA-Z0-9]/g, "") || "pgn";
+        let fileExtension = `.${safeExtension}`;
         let fileName = baseFileName + fileExtension;
         let counter = 0;
 
