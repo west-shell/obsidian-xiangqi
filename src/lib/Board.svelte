@@ -51,7 +51,6 @@
     enginePonder = null,
   }: Props = $props();
 
-  // oxlint-disable-next-line no-unassigned-vars
   let boardElement: HTMLDivElement;
   let api: Api | null = null;
   let layoutChangeHandler: (() => void) | null = null;
