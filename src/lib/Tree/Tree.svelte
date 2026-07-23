@@ -575,11 +575,15 @@
   <div class="svg-wrapper">
     {#if nodeMap.get(currentNode?.id ?? "")?.eval}
       {@const ce = nodeMap.get(currentNode!.id)!.eval!}
+      {@const isZero = ce.scoreType !== "mate" && ce.score === 0}
       {@const isPositive =
         ce.score > 0 || (ce.scoreType === "mate" && ce.score >= 0)}
       {@const evalColor = isPositive
         ? "rgba(76, 175, 80, 0.8)"
         : "rgba(244, 67, 54, 0.8)"}
+      {@const labelBg = isZero
+        ? "linear-gradient(to bottom, rgba(76, 175, 80, 0.8) 50%, rgba(244, 67, 54, 0.8) 50%)"
+        : evalColor}
       {@const fillPercent =
         ce.scoreType === "mate"
           ? 50
@@ -603,7 +607,7 @@
             ></div>
           {/if}
           <div class="eval-center-line"></div>
-          <span class="eval-label" style="background: {evalColor}"
+          <span class="eval-label" style="background: {labelBg}"
             >{evalText}</span
           >
         </div>
