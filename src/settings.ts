@@ -9,10 +9,6 @@ import type { ISettings } from "./types";
 
 const VALID_NAME_RE = /^[a-z0-9-]+$/;
 
-function validateNames(names: string[]): string[] {
-  return names.filter((s) => VALID_NAME_RE.test(s));
-}
-
 function parseAndValidateNames(value: string): {
   valid: string[];
   invalid: string[];
