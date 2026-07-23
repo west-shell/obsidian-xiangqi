@@ -7,6 +7,12 @@ import type ChessPlugin from "./main";
 import { THEME_KEYS } from "./themes";
 import type { ISettings } from "./types";
 
+const VALID_NAME_RE = /^[a-z0-9-]+$/;
+
+function validateNames(names: string[]): string[] {
+  return names.filter((s) => VALID_NAME_RE.test(s));
+}
+
 export const DEFAULT_SETTINGS: ISettings = {
   lang: "auto",
   position: "right",
@@ -348,10 +354,12 @@ export class ChessSettingTab extends PluginSettingTab {
         text
           .setValue(settings.codeBlockNames.xiangqi.join(", "))
           .onChange((value) => {
-            settings.codeBlockNames.xiangqi = value
+            const parsed = value
               .split(",")
-              .map((s) => s.trim())
+              .map((s) => s.trim().toLowerCase())
               .filter(Boolean);
+            const valid = validateNames(parsed);
+            settings.codeBlockNames.xiangqi = valid;
             void this.plugin.saveSettings();
           }),
       )
@@ -370,10 +378,12 @@ export class ChessSettingTab extends PluginSettingTab {
         text
           .setValue(settings.codeBlockNames.tree.join(", "))
           .onChange((value) => {
-            settings.codeBlockNames.tree = value
+            const parsed = value
               .split(",")
-              .map((s) => s.trim())
+              .map((s) => s.trim().toLowerCase())
               .filter(Boolean);
+            const valid = validateNames(parsed);
+            settings.codeBlockNames.tree = valid;
             void this.plugin.saveSettings();
           }),
       )
@@ -392,10 +402,12 @@ export class ChessSettingTab extends PluginSettingTab {
         text
           .setValue(settings.codeBlockNames.xq.join(", "))
           .onChange((value) => {
-            settings.codeBlockNames.xq = value
+            const parsed = value
               .split(",")
-              .map((s) => s.trim())
+              .map((s) => s.trim().toLowerCase())
               .filter(Boolean);
+            const valid = validateNames(parsed);
+            settings.codeBlockNames.xq = valid;
             void this.plugin.saveSettings();
           }),
       )
@@ -443,10 +455,12 @@ export class ChessSettingTab extends PluginSettingTab {
         text
           .setValue(settings.pgnFileExtensions.join(", "))
           .onChange((value) => {
-            settings.pgnFileExtensions = value
+            const parsed = value
               .split(",")
-              .map((s) => s.trim())
+              .map((s) => s.trim().toLowerCase())
               .filter(Boolean);
+            const valid = validateNames(parsed);
+            settings.pgnFileExtensions = valid;
             void this.plugin.saveSettings();
           }),
       )
