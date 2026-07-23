@@ -575,14 +575,11 @@
   <div class="svg-wrapper">
     {#if nodeMap.get(currentNode?.id ?? "")?.eval}
       {@const ce = nodeMap.get(currentNode!.id)!.eval!}
-      {@const isZero = ce.scoreType !== "mate" && ce.score === 0}
       {@const isPositive =
         ce.score > 0 || (ce.scoreType === "mate" && ce.score >= 0)}
-      {@const evalColor = isZero
-        ? "rgba(136, 136, 136, 0.8)"
-        : isPositive
-          ? "rgba(76, 175, 80, 0.8)"
-          : "rgba(244, 67, 54, 0.8)"}
+      {@const evalColor = isPositive
+        ? "rgba(76, 175, 80, 0.8)"
+        : "rgba(244, 67, 54, 0.8)"}
       {@const fillPercent =
         ce.scoreType === "mate"
           ? 50
@@ -593,16 +590,7 @@
           : (ce.score > 0 ? "+" : "") + (ce.score / 100).toFixed(1)}
       <div class="eval-sidebar">
         <div class="eval-bar">
-          {#if isZero}
-            <div
-              class="eval-fill"
-              style="height: 50%; top: 0; background: rgba(76, 175, 80, 0.8)"
-            ></div>
-            <div
-              class="eval-fill"
-              style="height: 50%; top: 50%; background: rgba(244, 67, 54, 0.8)"
-            ></div>
-          {:else if isPositive}
+          {#if isPositive}
             <div
               class="eval-fill"
               style="height: {fillPercent}%; top: {50 -
