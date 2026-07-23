@@ -1,6 +1,6 @@
 import "./style/settings.css";
 
-import { type App, PluginSettingTab, Setting } from "obsidian";
+import { type App, Notice, PluginSettingTab, Setting } from "obsidian";
 
 import { initI18n, t } from "./i18n";
 import type ChessPlugin from "./main";
@@ -11,6 +11,26 @@ const VALID_NAME_RE = /^[a-z0-9-]+$/;
 
 function validateNames(names: string[]): string[] {
   return names.filter((s) => VALID_NAME_RE.test(s));
+}
+
+function parseAndValidateNames(value: string): {
+  valid: string[];
+  invalid: string[];
+} {
+  const parsed = value
+    .split(",")
+    .map((s) => s.trim().toLowerCase())
+    .filter(Boolean);
+  const valid: string[] = [];
+  const invalid: string[] = [];
+  for (const name of parsed) {
+    if (VALID_NAME_RE.test(name)) {
+      valid.push(name);
+    } else {
+      invalid.push(name);
+    }
+  }
+  return { valid, invalid };
 }
 
 export const DEFAULT_SETTINGS: ISettings = {
@@ -354,11 +374,12 @@ export class ChessSettingTab extends PluginSettingTab {
         text
           .setValue(settings.codeBlockNames.xiangqi.join(", "))
           .onChange((value) => {
-            const parsed = value
-              .split(",")
-              .map((s) => s.trim().toLowerCase())
-              .filter(Boolean);
-            const valid = validateNames(parsed);
+            const { valid, invalid } = parseAndValidateNames(value);
+            if (invalid.length) {
+              new Notice(
+                t("codeblock.invalidName").replace("{name}", invalid[0]),
+              );
+            }
             settings.codeBlockNames.xiangqi = valid;
             void this.plugin.saveSettings();
           }),
@@ -378,11 +399,12 @@ export class ChessSettingTab extends PluginSettingTab {
         text
           .setValue(settings.codeBlockNames.tree.join(", "))
           .onChange((value) => {
-            const parsed = value
-              .split(",")
-              .map((s) => s.trim().toLowerCase())
-              .filter(Boolean);
-            const valid = validateNames(parsed);
+            const { valid, invalid } = parseAndValidateNames(value);
+            if (invalid.length) {
+              new Notice(
+                t("codeblock.invalidName").replace("{name}", invalid[0]),
+              );
+            }
             settings.codeBlockNames.tree = valid;
             void this.plugin.saveSettings();
           }),
@@ -402,11 +424,12 @@ export class ChessSettingTab extends PluginSettingTab {
         text
           .setValue(settings.codeBlockNames.xq.join(", "))
           .onChange((value) => {
-            const parsed = value
-              .split(",")
-              .map((s) => s.trim().toLowerCase())
-              .filter(Boolean);
-            const valid = validateNames(parsed);
+            const { valid, invalid } = parseAndValidateNames(value);
+            if (invalid.length) {
+              new Notice(
+                t("codeblock.invalidName").replace("{name}", invalid[0]),
+              );
+            }
             settings.codeBlockNames.xq = valid;
             void this.plugin.saveSettings();
           }),
@@ -455,11 +478,12 @@ export class ChessSettingTab extends PluginSettingTab {
         text
           .setValue(settings.pgnFileExtensions.join(", "))
           .onChange((value) => {
-            const parsed = value
-              .split(",")
-              .map((s) => s.trim().toLowerCase())
-              .filter(Boolean);
-            const valid = validateNames(parsed);
+            const { valid, invalid } = parseAndValidateNames(value);
+            if (invalid.length) {
+              new Notice(
+                t("codeblock.invalidName").replace("{name}", invalid[0]),
+              );
+            }
             settings.pgnFileExtensions = valid;
             void this.plugin.saveSettings();
           }),

@@ -88,6 +88,7 @@
   "pgn.displayName": "Pgn view",
   "codeblock.title": "Code Block Names",
   "codeblock.restartNotice": "Changes require restarting the plugin or Obsidian to take effect.",
+  "codeblock.invalidName": "Invalid name \"{name}\" ignored. Only lowercase letters, digits, and hyphens are allowed.",
   "codeblock.xiangqiAliases": "List mode",
   "codeblock.xiangqiAliases.desc": "Custom aliases for list code block, comma separated",
   "codeblock.xqAliases": "FEN generation mode",
