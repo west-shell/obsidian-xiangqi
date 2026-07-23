@@ -58,6 +58,10 @@
       autoAnalyze = false;
       engineBusy = false;
     });
+    eventBus.on("engine-batch-stop", () => {
+      batchAnalyzing = false;
+      engineBusy = false;
+    });
   });
 
   $effect(() => {
@@ -206,7 +210,7 @@
     use:useSetIcon={batchAnalyzing ? "circle-stop" : "workflow"}
     onclick={() => {
       if (batchAnalyzing) {
-        eventBus.emit("engine-stop");
+        eventBus.emit("engine-batch-stop");
       } else {
         pendingBatch = true;
         eventBus.emit("engine-analyze-batch");
