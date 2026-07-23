@@ -8,6 +8,7 @@ if (!['patch', 'minor', 'major'].includes(type)) {
 }
 
 execSync(`npm version ${type} --no-git-tag-version`, { stdio: 'inherit' });
+execSync('npm install --package-lock-only', { stdio: 'inherit' });
 
 const pkg = JSON.parse(readFileSync('package.json', 'utf8'));
 const mfst = JSON.parse(readFileSync('manifest.json', 'utf8'));
