@@ -81,3 +81,31 @@ export function iconPaths(name: string): string {
     })
     .join("");
 }
+
+/**
+ * Generate an inline SVG string for a named icon.
+ */
+export function iconSvg(
+  name: string,
+  size: number = 24,
+  strokeWidth: number = 2,
+  fill: string = "none",
+): string {
+  const nodes = ICONS[name];
+  if (!nodes) return "";
+  const children = nodes
+    .map(([tag, attrs]) => {
+      const attrStr = Object.entries(attrs)
+        .map(([k, v]) => `${k}="${v}"`)
+        .join(" ");
+      return `    <${tag} ${attrStr}/>`;
+    })
+    .join("\n");
+  return [
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24"`,
+    `  fill="${fill}" stroke="currentColor" stroke-width="${strokeWidth}"`,
+    '  stroke-linecap="round" stroke-linejoin="round">',
+    children,
+    "</svg>",
+  ].join("\n");
+}

@@ -5,7 +5,7 @@
   import { type ChessNode, type NodeMap, PIECE_CHARS } from "../../types";
   import { onLangChange, t } from "../../i18n";
   import { calculateTreeLayout } from "./layout";
-  import { iconPaths } from "../../utils/icon";
+  import { iconPaths, iconSvg } from "../../utils/icon";
   import { setIcon } from "obsidian";
   import * as d3 from "d3";
   import type { Move } from "../../chess";
@@ -797,34 +797,16 @@
                 style="pointer-events: none"
               />
             {/if}
-          </g>
-        {/each}
-
-        {#each renderedNodes as node (node.id)}
-          {#if getRegularComments(node).length > 0}
-            {@const nw = getNodeWidth(node)}
-            <g
-              transform="translate({node.x! * spacingX + 0.35 * nw} {node.y! *
-                spacingY -
-                0.7 * nodeHeight}){node.id === currentNode?.id
-                ? ' scale(1.35)'
-                : ''}"
-              opacity={currentPath.includes(node.id) ? 1 : 0.8}
-              style="pointer-events: none"
-            >
+            {#if getRegularComments(node).length > 0}
               <g
-                transform="scale(0.35)"
-                fill="royalblue"
-                stroke="currentColor"
-                stroke-width="1.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                transform="translate({0.3 * nw} {-0.8 * nodeHeight})"
+                style="pointer-events: none"
               >
                 <!-- eslint-disable-next-line svelte/no-at-html-tags -->
-                {@html iconPaths("message-square-text")}
+                {@html iconSvg("message-square-text", 8, 1.5, "royalblue")}
               </g>
-            </g>
-          {/if}
+            {/if}
+          </g>
         {/each}
       </g>
     </svg>
