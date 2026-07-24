@@ -12,7 +12,7 @@ Likes, coins, and feedback are greatly appreciated.
 
 ## Overview
 
-**Obsidian Chinese Chess Plugin** is a Chinese chess rendering engine built for Obsidian. It displays chess positions and games in FEN and PGN formats, supports move exploration and variation management. Features include Pikafish analysis links, voice narration, and more.
+**Obsidian Chinese Chess Plugin** is a Chinese chess rendering engine built for Obsidian. It displays chess positions and games in FEN and PGN formats, supports move exploration and variation management. Features include built-in engine analysis powered by [Pikafish](https://github.com/official-pikafish/Pikafish) (WASM), voice narration, and more.
 
 ## PGN File Support
 
@@ -23,6 +23,7 @@ Open `.pgn` files directly in Obsidian — the plugin registers a dedicated `.pg
 - **Comments & Annotations**: Supports branch diagram and board annotation symbols, comments
 - **Mode Toggle**: Switch between icon mode and text mode in branch diagram
 - **Jump to AI**: Package the current branch to Pikafish web version for analysis
+- **Engine Analysis**: Built-in Pikafish WASM engine with single position analysis, batch analysis, and auto-analysis
 - **Quick Create**: New PGN files from the ribbon button
 - **Custom File Types**: Set specific file types as PGN files
 - **Context Menu**: Right-click PGN files to switch between PGN view and Markdown view
@@ -98,7 +99,7 @@ For the best experience on mobile devices, it's recommended to install the Full 
 
 ### Board Appearance
 
-- **Theme**: Wood, Parchment, Green Felt, Marble, Classic Light, Classic Dark
+- **Theme**: Auto, Light, Dark, Parchment, Green, Wood, Bamboo
 - **Cell Size**: Adjustable board cell size (15–100 px)
 - **Layout**: Toolbar position — right / bottom
 - **Coordinate Labels**: Show/hide board coordinates
@@ -133,6 +134,18 @@ Customize code block aliases in **Settings > Chess > Code Block Names**:
 
 > **Note**: Changes require restarting the plugin or Obsidian to take effect.
 
+### Engine Analysis
+
+- **Engine Depth**: Search depth for Pikafish analysis (1–30, default 18)
+- **Engine Skill Level**: Skill level for engine play (0–20, default 20)
+- **Save Eval by Default**: Automatically include eval data when saving (default off)
+- **Save Eval Prompt**: Show prompt when saving with eval data (default on)
+
+### Save
+
+- **Save Eval by Default**: Whether to include eval annotations when saving PGN (default off)
+- **Save Eval Prompt**: Whether to show a prompt about eval when saving (default on)
+
 ### PGN File View
 
 Enable/disable PGN file view and customize file extensions:
@@ -157,6 +170,12 @@ Enable/disable PGN file view and customize file extensions:
 - **i18n**: Supports English and Chinese UI
 - **Board Markers**: Draw arrows and highlights on the board
 - **Jump to AI**: Package move list to Pikafish web version for analysis
+- **Engine Analysis**: Built-in Pikafish WASM engine with single position analysis, batch analysis, and auto-analysis
+  - **Best Move Arrow**: Green arrow shows the engine's best move; yellow arrow shows the ponder move
+  - **Eval Bar**: Left sidebar bar showing evaluation (green = red advantage, red = black advantage)
+  - **Eval Trend Chart**: Vertical polyline in the slider background showing evaluation across moves
+  - **Eval Color Bar**: Color bar on tree nodes indicating evaluation (green = red advantage, red = black advantage, gray = equal)
+  - **Eval Persistence**: Engine evaluations saved as `%e:` comments in PGN
 - **Mobile Friendly**: Adjust board size for small screens
 
 ## Usage
@@ -186,6 +205,11 @@ Enable/disable PGN file view and customize file extensions:
 3. Click any node to navigate to that position
 4. Switch between icon mode and text mode for node labels
 5. Click the fold button (triangle) on a node with multiple children to collapse/expand its variations
+6. Use engine analysis:
+   - Click **Analyze** for single position analysis, **Batch** to analyze all nodes, or enable auto-analysis
+   - Green arrow = best move, yellow arrow = ponder move
+   - Eval bar on the left shows position evaluation
+   - Eval color bars on nodes and eval trend chart on the slider show evaluation across the game
 
 ### Optional Parameters
 
