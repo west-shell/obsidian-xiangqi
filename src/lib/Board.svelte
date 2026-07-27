@@ -52,7 +52,7 @@
   }: Props = $props();
 
   let boardElement: HTMLDivElement;
-  let api: Api | null = null;
+  let api: Api | null = $state(null);
   let layoutChangeHandler: (() => void) | null = null;
 
   function handleWheel(e: WheelEvent) {
