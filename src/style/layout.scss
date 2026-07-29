@@ -53,9 +53,10 @@ $local-block-gap: 2px;
 
   // ====== col2：双栏（宽屏或横屏） ======
   @include mq-is-col2 {
+    ---xq-board-height: calc(var(---col2-uniboard-width));
     --xq-board-width: calc(0.9 * var(---col2-uniboard-width));
-    height: var(---col2-uniboard-width);
-    grid-template-columns: var(---col2-uniboard-width) auto $uniboard-table;
+    height: var(---xq-board-height);
+    grid-template-columns: var(--xq-board-width) auto $uniboard-table;
     grid-template-rows: var(---col2-uniboard-width) 1fr;
     grid-template-areas:
       "board toolbar tools"
@@ -70,13 +71,13 @@ $local-block-gap: 2px;
     .xq-layout__toolbar.toolbar-container {
       flex-direction: column;
       flex-wrap: wrap;
-      max-height: var(---col2-uniboard-width);
+      max-height: var(---xq-board-height);
       column-gap: 2px;
       grid-row: 1;
     }
 
     &__tools {
-      max-height: var(---col2-uniboard-width);
+      max-height: var(---xq-board-height);
       min-width: 160px;
     }
   }
@@ -135,7 +136,7 @@ $local-block-gap: 2px;
   height: 100%;
 
   &__board {
-    --xq-board-width: min(100cqw, 50cqh);
+    --xq-board-width: min(100cqw, 90cqh);
     .board-resize {
       display: none;
     }
@@ -152,9 +153,10 @@ $local-block-gap: 2px;
 
   @include mq-is-col2 {
     flex-direction: row;
+    ---col2-uniboard-width: calc(100cqh * 9 / 10);
 
     &__board {
-      --xq-board-width: min(60cqw, 90cqh);
+      --xq-board-width: min(60cqw, 100cqh);
     }
 
     &__toolbar {
