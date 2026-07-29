@@ -1,0 +1,14 @@
+@use "functions" as *;
+@use "variables" as *;
+
+@mixin mq-is-col1 {
+  @media (max-width: at-most($small)) and (orientation: portrait) {
+    @content;
+  }
+}
+
+@mixin mq-is-col2 {
+  @media (min-width: at-least($small)), (orientation: landscape) {
+    @content;
+  }
+}

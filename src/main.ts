@@ -1,5 +1,6 @@
 import "@west-shell/xiangqiground/assets/xiangqiground.base.css";
 import "@west-shell/xiangqiground/assets/xiangqiground.piece.css";
+import "./style/layout.scss";
 
 import { MarkdownView, Plugin, TFile } from "obsidian";
 
@@ -95,6 +96,16 @@ export default class ChessPlugin extends Plugin {
       }),
     );
 
+    this.registerDomEvent(
+      activeDocument.body,
+      "xq-zoom-changed",
+      (e: Event) => {
+        const zoom = (e as CustomEvent<number>).detail;
+        this.settings.zoom = zoom;
+        void this.saveSettings();
+      },
+    );
+
     this.registerEvent(
       this.app.workspace.on("css-change", () => {
         if (this.settings.theme === "auto") {
@@ -144,16 +155,27 @@ export default class ChessPlugin extends Plugin {
   }
 
   async loadSettings() {
-    const savedData: Partial<ISettings> =
-      (await this.loadData()) as Partial<ISettings>;
-    this.settings = {
-      ...DEFAULT_SETTINGS,
-      ...savedData,
-    };
+    const savedData = (await this.loadData()) as Record<string, unknown> | null;
+    if (savedData) {
+      const picked: Record<string, unknown> = {};
+      for (const key of Object.keys(DEFAULT_SETTINGS)) {
+        if (key in savedData) {
+          picked[key] = savedData[key];
+        }
+      }
+      this.settings = {
+        ...DEFAULT_SETTINGS,
+        ...(picked as Partial<ISettings>),
+      };
+    }
   }
 
   async saveSettings() {
     await this.saveData(this.settings);
     applyThemes(this.app, this.settings);
+  }
+
+  onunload() {
+    void this.saveSettings();
   }
 }

@@ -571,7 +571,7 @@
   });
 </script>
 
-<div class="tree-container">
+<div class="tree-container xq-layout__tools">
   <div class="svg-wrapper">
     {#if nodeMap.get(currentNode?.id ?? "")?.eval}
       {@const ce = nodeMap.get(currentNode!.id)!.eval!}
@@ -935,14 +935,6 @@
     --piece-red: var(--xq-piece-red, var(--color-red));
     --piece-black: var(--xq-piece-black, var(--color-blue));
     --text-color: var(--text-normal);
-  }
-
-  :global(.tree-codeblock .tree-view.right) .tree-container {
-    height: calc(var(--xq-cell-size, 50px) * 10);
-  }
-
-  :global(.tree-codeblock .tree-view.bottom) .tree-container {
-    height: calc(var(--xq-cell-size, 50px) * 6);
   }
 
   .svg-wrapper {

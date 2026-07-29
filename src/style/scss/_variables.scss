@@ -1,0 +1,11 @@
+$small: 800px;
+
+$site-header-height: var(--xq-header-height, 0px);
+$site-header-margin: 0px;
+$site-header-outer-height: calc(
+  #{$site-header-height} + #{$site-header-margin}
+);
+$main-margin: 0px;
+
+$block-gap: var(--xq-block-gap, 4px);
+$scrollbar-width: 20px;

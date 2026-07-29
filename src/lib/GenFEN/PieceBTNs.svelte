@@ -5,10 +5,9 @@
   interface Props {
     fen: string;
     eventBus: EventBus;
-    position?: string;
     selectedPiece: string | null;
   }
-  let { fen, eventBus, position = "", selectedPiece }: Props = $props();
+  let { fen, eventBus, selectedPiece }: Props = $props();
 
   const MAX_COUNT: Record<string, number> = {
     K: 1,
@@ -50,10 +49,10 @@
   );
 </script>
 
-<div class={`piece-btn-container ${position}`}>
+<div class="piece-btn-container xq-layout__piecebtns">
   {#each Object.entries(PIECE_CHARS) as [piece, name] (piece)}
     <button
-      class={`piece-btn ${position} ${isRed(piece) ? "red-piece" : "black-piece"}`}
+      class={`piece-btn ${isRed(piece) ? "red-piece" : "black-piece"}`}
       class:empty={count[piece] === 0}
       class:active={selectedPiece === piece}
       onclick={() => eventBus.emit("clickPieceBTN", piece)}
@@ -67,45 +66,15 @@
   .piece-btn-container {
     --piece-red: var(--xq-piece-red, var(--color-red));
     --piece-black: var(--xq-piece-black, var(--color-blue));
-  }
-  .piece-btn-container.right {
-    display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: repeat(14, 1fr);
-    flex-direction: column;
-    width: fit-content;
-    align-items: stretch;
-    display: flex;
-    justify-content: space-between;
-  }
-
-  .piece-btn-container.bottom {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     grid-template-rows: repeat(2, 1fr);
-    width: calc(var(--xq-cell-size, 50px) * 9);
-    height: auto;
-    justify-content: left;
-  }
-
-  .piece-btn.right {
-    flex: 1;
     width: 100%;
-    height: calc(var(--xq-cell-size, 50px) * 10 / 14);
-    border-radius: 4px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: max(8px, calc(var(--xq-cell-size, 50px) * 0.3));
-    transition:
-      box-shadow 0.15s,
-      border-color 0.15s;
+    height: auto;
   }
 
-  .piece-btn.bottom {
+  .piece-btn {
     padding: 0;
-    width: calc(var(--xq-cell-size, 50px) * 9 / 7);
     border-radius: 4px;
     cursor: pointer;
     font-size: calc(var(--xq-cell-size, 50px) * 0.3);

@@ -63,7 +63,6 @@
   let lastMove: [Square, Square] | null = $derived(
     currentNode.move ? [currentNode.move.from, currentNode.move.to] : null,
   );
-  let { position } = $derived(settings);
   let rotated = $state(false);
   let variations = $derived(
     currentNode.children
@@ -81,31 +80,6 @@
   let userShapes = $derived(loadShapes(currentNode));
   let engineBestMove: { from: Square; to: Square } | null = $state(null);
   let enginePonder: { from: Square; to: Square } | null = $state(null);
-
-  let treeViewEl: HTMLDivElement | null = null;
-  let adaptiveBoardWidth = $state(300);
-
-  $effect(() => {
-    const el = treeViewEl;
-    if (!el) return;
-    const pos = position;
-    const ro = new ResizeObserver(() => {
-      const rect = el.getBoundingClientRect();
-      if (pos === "right") {
-        const availWidth = rect.width * 0.6;
-        const availHeight = rect.height;
-        const byHeight = (availHeight * 9) / 10;
-        adaptiveBoardWidth = Math.min(availWidth, byHeight);
-      } else {
-        const availWidth = rect.width;
-        const availHeight = rect.height * 0.65;
-        const byHeight = (availHeight * 9) / 10;
-        adaptiveBoardWidth = Math.min(availWidth, byHeight);
-      }
-    });
-    ro.observe(el);
-    return () => ro.disconnect();
-  });
 
   onMount(async () => {
     await tick();
@@ -157,11 +131,7 @@
   });
 </script>
 
-<div
-  class="tree-view {position}"
-  bind:this={treeViewEl}
-  style="--adaptive-board-width:{adaptiveBoardWidth}px"
->
+<div class="xq-layout">
   <Board
     {settings}
     {fen}
@@ -179,47 +149,8 @@
 </div>
 
 <style>
-  :global(.tree-codeblock) .tree-view {
-    margin: 1rem 0;
-  }
-  :global(.tree-codeblock) .tree-view.right {
-    justify-content: flex-start;
-  }
-  :global(.tree-codeblock) .tree-view.bottom {
-    align-items: stretch;
-  }
-  :global(.view-content.pgn-view) .tree-view {
-    --xq-board-width: var(--adaptive-board-width, 300px);
-  }
-  :global(.view-content.pgn-view) {
-    overflow: hidden !important;
-    margin: 0 !important;
-    padding-top: var(--xq-board-margin-top, 0px) !important;
-    padding-bottom: var(--xq-board-margin-bottom, 0px) !important;
-  }
-  .tree-view {
-    display: flex;
-    justify-content: center;
-    margin: 0;
-    padding: 0;
-  }
-  .tree-view.right {
-    flex-direction: row;
-    height: 100%;
-  }
-  .tree-view.right :global(.tree-container) {
-    flex: 1 1 auto;
-    min-width: 25%;
-    max-width: 50%;
-  }
-  .tree-view.bottom {
-    flex-direction: column;
-    align-items: center;
-    height: 100%;
-  }
-  .tree-view.bottom :global(.tree-container) {
-    flex: 1 1 auto;
-    min-height: 25%;
-    width: 100%;
+  .xq-layout {
+    --red: #861818;
+    --black: #000080;
   }
 </style>

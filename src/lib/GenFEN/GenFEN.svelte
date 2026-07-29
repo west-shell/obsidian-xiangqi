@@ -13,10 +13,9 @@
   }
 
   let { settings, fen, selectedPiece, eventBus }: Props = $props();
-  let position = $derived(settings.position);
 </script>
 
-<div class="XQ-container {settings.position}">
+<div class="xq-layout xq-layout--genfen">
   <Board
     settings={{ ...settings, showLastMove: false }}
     {fen}
@@ -24,27 +23,16 @@
     rotated={false}
     freeMode={true}
   />
-  <PieceBTNs {fen} {eventBus} {position} {selectedPiece} />
+  <PieceBTNs {fen} {eventBus} {selectedPiece} />
   <Toolbar
     {eventBus}
-    {position}
     currentTurn={fen.split(" ")[1] === "b" ? "black" : "white"}
   />
 </div>
 
 <style>
-  .XQ-container {
+  .xq-layout {
     --red: #861818;
     --black: #000080;
-    margin: 1rem 0;
-  }
-  .XQ-container.right {
-    display: flex;
-    flex-direction: row;
-    gap: 2px;
-  }
-  .XQ-container.bottom {
-    display: flex;
-    flex-direction: column;
   }
 </style>

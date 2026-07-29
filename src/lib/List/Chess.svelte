@@ -39,8 +39,6 @@
   let isprotected = $derived(options.protected || false);
   // svelte-ignore state_referenced_locally
   let rotatedState = $state(options.rotated ?? false);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  let { position } = $derived(settings);
 
   onMount(async () => {
     await tick();
@@ -54,7 +52,7 @@
   });
 </script>
 
-<div class="XQ-container {settings.position}">
+<div class="xq-layout">
   <Board
     {settings}
     {fen}
@@ -71,20 +69,8 @@
 </div>
 
 <style>
-  .XQ-container {
+  .xq-layout {
     --red: #861818;
     --black: #000080;
-    margin: 1rem 0;
-  }
-
-  .XQ-container.right {
-    display: flex;
-    flex-direction: row;
-    gap: 2px;
-  }
-
-  .XQ-container.bottom {
-    display: flex;
-    flex-direction: column;
   }
 </style>

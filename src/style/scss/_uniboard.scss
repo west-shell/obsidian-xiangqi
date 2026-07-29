@@ -1,0 +1,22 @@
+@use "functions" as *;
+@use "variables" as *;
+
+$uniboard-table-min: 240px;
+$uniboard-table: minmax(#{$uniboard-table-min}, 400px);
+$uniboard-controls: 3rem;
+$col-min-bottom-margin: 1rem;
+
+$col2-uniboard-max-width: calc(
+  100vw - #{$block-gap} - #{$uniboard-table-min} - 2 * #{$main-margin} -
+    #{$scrollbar-width}
+);
+$col2-uniboard-max-height: calc(
+  100vh - #{$site-header-outer-height} - #{$col-min-bottom-margin}
+);
+$col2-uniboard-max-size: min(
+  #{$col2-uniboard-max-width},
+  #{$col2-uniboard-max-height}
+);
+$col2-uniboard-width: calc(
+  #{$col2-uniboard-max-size} * var(--xq-board-scale, 0.85)
+);

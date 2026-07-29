@@ -171,7 +171,7 @@
   }
 </script>
 
-<div class="toolbar-container">
+<div class="toolbar-container xq-layout__toolbar">
   {#each buttons as { title, icon, event } (event)}
     <button
       class="toolbar-btn"
@@ -227,41 +227,6 @@
 </div>
 
 <style>
-  :global(.tree-view.right) .toolbar-container {
-    display: flex;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    align-items: center;
-    gap: 2px;
-  }
-
-  :global(.tree-view.bottom) .toolbar-container {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    align-items: center;
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  :global(.tree-view.bottom) .toolbar-container .toolbar-btn {
-    flex: 0 1 auto;
-    min-width: 24px;
-    font-size: clamp(12px, 3vw, 16px);
-    padding: clamp(2px, 1vw, 6px) clamp(4px, 2vw, 10px);
-    margin: 0;
-  }
-
-  :global(.tree-view.right) .toolbar-container .toolbar-btn {
-    flex: 0 1 auto;
-    min-height: 24px;
-    font-size: clamp(12px, 3vw, 16px);
-    padding: clamp(2px, 1vw, 6px) clamp(4px, 2vw, 10px);
-    margin: 0;
-  }
-
   .toolbar-btn {
     border: none;
     padding: 6px 10px;

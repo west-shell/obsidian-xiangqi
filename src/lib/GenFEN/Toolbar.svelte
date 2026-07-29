@@ -4,10 +4,9 @@
 
   interface Props {
     eventBus: EventBus;
-    position: string;
     currentTurn: string;
   }
-  let { eventBus, position, currentTurn }: Props = $props();
+  let { eventBus, currentTurn }: Props = $props();
 
   let _lv = $state(0);
   onLangChange(() => _lv++);
@@ -20,7 +19,7 @@
   ]);
 </script>
 
-<div class={`getFENT-toolbar-container ${position}`}>
+<div class="getFENT-toolbar-container xq-layout__toolbar">
   {#each buttons as { title, text, action, color }, i (i)}
     <button
       {title}
@@ -33,18 +32,6 @@
 </div>
 
 <style>
-  .getFENT-toolbar-container.right {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5em;
-  }
-
-  .getFENT-toolbar-container.bottom {
-    display: flex;
-    flex-direction: row;
-    gap: 0.5em;
-  }
-
   .toolbar-btn {
     padding: 0.4em 0.8em;
     border: none;

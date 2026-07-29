@@ -59,6 +59,7 @@ export const DEFAULT_SETTINGS: ISettings = {
   engineSkillLevel: 20,
   saveEvalByDefault: false,
   saveEvalPrompt: true,
+  zoom: 80,
 };
 
 function addSliderWithValue(

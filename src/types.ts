@@ -56,6 +56,7 @@ export interface ISettings {
   engineSkillLevel: number;
   saveEvalByDefault: boolean;
   saveEvalPrompt: boolean;
+  zoom: number;
 }
 
 export type IOptions = {

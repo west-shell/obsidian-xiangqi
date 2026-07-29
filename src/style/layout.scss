@@ -1,0 +1,180 @@
+@use "scss/functions" as *;
+@use "scss/variables" as *;
+@use "scss/media-queries" as *;
+@use "scss/uniboard" as *;
+@use "scss/layout-base" as *;
+
+$local-block-gap: 2px;
+
+.xq-layout {
+  display: grid;
+  gap: $local-block-gap;
+
+  &__board {
+    grid-area: board;
+    align-self: start;
+  }
+
+  &__toolbar {
+    grid-area: toolbar;
+    align-self: start;
+  }
+
+  &__tools {
+    grid-area: tools;
+  }
+
+  &__piecebtns {
+    grid-area: piecebtns;
+  }
+
+  // ====== col1：单栏（默认，竖屏） ======
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto auto;
+  grid-template-areas:
+    "board"
+    "toolbar"
+    "tools";
+
+  &__board {
+    --xq-board-scale: 1;
+    max-width: calc(
+      100vh - var(--xq-header-height, 0px) - var(--xq-block-gap, 4px)
+    );
+
+    .board-resize {
+      display: none;
+    }
+  }
+
+  &__tools {
+    max-height: 40vh;
+  }
+
+  // ====== col2：双栏（宽屏或横屏） ======
+  @include mq-is-col2 {
+    height: var(---col2-uniboard-width);
+    grid-template-columns: var(---col2-uniboard-width) auto $uniboard-table;
+    grid-template-rows: var(---col2-uniboard-width) 1fr;
+    grid-template-areas:
+      "board toolbar tools"
+      "board toolbar tools";
+
+    &__board {
+      .board-resize {
+        display: block;
+      }
+    }
+
+    .xq-layout__toolbar.toolbar-container {
+      flex-direction: column;
+      flex-wrap: wrap;
+      max-height: var(---col2-uniboard-width);
+      column-gap: 2px;
+      grid-row: 1;
+    }
+
+    &__tools {
+      max-height: var(---col2-uniboard-width);
+      min-width: 160px;
+    }
+  }
+}
+
+.xq-layout__toolbar {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 2px;
+}
+
+// ====== GenFEN 编辑器专用 ======
+.xq-layout--genfen {
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto auto;
+  grid-template-areas:
+    "board"
+    "piecebtns"
+    "toolbar";
+
+  @include mq-is-col2 {
+    height: auto;
+    grid-template-columns: var(---col2-uniboard-width) min-content min-content;
+    grid-template-rows: auto;
+    grid-template-areas: "board piecebtns toolbar";
+
+    .xq-layout__toolbar {
+      flex-direction: column;
+      flex-wrap: nowrap;
+      align-items: center;
+    }
+  }
+
+  .xq-layout__piecebtns.piece-btn-container {
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    width: 100%;
+    height: auto;
+
+    @include mq-is-col2 {
+      grid-template-columns: repeat(1, 1fr);
+      grid-template-rows: repeat(14, 1fr);
+      width: auto;
+    }
+  }
+}
+
+// ====== PGN 文件视图专用 ======
+.pgn-view .xq-layout {
+  container-type: size;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  &__board {
+    --xq-board-width: min(100cqw, 50cqh);
+    .board-resize {
+      display: none;
+    }
+  }
+
+  &__toolbar {
+    flex-shrink: 0;
+  }
+
+  &__tools {
+    flex: 1 1 0;
+    min-height: 0;
+  }
+
+  @include mq-is-col2 {
+    flex-direction: row;
+
+    &__board {
+      --xq-board-width: min(60cqw, 100cqh);
+    }
+
+    &__toolbar {
+      flex-direction: column;
+      max-height: none;
+    }
+
+    &__tools {
+      height: 100%;
+    }
+  }
+}
+
+.pgn-view {
+  overflow: hidden !important;
+  margin: 0 !important;
+  padding-top: var(--xq-board-margin-top, 0px) !important;
+  padding-bottom: var(--xq-board-margin-bottom, 0px) !important;
+}
+
+// ====== tree codeblock 专用 ======
+.tree-codeblock .xq-layout {
+  margin: 1rem 0;
+}
