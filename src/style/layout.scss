@@ -120,9 +120,10 @@ $local-block-gap: 2px;
     height: auto;
 
     @include mq-is-col2 {
-      grid-template-columns: repeat(1, 1fr);
-      grid-template-rows: repeat(14, 1fr);
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: repeat(7, 1fr);
       width: auto;
+      height: 100%;
     }
   }
 }

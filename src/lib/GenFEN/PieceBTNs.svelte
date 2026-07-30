@@ -67,17 +67,24 @@
     --piece-red: var(--xq-piece-red, var(--color-red));
     --piece-black: var(--xq-piece-black, var(--color-blue));
     display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    grid-template-rows: repeat(2, 1fr);
-    width: 100%;
-    height: auto;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(7, 1fr);
+    height: 100%;
+    width: auto;
+    justify-content: left;
   }
 
   .piece-btn {
+    width: 28px;
+    height: 28px;
     padding: 0;
+    margin: 0;
     border-radius: 4px;
     cursor: pointer;
-    font-size: calc(var(--xq-cell-size, 50px) * 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
     border: 1.5px solid rgba(0, 0, 0, 0.35);
     transition:
       box-shadow 0.15s,
