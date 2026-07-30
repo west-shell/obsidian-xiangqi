@@ -81,17 +81,35 @@
 </div>
 
 <style>
-  .toolbar-btn {
+  .toolbar-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    align-items: center;
+  }
+
+  .toolbar-container :global(.toolbar-btn) {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    margin: 0;
     border: none;
-    padding: 6px 10px;
     border-radius: 6px;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
     transition:
       background-color 0.2s ease,
       transform 0.1s ease;
   }
 
-  /* === 状态颜色 === */
+  .toolbar-container :global(.toolbar-btn svg) {
+    width: 18px;
+    height: 18px;
+  }
+
   .toolbar-btn.empty {
     background-color: hsl(33, 5%, 57%);
   }
