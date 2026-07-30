@@ -28,9 +28,8 @@ export const PIECE_CHARS = {
 
 export interface ISettings {
   lang: "auto" | "en" | "zh";
-  position: "bottom" | "right";
   theme: ThemeName;
-  cellSize: number;
+  zoom: number;
   fontSize: number;
   showCoordinateLabels: boolean;
   showLastMove: boolean;
@@ -56,7 +55,6 @@ export interface ISettings {
   engineSkillLevel: number;
   saveEvalByDefault: boolean;
   saveEvalPrompt: boolean;
-  zoom: number;
 }
 
 export type IOptions = {

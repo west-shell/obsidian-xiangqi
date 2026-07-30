@@ -31,9 +31,8 @@ function parseAndValidateNames(value: string): {
 
 export const DEFAULT_SETTINGS: ISettings = {
   lang: "auto",
-  position: "right",
   theme: "wood",
-  cellSize: 50,
+  zoom: 80,
   fontSize: 12,
   showCoordinateLabels: true,
   showLastMove: true,
@@ -59,7 +58,6 @@ export const DEFAULT_SETTINGS: ISettings = {
   engineSkillLevel: 20,
   saveEvalByDefault: false,
   saveEvalPrompt: true,
-  zoom: 80,
 };
 
 function addSliderWithValue(
@@ -140,32 +138,16 @@ export class ChessSettingTab extends PluginSettingTab {
 
     addSliderWithValue(
       containerEl,
-      t("board.cellSize"),
-      t("board.cellSize.desc"),
-      settings.cellSize,
-      { min: 15, max: 100, step: 1 },
-      "px",
+      t("board.zoom"),
+      t("board.zoom.desc"),
+      settings.zoom,
+      { min: 0, max: 100, step: 1 },
+      "%",
       (v) => {
-        settings.cellSize = v;
+        settings.zoom = v;
         this.plugin.refresh();
       },
     );
-
-    new Setting(containerEl)
-      .setName(t("board.layout"))
-      .setDesc(t("board.layout.desc"))
-      .addDropdown((dropdown) => {
-        dropdown
-          .addOptions({
-            right: t("board.layout.side"),
-            bottom: t("board.layout.bottom"),
-          })
-          .setValue(settings.position)
-          .onChange((position) => {
-            settings.position = position as "bottom" | "right";
-            this.plugin.refresh();
-          });
-      });
 
     new Setting(containerEl)
       .setName(t("board.coordinates"))

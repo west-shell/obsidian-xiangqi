@@ -146,8 +146,24 @@
   .move-list span.move.active {
     background-color: var(--color-accent);
     color: var(--text-on-accent);
-    box-shadow: 0.125em 0.375em rgba(0, 0, 0, 0.15);
+    box-shadow: 0 0.125em 0.375em rgba(0, 0, 0, 0.15);
     font-weight: 500;
     transform: scale(1.02);
+  }
+
+  @container move-list-container (max-width: 500px) {
+    .move-list {
+      flex-direction: column;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      overflow-x: auto;
+      overflow-y: hidden;
+      gap: 0 0.5em;
+      height: auto;
+    }
+
+    .move-list li {
+      width: fit-content;
+    }
   }
 </style>

@@ -168,18 +168,19 @@ export function registerIcon() {
 export function applyThemes(app: App, settings: ISettings) {
   const {
     theme,
-    cellSize,
+    zoom,
     boardMarginTop,
     boardMarginBottom,
     showCoordinateLabels,
   } = settings;
   const t = themes[theme] ?? themes.light;
 
+  const boardScale = (zoom / 100) * 0.75 + 0.25;
   const bg = isImagePath(t.bg)
     ? `url('${app.vault.adapter.getResourcePath(app.vault.configDir + "/" + t.bg)}') center / cover no-repeat`
     : t.bg;
 
-  activeDocument.body.style.setProperty("--xq-cell-size", `${cellSize}px`);
+  activeDocument.body.style.setProperty("--xq-board-scale", `${boardScale}`);
   activeDocument.body.style.setProperty(
     "--xq-font-size",
     `${settings.fontSize}px`,
