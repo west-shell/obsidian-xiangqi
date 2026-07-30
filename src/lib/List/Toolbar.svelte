@@ -1,18 +1,17 @@
 <script lang="ts">
   import { setIcon } from "obsidian";
   import type { EventBus } from "../../core/event-bus";
-  import type { ChessNode, ISettings } from "../../types";
+  import type { ChessNode } from "../../types";
   import { onLangChange, t } from "../../i18n";
 
   interface Props {
-    settings: ISettings;
     eventBus: EventBus;
     modified: boolean;
     PGN: ChessNode[];
     isprotected: boolean;
   }
 
-  let { settings, eventBus, modified, PGN, isprotected }: Props = $props();
+  let { eventBus, modified, PGN, isprotected }: Props = $props();
 
   let buttonClass: string = $derived(
     modified ? "unsaved" : PGN.length > 0 ? "saved" : "empty",

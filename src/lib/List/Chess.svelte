@@ -62,7 +62,7 @@
     {eventBus}
     rotated={rotatedState}
   />
-  <Toolbar {settings} {eventBus} {modified} {PGN} {isprotected} />
+  <Toolbar {eventBus} {modified} {PGN} {isprotected} />
   {#if settings.showMovelist}
     <List {settings} {currentStep} {moves} {eventBus} />
   {/if}
