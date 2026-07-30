@@ -53,6 +53,7 @@ $local-block-gap: 2px;
 
   // ====== col2：双栏（宽屏或横屏） ======
   @include mq-is-col2 {
+    --xq-board-height: var(---col2-uniboard-height);
     height: var(---col2-uniboard-height);
     grid-template-columns: var(---col2-uniboard-width) auto $uniboard-table;
     grid-template-rows: var(---col2-uniboard-height) 1fr;
