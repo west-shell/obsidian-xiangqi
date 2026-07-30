@@ -17,6 +17,6 @@ $col2-uniboard-max-size: min(
   #{$col2-uniboard-max-width},
   #{$col2-uniboard-max-height}
 );
-$col2-uniboard-width: calc(
+$col2-uniboard-height: calc(
   #{$col2-uniboard-max-size} * var(--xq-board-scale, 0.85)
 );

@@ -310,11 +310,11 @@
 
 <style>
   .board-wrapper {
-    --bw: var(
-      --xq-board-width,
+    --bh: var(
+      --xq-board-height,
       min(var(--xq-board-max-size, 100vh) * var(--xq-board-scale, 0.85), 100%)
     );
-    width: var(--bw);
+    width: calc(0.9 * var(--bh));
     position: relative;
     margin: 1.5px;
   }
