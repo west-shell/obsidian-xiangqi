@@ -195,7 +195,6 @@
         if (api && boardElement.offsetWidth) {
           api.state.dom.bounds.clear();
           api.state.dom.redraw();
-          injectGridSVG(boardElement);
         }
       }, 100);
     });
@@ -205,7 +204,6 @@
       if (api && boardElement.offsetWidth) {
         api.state.dom.bounds.clear();
         api.state.dom.redraw();
-        injectGridSVG(boardElement);
       }
     };
     activeDocument.body.addEventListener(
