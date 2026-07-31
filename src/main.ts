@@ -96,15 +96,14 @@ export default class ChessPlugin extends Plugin {
       }),
     );
 
-    this.registerDomEvent(
-      activeDocument.body,
-      "xq-zoom-changed",
-      (e: Event) => {
-        const zoom = (e as CustomEvent<number>).detail;
-        this.settings.zoom = zoom;
-        void this.saveSettings();
-      },
-    );
+    const onZoomChanged = (e: Event) => {
+      this.settings.zoom = (e as CustomEvent<number>).detail;
+      void this.saveSettings();
+    };
+    activeDocument.body.addEventListener("xq-zoom-changed", onZoomChanged);
+    this.register(() => {
+      activeDocument.body.removeEventListener("xq-zoom-changed", onZoomChanged);
+    });
 
     this.registerEvent(
       this.app.workspace.on("css-change", () => {
