@@ -53,6 +53,9 @@
 
   let boardElement: HTMLDivElement;
   let api: Api | null = $state(null);
+  let layoutChangeHandler: (() => void) | null = null;
+  let boardResizeRo: ResizeObserver | null = null;
+  let resizeTimer: ReturnType<typeof setTimeout> | null = null;
 
   function handleWheel(e: WheelEvent) {
     if (Math.abs(e.deltaY) < Math.abs(e.deltaX)) return;
@@ -183,9 +186,49 @@
     }
     api = Chessground(boardElement, config);
     injectGridSVG(boardElement);
+
+    boardResizeRo = new ResizeObserver(() => {
+      if (!api || !boardElement.offsetWidth) return;
+      if (resizeTimer) clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        resizeTimer = null;
+        if (api && boardElement.offsetWidth) {
+          api.state.dom.bounds.clear();
+          api.state.dom.redraw();
+          injectGridSVG(boardElement);
+        }
+      }, 100);
+    });
+    boardResizeRo.observe(boardElement);
+
+    layoutChangeHandler = () => {
+      if (api && boardElement.offsetWidth) {
+        api.state.dom.bounds.clear();
+        api.state.dom.redraw();
+        injectGridSVG(boardElement);
+      }
+    };
+    activeDocument.body.addEventListener(
+      "xq-layout-change",
+      layoutChangeHandler,
+    );
   });
 
   onDestroy(() => {
+    if (boardResizeRo) {
+      boardResizeRo.disconnect();
+      boardResizeRo = null;
+    }
+    if (resizeTimer) {
+      clearTimeout(resizeTimer);
+      resizeTimer = null;
+    }
+    if (layoutChangeHandler) {
+      activeDocument.body.removeEventListener(
+        "xq-layout-change",
+        layoutChangeHandler,
+      );
+    }
     if (api) {
       api.destroy();
     }
