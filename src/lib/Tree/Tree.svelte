@@ -793,7 +793,7 @@
                   fill="white"
                   font-size="5px"
                 >
-                  {node.move?.zh ?? "始"}
+                  {node.move?.zh ?? "开局"}
                 </text>
               {/if}
             {/if}

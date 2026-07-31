@@ -36,17 +36,6 @@ $local-block-gap: 2px;
     "toolbar"
     "tools";
 
-  &__board {
-    --xq-board-scale: 1;
-    max-width: calc(
-      100vh - var(--xq-header-height, 0px) - var(--xq-block-gap, 4px)
-    );
-
-    .board-resize {
-      display: none;
-    }
-  }
-
   &__tools {
     max-height: 40vh;
   }
@@ -136,7 +125,7 @@ $local-block-gap: 2px;
   height: 100%;
 
   &__board {
-    --xq-board-height: min(100cqw, 50cqh);
+    --xq-board-height: min(111.111cqw, 60cqh);
     .board-resize {
       display: none;
     }
