@@ -1,6 +1,12 @@
 import "./style/settings.css";
 
-import { type App, Notice, PluginSettingTab, Setting } from "obsidian";
+import {
+  type App,
+  Notice,
+  PluginSettingTab,
+  Setting,
+  type SettingDefinitionItem,
+} from "obsidian";
 
 import { initI18n, t } from "./i18n";
 import type ChessPlugin from "./main";
@@ -102,6 +108,337 @@ export class ChessSettingTab extends PluginSettingTab {
   constructor(app: App, plugin: ChessPlugin) {
     super(app, plugin);
     this.plugin = plugin;
+  }
+
+  getSettingDefinitions(): SettingDefinitionItem[] {
+    const settings = this.plugin.settings;
+    return [
+      {
+        name: "Language / 语言",
+        control: {
+          type: "dropdown",
+          key: "lang",
+          options: { auto: "Auto/跟随软件", en: "English", zh: "中文" },
+        },
+      },
+      {
+        type: "group",
+        heading: t("board.title"),
+        items: [
+          {
+            name: t("board.theme"),
+            desc: t("board.theme.desc"),
+            control: {
+              type: "dropdown",
+              key: "theme",
+              options: Object.fromEntries(
+                THEME_KEYS.map((k) => [k, t(`theme.${k}`)]),
+              ),
+            },
+          },
+          {
+            name: t("board.zoom"),
+            desc: t("board.zoom.desc"),
+            control: {
+              type: "slider",
+              key: "zoom",
+              min: 0,
+              max: 100,
+              step: 1,
+              displayFormat: (v) => `${v}%`,
+            },
+          },
+          {
+            name: t("board.coordinates"),
+            desc: t("board.coordinates.desc"),
+            control: { type: "toggle", key: "showCoordinateLabels" },
+          },
+        ],
+      },
+      {
+        type: "group",
+        heading: t("game.title"),
+        items: [
+          {
+            name: t("game.lastMove"),
+            desc: t("game.lastMove.desc"),
+            control: { type: "toggle", key: "showLastMove" },
+          },
+          {
+            name: t("game.legalMoves"),
+            desc: t("game.legalMoves.desc"),
+            control: { type: "toggle", key: "showNextMove" },
+          },
+          {
+            name: t("game.turnBorder"),
+            desc: t("game.turnBorder.desc"),
+            control: { type: "toggle", key: "showTurnBorder" },
+          },
+          {
+            name: t("game.speech"),
+            desc: t("game.speech.desc"),
+            control: { type: "toggle", key: "enableSpeech" },
+            visible: () => !!window.speechSynthesis,
+          },
+        ],
+      },
+      {
+        type: "group",
+        heading: t("movelist.title"),
+        items: [
+          {
+            name: t("movelist.show"),
+            desc: t("movelist.show.desc"),
+            control: { type: "toggle", key: "showMovelist" },
+          },
+          {
+            name: t("movelist.text"),
+            desc: t("movelist.text.desc"),
+            control: { type: "toggle", key: "showMovelistText" },
+          },
+          {
+            name: t("movelist.fontSize"),
+            desc: t("movelist.fontSize.desc"),
+            control: {
+              type: "slider",
+              key: "fontSize",
+              min: 10,
+              max: 25,
+              step: 1,
+              displayFormat: (v) => `${v}px`,
+            },
+          },
+          {
+            name: t("movelist.autoJump"),
+            desc: t("movelist.autoJump.desc"),
+            control: {
+              type: "dropdown",
+              key: "autoJump",
+              options: {
+                never: t("movelist.autoJump.never"),
+                always: t("movelist.autoJump.always"),
+                auto: t("movelist.autoJump.auto"),
+              },
+            },
+          },
+        ],
+      },
+      {
+        type: "group",
+        heading: t("engine.title"),
+        items: [
+          {
+            name: t("engine.depth"),
+            desc: t("engine.depth.desc"),
+            control: {
+              type: "slider",
+              key: "engineDepth",
+              min: 1,
+              max: 30,
+              step: 1,
+            },
+          },
+          {
+            name: t("engine.skillLevel"),
+            desc: t("engine.skillLevel.desc"),
+            control: {
+              type: "slider",
+              key: "engineSkillLevel",
+              min: 0,
+              max: 20,
+              step: 1,
+            },
+          },
+        ],
+      },
+      {
+        type: "group",
+        heading: t("save.title"),
+        items: [
+          {
+            name: t("save.saveEval"),
+            desc: t("save.saveEval.desc"),
+            control: { type: "toggle", key: "saveEvalByDefault" },
+          },
+          {
+            name: t("save.saveEvalPrompt"),
+            desc: t("save.saveEvalPrompt.desc"),
+            control: { type: "toggle", key: "saveEvalPrompt" },
+          },
+        ],
+      },
+      {
+        type: "group",
+        heading: t("margin.title"),
+        items: [
+          {
+            name: t("margin.top"),
+            desc: t("margin.top.desc"),
+            control: {
+              type: "slider",
+              key: "boardMarginTop",
+              min: 0,
+              max: 100,
+              step: 1,
+              displayFormat: (v) => `${v}px`,
+            },
+          },
+          {
+            name: t("margin.bottom"),
+            desc: t("margin.bottom.desc"),
+            control: {
+              type: "slider",
+              key: "boardMarginBottom",
+              min: 0,
+              max: 100,
+              step: 1,
+              displayFormat: (v) => `${v}px`,
+            },
+          },
+        ],
+      },
+      {
+        type: "group",
+        heading: t("settings.restartRequired.title"),
+        desc: t("settings.restartRequired.desc"),
+        items: [
+          ...(["xiangqi", "xq", "tree"] as const).flatMap(
+            (mode): SettingDefinitionItem[] => {
+              const i18nKey =
+                mode === "xiangqi"
+                  ? "xiangqiAliases"
+                  : mode === "xq"
+                    ? "xqAliases"
+                    : "treeAliases";
+              const fallback =
+                mode === "xiangqi" ? "xiangqi" : mode === "xq" ? "xq" : "tree";
+              return [
+                {
+                  name: t(`codeblock.${i18nKey}`),
+                  desc: t(`codeblock.${i18nKey}.desc`),
+                  render: (setting: Setting) => {
+                    setting.addText((text) =>
+                      text
+                        .setValue(
+                          (settings.codeBlockNames[mode] ?? []).join(", "),
+                        )
+                        .setPlaceholder(fallback)
+                        .onChange((value) => {
+                          const { valid, invalid } =
+                            parseAndValidateNames(value);
+                          if (invalid.length) {
+                            new Notice(
+                              t("codeblock.invalidName").replace(
+                                "{name}",
+                                invalid[0],
+                              ),
+                            );
+                            const input =
+                              setting.controlEl.querySelector("input")!;
+                            input.value = valid.length
+                              ? valid.join(", ")
+                              : fallback;
+                          }
+                          if (!valid.length) return;
+                          settings.codeBlockNames[mode] = valid;
+                          void this.plugin.saveSettings();
+                        }),
+                    );
+                    setting.addButton((button) =>
+                      button.setIcon("rotate-ccw").onClick(() => {
+                        settings.codeBlockNames[mode] = [fallback];
+                        const input = setting.controlEl.querySelector("input")!;
+                        input.value = fallback;
+                        void this.plugin.saveSettings();
+                      }),
+                    );
+                  },
+                },
+              ];
+            },
+          ),
+          {
+            name: t("codeblock.genfenSaveType"),
+            desc: t("codeblock.genfenSaveType.desc"),
+            control: {
+              type: "dropdown",
+              key: "genfenSaveType",
+              options: {
+                xiangqi: t("codeblock.modeXiangqi"),
+                tree: t("codeblock.modeBranch"),
+              },
+            },
+          },
+        ],
+      },
+      {
+        type: "group",
+        heading: t("pgn.title"),
+        items: [
+          {
+            name: t("pgn.enable"),
+            desc: t("pgn.enable.desc"),
+            control: { type: "toggle", key: "enablePGNView" },
+          },
+          {
+            name: t("pgn.extensions"),
+            desc: t("pgn.extensions.desc"),
+            render: (setting: Setting) => {
+              setting.addText((text) =>
+                text
+                  .setValue(settings.pgnFileExtensions.join(", "))
+                  .setPlaceholder("pgn")
+                  .onChange((value) => {
+                    const { valid, invalid } = parseAndValidateNames(value);
+                    if (invalid.length) {
+                      new Notice(
+                        t("codeblock.invalidName").replace(
+                          "{name}",
+                          invalid[0],
+                        ),
+                      );
+                      const input = setting.controlEl.querySelector("input")!;
+                      input.value = valid.length ? valid.join(", ") : "pgn";
+                    }
+                    if (!valid.length) return;
+                    settings.pgnFileExtensions = valid;
+                    void this.plugin.saveSettings();
+                  }),
+              );
+              setting.addButton((button) =>
+                button.setIcon("rotate-ccw").onClick(() => {
+                  settings.pgnFileExtensions = ["pgn"];
+                  const input = setting.controlEl.querySelector("input")!;
+                  input.value = "pgn";
+                  void this.plugin.saveSettings();
+                }),
+              );
+            },
+          },
+        ],
+      },
+    ];
+  }
+
+  override setControlValue(key: string, value: unknown): void | Promise<void> {
+    (this.plugin.settings as Record<string, unknown>)[key] = value;
+    void this.plugin.saveSettings();
+    if (
+      [
+        "theme",
+        "zoom",
+        "showLastMove",
+        "showNextMove",
+        "showTurnBorder",
+        "showMovelist",
+        "showMovelistText",
+        "fontSize",
+        "boardMarginTop",
+        "boardMarginBottom",
+      ].includes(key)
+    ) {
+      this.plugin.refresh();
+    }
   }
 
   display(): void {
