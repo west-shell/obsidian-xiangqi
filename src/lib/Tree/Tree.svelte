@@ -955,7 +955,7 @@
     flex-direction: column;
     height: 100%;
     overflow: hidden;
-    --xq-board-background: var(--background-primary-alt);
+    --xq-board-background: transparent;
     --xq-board-line: var(--text-normal);
     --piece-red: var(--xq-piece-red, var(--color-red));
     --piece-black: var(--xq-piece-black, var(--color-blue));
@@ -1031,7 +1031,7 @@
 
   .toolbar {
     position: absolute;
-    top: 0.5rem;
+    bottom: 0.5rem;
     left: 0.5rem;
     display: flex;
     gap: 0;
