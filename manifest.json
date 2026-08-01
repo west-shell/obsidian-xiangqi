@@ -1,6 +1,6 @@
 {
   "id": "xiangqi",
-  "version": "4.1.1",
+  "version": "4.1.2",
   "name": "Chinese Chess",
   "description": "Variation tree viewer and editor for Chinese chess (Xiangqi).",
   "author": "weshell",
