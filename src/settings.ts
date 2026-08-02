@@ -6,6 +6,7 @@ import {
   PluginSettingTab,
   Setting,
   type SettingDefinitionItem,
+  type SettingGroupItem,
 } from "obsidian";
 
 import { initI18n, t } from "./i18n";
@@ -303,7 +304,7 @@ export class ChessSettingTab extends PluginSettingTab {
         desc: t("settings.restartRequired.desc"),
         items: [
           ...(["xiangqi", "xq", "tree"] as const).flatMap(
-            (mode): SettingDefinitionItem[] => {
+            (mode): SettingGroupItem[] => {
               const i18nKey =
                 mode === "xiangqi"
                   ? "xiangqiAliases"
@@ -421,7 +422,7 @@ export class ChessSettingTab extends PluginSettingTab {
   }
 
   override setControlValue(key: string, value: unknown): void | Promise<void> {
-    (this.plugin.settings as Record<string, unknown>)[key] = value;
+    (this.plugin.settings as unknown as Record<string, unknown>)[key] = value;
     void this.plugin.saveSettings();
     if (
       [
