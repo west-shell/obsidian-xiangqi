@@ -47,19 +47,30 @@ export class PGNView extends TextFileView {
     this.contentEl.empty();
 
     this.scope = new Scope(this.app.scope);
+    const isEditing = (): boolean => {
+      const el = document.activeElement;
+      return (
+        (el instanceof HTMLTextAreaElement || el instanceof HTMLInputElement) &&
+        this.contentEl.contains(el)
+      );
+    };
     this.scope.register([], "ArrowUp", () => {
+      if (isEditing()) return true;
       this.eventBus.emit("btn-click", { name: "back" });
       return false;
     });
     this.scope.register([], "ArrowDown", () => {
+      if (isEditing()) return true;
       this.eventBus.emit("btn-click", { name: "next" });
       return false;
     });
     this.scope.register([], "ArrowLeft", () => {
+      if (isEditing()) return true;
       this.eventBus.emit("btn-click", { name: "toStart" });
       return false;
     });
     this.scope.register([], "ArrowRight", () => {
+      if (isEditing()) return true;
       this.eventBus.emit("btn-click", { name: "toEnd" });
       return false;
     });
