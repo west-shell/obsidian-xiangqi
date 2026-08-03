@@ -2,10 +2,16 @@
   import { onDestroy, onMount, tick } from "svelte";
   import { SvelteSet } from "svelte/reactivity";
   import type { EventBus } from "../../core/event-bus";
-  import { type ChessNode, type NodeMap, PIECE_CHARS } from "../../types";
+  import {
+    type ChessNode,
+    type ISettings,
+    type NodeMap,
+    PIECE_CHARS,
+  } from "../../types";
   import { onLangChange, t } from "../../i18n";
   import { calculateTreeLayout } from "./layout";
   import { iconPaths, iconSvg } from "../../utils/icon";
+  import { scrollToBTN } from "../../utils/utils";
   import { setIcon } from "obsidian";
   import * as d3 from "d3";
   import type { Move } from "../../chess";
@@ -21,6 +27,7 @@
     eventBus: EventBus;
     currentNode: ChessNode | null;
     currentPath: string[];
+    settings?: ISettings;
   }
 
   let {
@@ -28,6 +35,7 @@
     eventBus,
     currentNode = $bindable(),
     currentPath,
+    settings,
   }: Props = $props();
 
   let _lv = $state(0);
@@ -38,6 +46,34 @@
   let svgEl: SVGSVGElement | undefined = $state();
   let renderedNodes: ChessNode[] = $state([]);
   let foldedNodes = new SvelteSet<string>();
+
+  // ---- List mode ----
+  let listMoves = $derived(
+    currentPath
+      .map((id) => nodeMap.get(id)!)
+      .filter((n): n is ChessNode => n != null && n.move !== null),
+  );
+  let listCurrentStep = $derived(currentPath.indexOf(currentNode?.id ?? ""));
+  let listItemRefs: HTMLLIElement[] = [];
+  let listUlRef: HTMLUListElement | null = $state(null);
+
+  $effect(() => {
+    void listCurrentStep;
+    void listMoves;
+    (async () => {
+      await tick();
+      const index = listCurrentStep <= 0 ? 0 : Math.ceil(listCurrentStep / 2);
+      const targetEl = listItemRefs[index];
+      if (targetEl) {
+        scrollToBTN(targetEl, listUlRef);
+      }
+    })();
+  });
+
+  function onClickStep(step: number) {
+    const nodeId = step === 0 ? currentPath[0] : currentPath[step];
+    if (nodeId) eventBus.emit("slider-navigate", nodeId);
+  }
 
   // ---- D3 Zoom ----
   let zoomTransform = $state(d3.zoomIdentity);
@@ -596,347 +632,392 @@
 </script>
 
 <div class="tree-container xq-layout__tools">
-  <div class="svg-wrapper">
-    {#if nodeMap.get(currentNode?.id ?? "")?.eval}
-      {@const ce = nodeMap.get(currentNode!.id)!.eval!}
-      {@const isZero = ce.scoreType !== "mate" && ce.score === 0}
-      {@const isPositive =
-        ce.score > 0 || (ce.scoreType === "mate" && ce.score >= 0)}
-      {@const evalColor = isPositive
-        ? "rgba(76, 175, 80, 0.8)"
-        : "rgba(244, 67, 54, 0.8)"}
-      {@const labelBg = isZero
-        ? "linear-gradient(to bottom, rgba(76, 175, 80, 0.8) 50%, rgba(244, 67, 54, 0.8) 50%)"
-        : evalColor}
-      {@const fillPercent =
-        ce.scoreType === "mate"
-          ? 50
-          : Math.min(Math.abs(ce.score) / 300, 1) * 50}
-      {@const evalText =
-        ce.scoreType === "mate"
-          ? (ce.score >= 0 ? "+" : "-") + "M"
-          : (ce.score > 0 ? "+" : "") + (ce.score / 100).toFixed(1)}
-      <div class="eval-sidebar">
-        <div class="eval-bar">
-          {#if isPositive}
-            <div
-              class="eval-fill"
-              style="height: {fillPercent}%; top: {50 -
-                fillPercent}%; background: {evalColor}"
-            ></div>
-          {:else}
-            <div
-              class="eval-fill"
-              style="height: {fillPercent}%; top: 50%; background: {evalColor}"
-            ></div>
-          {/if}
-          <div class="eval-center-line"></div>
-          <span class="eval-label" style="background: {labelBg}"
-            >{evalText}</span
-          >
+  <div class="tools-row">
+    <div class="svg-wrapper">
+      {#if nodeMap.get(currentNode?.id ?? "")?.eval}
+        {@const ce = nodeMap.get(currentNode!.id)!.eval!}
+        {@const isZero = ce.scoreType !== "mate" && ce.score === 0}
+        {@const isPositive =
+          ce.score > 0 || (ce.scoreType === "mate" && ce.score >= 0)}
+        {@const evalColor = isPositive
+          ? "rgba(76, 175, 80, 0.8)"
+          : "rgba(244, 67, 54, 0.8)"}
+        {@const labelBg = isZero
+          ? "linear-gradient(to bottom, rgba(76, 175, 80, 0.8) 50%, rgba(244, 67, 54, 0.8) 50%)"
+          : evalColor}
+        {@const fillPercent =
+          ce.scoreType === "mate"
+            ? 50
+            : Math.min(Math.abs(ce.score) / 300, 1) * 50}
+        {@const evalText =
+          ce.scoreType === "mate"
+            ? (ce.score >= 0 ? "+" : "-") + "M"
+            : (ce.score > 0 ? "+" : "") + (ce.score / 100).toFixed(1)}
+        <div class="eval-sidebar">
+          <div class="eval-bar">
+            {#if isPositive}
+              <div
+                class="eval-fill"
+                style="height: {fillPercent}%; top: {50 -
+                  fillPercent}%; background: {evalColor}"
+              ></div>
+            {:else}
+              <div
+                class="eval-fill"
+                style="height: {fillPercent}%; top: 50%; background: {evalColor}"
+              ></div>
+            {/if}
+            <div class="eval-center-line"></div>
+            <span class="eval-label" style="background: {labelBg}"
+              >{evalText}</span
+            >
+          </div>
         </div>
-      </div>
-    {/if}
-    <svg bind:this={svgEl} width="100%" height="100%" class="tree-svg">
-      <g transform={TRANSFORM_SAFE}>
-        <!-- 连线 -->
-        {#each renderedNodes as node (node.id)}
-          {#each node.children as child, idx (child.id)}
-            {#if !(foldedNodes.has(node.id) && idx > 0)}
-              <path
-                d={`
+      {/if}
+      <svg bind:this={svgEl} width="100%" height="100%" class="tree-svg">
+        <g transform={TRANSFORM_SAFE}>
+          <!-- 连线 -->
+          {#each renderedNodes as node (node.id)}
+            {#each node.children as child, idx (child.id)}
+              {#if !(foldedNodes.has(node.id) && idx > 0)}
+                <path
+                  d={`
               M ${node.x! * spacingX} ${node.y! * spacingY}
               L ${(child.x! - 0.3 * Math.sign(child.x! - node.x!)) * spacingX} ${node.y! * spacingY}
               L ${child.x! * spacingX} ${child.y! * spacingY}
               `}
-                stroke="var(--xq-board-line)"
-                stroke-linejoin="round"
-                stroke-width={currentPath.includes(node.id) &&
-                currentPath.includes(child.id)
-                  ? 1.5
-                  : 1}
-                opacity={currentPath.includes(node.id) &&
-                currentPath.includes(child.id)
-                  ? 1.5
-                  : 0.7}
-                filter={currentPath.includes(node.id) &&
-                currentPath.includes(child.id)
-                  ? "brightness(1.5) saturate(1.4) drop-shadow(0 0 1px rgba(255, 255, 255, 0.6))"
-                  : "grayscale(50%) brightness(0.75)"}
-                fill="none"
-              />
+                  stroke="var(--xq-board-line)"
+                  stroke-linejoin="round"
+                  stroke-width={currentPath.includes(node.id) &&
+                  currentPath.includes(child.id)
+                    ? 1.5
+                    : 1}
+                  opacity={currentPath.includes(node.id) &&
+                  currentPath.includes(child.id)
+                    ? 1.5
+                    : 0.7}
+                  filter={currentPath.includes(node.id) &&
+                  currentPath.includes(child.id)
+                    ? "brightness(1.5) saturate(1.4) drop-shadow(0 0 1px rgba(255, 255, 255, 0.6))"
+                    : "grayscale(50%) brightness(0.75)"}
+                  fill="none"
+                />
+              {/if}
+            {/each}
+          {/each}
+
+          {#each renderedNodes as node (node.id)}
+            {#if node.children.length > 1}
+              {@const isLeft = (node.y ?? 0) % 2 === 0}
+              {@const nw = getNodeWidth(node)}
+              <!-- svelte-ignore a11y_click_events_have_key_events -->
+              <!-- svelte-ignore a11y_no_static_element_interactions -->
+              <g
+                transform="translate({node.x! * spacingX +
+                  (isLeft ? -nw / 2 : nw / 2)} {node.y! * spacingY}){node.id ===
+                currentNode?.id
+                  ? ' scale(1.2)'
+                  : ''}"
+                style="cursor: pointer"
+                onclick={(e) => {
+                  e.stopPropagation();
+                  toggleFold(node);
+                }}
+              >
+                <polygon
+                  points={foldedNodes.has(node.id)
+                    ? isLeft
+                      ? "0,-4 0,4 -3,3 -3,-3"
+                      : "0,-4 0,4 3,3 3,-3"
+                    : isLeft
+                      ? "0,-4 0,4 -5,0"
+                      : "0,-4 0,4 5,0"}
+                  fill="var(--xq-board-line)"
+                  stroke="var(--xq-board-line)"
+                  stroke-width="1.5"
+                  stroke-linejoin="round"
+                  opacity={currentPath.includes(node.id) &&
+                  node.children[0] &&
+                  !currentPath.includes(node.children[0].id)
+                    ? 1.5
+                    : 0.7}
+                  filter={currentPath.includes(node.id) &&
+                  node.children[0] &&
+                  !currentPath.includes(node.children[0].id)
+                    ? "brightness(1.5) saturate(1.4) drop-shadow(0 0 1px rgba(255, 255, 255, 0.6))"
+                    : "grayscale(50%) brightness(0.75)"}
+                />
+              </g>
             {/if}
           {/each}
-        {/each}
 
-        {#each renderedNodes as node (node.id)}
-          {#if node.children.length > 1}
-            {@const isLeft = (node.y ?? 0) % 2 === 0}
+          <!-- 节点 -->
+          {#each renderedNodes as node (node.id)}
+            {@const primaryAnnotation = getPrimaryAnnotation(node)}
             {@const nw = getNodeWidth(node)}
             <!-- svelte-ignore a11y_click_events_have_key_events -->
             <!-- svelte-ignore a11y_no_static_element_interactions -->
             <g
-              transform="translate({node.x! * spacingX +
-                (isLeft ? -nw / 2 : nw / 2)} {node.y! * spacingY}){node.id ===
-              currentNode?.id
-                ? ' scale(1.2)'
-                : ''}"
-              style="cursor: pointer"
-              onclick={(e) => {
-                e.stopPropagation();
-                toggleFold(node);
-              }}
+              class="node-group"
+              transform="translate({node.x! * spacingX} {node.y! *
+                spacingY}){node.id === currentNode?.id ? ' scale(1.2)' : ''}"
+              opacity={currentPath.includes(node.id) ? 1 : 0.8}
+              filter={!currentPath.includes(node.id)
+                ? "grayscale(100%) brightness(0.75)"
+                : node.id === currentNode?.id
+                  ? "drop-shadow(0 0 4px var(--interactive-accent))"
+                  : undefined}
+              stroke-width={node.id === currentNode?.id ? 1 : 0.5}
+              onclick={() => eventBus.emit("node-click", node.id)}
             >
-              <polygon
-                points={foldedNodes.has(node.id)
-                  ? isLeft
-                    ? "0,-4 0,4 -3,3 -3,-3"
-                    : "0,-4 0,4 3,3 3,-3"
-                  : isLeft
-                    ? "0,-4 0,4 -5,0"
-                    : "0,-4 0,4 5,0"}
-                fill="var(--xq-board-line)"
-                stroke="var(--xq-board-line)"
-                stroke-width="1.5"
-                stroke-linejoin="round"
-                opacity={currentPath.includes(node.id) &&
-                node.children[0] &&
-                !currentPath.includes(node.children[0].id)
-                  ? 1.5
-                  : 0.7}
-                filter={currentPath.includes(node.id) &&
-                node.children[0] &&
-                !currentPath.includes(node.children[0].id)
-                  ? "brightness(1.5) saturate(1.4) drop-shadow(0 0 1px rgba(255, 255, 255, 0.6))"
-                  : "grayscale(50%) brightness(0.75)"}
-              />
-            </g>
-          {/if}
-        {/each}
-
-        <!-- 节点 -->
-        {#each renderedNodes as node (node.id)}
-          {@const primaryAnnotation = getPrimaryAnnotation(node)}
-          {@const nw = getNodeWidth(node)}
-          <!-- svelte-ignore a11y_click_events_have_key_events -->
-          <!-- svelte-ignore a11y_no_static_element_interactions -->
-          <g
-            class="node-group"
-            transform="translate({node.x! * spacingX} {node.y! *
-              spacingY}){node.id === currentNode?.id ? ' scale(1.2)' : ''}"
-            opacity={currentPath.includes(node.id) ? 1 : 0.8}
-            filter={!currentPath.includes(node.id)
-              ? "grayscale(100%) brightness(0.75)"
-              : node.id === currentNode?.id
-                ? "drop-shadow(0 0 4px var(--interactive-accent))"
-                : undefined}
-            stroke-width={node.id === currentNode?.id ? 1 : 0.5}
-            onclick={() => eventBus.emit("node-click", node.id)}
-          >
-            {#if primaryAnnotation}
-              {@const def = ANNOTATION_DEFINITIONS[primaryAnnotation]}
-              <rect
-                x={-nw / 2}
-                y={-nodeHeight / 2}
-                width={nw}
-                height={nodeHeight}
-                rx="2.5"
-                ry="2.5"
-                fill={node.side === "white"
-                  ? "var(--piece-red)"
-                  : node.side === "black"
-                    ? "var(--piece-black)"
-                    : "green"}
-                stroke="var(--xq-board-line)"
-              />
-              <g
-                transform="translate(-4, -4) scale(0.333)"
-                fill={node.side === "white"
-                  ? "var(--piece-red)"
-                  : "var(--piece-black)"}
-                stroke="currentColor"
-                stroke-width="1.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <!-- eslint-disable-next-line svelte/no-at-html-tags -->
-                {@html def.icon}
-              </g>
-            {:else}
-              <rect
-                x={-nw / 2}
-                y={-nodeHeight / 2}
-                width={nw}
-                height={nodeHeight}
-                rx="2.5"
-                ry="2.5"
-                fill={node.side === "white"
-                  ? "var(--piece-red)"
-                  : node.side === "black"
-                    ? "var(--piece-black)"
-                    : "green"}
-                stroke="var(--xq-board-line)"
-              />
-              {#if nodeMode === 0}
-                <text
-                  dy="3.5"
-                  text-anchor="middle"
-                  fill="white"
-                  font-size="9px"
+              {#if primaryAnnotation}
+                {@const def = ANNOTATION_DEFINITIONS[primaryAnnotation]}
+                <rect
+                  x={-nw / 2}
+                  y={-nodeHeight / 2}
+                  width={nw}
+                  height={nodeHeight}
+                  rx="2.5"
+                  ry="2.5"
+                  fill={node.side === "white"
+                    ? "var(--piece-red)"
+                    : node.side === "black"
+                      ? "var(--piece-black)"
+                      : "green"}
+                  stroke="var(--xq-board-line)"
+                />
+                <g
+                  transform="translate(-4, -4) scale(0.333)"
+                  fill={node.side === "white"
+                    ? "var(--piece-red)"
+                    : "var(--piece-black)"}
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
                 >
-                  {node.move?.piece ? pieceLabel(node.move) : "始"}
-                </text>
+                  <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+                  {@html def.icon}
+                </g>
               {:else}
-                <text
-                  dominant-baseline="central"
-                  text-anchor="middle"
-                  fill="white"
-                  font-size="5px"
-                >
-                  {node.move?.zh ?? "开局"}
-                </text>
+                <rect
+                  x={-nw / 2}
+                  y={-nodeHeight / 2}
+                  width={nw}
+                  height={nodeHeight}
+                  rx="2.5"
+                  ry="2.5"
+                  fill={node.side === "white"
+                    ? "var(--piece-red)"
+                    : node.side === "black"
+                      ? "var(--piece-black)"
+                      : "green"}
+                  stroke="var(--xq-board-line)"
+                />
+                {#if nodeMode === 0}
+                  <text
+                    dy="3.5"
+                    text-anchor="middle"
+                    fill="white"
+                    font-size="9px"
+                  >
+                    {node.move?.piece ? pieceLabel(node.move) : "始"}
+                  </text>
+                {:else}
+                  <text
+                    dominant-baseline="central"
+                    text-anchor="middle"
+                    fill="white"
+                    font-size="5px"
+                  >
+                    {node.move?.zh ?? "开局"}
+                  </text>
+                {/if}
               {/if}
-            {/if}
-            {#if node.eval}
-              {@const intensity =
-                node.eval.scoreType === "mate"
-                  ? 1
-                  : Math.min(Math.abs(node.eval.score) / 300, 1)}
-              {@const color =
-                node.eval.score > 0 ||
-                (node.eval.scoreType === "mate" && node.eval.score >= 0)
-                  ? `rgba(76, 175, 80, ${0.6 + intensity * 0.4})`
-                  : node.eval.score < 0 ||
-                      (node.eval.scoreType === "mate" && node.eval.score < 0)
-                    ? `rgba(244, 67, 54, ${0.6 + intensity * 0.4})`
-                    : `rgba(136, 136, 136, 0.6)`}
-              {@const barWidth = 2 + intensity * (nw - 4)}
-              <rect
-                x={-barWidth / 2}
-                y={nodeHeight / 2 - 0.5}
-                width={barWidth}
-                height="1.5"
-                rx="0.5"
-                fill={color}
-                style="pointer-events: none"
-              />
-            {/if}
-            {#if getRegularComments(node).length > 0}
-              <g
-                transform="translate({0.3 * nw} {-0.8 * nodeHeight})"
-                style="pointer-events: none"
-              >
-                <!-- eslint-disable-next-line svelte/no-at-html-tags -->
-                {@html iconSvg("message-square-text", 8, 1.5, "royalblue")}
-              </g>
-            {/if}
-          </g>
-        {/each}
-      </g>
-    </svg>
+              {#if node.eval}
+                {@const intensity =
+                  node.eval.scoreType === "mate"
+                    ? 1
+                    : Math.min(Math.abs(node.eval.score) / 300, 1)}
+                {@const color =
+                  node.eval.score > 0 ||
+                  (node.eval.scoreType === "mate" && node.eval.score >= 0)
+                    ? `rgba(76, 175, 80, ${0.6 + intensity * 0.4})`
+                    : node.eval.score < 0 ||
+                        (node.eval.scoreType === "mate" && node.eval.score < 0)
+                      ? `rgba(244, 67, 54, ${0.6 + intensity * 0.4})`
+                      : `rgba(136, 136, 136, 0.6)`}
+                {@const barWidth = 2 + intensity * (nw - 4)}
+                <rect
+                  x={-barWidth / 2}
+                  y={nodeHeight / 2 - 0.5}
+                  width={barWidth}
+                  height="1.5"
+                  rx="0.5"
+                  fill={color}
+                  style="pointer-events: none"
+                />
+              {/if}
+              {#if getRegularComments(node).length > 0}
+                <g
+                  transform="translate({0.3 * nw} {-0.8 * nodeHeight})"
+                  style="pointer-events: none"
+                >
+                  <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+                  {@html iconSvg("message-square-text", 8, 1.5, "royalblue")}
+                </g>
+              {/if}
+            </g>
+          {/each}
+        </g>
+      </svg>
 
-    <div class="toolbar">
-      {#each toolbarBTN as btn, i (i)}
+      <div class="toolbar">
+        {#each toolbarBTN as btn, i (i)}
+          <button
+            class="toolbar-btn"
+            aria-label={btn.title}
+            use:useSetIcon={btn.icon}
+            onclick={btn.event}
+          ></button>
+        {/each}
         <button
           class="toolbar-btn"
-          aria-label={btn.title}
-          use:useSetIcon={btn.icon}
-          onclick={btn.event}
+          aria-label="切换模式"
+          use:useSetIcon={modeIcon}
+          onclick={cycleNodeMode}
         ></button>
-      {/each}
-      <button
-        class="toolbar-btn"
-        aria-label="切换模式"
-        use:useSetIcon={modeIcon}
-        onclick={cycleNodeMode}
-      ></button>
-    </div>
+      </div>
 
-    <div
-      class="slider"
-      class:active={sliderDragging}
-      class:has-eval={!!evalChartSegments}
-    >
-      <button
-        class="slider-btn slider-to-start"
-        aria-label="To start"
-        use:useSetIcon={"minus"}
-        onclick={() =>
-          eventBus.emit("btn-click", { name: "toStart", payload: null })}
-      ></button>
-      <button
-        class="slider-btn slider-prev"
-        aria-label="Previous"
-        use:useSetIcon={"arrow-up"}
-        onclick={() =>
-          eventBus.emit("btn-click", { name: "back", payload: null })}
-      ></button>
       <div
-        role="slider"
-        tabindex={-1}
-        aria-valuenow={sliderPercent}
-        aria-valuemin={0}
-        aria-valuemax={100}
-        bind:this={sliderInnerEl}
-        class="slider-inner"
-        onmousedown={handleSliderAreaMouseDown}
+        class="slider"
+        class:active={sliderDragging}
+        class:has-eval={!!evalChartSegments}
       >
-        {#if evalChartSegments}
-          <svg
-            width={evalChartSegments.w}
-            height="100%"
-            viewBox="0 0 {evalChartSegments.w} {evalChartSegments.h}"
-            preserveAspectRatio="none"
-            class="eval-chart-bg"
-          >
-            <line
-              x1={evalChartSegments.midX}
-              y1="0"
-              x2={evalChartSegments.midX}
-              y2={evalChartSegments.h}
-              stroke="var(--text-faint)"
-              stroke-width="0.5"
-              vector-effect="non-scaling-stroke"
-            />
-            {#each evalChartSegments.segments as seg, i (i)}
+        <button
+          class="slider-btn slider-to-start"
+          aria-label="To start"
+          use:useSetIcon={"minus"}
+          onclick={() =>
+            eventBus.emit("btn-click", { name: "toStart", payload: null })}
+        ></button>
+        <button
+          class="slider-btn slider-prev"
+          aria-label="Previous"
+          use:useSetIcon={"arrow-up"}
+          onclick={() =>
+            eventBus.emit("btn-click", { name: "back", payload: null })}
+        ></button>
+        <div
+          role="slider"
+          tabindex={-1}
+          aria-valuenow={sliderPercent}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          bind:this={sliderInnerEl}
+          class="slider-inner"
+          onmousedown={handleSliderAreaMouseDown}
+        >
+          {#if evalChartSegments}
+            <svg
+              width={evalChartSegments.w}
+              height="100%"
+              viewBox="0 0 {evalChartSegments.w} {evalChartSegments.h}"
+              preserveAspectRatio="none"
+              class="eval-chart-bg"
+            >
               <line
-                x1={seg.x1}
-                y1={seg.y1}
-                x2={seg.x2}
-                y2={seg.y2}
-                stroke={seg.color}
-                stroke-width="1"
+                x1={evalChartSegments.midX}
+                y1="0"
+                x2={evalChartSegments.midX}
+                y2={evalChartSegments.h}
+                stroke="var(--text-faint)"
+                stroke-width="0.5"
                 vector-effect="non-scaling-stroke"
               />
-            {/each}
-          </svg>
-        {/if}
-        <span class="slider-thumb" style="top: {sliderPercent}%"></span>
-        {#if sliderText}
-          <span
-            role="presentation"
-            class="slider-label"
-            style="top: {sliderPercent}%"
-            onmousedown={handleSliderAreaMouseDown}
-            ontouchstart={handleSliderLabelTouchStart}>{sliderText}</span
-          >
-        {/if}
+              {#each evalChartSegments.segments as seg, i (i)}
+                <line
+                  x1={seg.x1}
+                  y1={seg.y1}
+                  x2={seg.x2}
+                  y2={seg.y2}
+                  stroke={seg.color}
+                  stroke-width="1"
+                  vector-effect="non-scaling-stroke"
+                />
+              {/each}
+            </svg>
+          {/if}
+          <span class="slider-thumb" style="top: {sliderPercent}%"></span>
+          {#if sliderText}
+            <span
+              role="presentation"
+              class="slider-label"
+              style="top: {sliderPercent}%"
+              onmousedown={handleSliderAreaMouseDown}
+              ontouchstart={handleSliderLabelTouchStart}>{sliderText}</span
+            >
+          {/if}
+        </div>
+        <button
+          class="slider-btn slider-next"
+          aria-label="Next"
+          use:useSetIcon={"arrow-down"}
+          onclick={() =>
+            eventBus.emit("btn-click", { name: "next", payload: null })}
+        ></button>
+        <button
+          class="slider-btn slider-to-end"
+          aria-label="To end"
+          use:useSetIcon={"minus"}
+          onclick={() =>
+            eventBus.emit("btn-click", { name: "toEnd", payload: null })}
+        ></button>
       </div>
-      <button
-        class="slider-btn slider-next"
-        aria-label="Next"
-        use:useSetIcon={"arrow-down"}
-        onclick={() =>
-          eventBus.emit("btn-click", { name: "next", payload: null })}
-      ></button>
-      <button
-        class="slider-btn slider-to-end"
-        aria-label="To end"
-        use:useSetIcon={"minus"}
-        onclick={() =>
-          eventBus.emit("btn-click", { name: "toEnd", payload: null })}
-      ></button>
     </div>
+    <ul class="move-list" bind:this={listUlRef}>
+      <li class="start" bind:this={listItemRefs[0]}>
+        <span class="roundnum">0</span>
+        <!-- svelte-ignore a11y_click_events_have_key_events -->
+        <!-- svelte-ignore a11y_no_static_element_interactions -->
+        <span
+          class="move start"
+          class:active={listCurrentStep === 0}
+          onclick={() => onClickStep(0)}
+        >
+          {settings?.showMovelistText ? "= 开 局 =" : "开局"}
+        </span>
+      </li>
+      {#each listMoves as move, i (i)}
+        {#if i % 2 === 0}
+          <li class="round" bind:this={listItemRefs[i / 2 + 1]}>
+            <span class="roundnum">{i / 2 + 1}</span>
+            <!-- svelte-ignore a11y_click_events_have_key_events -->
+            <!-- svelte-ignore a11y_no_static_element_interactions -->
+            <span
+              class="move red"
+              class:active={listCurrentStep === i + 1}
+              onclick={() => onClickStep(i + 1)}
+            >
+              {settings?.showMovelistText ? (move.move?.zh ?? "...") : "红"}
+            </span>
+            {#if listMoves[i + 1]}
+              <!-- svelte-ignore a11y_click_events_have_key_events -->
+              <!-- svelte-ignore a11y_no_static_element_interactions -->
+              <span
+                class="move black"
+                class:active={listCurrentStep === i + 2}
+                onclick={() => onClickStep(i + 2)}
+              >
+                {settings?.showMovelistText
+                  ? (listMoves[i + 1].move?.zh ?? "...")
+                  : "黑"}
+              </span>
+            {/if}
+          </li>
+        {/if}
+      {/each}
+    </ul>
   </div>
 
   <textarea
@@ -960,6 +1041,80 @@
     --piece-red: var(--xq-piece-red, var(--color-red));
     --piece-black: var(--xq-piece-black, var(--color-blue));
     --text-color: var(--text-normal);
+  }
+
+  .tools-row {
+    display: flex;
+    flex-direction: row;
+    flex: 1 1 auto;
+    overflow: hidden;
+  }
+
+  .move-list {
+    width: auto;
+    min-width: 0;
+    max-width: 200px;
+    display: flex;
+    flex-direction: column;
+    font-size: var(--xq-font-size, 12px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0;
+    margin: 0;
+    color: var(--text-normal);
+    background-color: var(--background-primary-alt);
+    border-left: 1px solid var(--background-modifier-border);
+    flex-shrink: 0;
+    list-style: none;
+  }
+
+  .move-list li {
+    display: flex;
+    flex-wrap: nowrap;
+    flex-shrink: 0;
+    flex-grow: 0;
+    align-items: center;
+    gap: 0.25em;
+    padding: 0 0.25em;
+    margin: 0;
+    border-bottom: none;
+    white-space: nowrap;
+    width: 100%;
+  }
+
+  .move-list .roundnum {
+    display: inline-block;
+    min-width: 1.2em;
+    max-width: 2em;
+    text-align: right;
+    margin-right: 0.2em;
+    color: var(--text-muted);
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  .move-list span.move {
+    display: inline-block;
+    line-height: 1.1;
+    text-align: center;
+    border-radius: 0.2em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    flex-shrink: 0;
+    padding: 0.1em 0.35em;
+    margin: 0;
+    color: var(--text-normal);
+  }
+
+  .move-list span.move.red {
+    min-width: 2.5em;
+    text-align: left;
+  }
+
+  .move-list span.move.black {
+    min-width: 2.5em;
+    text-align: right;
   }
 
   .svg-wrapper {

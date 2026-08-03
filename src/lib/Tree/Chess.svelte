@@ -2,7 +2,7 @@
   import Tree from "./Tree.svelte";
   import Board from "../Board.svelte";
   import Toolbar from "./Toolbar.svelte";
-  import type { ChessNode, ISettings, NodeMap } from "../../types";
+  import type { ChessNode, IOptions, ISettings, NodeMap } from "../../types";
   import type { EventBus } from "../../core/event-bus";
   import type { cg, DrawShape, Move, Square } from "../../chess";
   import { onMount, tick } from "svelte";
@@ -55,10 +55,18 @@
     nodeMap: NodeMap;
     currentNode: ChessNode;
     currentPath: string[];
+    options: IOptions;
   }
 
-  let { settings, fen, eventBus, nodeMap, currentNode, currentPath }: Props =
-    $props();
+  let {
+    settings,
+    fen,
+    eventBus,
+    nodeMap,
+    currentNode,
+    currentPath,
+    options,
+  }: Props = $props();
 
   let lastMove: [Square, Square] | null = $derived(
     currentNode.move ? [currentNode.move.from, currentNode.move.to] : null,
@@ -144,8 +152,8 @@
     {engineBestMove}
     {enginePonder}
   />
-  <Toolbar {eventBus} {fen} />
-  <Tree {nodeMap} {eventBus} {currentNode} {currentPath} />
+  <Toolbar {eventBus} {fen} {options} />
+  <Tree {nodeMap} {eventBus} {currentNode} {currentPath} {settings} />
 </div>
 
 <style>

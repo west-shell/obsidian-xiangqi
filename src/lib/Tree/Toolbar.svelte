@@ -1,13 +1,15 @@
 <script lang="ts">
   import { Menu, setIcon } from "obsidian";
   import type { EventBus } from "../../core/event-bus";
+  import type { IOptions } from "../../types";
   import { onLangChange, t } from "../../i18n";
 
   interface Props {
     eventBus: EventBus;
     fen?: string;
+    options?: IOptions;
   }
-  let { eventBus, fen = "" }: Props = $props();
+  let { eventBus, fen = "", options = {} }: Props = $props();
 
   let _lv = $state(0);
   onLangChange(() => _lv++);
@@ -29,6 +31,7 @@
     });
   });
 
+  let isprotected = $derived(options?.protected || false);
   let saveBtnClass = $derived(modified ? "unsaved" : "saved");
 
   let autoAnalyze = $state(false);
@@ -222,6 +225,7 @@
     class="toolbar-btn {saveBtnClass}"
     aria-label={t("toolbar.save", _lv)}
     use:useSetSaveIcon
+    disabled={isprotected}
     onclick={() => emitEvent("save")}
   ></button>
 </div>

@@ -38,6 +38,7 @@ const BoardModule = {
         fen: host.currentNode.fen,
         currentNode: host.currentNode,
         currentPath: host.currentPath,
+        options: { ...host.options },
       });
     });
 
