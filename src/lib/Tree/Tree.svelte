@@ -1117,6 +1117,19 @@
     text-align: right;
   }
 
+  .move-list span.move:hover {
+    background-color: var(--background-modifier-hover);
+    transform: scale(1.02);
+  }
+
+  .move-list span.move.active {
+    background-color: var(--color-accent);
+    color: var(--text-on-accent);
+    box-shadow: 0 0.125em 0.375em rgba(0, 0, 0, 0.15);
+    font-weight: 500;
+    transform: scale(1.02);
+  }
+
   .svg-wrapper {
     flex: 1 1 auto;
     overflow: hidden;
