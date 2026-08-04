@@ -136,6 +136,7 @@ export default tseslint.config(
       'svelte/prefer-writable-derived': 'warn',
       'svelte/no-unused-svelte-ignore': 'warn',
       'obsidianmd/settings-tab/prefer-setting-definitions': 'off',
+      'obsidianmd/ui/sentence-case': 'off',
     },
   },
 
