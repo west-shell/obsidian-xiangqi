@@ -89,8 +89,6 @@
   }
 
   .piece-btn {
-    width: 28px;
-    height: 28px;
     padding: 0;
     margin: 0;
     border-radius: 4px;
@@ -98,11 +96,11 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 12px;
     border: 1.5px solid rgba(0, 0, 0, 0.35);
     transition:
       box-shadow 0.15s,
       border-color 0.15s;
+    color: white;
   }
 
   .red-piece {
