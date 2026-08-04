@@ -1223,6 +1223,7 @@
     bottom: 0.5rem;
     left: 0.5rem;
     display: flex;
+    flex-direction: column;
     gap: 0;
     margin: 0;
     padding: 0px;
