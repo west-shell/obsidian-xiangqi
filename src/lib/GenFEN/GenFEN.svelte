@@ -2,13 +2,14 @@
   import Board from "../Board.svelte";
   import PieceBTNs from "./PieceBTNs.svelte";
   import type { ISettings } from "../../types";
+  import type { Piece } from "../../chess";
   import type { EventBus } from "../../core/event-bus";
   import Toolbar from "./Toolbar.svelte";
 
   interface Props {
     settings: ISettings;
     fen: string;
-    selectedPiece: string | null;
+    selectedPiece: Piece | null;
     eventBus: EventBus;
   }
 

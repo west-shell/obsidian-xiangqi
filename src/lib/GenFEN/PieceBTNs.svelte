@@ -1,11 +1,12 @@
 <script lang="ts">
   import { PIECE_CHARS } from "../../types";
+  import type { Piece } from "../../chess";
   import type { EventBus } from "../../core/event-bus";
 
   interface Props {
     fen: string;
     eventBus: EventBus;
-    selectedPiece: string | null;
+    selectedPiece: Piece | null;
   }
   let { fen, eventBus, selectedPiece }: Props = $props();
 
@@ -26,7 +27,18 @@
     p: 5,
   };
 
-  const isRed = (piece: string) => piece === piece.toUpperCase();
+  const PIECES: { key: string; piece: Piece; name: string }[] = Object.entries(
+    PIECE_CHARS,
+  ).map(([key, name]) => ({
+    key,
+    piece: {
+      type: key.toLowerCase() as Piece["type"],
+      color: key === key.toUpperCase() ? ("w" as const) : ("b" as const),
+    },
+    name,
+  }));
+
+  const isRed = (key: string) => key === key.toUpperCase();
 
   let pieceCount = $derived(
     fen
@@ -50,11 +62,13 @@
 </script>
 
 <div class="piece-btn-container xq-layout__piecebtns">
-  {#each Object.entries(PIECE_CHARS) as [piece, name] (piece)}
+  {#each PIECES as { key, piece, name } (key)}
     <button
-      class={`piece-btn ${isRed(piece) ? "red-piece" : "black-piece"}`}
-      class:empty={count[piece] === 0}
-      class:active={selectedPiece === piece}
+      class={`piece-btn ${isRed(key) ? "red-piece" : "black-piece"}`}
+      class:empty={count[key] === 0}
+      class:active={selectedPiece &&
+        selectedPiece.type === piece.type &&
+        selectedPiece.color === piece.color}
       onclick={() => eventBus.emit("clickPieceBTN", piece)}
     >
       {name}

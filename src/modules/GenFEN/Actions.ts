@@ -2,6 +2,7 @@ import { MarkdownView, Notice } from "obsidian";
 
 import { registerGenFENModule } from "../../core/module-system";
 import { t } from "../../i18n";
+import type { Piece } from "../../chess";
 import type { IGenFENHost } from "../../types";
 import { DEFAULT_FEN } from "../../types";
 
@@ -9,9 +10,13 @@ const ActionsModule = {
   init(host: IGenFENHost) {
     const eventBus = host.eventBus;
 
-    eventBus.on<string>("clickPieceBTN", (piece) => {
+    eventBus.on<Piece>("clickPieceBTN", (piece) => {
       if (!piece) return;
-      if (host.selectedPiece === piece) {
+      if (
+        host.selectedPiece &&
+        host.selectedPiece.type === piece.type &&
+        host.selectedPiece.color === piece.color
+      ) {
         host.selectedPiece = null;
       } else {
         host.selectedPiece = piece;
