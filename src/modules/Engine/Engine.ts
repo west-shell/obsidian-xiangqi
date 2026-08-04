@@ -39,8 +39,9 @@ export class XiangqiEngine {
   }
 
   async checkFileExists(): Promise<string[]> {
-    const adapter = this.plugin.app.vault.adapter;
-    const baseDir = `${this.plugin.app.vault.configDir}/plugins/xiangqi`;
+    const plugin = this.plugin!;
+    const adapter = plugin.app.vault.adapter;
+    const baseDir = `${plugin.app.vault.configDir}/plugins/xiangqi`;
     const missing: string[] = [];
     for (const file of ENGINE_FILES) {
       if (!(await adapter.exists(`${baseDir}/${file}`))) {
@@ -51,15 +52,16 @@ export class XiangqiEngine {
   }
 
   openDownloadModal(missingFiles: string[]): void {
-    const adapter = this.plugin.app.vault.adapter;
-    const baseDir = `${this.plugin.app.vault.configDir}/plugins/xiangqi`;
+    const plugin = this.plugin!;
+    const adapter = plugin.app.vault.adapter;
+    const baseDir = `${plugin.app.vault.configDir}/plugins/xiangqi`;
 
     const files = missingFiles.map((f) => ({
       name: f,
       url: `${BASE_URL}/${f}`,
     }));
     const modal = new DownloadModal(
-      this.plugin.app,
+      plugin.app,
       t("engine.downloadFile", 0),
       files,
       t("engine.downloadBtn", 0),
