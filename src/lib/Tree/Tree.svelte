@@ -507,6 +507,7 @@
   let listVisible = $state(true);
   function toggleListVisible() {
     listVisible = !listVisible;
+    tick().then(() => resetView());
   }
 
   function getNodeWidth(node: ChessNode): number {
