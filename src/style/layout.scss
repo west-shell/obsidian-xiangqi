@@ -103,16 +103,25 @@ $local-block-gap: 2px;
   }
 
   .xq-layout__piecebtns.piece-btn-container {
+    container-type: size;
     grid-template-columns: repeat(7, 1fr);
     grid-template-rows: repeat(2, 1fr);
     width: 100%;
-    height: auto;
+    height: 56px;
+    .piece-btn {
+      width: 14.2857cqw;
+      height: 28px;
+    }
 
     @include mq-is-col2 {
       grid-template-columns: repeat(2, 1fr);
       grid-template-rows: repeat(7, 1fr);
-      width: auto;
+      width: 56px;
       height: 100%;
+      .piece-btn {
+        width: 28px;
+        height: 14.2857cqh;
+      }
     }
   }
 }
