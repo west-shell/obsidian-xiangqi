@@ -828,7 +828,7 @@ export class ChessSettingTab extends PluginSettingTab {
     containerEl.parentElement?.classList.add("ws-setting-tab");
   }
 
-  async hide() {
+  hide() {
     this.plugin.refresh();
     void this.plugin.saveSettings();
   }
