@@ -16,57 +16,33 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout plugin
+      - name: Checkout
         uses: actions/checkout@v4
-        with:
-          path: obsidian-xiangqi
-
-      - name: Checkout xiangqi.js
-        uses: actions/checkout@v4
-        with:
-          repository: west-shell/xiangqi.js
-          path: xiangqi.js
-
-      - name: Checkout xiangqiground
-        uses: actions/checkout@v4
-        with:
-          repository: west-shell/xiangqiground
-          path: xiangqiground
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '22'
 
-      - name: Install dependencies (xiangqi.js)
-        working-directory: xiangqi.js
-        run: npm ci
-
-      - name: Install dependencies (xiangqiground)
-        working-directory: xiangqiground
-        run: npm ci
-
       - name: Install dependencies
-        working-directory: obsidian-xiangqi
         run: npm ci
 
       - name: Build
-        working-directory: obsidian-xiangqi
         run: npm run build:min
 
       - name: Generate build provenance
         uses: actions/attest-build-provenance@v2
         with:
           subject-path: |
-            obsidian-xiangqi/build/main.js
-            obsidian-xiangqi/build/manifest.json
-            obsidian-xiangqi/build/styles.css
+            build/main.js
+            build/manifest.json
+            build/styles.css
 
       - name: Create release
         uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
           files: |
-            obsidian-xiangqi/build/main.js
-            obsidian-xiangqi/build/manifest.json
-            obsidian-xiangqi/build/styles.css
+            build/main.js
+            build/manifest.json
+            build/styles.css
