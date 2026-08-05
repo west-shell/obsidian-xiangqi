@@ -1250,8 +1250,8 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    border-radius: 3px;
-    margin: 6px;
+    border-radius: 3px 0 0 3px;
+    margin: 0 0 0 6px;
     touch-action: none;
   }
 
