@@ -504,7 +504,7 @@
   }
   let modeIcon = $derived(MODE_ICONS[nodeMode]);
 
-  let listVisible = $state(true);
+  let listVisible = $state(settings?.showMovelist ?? true);
   function toggleListVisible() {
     listVisible = !listVisible;
     tick().then(() => resetView());
@@ -997,7 +997,7 @@
             class:active={listCurrentStep === 0}
             onclick={() => onClickStep(0)}
           >
-            {settings?.showMovelistText ? "= 开 局 =" : "开局"}
+            = 开 局 =
           </span>
         </li>
         {#each listMoves as move, i (i)}
@@ -1011,7 +1011,7 @@
                 class:active={listCurrentStep === i + 1}
                 onclick={() => onClickStep(i + 1)}
               >
-                {settings?.showMovelistText ? (move.move?.zh ?? "...") : "红"}
+                {move.move?.zh ?? "..."}
               </span>
               {#if listMoves[i + 1]}
                 <!-- svelte-ignore a11y_click_events_have_key_events -->
@@ -1021,9 +1021,7 @@
                   class:active={listCurrentStep === i + 2}
                   onclick={() => onClickStep(i + 2)}
                 >
-                  {settings?.showMovelistText
-                    ? (listMoves[i + 1].move?.zh ?? "...")
-                    : "黑"}
+                  {listMoves[i + 1].move?.zh ?? "..."}
                 </span>
               {/if}
             </li>

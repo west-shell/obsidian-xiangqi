@@ -6,7 +6,6 @@ import { MarkdownView, Plugin, TFile } from "obsidian";
 
 import { initI18n, t } from "./i18n";
 import { GenFENRenderChild } from "./renderChild/GenFENRenderChild";
-import { ChessRenderChild } from "./renderChild/ListRenderChild";
 import { TreeRenderChild } from "./renderChild/TreeRenderChild";
 import { ChessSettingTab, DEFAULT_SETTINGS } from "./settings";
 import { applyThemes, ensureBoardAssets, registerIcon } from "./themes";
@@ -23,7 +22,6 @@ export default class ChessPlugin extends Plugin {
 
     this.addSettingTab(new ChessSettingTab(this.app, this));
 
-    // 首次加载时把内嵌的背景图写盘（缺失才写），完成后再应用主题
     await ensureBoardAssets(this.app);
     applyThemes(this.app, this.settings);
 
@@ -123,21 +121,15 @@ export default class ChessPlugin extends Plugin {
   registerCodeBlocks() {
     const { codeBlockNames } = this.settings;
 
-    for (const name of codeBlockNames.xiangqi) {
+    for (const name of codeBlockNames.tree) {
       this.registerMarkdownCodeBlockProcessor(name, (source, el, ctx) => {
-        ctx.addChild(new ChessRenderChild(el, ctx, source, this));
+        ctx.addChild(new TreeRenderChild(el, ctx, source, this));
       });
     }
 
     for (const name of codeBlockNames.xq) {
       this.registerMarkdownCodeBlockProcessor(name, (source, el, ctx) => {
         ctx.addChild(new GenFENRenderChild(el, ctx, source, this));
-      });
-    }
-
-    for (const name of codeBlockNames.tree) {
-      this.registerMarkdownCodeBlockProcessor(name, (source, el, ctx) => {
-        ctx.addChild(new TreeRenderChild(el, ctx, source, this));
       });
     }
   }

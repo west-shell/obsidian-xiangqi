@@ -5,7 +5,6 @@ export type ChessModule = {
 
 export type ModuleRegistry = Map<string, ChessModule>;
 
-// 工厂函数：创建模块系统
 function createModuleSystem() {
   const moduleMap = new Map<string, ChessModule>();
   const registryMap = new WeakMap<object, ModuleRegistry>();
@@ -46,26 +45,8 @@ function createModuleSystem() {
   };
 }
 
-// 实例化 XQ 模块系统
-const ListModules = createModuleSystem();
-
-// 导出 XQ 模块相关函数
-export function registerListModule(name: string, module: ChessModule) {
-  ListModules.register(name, module);
-}
-
-export function createXQModuleRegistry(host: object) {
-  return ListModules.createRegistry(host);
-}
-
-export function destroyXQModuleRegistry(host: object) {
-  ListModules.destroyRegistry(host);
-}
-
-// 实例化 GenFEN 模块系统
 const GenFENModules = createModuleSystem();
 
-// 导出 GenFEN 模块相关函数
 export function registerGenFENModule(name: string, module: ChessModule) {
   GenFENModules.register(name, module);
 }
@@ -78,7 +59,6 @@ export function destroyGenFENModuleRegistry(host: object) {
   GenFENModules.destroyRegistry(host);
 }
 
-// 导出 PGNView 模块系统
 const PGNViewModules = createModuleSystem();
 export function registerPGNViewModule(name: string, module: ChessModule) {
   PGNViewModules.register(name, module);
@@ -90,7 +70,6 @@ export function destroyPGNViewModuleRegistry(host: object) {
   PGNViewModules.destroyRegistry(host);
 }
 
-// 导出 Tree 模块系统
 const TreeModules = createModuleSystem();
 export function registerTreeModule(name: string, module: ChessModule) {
   TreeModules.register(name, module);

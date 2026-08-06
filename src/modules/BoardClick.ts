@@ -1,16 +1,15 @@
 import { Chess, type Square } from "../chess";
 import {
-  registerListModule,
   registerPGNViewModule,
   registerTreeModule,
 } from "../core/module-system";
-import type { IListHost, IPGNViewHost, ITreeHost } from "../types";
+import type { IPGNViewHost, ITreeHost } from "../types";
 
 type TryMovePayload = { from: Square; to: Square };
 
 function tryMove(
   chess: Chess,
-  host: IListHost | ITreeHost | IPGNViewHost,
+  host: ITreeHost | IPGNViewHost,
   from: Square,
   to: Square,
 ): void {
@@ -32,7 +31,7 @@ function tryMove(
 }
 
 const BoardClickModule = {
-  init(host: IListHost | ITreeHost | IPGNViewHost) {
+  init(host: ITreeHost | IPGNViewHost) {
     const eventBus = host.eventBus;
     const chess = new Chess();
 
@@ -53,6 +52,5 @@ const BoardClickModule = {
   },
 };
 
-registerListModule("BoardClick", BoardClickModule);
 registerPGNViewModule("BoardClick", BoardClickModule);
 registerTreeModule("BoardClick", BoardClickModule);
