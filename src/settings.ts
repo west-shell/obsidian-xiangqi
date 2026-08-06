@@ -53,8 +53,8 @@ export const DEFAULT_SETTINGS: ISettings = {
   viewOnly: false,
   rotated: false,
   codeBlockNames: {
-    tree: ["xiangqi", "xq", "tree"],
-    fen: ["fen"],
+    tree: ["xiangqi", "tree"],
+    fen: ["fen", "xq"],
   },
   enablePGNView: true,
   pgnFileExtensions: ["pgn"],
@@ -296,7 +296,7 @@ export class ChessSettingTab extends PluginSettingTab {
         items: [
           ...(["tree", "fen"] as const).flatMap((mode): SettingGroupItem[] => {
             const i18nKey = mode === "tree" ? "treeAliases" : "fenAliases";
-            const fallback = mode === "tree" ? "xiangqi, xq, tree" : "fen";
+            const fallback = mode === "tree" ? "xiangqi, tree" : "fen, xq";
             return [
               {
                 name: t(`codeblock.${i18nKey}`),
@@ -331,7 +331,7 @@ export class ChessSettingTab extends PluginSettingTab {
                   setting.addButton((button) =>
                     button.setIcon("rotate-ccw").onClick(() => {
                       settings.codeBlockNames[mode] =
-                        mode === "tree" ? ["xiangqi", "xq", "tree"] : ["fen"];
+                        mode === "tree" ? ["xiangqi", "tree"] : ["fen"];
                       const input = setting.controlEl.querySelector("input")!;
                       input.value = fallback;
                       void this.plugin.saveSettings();
@@ -636,7 +636,7 @@ export class ChessSettingTab extends PluginSettingTab {
 
     const treeSetting = new Setting(containerEl)
       .setName(t("codeblock.treeAliases"))
-      .setDesc(t("codeblock.treeAliases.desc") + " (默认: xiangqi, xq, tree)")
+      .setDesc(t("codeblock.treeAliases.desc") + " (默认: xiangqi, tree)")
       .addText((text) =>
         text
           .setValue(settings.codeBlockNames.tree.join(", "))
@@ -647,9 +647,7 @@ export class ChessSettingTab extends PluginSettingTab {
                 t("codeblock.invalidName").replace("{name}", invalid[0]),
               );
               const input = treeSetting.controlEl.querySelector("input")!;
-              input.value = valid.length
-                ? valid.join(", ")
-                : "xiangqi, xq, tree";
+              input.value = valid.length ? valid.join(", ") : "xiangqi, tree";
             }
             if (!valid.length) return;
             settings.codeBlockNames.tree = valid;
@@ -658,16 +656,15 @@ export class ChessSettingTab extends PluginSettingTab {
       )
       .addButton((button) =>
         button.setIcon("rotate-ccw").onClick(() => {
-          settings.codeBlockNames.tree = ["xiangqi", "xq", "tree"];
-          treeSetting.controlEl.querySelector("input")!.value =
-            "xiangqi, xq, tree";
+          settings.codeBlockNames.tree = ["xiangqi", "tree"];
+          treeSetting.controlEl.querySelector("input")!.value = "xiangqi, tree";
           void this.plugin.saveSettings();
         }),
       );
 
     const fenSetting = new Setting(containerEl)
       .setName(t("codeblock.fenAliases"))
-      .setDesc(t("codeblock.fenAliases.desc") + " (默认: fen)")
+      .setDesc(t("codeblock.fenAliases.desc") + " (默认: fen, xq)")
       .addText((text) =>
         text
           .setValue(settings.codeBlockNames.fen.join(", "))
@@ -678,7 +675,7 @@ export class ChessSettingTab extends PluginSettingTab {
                 t("codeblock.invalidName").replace("{name}", invalid[0]),
               );
               const input = fenSetting.controlEl.querySelector("input")!;
-              input.value = valid.length ? valid.join(", ") : "fen";
+              input.value = valid.length ? valid.join(", ") : "fen, xq";
             }
             if (!valid.length) return;
             settings.codeBlockNames.fen = valid;
@@ -687,8 +684,8 @@ export class ChessSettingTab extends PluginSettingTab {
       )
       .addButton((button) =>
         button.setIcon("rotate-ccw").onClick(() => {
-          settings.codeBlockNames.fen = ["fen"];
-          fenSetting.controlEl.querySelector("input")!.value = "fen";
+          settings.codeBlockNames.fen = ["fen", "xq"];
+          fenSetting.controlEl.querySelector("input")!.value = "fen, xq";
           void this.plugin.saveSettings();
         }),
       );
