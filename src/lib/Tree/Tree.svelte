@@ -517,16 +517,12 @@
     return Math.max(13, zh.length * 5.5);
   }
 
-  const toolbarBTN = [
+  let canFold = $derived(currentNode?.children?.length > 1);
+  let toolbarBTN = $derived([
     { title: "放大", icon: "plus", event: zoomIn },
     { title: "缩小", icon: "minus", event: zoomOut },
-    {
-      title: t("tree.fold"),
-      icon: "chevrons-right-left",
-      event: toggleCurrentFold,
-    },
     { title: "重置", icon: "rotate-ccw", event: resetView },
-  ];
+  ]);
   function useSetIcon(el: HTMLElement, icon: string) {
     setIcon(el, icon);
     return {
@@ -885,6 +881,14 @@
       </svg>
 
       <div class="toolbar">
+        {#if canFold}
+          <button
+            class="toolbar-btn"
+            aria-label={t("tree.fold")}
+            use:useSetIcon={"chevrons-right-left"}
+            onclick={toggleCurrentFold}
+          ></button>
+        {/if}
         {#each toolbarBTN as btn, i (i)}
           <button
             class="toolbar-btn"
