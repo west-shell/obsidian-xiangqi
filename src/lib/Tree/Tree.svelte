@@ -1247,8 +1247,9 @@
     top: 0;
     right: 0;
     bottom: 0;
-    width: 6px;
-    background: var(--background-modifier-border);
+    width: 20px;
+    background: var(--background-primary-alt);
+    border: 1px solid var(--background-modifier-border);
     z-index: 2;
     display: flex;
     flex-direction: column;
@@ -1258,10 +1259,16 @@
     touch-action: none;
   }
 
-  .slider.has-eval {
-    width: 20px;
-    background: var(--background-primary-alt);
-    border: 1px solid var(--background-modifier-border);
+  .slider:not(.has-eval) {
+    background: transparent;
+    border-color: transparent;
+  }
+
+  .slider:not(.has-eval) .slider-inner {
+    width: 4px;
+    background: var(--background-modifier-border);
+    border-radius: 2px;
+    align-self: center;
   }
 
   .eval-chart-bg {
