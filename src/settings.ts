@@ -52,10 +52,8 @@ export const DEFAULT_SETTINGS: ISettings = {
   boardMarginBottom: 20,
   viewOnly: false,
   rotated: false,
-  codeBlockNames: {
-    tree: ["xiangqi", "tree"],
-    fen: ["fen", "xq"],
-  },
+  treeBlockNames: ["xiangqi", "tree"],
+  fenBlockNames: ["fen", "xq"],
   enablePGNView: true,
   pgnFileExtensions: ["pgn"],
   engineDepth: 18,
@@ -294,20 +292,31 @@ export class ChessSettingTab extends PluginSettingTab {
         heading: t("settings.restartRequired.title"),
         desc: t("settings.restartRequired.desc"),
         items: [
-          ...(["tree", "fen"] as const).flatMap((mode): SettingGroupItem[] => {
-            const i18nKey = mode === "tree" ? "treeAliases" : "fenAliases";
-            const fallback = mode === "tree" ? "xiangqi, tree" : "fen, xq";
+          ...(
+            [
+              {
+                key: "treeBlockNames" as const,
+                i18n: "treeAliases",
+                fallback: "xiangqi, tree",
+                defaults: ["xiangqi", "tree"] as const,
+              },
+              {
+                key: "fenBlockNames" as const,
+                i18n: "fenAliases",
+                fallback: "fen, xq",
+                defaults: ["fen", "xq"] as const,
+              },
+            ] as const
+          ).flatMap((cfg): SettingGroupItem[] => {
             return [
               {
-                name: t(`codeblock.${i18nKey}`),
-                desc: t(`codeblock.${i18nKey}.desc`),
+                name: t(`codeblock.${cfg.i18n}`),
+                desc: t(`codeblock.${cfg.i18n}.desc`),
                 render: (setting: Setting) => {
                   setting.addText((text) =>
                     text
-                      .setValue(
-                        (settings.codeBlockNames[mode] ?? []).join(", "),
-                      )
-                      .setPlaceholder(fallback)
+                      .setValue(settings[cfg.key].join(", "))
+                      .setPlaceholder(cfg.fallback)
                       .onChange((value) => {
                         const { valid, invalid } = parseAndValidateNames(value);
                         if (invalid.length) {
@@ -321,19 +330,18 @@ export class ChessSettingTab extends PluginSettingTab {
                             setting.controlEl.querySelector("input")!;
                           input.value = valid.length
                             ? valid.join(", ")
-                            : fallback;
+                            : cfg.fallback;
                         }
                         if (!valid.length) return;
-                        settings.codeBlockNames[mode] = valid;
+                        settings[cfg.key] = valid;
                         void this.plugin.saveSettings();
                       }),
                   );
                   setting.addButton((button) =>
                     button.setIcon("rotate-ccw").onClick(() => {
-                      settings.codeBlockNames[mode] =
-                        mode === "tree" ? ["xiangqi", "tree"] : ["fen"];
+                      settings[cfg.key] = [...cfg.defaults];
                       const input = setting.controlEl.querySelector("input")!;
-                      input.value = fallback;
+                      input.value = cfg.fallback;
                       void this.plugin.saveSettings();
                     }),
                   );
@@ -638,25 +646,23 @@ export class ChessSettingTab extends PluginSettingTab {
       .setName(t("codeblock.treeAliases"))
       .setDesc(t("codeblock.treeAliases.desc") + " (默认: xiangqi, tree)")
       .addText((text) =>
-        text
-          .setValue(settings.codeBlockNames.tree.join(", "))
-          .onChange((value) => {
-            const { valid, invalid } = parseAndValidateNames(value);
-            if (invalid.length) {
-              new Notice(
-                t("codeblock.invalidName").replace("{name}", invalid[0]),
-              );
-              const input = treeSetting.controlEl.querySelector("input")!;
-              input.value = valid.length ? valid.join(", ") : "xiangqi, tree";
-            }
-            if (!valid.length) return;
-            settings.codeBlockNames.tree = valid;
-            void this.plugin.saveSettings();
-          }),
+        text.setValue(settings.treeBlockNames.join(", ")).onChange((value) => {
+          const { valid, invalid } = parseAndValidateNames(value);
+          if (invalid.length) {
+            new Notice(
+              t("codeblock.invalidName").replace("{name}", invalid[0]),
+            );
+            const input = treeSetting.controlEl.querySelector("input")!;
+            input.value = valid.length ? valid.join(", ") : "xiangqi, tree";
+          }
+          if (!valid.length) return;
+          settings.treeBlockNames = valid;
+          void this.plugin.saveSettings();
+        }),
       )
       .addButton((button) =>
         button.setIcon("rotate-ccw").onClick(() => {
-          settings.codeBlockNames.tree = ["xiangqi", "tree"];
+          settings.treeBlockNames = ["xiangqi", "tree"];
           treeSetting.controlEl.querySelector("input")!.value = "xiangqi, tree";
           void this.plugin.saveSettings();
         }),
@@ -666,25 +672,23 @@ export class ChessSettingTab extends PluginSettingTab {
       .setName(t("codeblock.fenAliases"))
       .setDesc(t("codeblock.fenAliases.desc") + " (默认: fen, xq)")
       .addText((text) =>
-        text
-          .setValue(settings.codeBlockNames.fen.join(", "))
-          .onChange((value) => {
-            const { valid, invalid } = parseAndValidateNames(value);
-            if (invalid.length) {
-              new Notice(
-                t("codeblock.invalidName").replace("{name}", invalid[0]),
-              );
-              const input = fenSetting.controlEl.querySelector("input")!;
-              input.value = valid.length ? valid.join(", ") : "fen, xq";
-            }
-            if (!valid.length) return;
-            settings.codeBlockNames.fen = valid;
-            void this.plugin.saveSettings();
-          }),
+        text.setValue(settings.fenBlockNames.join(", ")).onChange((value) => {
+          const { valid, invalid } = parseAndValidateNames(value);
+          if (invalid.length) {
+            new Notice(
+              t("codeblock.invalidName").replace("{name}", invalid[0]),
+            );
+            const input = fenSetting.controlEl.querySelector("input")!;
+            input.value = valid.length ? valid.join(", ") : "fen, xq";
+          }
+          if (!valid.length) return;
+          settings.fenBlockNames = valid;
+          void this.plugin.saveSettings();
+        }),
       )
       .addButton((button) =>
         button.setIcon("rotate-ccw").onClick(() => {
-          settings.codeBlockNames.fen = ["fen", "xq"];
+          settings.fenBlockNames = ["fen", "xq"];
           fenSetting.controlEl.querySelector("input")!.value = "fen, xq";
           void this.plugin.saveSettings();
         }),

@@ -119,15 +119,15 @@ export default class ChessPlugin extends Plugin {
   }
 
   registerCodeBlocks() {
-    const { codeBlockNames } = this.settings;
+    const { treeBlockNames, fenBlockNames } = this.settings;
 
-    for (const name of codeBlockNames.tree) {
+    for (const name of treeBlockNames) {
       this.registerMarkdownCodeBlockProcessor(name, (source, el, ctx) => {
         ctx.addChild(new TreeRenderChild(el, ctx, source, this));
       });
     }
 
-    for (const name of codeBlockNames.fen) {
+    for (const name of fenBlockNames) {
       this.registerMarkdownCodeBlockProcessor(name, (source, el, ctx) => {
         ctx.addChild(new GenFENRenderChild(el, ctx, source, this));
       });

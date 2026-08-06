@@ -42,10 +42,8 @@ export interface ISettings {
   boardMarginBottom: number;
   viewOnly?: boolean;
   rotated?: boolean;
-  codeBlockNames: {
-    tree: string[];
-    fen: string[];
-  };
+  treeBlockNames: string[];
+  fenBlockNames: string[];
   enablePGNView: boolean;
   pgnFileExtensions: string[];
   engineDepth: number;
