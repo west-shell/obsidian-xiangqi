@@ -504,6 +504,7 @@
   }
   let modeIcon = $derived(MODE_ICONS[nodeMode]);
 
+  // svelte-ignore state_referenced_locally
   let listVisible = $state(settings?.showMovelist ?? true);
   function toggleListVisible() {
     listVisible = !listVisible;

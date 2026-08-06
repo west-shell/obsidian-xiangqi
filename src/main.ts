@@ -127,7 +127,7 @@ export default class ChessPlugin extends Plugin {
       });
     }
 
-    for (const name of codeBlockNames.xq) {
+    for (const name of codeBlockNames.fen) {
       this.registerMarkdownCodeBlockProcessor(name, (source, el, ctx) => {
         ctx.addChild(new GenFENRenderChild(el, ctx, source, this));
       });

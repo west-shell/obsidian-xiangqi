@@ -44,7 +44,7 @@ export interface ISettings {
   rotated?: boolean;
   codeBlockNames: {
     tree: string[];
-    xq: string[];
+    fen: string[];
   };
   enablePGNView: boolean;
   pgnFileExtensions: string[];

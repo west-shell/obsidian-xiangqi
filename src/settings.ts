@@ -53,8 +53,8 @@ export const DEFAULT_SETTINGS: ISettings = {
   viewOnly: false,
   rotated: false,
   codeBlockNames: {
-    tree: ["xiangqi", "tree"],
-    xq: ["xq"],
+    tree: ["xiangqi", "xq", "tree"],
+    fen: ["fen"],
   },
   enablePGNView: true,
   pgnFileExtensions: ["pgn"],
@@ -294,9 +294,9 @@ export class ChessSettingTab extends PluginSettingTab {
         heading: t("settings.restartRequired.title"),
         desc: t("settings.restartRequired.desc"),
         items: [
-          ...(["tree", "xq"] as const).flatMap((mode): SettingGroupItem[] => {
-            const i18nKey = mode === "tree" ? "treeAliases" : "xqAliases";
-            const fallback = mode === "tree" ? "xiangqi, tree" : "xq";
+          ...(["tree", "fen"] as const).flatMap((mode): SettingGroupItem[] => {
+            const i18nKey = mode === "tree" ? "treeAliases" : "fenAliases";
+            const fallback = mode === "tree" ? "xiangqi, xq, tree" : "fen";
             return [
               {
                 name: t(`codeblock.${i18nKey}`),
@@ -331,7 +331,7 @@ export class ChessSettingTab extends PluginSettingTab {
                   setting.addButton((button) =>
                     button.setIcon("rotate-ccw").onClick(() => {
                       settings.codeBlockNames[mode] =
-                        mode === "tree" ? ["xiangqi", "tree"] : ["xq"];
+                        mode === "tree" ? ["xiangqi", "xq", "tree"] : ["fen"];
                       const input = setting.controlEl.querySelector("input")!;
                       input.value = fallback;
                       void this.plugin.saveSettings();
@@ -636,7 +636,7 @@ export class ChessSettingTab extends PluginSettingTab {
 
     const treeSetting = new Setting(containerEl)
       .setName(t("codeblock.treeAliases"))
-      .setDesc(t("codeblock.treeAliases.desc") + " (默认: xiangqi, tree)")
+      .setDesc(t("codeblock.treeAliases.desc") + " (默认: xiangqi, xq, tree)")
       .addText((text) =>
         text
           .setValue(settings.codeBlockNames.tree.join(", "))
@@ -647,7 +647,9 @@ export class ChessSettingTab extends PluginSettingTab {
                 t("codeblock.invalidName").replace("{name}", invalid[0]),
               );
               const input = treeSetting.controlEl.querySelector("input")!;
-              input.value = valid.length ? valid.join(", ") : "xiangqi, tree";
+              input.value = valid.length
+                ? valid.join(", ")
+                : "xiangqi, xq, tree";
             }
             if (!valid.length) return;
             settings.codeBlockNames.tree = valid;
@@ -656,39 +658,42 @@ export class ChessSettingTab extends PluginSettingTab {
       )
       .addButton((button) =>
         button.setIcon("rotate-ccw").onClick(() => {
-          settings.codeBlockNames.tree = ["xiangqi", "tree"];
-          treeSetting.controlEl.querySelector("input")!.value = "xiangqi, tree";
+          settings.codeBlockNames.tree = ["xiangqi", "xq", "tree"];
+          treeSetting.controlEl.querySelector("input")!.value =
+            "xiangqi, xq, tree";
           void this.plugin.saveSettings();
         }),
       );
 
-    const xqSetting = new Setting(containerEl)
-      .setName(t("codeblock.xqAliases"))
-      .setDesc(t("codeblock.xqAliases.desc") + " (默认: xq)")
+    const fenSetting = new Setting(containerEl)
+      .setName(t("codeblock.fenAliases"))
+      .setDesc(t("codeblock.fenAliases.desc") + " (默认: fen)")
       .addText((text) =>
         text
-          .setValue(settings.codeBlockNames.xq.join(", "))
+          .setValue(settings.codeBlockNames.fen.join(", "))
           .onChange((value) => {
             const { valid, invalid } = parseAndValidateNames(value);
             if (invalid.length) {
               new Notice(
                 t("codeblock.invalidName").replace("{name}", invalid[0]),
               );
-              const input = xqSetting.controlEl.querySelector("input")!;
-              input.value = valid.length ? valid.join(", ") : "xq";
+              const input = fenSetting.controlEl.querySelector("input")!;
+              input.value = valid.length ? valid.join(", ") : "fen";
             }
             if (!valid.length) return;
-            settings.codeBlockNames.xq = valid;
+            settings.codeBlockNames.fen = valid;
             void this.plugin.saveSettings();
           }),
       )
       .addButton((button) =>
         button.setIcon("rotate-ccw").onClick(() => {
-          settings.codeBlockNames.xq = ["xq"];
-          xqSetting.controlEl.querySelector("input")!.value = "xq";
+          settings.codeBlockNames.fen = ["fen"];
+          fenSetting.controlEl.querySelector("input")!.value = "fen";
           void this.plugin.saveSettings();
         }),
       );
+
+    // ---- PGN 文件视图 ----
 
     new Setting(containerEl).setName(t("pgn.title")).setHeading();
 
