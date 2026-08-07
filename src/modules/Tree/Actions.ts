@@ -7,6 +7,7 @@ import { t } from "../../i18n";
 import type { ChessNode, ITreeHost } from "../../types";
 import { DEFAULT_FEN } from "../../types";
 import { ConfirmModal } from "../../utils/confirmModal";
+import { Modal, Setting } from "obsidian";
 
 const ActionsModule = {
   init(host: ITreeHost) {
@@ -110,12 +111,13 @@ const ActionsModule = {
       host.eventBus.emit("updateUI");
     });
 
-    eventBus.on<{ name: string; payload: string }>(
+    eventBus.on<{ name: string; payload: unknown }>(
       "btn-click",
       async (payload) => {
         if (!payload) return;
         host.markedPos = null;
-        const { name, payload: data } = payload;
+        const { name } = payload;
+        const data = payload.payload as string;
         switch (name) {
           case "annotation": {
             if (!host.currentNode) break;
@@ -238,21 +240,6 @@ const ActionsModule = {
             )!;
             host.fen = host.currentNode.fen;
             break;
-          case "openPikafish": {
-            const fen = host.root.fen;
-            const movesOnPath: string[] = [];
-            for (let i = 1; i < host.currentPath.length; i++) {
-              const node = host.nodeMap.get(host.currentPath[i]);
-              if (node?.move?.iccs)
-                movesOnPath.push(
-                  node.move.iccs.replace(/-/g, "").toLowerCase(),
-                );
-            }
-            window.open(
-              `https://xiangqiai.com/#/${fen} moves ${movesOnPath.join("")}`,
-            );
-            break;
-          }
           case "edit-board": {
             const modal = new ConfirmModal(
               host.plugin.app,
@@ -270,6 +257,82 @@ const ActionsModule = {
             }
             break;
           }
+          case "edit-tags": {
+            const tagPairs: { key: string; value: string }[] = [];
+            const tagRe = /\[(\w+)\s+"([^"]*)"\]/g;
+            let m: RegExpExecArray | null;
+            while ((m = tagRe.exec(host.tags ?? "")) !== null) {
+              if (m[1] === "FEN") continue;
+              tagPairs.push({ key: m[1], value: m[2] });
+            }
+            const standardKeys = [
+              "Event",
+              "Site",
+              "Date",
+              "Round",
+              "Red",
+              "Black",
+              "Result",
+            ];
+            for (const key of standardKeys) {
+              if (!tagPairs.some((p) => p.key === key)) {
+                tagPairs.push({ key, value: "" });
+              }
+            }
+            const tagsModal = new Modal(host.plugin.app);
+            let resolve: (value: boolean) => void;
+            const tagsPromise = new Promise<boolean>((r) => {
+              resolve = r;
+            });
+            tagsModal.onOpen = () => {
+              const { contentEl } = tagsModal;
+              new Setting(contentEl)
+                .setName(t("confirm.editTagsTitle", 0))
+                .setHeading();
+              for (const pair of tagPairs) {
+                new Setting(contentEl)
+                  .setName(t(`tag.${pair.key}`, 0) || pair.key)
+                  .addText((text) => {
+                    text.setValue(pair.value).onChange((v) => {
+                      pair.value = v;
+                    });
+                  });
+              }
+              const btnContainer = contentEl.createDiv(
+                "modal-button-container",
+              );
+              const okBtn = btnContainer.createEl("button", {
+                text: t("confirm.yes"),
+                cls: "mod-cta",
+              });
+              okBtn.addEventListener("click", () => {
+                resolve(true);
+                tagsModal.close();
+              });
+              const cancelBtn = btnContainer.createEl("button", {
+                text: t("confirm.cancel"),
+              });
+              cancelBtn.addEventListener("click", () => {
+                resolve(false);
+                tagsModal.close();
+              });
+            };
+            tagsModal.onClose = () => {
+              (tagsModal as { contentEl: HTMLElement }).contentEl.empty();
+            };
+            tagsModal.open();
+            if (await tagsPromise) {
+              const fenTag = (host.tags ?? "").match(/\[FEN\s+"[^"]*"\]/)?.[0];
+              const edited = tagPairs
+                .filter((p) => p.value)
+                .map((p) => `[${p.key} "${p.value}"]`)
+                .join("\n");
+              host.tags = fenTag ? `${edited}\n${fenTag}` : edited;
+              eventBus.emit("modified", null);
+              eventBus.emit("updateUI");
+            }
+            break;
+          }
           case "reset": {
             eventBus.emit("reset");
             break;
@@ -277,17 +340,20 @@ const ActionsModule = {
           case "save": {
             if (host.editing) {
               const fen = host.fen;
-              host.currentNode.children = [];
+              host.root.children = [];
+              host.root.comments = [];
+              host.root.fen = fen;
               host.nodeMap.clear();
-              host.currentNode = { ...host.currentNode, fen };
-              host.nodeMap.set(host.currentNode.id, host.currentNode);
+              host.nodeMap.set(host.root.id, host.root);
+              host.currentNode = host.root;
               host.fen = fen;
+              host.tags = updateFenTag(host.tags, fen);
               host.editing = false;
               host.selectedPiece = null;
               host.markedPos = null;
               eventBus.emit("updateMainPath");
-              eventBus.emit("modified", null);
               eventBus.emit("updateUI");
+              eventBus.emit("save");
               break;
             }
             eventBus.emit("save");
@@ -349,21 +415,61 @@ const ActionsModule = {
     eventBus.on("saveFen", () => {
       if (!host.editing) return;
       const fen = host.fen;
-      host.currentNode.children = [];
+      host.root.children = [];
+      host.root.comments = [];
+      host.root.fen = fen;
       host.nodeMap.clear();
-      host.currentNode = { ...host.currentNode, fen };
-      host.nodeMap.set(host.currentNode.id, host.currentNode);
+      host.nodeMap.set(host.root.id, host.root);
+      host.currentNode = host.root;
       host.fen = fen;
+      host.tags = updateFenTag(host.tags, fen);
       host.editing = false;
       host.selectedPiece = null;
       host.markedPos = null;
       eventBus.emit("updateMainPath");
-      eventBus.emit("modified", null);
       eventBus.emit("updateUI");
+      eventBus.emit("save");
     });
 
     host.stringifyPGN = (root: ChessNode, includeEval = true) =>
       stringifyPGN(root, includeEval);
+
+    eventBus.on("set-depth", () => {
+      const depthModal = new Modal(host.plugin.app);
+      let depthValue = host.settings.engineDepth;
+      depthModal.onOpen = () => {
+        const { contentEl } = depthModal;
+        contentEl.createEl("h3", { text: t("engine.depth") });
+        const input = contentEl.createEl("input", {
+          type: "number",
+          value: String(depthValue),
+        });
+        input.setAttribute("min", "1");
+        input.setAttribute("max", "30");
+        input.addEventListener("input", () => {
+          depthValue = Number.parseInt(input.value) || 18;
+        });
+        const btnContainer = contentEl.createDiv("modal-button-container");
+        const okBtn = btnContainer.createEl("button", {
+          text: t("confirm.yes"),
+          cls: "mod-cta",
+        });
+        okBtn.addEventListener("click", () => {
+          if (depthValue >= 1 && depthValue <= 30) {
+            host.settings.engineDepth = depthValue;
+          }
+          depthModal.close();
+        });
+        const cancelBtn = btnContainer.createEl("button", {
+          text: t("confirm.cancel"),
+        });
+        cancelBtn.addEventListener("click", () => depthModal.close());
+      };
+      depthModal.onClose = () => {
+        (depthModal as { contentEl: HTMLElement }).contentEl.empty();
+      };
+      depthModal.open();
+    });
   },
 };
 
@@ -420,6 +526,13 @@ export function stringifyPGN(root: ChessNode, includeEval = true): string {
     return result;
   }
   return walk(root, 0);
+}
+
+function updateFenTag(tags: string, newFen: string): string {
+  if (tags.includes('[FEN "')) {
+    return tags.replace(/\[FEN "[^"]*"\]/, `[FEN "${newFen}"]`);
+  }
+  return `[FEN "${newFen}"]\n${tags}`;
 }
 
 function emitNodeEval(host: ITreeHost) {

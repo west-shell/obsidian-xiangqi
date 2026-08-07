@@ -1,15 +1,16 @@
 <script lang="ts">
   import { Menu, setIcon } from "obsidian";
   import type { EventBus } from "../../core/event-bus";
-  import type { IOptions } from "../../types";
+  import type { IOptions, ISettings } from "../../types";
   import { onLangChange, t } from "../../i18n";
 
   interface Props {
     eventBus: EventBus;
     fen?: string;
     options?: IOptions;
+    settings?: ISettings;
   }
-  let { eventBus, fen = "", options = {} }: Props = $props();
+  let { eventBus, fen = "", options = {}, settings }: Props = $props();
 
   let _lv = $state(0);
   onLangChange(() => _lv++);
@@ -30,9 +31,6 @@
       modified = false;
     });
   });
-
-  let isprotected = $derived(options?.protected || false);
-  let saveBtnClass = $derived(modified ? "unsaved" : "saved");
 
   let autoAnalyze = $state(false);
   let engineBusy = $state(false);
@@ -82,14 +80,11 @@
     }
   }
 
+  let isprotected = $derived(options?.protected || false);
+  let saveBtnClass = $derived(modified ? "unsaved" : "saved");
+
   const buildButtons = (v: number) => [
     { title: t("toolbar.reset", v), icon: "rotate-ccw", event: "reset" },
-    { title: t("toolbar.delete", v), icon: "circle-x", event: "remove" },
-    {
-      title: t("toolbar.promote", v),
-      icon: "arrow-up-wide-narrow",
-      event: "promote",
-    },
     {
       title: t("toolbar.start", v),
       icon: "arrow-left-to-line",
@@ -99,16 +94,20 @@
     { title: t("toolbar.forward", v), icon: "arrow-right", event: "next" },
     { title: t("toolbar.end", v), icon: "arrow-right-to-line", event: "toEnd" },
     { title: t("toolbar.flip", v), icon: "flip-vertical", event: "rotate" },
-    { title: "皮卡鱼Web", icon: "external-link", event: "openPikafish" },
     {
-      title: t("toolbar.editBoard", v),
-      icon: "pencil",
-      event: "edit-board",
+      title: t("toolbar.editMenu", v),
+      icon: "file-pen-line",
+      event: "toggle-edit-menu",
     },
     {
-      title: t("toolbar.annotate", v),
-      icon: "tag",
-      event: "toggle-annotation-menu",
+      title: t("toolbar.nodeMenu", v),
+      icon: "scan-line",
+      event: "toggle-node-menu",
+    },
+    {
+      title: t("toolbar.analyzeMenu", v),
+      icon: "brain",
+      event: "toggle-analyze-menu",
     },
   ];
   let buttons = $derived(buildButtons(_lv));
@@ -147,7 +146,7 @@
   ];
   let annotations = $derived(buildAnnotations(_lv));
 
-  function emitEvent(name: string, payload: unknown = null) {
+  function emitEvent(name: string, payload: string | null = null) {
     eventBus.emit("btn-click", { name, payload });
   }
 
@@ -164,15 +163,92 @@
     setIcon(el, "save");
   }
 
-  function handleAnnotationMenu(evt: MouseEvent) {
+  function handleEditMenu(evt: MouseEvent) {
     const menu = new Menu();
 
-    annotations.forEach((item) => {
-      menu.addItem((mi) => {
-        mi.setTitle(item.title)
-          .setIcon(item.icon)
-          .onClick(() => emitEvent(item.event, item.symbol));
+    menu.addItem((mi) => {
+      mi.setTitle(t("toolbar.editBoard", _lv))
+        .setIcon("pencil")
+        .onClick(() => emitEvent("edit-board"));
+    });
+
+    menu.addItem((mi) => {
+      mi.setTitle(t("toolbar.editTags", _lv))
+        .setIcon("file-text")
+        .onClick(() => emitEvent("edit-tags"));
+    });
+
+    menu.showAtMouseEvent(evt);
+  }
+
+  function handleNodeMenu(evt: MouseEvent) {
+    const menu = new Menu();
+
+    menu.addItem((mi) => {
+      mi.setTitle(t("toolbar.delete", _lv))
+        .setIcon("circle-x")
+        .onClick(() => emitEvent("remove"));
+    });
+
+    menu.addItem((mi) => {
+      mi.setTitle(t("toolbar.promote", _lv))
+        .setIcon("arrow-up-wide-narrow")
+        .onClick(() => emitEvent("promote"));
+    });
+
+    menu.addItem((mi) => {
+      mi.setTitle(t("toolbar.annotate", _lv)).setIcon("tag");
+      const sub = mi.setSubmenu();
+      annotations.forEach((ann) => {
+        sub.addItem((si) => {
+          si.setTitle(ann.title)
+            .setIcon(ann.icon)
+            .onClick(() => emitEvent(ann.event, ann.symbol));
+        });
       });
+    });
+
+    menu.showAtMouseEvent(evt);
+  }
+
+  function handleAnalyzeMenu(evt: MouseEvent) {
+    const menu = new Menu();
+
+    menu.addItem((mi) => {
+      mi.setTitle(t("toolbar.analyzeDepth", _lv))
+        .setIcon("sliders-horizontal")
+        .onClick(() => eventBus.emit("set-depth"));
+    });
+
+    menu.addItem((mi) => {
+      mi.setTitle(t("toolbar.analyze", _lv))
+        .setIcon("brain")
+        .onClick(() => eventBus.emit("engine-analyze"));
+    });
+
+    menu.addItem((mi) => {
+      mi.setTitle(
+        autoAnalyze ? t("toolbar.stop", _lv) : t("toolbar.autoAnalyze", _lv),
+      )
+        .setIcon(autoAnalyze ? "circle-stop" : "play")
+        .onClick(() => toggleAutoAnalyze());
+    });
+
+    menu.addItem((mi) => {
+      mi.setTitle(
+        batchAnalyzing
+          ? t("toolbar.cancelBatch", _lv)
+          : t("toolbar.analyzeBatch", _lv),
+      )
+        .setIcon(batchAnalyzing ? "circle-stop" : "workflow")
+        .onClick(() => {
+          if (batchAnalyzing) {
+            eventBus.emit("engine-batch-stop");
+          } else {
+            pendingBatch = true;
+            eventBus.emit("engine-analyze-batch");
+          }
+        });
     });
 
     menu.showAtMouseEvent(evt);
@@ -186,8 +262,12 @@
       aria-label={title}
       use:useSetIcon={icon}
       onclick={(e) => {
-        if (event === "toggle-annotation-menu") {
-          handleAnnotationMenu(e);
+        if (event === "toggle-edit-menu") {
+          handleEditMenu(e);
+        } else if (event === "toggle-node-menu") {
+          handleNodeMenu(e);
+        } else if (event === "toggle-analyze-menu") {
+          handleAnalyzeMenu(e);
         } else if (event === "rotate") {
           eventBus.emit("rotate");
         } else {
@@ -196,35 +276,6 @@
       }}
     ></button>
   {/each}
-
-  <button
-    class="toolbar-btn engine-btn"
-    class:active={autoAnalyze}
-    class:busy={engineBusy}
-    aria-label={autoAnalyze
-      ? t("toolbar.stop", _lv)
-      : t("toolbar.analyze", _lv)}
-    use:useSetIcon={autoAnalyze ? "circle-stop" : "brain"}
-    onclick={toggleAutoAnalyze}
-  ></button>
-
-  <button
-    class="toolbar-btn engine-btn"
-    class:busy={engineBusy && !batchAnalyzing}
-    class:batch-analyzing={batchAnalyzing}
-    aria-label={batchAnalyzing
-      ? t("toolbar.cancelBatch", _lv)
-      : t("toolbar.analyzeBatch", _lv)}
-    use:useSetIcon={batchAnalyzing ? "circle-stop" : "workflow"}
-    onclick={() => {
-      if (batchAnalyzing) {
-        eventBus.emit("engine-batch-stop");
-      } else {
-        pendingBatch = true;
-        eventBus.emit("engine-analyze-batch");
-      }
-    }}
-  ></button>
 
   <button
     class="toolbar-btn {saveBtnClass}"
@@ -236,6 +287,14 @@
 </div>
 
 <style>
+  .toolbar-btn.saved {
+    background-color: hsl(122, 39%, 49%);
+  }
+
+  .toolbar-btn.unsaved {
+    background-color: hsl(35, 100%, 50%);
+  }
+
   .toolbar-container {
     display: flex;
     flex-wrap: wrap;
@@ -248,29 +307,15 @@
     height: 28px;
     padding: 0;
     margin: 0;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    transition:
-      background-color 0.2s ease,
-      transform 0.1s ease;
   }
 
   .toolbar-container :global(.toolbar-btn svg) {
     width: 18px;
     height: 18px;
-  }
-
-  .toolbar-btn.saved {
-    background-color: hsl(122, 39%, 49%);
-  }
-
-  .toolbar-btn.unsaved {
-    background-color: hsl(35, 100%, 50%);
   }
 
   .engine-btn.active {
