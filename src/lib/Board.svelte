@@ -357,12 +357,15 @@
     width: calc(0.9 * var(--bh));
     position: relative;
     margin: 1.5px;
-    touch-action: none;
   }
   .xq-wrap :global(xq-board) {
     background:
       var(--xq-board-texture, none) center / cover no-repeat,
       var(--xq-board-bg, #d0b899);
+  }
+
+  .xq-wrap :global(piece) {
+    touch-action: none;
   }
   .xq-wrap {
     aspect-ratio: 9 / 10;
