@@ -90,6 +90,8 @@
   "codeblock.treeAliases.desc": "自定义棋谱代码块别名，逗号分隔",
   "codeblock.fenAliases": "FEN 生成模式",
   "codeblock.fenAliases.desc": "自定义 FEN 生成代码块别名，逗号分隔",
+  "codeblock.fenSaveBlockName": "FEN 保存为",
+  "codeblock.fenSaveBlockName.desc": "FEN 编辑器保存时使用的代码块名称，从棋谱模式代码块名称中选择",
   "settings.restartRequired.title": "重启后生效",
   "settings.restartRequired.desc": "以下设置需要重启插件或软件才能生效",
   "pgn.title": "PGN 文件视图",

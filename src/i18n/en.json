@@ -89,6 +89,8 @@
   "codeblock.treeAliases.desc": "Custom aliases for tree code block, comma separated",
   "codeblock.fenAliases": "FEN generation mode",
   "codeblock.fenAliases.desc": "Custom aliases for FEN generation code block, comma separated",
+  "codeblock.fenSaveBlockName": "Save FEN as",
+  "codeblock.fenSaveBlockName.desc": "Code block name used when saving from the FEN editor, selected from tree mode block names",
   "settings.restartRequired.title": "Restart Required",
   "settings.restartRequired.desc": "The following settings require restarting the plugin or Obsidian to take effect.",
   "pgn.title": "PGN File View",

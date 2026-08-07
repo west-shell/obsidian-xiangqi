@@ -44,6 +44,7 @@ export interface ISettings {
   rotated?: boolean;
   treeBlockNames: string[];
   fenBlockNames: string[];
+  fenSaveBlockName: string;
   enablePGNView: boolean;
   pgnFileExtensions: string[];
   engineDepth: number;

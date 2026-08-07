@@ -54,6 +54,7 @@ export const DEFAULT_SETTINGS: ISettings = {
   rotated: false,
   treeBlockNames: ["xiangqi", "tree"],
   fenBlockNames: ["fen", "xq"],
+  fenSaveBlockName: "tree",
   enablePGNView: true,
   pgnFileExtensions: ["pgn"],
   engineDepth: 18,
@@ -349,6 +350,22 @@ export class ChessSettingTab extends PluginSettingTab {
               },
             ];
           }),
+          {
+            name: t("codeblock.fenSaveBlockName"),
+            desc: t("codeblock.fenSaveBlockName.desc"),
+            render: (setting: Setting) => {
+              setting.addDropdown((dropdown) => {
+                for (const name of settings.treeBlockNames) {
+                  dropdown.addOption(name, name);
+                }
+                dropdown.setValue(settings.fenSaveBlockName);
+                dropdown.onChange((value) => {
+                  settings.fenSaveBlockName = value;
+                  void this.plugin.saveSettings();
+                });
+              });
+            },
+          },
         ],
       },
       {

@@ -69,7 +69,10 @@ async function onSaveBTNClick(host: IGenFENHost) {
     const lines = fileContent.split("\n");
     let blockLines: string[] = lines.slice(lineStart, lineEnd + 1);
     if (blockLines.length < 2) return fileContent;
-    blockLines[0] = blockLines[0].replace(/^```\S+\b.*$/, "```tree");
+    blockLines[0] = blockLines[0].replace(
+      /^```\S+\b.*$/,
+      `\`\`\`${host.settings.fenSaveBlockName}`,
+    );
     blockLines = [blockLines[0], `[FEN "${fen}"]`, "```"];
     const newContent = [
       ...lines.slice(0, lineStart),
