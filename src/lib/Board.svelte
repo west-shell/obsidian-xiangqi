@@ -357,6 +357,7 @@
     width: calc(0.9 * var(--bh));
     position: relative;
     margin: 1.5px;
+    touch-action: none;
   }
   .xq-wrap :global(xq-board) {
     background:
