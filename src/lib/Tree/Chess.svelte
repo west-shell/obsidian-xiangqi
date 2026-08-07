@@ -2,9 +2,11 @@
   import Tree from "./Tree.svelte";
   import Board from "../Board.svelte";
   import Toolbar from "./Toolbar.svelte";
+  import PieceBTNs from "../GenFEN/PieceBTNs.svelte";
+  import GenFENToolbar from "../GenFEN/Toolbar.svelte";
   import type { ChessNode, IOptions, ISettings, NodeMap } from "../../types";
   import type { EventBus } from "../../core/event-bus";
-  import type { cg, DrawShape, Move, Square } from "../../chess";
+  import type { cg, DrawShape, Move, Piece, Square } from "../../chess";
   import { onMount, tick } from "svelte";
 
   const SHAPES_RE = /^([a-i][0-9])([a-i][0-9])?:([gryb])$/;
@@ -56,6 +58,8 @@
     currentNode: ChessNode;
     currentPath: string[];
     options: IOptions;
+    editing?: boolean;
+    selectedPiece?: Piece | null;
   }
 
   let {
@@ -66,6 +70,8 @@
     currentNode,
     currentPath,
     options,
+    editing = false,
+    selectedPiece = null,
   }: Props = $props();
 
   let lastMove: [Square, Square] | null = $derived(
@@ -139,22 +145,33 @@
   });
 </script>
 
-<div class="xq-layout">
-  <Board
-    {settings}
-    {fen}
-    {lastMove}
-    {checkColor}
-    {eventBus}
-    {rotated}
-    {variations}
-    {userShapes}
-    {engineBestMove}
-    {enginePonder}
-  />
-  <Toolbar {eventBus} {fen} {options} />
-  <Tree {nodeMap} {eventBus} {currentNode} {currentPath} {settings} />
-</div>
+{#if editing}
+  <div class="xq-layout xq-layout--genfen">
+    <Board {settings} {fen} {eventBus} {rotated} freeMode={true} />
+    <PieceBTNs {fen} {eventBus} {selectedPiece} />
+    <GenFENToolbar
+      {eventBus}
+      currentTurn={fen.split(" ")[1] === "b" ? "black" : "white"}
+    />
+  </div>
+{:else}
+  <div class="xq-layout">
+    <Board
+      {settings}
+      {fen}
+      {lastMove}
+      {checkColor}
+      {eventBus}
+      {rotated}
+      {variations}
+      {userShapes}
+      {engineBestMove}
+      {enginePonder}
+    />
+    <Toolbar {eventBus} {fen} {options} />
+    <Tree {nodeMap} {eventBus} {currentNode} {currentPath} {settings} />
+  </div>
+{/if}
 
 <style>
   .xq-layout {

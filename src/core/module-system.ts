@@ -45,20 +45,6 @@ function createModuleSystem() {
   };
 }
 
-const GenFENModules = createModuleSystem();
-
-export function registerGenFENModule(name: string, module: ChessModule) {
-  GenFENModules.register(name, module);
-}
-
-export function createGenFENModuleRegistry(host: object) {
-  return GenFENModules.createRegistry(host);
-}
-
-export function destroyGenFENModuleRegistry(host: object) {
-  GenFENModules.destroyRegistry(host);
-}
-
 const PGNViewModules = createModuleSystem();
 export function registerPGNViewModule(name: string, module: ChessModule) {
   PGNViewModules.register(name, module);

@@ -39,6 +39,8 @@ const BoardModule = {
         currentNode: host.currentNode,
         currentPath: host.currentPath,
         options: { ...host.options },
+        editing: host.editing,
+        selectedPiece: host.selectedPiece,
       });
     });
 

@@ -420,6 +420,10 @@ export class ChessSettingTab extends PluginSettingTab {
   override setControlValue(key: string, value: unknown): void | Promise<void> {
     (this.plugin.settings as unknown as Record<string, unknown>)[key] = value;
     void this.plugin.saveSettings();
+    if (key === "lang") {
+      initI18n(value as string);
+      this.update();
+    }
     if (
       [
         "theme",

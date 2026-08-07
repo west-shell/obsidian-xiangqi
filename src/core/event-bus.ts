@@ -1,8 +1,4 @@
-import {
-  registerGenFENModule,
-  registerPGNViewModule,
-  registerTreeModule,
-} from "./module-system";
+import { registerPGNViewModule, registerTreeModule } from "./module-system";
 
 type EventType = string | symbol;
 type Handler<T = unknown> = (payload?: T) => void | Promise<void>;
@@ -72,6 +68,5 @@ export class EventBus {
   }
 }
 
-registerGenFENModule("eventBus", EventBus);
 registerPGNViewModule("eventBus", EventBus);
 registerTreeModule("eventBus", EventBus);

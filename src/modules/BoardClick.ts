@@ -30,6 +30,41 @@ function tryMove(
   }
 }
 
+function handleEditClick(host: ITreeHost, clickedKey: Square): void {
+  const eventBus = host.eventBus;
+  const chess = new Chess(host.fen, { skipValidation: true });
+
+  if (!host.markedPos && !host.selectedPiece) {
+    const piece = chess.get(clickedKey);
+    if (piece) {
+      host.markedPos = clickedKey;
+      eventBus.emit("updateUI");
+    }
+  } else if (host.markedPos && !host.selectedPiece) {
+    const from = host.markedPos;
+    const piece = chess.get(from);
+    if (piece) {
+      chess.remove(clickedKey);
+      const sqPiece = chess.get(from);
+      chess.remove(from);
+      if (sqPiece) chess.put(sqPiece, clickedKey);
+      host.fen = chess.fen();
+      host.markedPos = null;
+      eventBus.emit("updateUI");
+    } else {
+      host.markedPos = null;
+      eventBus.emit("updateUI");
+    }
+  } else if (host.selectedPiece) {
+    chess.remove(clickedKey);
+    chess.put(host.selectedPiece, clickedKey);
+    host.fen = chess.fen();
+    host.selectedPiece = null;
+    host.markedPos = null;
+    eventBus.emit("updateUI");
+  }
+}
+
 const BoardClickModule = {
   init(host: ITreeHost | IPGNViewHost) {
     const eventBus = host.eventBus;
@@ -37,6 +72,10 @@ const BoardClickModule = {
 
     eventBus.on<Square>("click", (clickedKey) => {
       if (!clickedKey) return;
+      if ("editing" in host && host.editing) {
+        handleEditClick(host, clickedKey);
+        return;
+      }
       if (!host.markedPos) {
         host.markedPos = clickedKey;
         eventBus.emit("updateUI");

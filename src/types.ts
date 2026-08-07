@@ -99,16 +99,13 @@ export interface IHost {
   source: string;
 }
 
-export interface IGenFENHost extends IHost {
+export interface ITreeHost extends IHost {
   fen: string;
   selectedPiece: Piece | null;
   markedPos: Square | null;
   Chess: SvelteComponent | null;
-}
-
-export interface ITreeHost extends IGenFENHost {
+  editing: boolean;
   parser: PGNParser;
-  fen: string;
   tags: string;
   root: ChessNode;
   nodeMap: NodeMap;
