@@ -440,14 +440,20 @@ const ActionsModule = {
       depthModal.onOpen = () => {
         const { contentEl } = depthModal;
         contentEl.createEl("h3", { text: t("engine.depth") });
-        const input = contentEl.createEl("input", {
-          type: "number",
-          value: String(depthValue),
+        const slider = contentEl.createEl("input", {
+          type: "range",
         });
-        input.setAttribute("min", "1");
-        input.setAttribute("max", "30");
-        input.addEventListener("input", () => {
-          depthValue = Number.parseInt(input.value) || 18;
+        slider.setAttribute("min", "1");
+        slider.setAttribute("max", "30");
+        slider.setAttribute("step", "1");
+        slider.value = String(depthValue);
+        const label = contentEl.createDiv({
+          text: String(depthValue),
+          cls: "depth-slider-label",
+        });
+        slider.addEventListener("input", () => {
+          depthValue = Number.parseInt(slider.value) || 18;
+          label.textContent = String(depthValue);
         });
         const btnContainer = contentEl.createDiv("modal-button-container");
         const okBtn = btnContainer.createEl("button", {
@@ -457,6 +463,7 @@ const ActionsModule = {
         okBtn.addEventListener("click", () => {
           if (depthValue >= 1 && depthValue <= 30) {
             host.settings.engineDepth = depthValue;
+            void host.plugin.saveSettings();
           }
           depthModal.close();
         });
