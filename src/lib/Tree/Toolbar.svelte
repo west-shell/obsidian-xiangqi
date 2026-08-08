@@ -211,13 +211,16 @@
 
     menu.addItem((mi) => {
       mi.setTitle(t("toolbar.annotate", _lv)).setIcon("tag");
-      const sub = mi.setSubmenu();
-      annotations.forEach((ann) => {
-        sub.addItem((si) => {
-          si.setTitle(ann.title)
-            .setIcon(ann.icon)
-            .onClick(() => emitEvent(ann.event, ann.symbol));
+      mi.onClick(() => {
+        const sub = new Menu();
+        annotations.forEach((ann) => {
+          sub.addItem((si) => {
+            si.setTitle(ann.title)
+              .setIcon(ann.icon)
+              .onClick(() => emitEvent(ann.event, ann.symbol));
+          });
         });
+        sub.showAtMouseEvent(evt);
       });
     });
 
