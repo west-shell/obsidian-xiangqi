@@ -41,7 +41,7 @@ $local-block-gap: 2px;
   }
 
   &__tools {
-    max-height: 40vh;
+    min-height: 45vh;
   }
 
   // ====== col2：双栏（宽屏或横屏） ======
@@ -101,8 +101,9 @@ $local-block-gap: 2px;
 
     .xq-layout__toolbar {
       flex-direction: column;
-      flex-wrap: nowrap;
+      flex-wrap: wrap;
       align-items: center;
+      align-content: start;
     }
   }
 
@@ -173,6 +174,10 @@ $local-block-gap: 2px;
       max-height: none;
       align-self: center;
       height: auto;
+    }
+
+    .xq-layout--genfen &__toolbar {
+      align-self: stretch;
     }
 
     &__tools {
