@@ -119,7 +119,7 @@
   "save.saveEval.desc": "分析后自动将评估结果保存到棋谱中",
   "save.saveEvalPrompt": "保存评估提示",
   "save.saveEvalPrompt.desc": "保存时提示是否包含引擎评估数据",
-  "toolbar.analyze": "分析",
+  "toolbar.analyze": "单次分析",
   "toolbar.stop": "停止",
   "toolbar.analyzeBatch": "批量分析",
   "toolbar.cancelBatch": "取消批量",

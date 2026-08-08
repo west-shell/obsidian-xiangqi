@@ -36,6 +36,7 @@
   let engineBusy = $state(false);
   let batchAnalyzing = $state(false);
   let pendingBatch = false;
+  let singleAnalyzing = false;
 
   $effect(() => {
     eventBus.on("engine-busy", () => {
@@ -43,12 +44,15 @@
       if (pendingBatch) {
         batchAnalyzing = true;
         pendingBatch = false;
+      } else if (autoAnalyze) {
+        // autoAnalyze already set
       } else {
-        autoAnalyze = true;
+        singleAnalyzing = true;
       }
     });
     eventBus.on("engine-result", () => {
       engineBusy = false;
+      singleAnalyzing = false;
     });
     eventBus.on("engine-batch-done", () => {
       engineBusy = false;
@@ -58,6 +62,7 @@
       batchAnalyzing = false;
       autoAnalyze = false;
       engineBusy = false;
+      singleAnalyzing = false;
     });
     eventBus.on("engine-batch-stop", () => {
       batchAnalyzing = false;
@@ -67,7 +72,7 @@
 
   $effect(() => {
     if (autoAnalyze && fen) {
-      eventBus.emit("engine-analyze");
+      eventBus.emit("engine-analyze", true);
     }
   });
 
@@ -76,6 +81,7 @@
       autoAnalyze = false;
       eventBus.emit("engine-stop");
     } else {
+      autoAnalyze = true;
       eventBus.emit("engine-analyze");
     }
   }
@@ -85,9 +91,11 @@
       ? " engine-active engine-busy"
       : autoAnalyze
         ? " engine-active"
-        : batchAnalyzing
-          ? " engine-active engine-busy"
-          : "",
+        : singleAnalyzing
+          ? " engine-busy"
+          : batchAnalyzing
+            ? " engine-active engine-busy"
+            : "",
   );
 
   let isprotected = $derived(options?.protected || false);

@@ -70,7 +70,7 @@ function initEngine(host: object) {
     }
   });
 
-  eventBus.on("engine-analyze", async () => {
+  eventBus.on("engine-analyze", async (skipExisting?: boolean) => {
     if (!engineFileExists) {
       const missing = await engine.checkFileExists();
       if (missing.length > 0) {
@@ -94,6 +94,7 @@ function initEngine(host: object) {
     const node = h.nodeMap.get(nodeId);
     if (!node) return;
     if (node.eval && node.eval.depth >= settings.engineDepth) {
+      if (skipExisting) return;
       eventBus.emit("engine-busy");
       eventBus.emit("engine-result", {
         bestmove: node.eval.bestmove,
@@ -142,7 +143,7 @@ function initEngine(host: object) {
       analyzing = false;
       if (!stopped && pendingNodeId) {
         pendingNodeId = null;
-        eventBus.emit("engine-analyze");
+        eventBus.emit("engine-analyze", true);
       }
     }
   });
