@@ -387,8 +387,8 @@
     position: absolute;
     right: 0;
     bottom: 0;
-    width: 18px;
-    height: 18px;
+    width: 14px;
+    height: 14px;
     cursor: nwse-resize;
     z-index: 5;
 
