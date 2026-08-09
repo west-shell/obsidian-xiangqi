@@ -133,16 +133,19 @@ const ActionsModule = {
               "0-1",
               "1/2-1/2",
             ];
-            if (ALL_ANNOTATIONS.includes(data)) {
-              const idx = node.comments.indexOf(data);
-              if (idx !== -1) node.comments.splice(idx, 1);
-              else {
+            const isClickedDataAnnotation = ALL_ANNOTATIONS.includes(data);
+            if (isClickedDataAnnotation) {
+              const existingAnnotationIndex = node.comments.indexOf(data);
+              if (existingAnnotationIndex !== -1) {
+                node.comments.splice(existingAnnotationIndex, 1);
+              } else {
                 node.comments = node.comments.filter(
-                  (c: string) => !ALL_ANNOTATIONS.includes(c),
+                  (comment: string) => !ALL_ANNOTATIONS.includes(comment),
                 );
                 node.comments.push(data);
               }
             }
+            eventBus.emit("modified", null);
             break;
           }
           case "remove": {

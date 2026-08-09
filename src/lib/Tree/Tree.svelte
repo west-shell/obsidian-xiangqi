@@ -45,7 +45,8 @@
   let textareaEl: HTMLTextAreaElement | undefined = $state();
   let svgEl: SVGSVGElement | undefined = $state();
   let renderedNodes: ChessNode[] = $state([]);
-  let foldedNodes = new SvelteSet<string>();
+  // eslint-disable-next-line svelte/no-unnecessary-state-wrap
+  let foldedNodes = $state(new SvelteSet<string>());
 
   // ---- List mode ----
   let listMoves = $derived(
@@ -265,6 +266,7 @@
     } else {
       foldedNodes.add(node.id);
     }
+    foldedNodes = new SvelteSet(foldedNodes);
     updateTreeLayout();
   }
 

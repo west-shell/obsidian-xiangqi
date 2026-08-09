@@ -38,6 +38,7 @@ const BoardModule = {
         settings: { ...host.settings },
         nodeMap: new Map(host.nodeMap),
         fen: host.editing ? host.fen : (host.currentNode?.fen ?? ""),
+        eventBus: host.eventBus,
         currentNode: host.currentNode,
         currentPath: host.currentPath,
         options: { ...host.options },

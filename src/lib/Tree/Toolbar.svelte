@@ -236,6 +236,12 @@
     });
 
     menu.addItem((mi) => {
+      mi.setTitle(t("toolbar.analyze", _lv))
+        .setIcon("brain")
+        .onClick(() => eventBus.emit("engine-analyze"));
+    });
+
+    menu.addItem((mi) => {
       mi.setTitle(
         autoAnalyze ? t("toolbar.stop", _lv) : t("toolbar.autoAnalyze", _lv),
       )

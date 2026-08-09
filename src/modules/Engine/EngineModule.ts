@@ -153,6 +153,7 @@ function initEngine(host: object) {
       const missing = await engine.checkFileExists();
       if (missing.length > 0) {
         engine.openDownloadModal(missing);
+        eventBus.emit("engine-stop");
         return;
       }
       engineFileExists = true;
