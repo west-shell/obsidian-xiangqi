@@ -77,7 +77,7 @@
   let lastMove: [Square, Square] | null = $derived(
     currentNode.move ? [currentNode.move.from, currentNode.move.to] : null,
   );
-  let rotated = $state(false);
+  let rotated = $state((() => options.rotated ?? false)());
   let variations = $derived(
     currentNode.children
       .map((child) => child.move)
