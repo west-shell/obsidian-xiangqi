@@ -85,21 +85,21 @@ For the best experience on mobile devices, it's recommended to install the Full 
 ### Board Appearance
 
 - **Theme**: Auto, Light, Dark, Parchment, Green, Wood, Bamboo
-- **Cell Size**: Adjustable board cell size (15–100 px)
-- **Coordinate Labels**: Show/hide board coordinates
+- **Board Size**: Adjust board and piece display size (0–100%)
+- **Show Coordinates**: Show coordinate labels on board edges
 
 ### Game Hints
 
-- **Last Move Highlight**: Highlight the last move on the board
-- **Legal Moves**: Show legal move destinations
-- **Turn Border**: Highlight the current player's turn
-- **Move Narration**: Optional speech synthesis for moves (desktop only)
+- **Show Last Move**: Highlight the origin and destination of the previous move
+- **Show Next Moves**: Whether to show next moves
+- **Show Turn Border**: Show a highlighted border indicating whose turn it is
+- **Speech**: Read moves aloud (unavailable on mobile)
+- **Auto Jump**: Where to position the board when opening a game — Never / Always / Only for default position
 
 ### Move List
 
-- **Show Move List**: Toggle move list visibility
-- **Font Size**: Adjustable move text size (10–25 px)
-- **Auto Jump**: Jump to latest position — never / always / auto
+- **Show Move List**: Display the move list panel when opening a tree
+- **Move Text Size**: Font size for the move list
 
 ### Board Margins
 
