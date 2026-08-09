@@ -1,16 +1,15 @@
 <script lang="ts">
   import { Menu, setIcon } from "obsidian";
   import type { EventBus } from "../../core/event-bus";
-  import type { IOptions, ISettings } from "../../types";
+  import type { IOptions } from "../../types";
   import { onLangChange, t } from "../../i18n";
 
   interface Props {
     eventBus: EventBus;
     fen?: string;
     options?: IOptions;
-    settings?: ISettings;
   }
-  let { eventBus, fen = "", options = {}, settings }: Props = $props();
+  let { eventBus, fen = "", options = {} }: Props = $props();
 
   let _lv = $state(0);
   onLangChange(() => _lv++);

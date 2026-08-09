@@ -12,7 +12,7 @@ Likes, coins, and feedback are greatly appreciated.
 
 ## Overview
 
-**Obsidian Chinese Chess Plugin** is a Chinese chess rendering engine built for Obsidian. It displays chess positions and games in FEN and PGN formats, supports move exploration and variation management. Features include built-in engine analysis powered by [Pikafish](https://github.com/official-pikafish/Pikafish) (WASM), voice narration, and more.
+**Obsidian Chinese Chess Plugin** is a Chinese chess rendering engine built for Obsidian. It displays chess positions and games in FEN and PGN formats, supports move exploration and variation management. Features include code blocks with customizable names (`xiangqi`/`tree` for tree mode, `xq` for FEN editor), responsive layout, built-in engine analysis powered by [Pikafish](https://github.com/official-pikafish/Pikafish) (WASM), voice narration, and more.
 
 ## PGN File Support
 
@@ -23,7 +23,7 @@ Open `.pgn` files directly in Obsidian — the plugin registers a dedicated `.pg
 - **Comments & Annotations**: Supports branch diagram and board annotation symbols, comments
 - **Mode Toggle**: Switch between icon mode and text mode in branch diagram
 - **Jump to AI**: Package the current branch to Pikafish web version for analysis
-- **Engine Analysis**: Built-in Pikafish WASM engine with single position analysis, batch analysis, and auto-analysis
+- **Engine Analysis**: Built-in Pikafish WASM engine with single position analysis, auto-analysis, and batch analysis
 - **Quick Create**: New PGN files from the ribbon button
 - **Custom File Types**: Set specific file types as PGN files
 - **Context Menu**: Right-click PGN files to switch between PGN view and Markdown view
@@ -46,7 +46,7 @@ Open `.pgn` files directly in Obsidian — the plugin registers a dedicated `.pg
 
 ## Code Blocks
 
-Three code block types — all code block names are customizable.
+One code block type with customizable names — `xiangqi` and `tree` are default aliases for the same block, `xq` is the FEN editor block.
 
 ---
 
@@ -76,7 +76,7 @@ Three code block types — all code block names are customizable.
 
 ---
 
-`tree`: Branch diagram — display game variations as a tree graph
+`tree`: Branch diagram — display game variations as a tree graph with menu-style toolbar (Edit / Node / Analyze menus)
 
 ````markdown
 ```tree
@@ -101,7 +101,7 @@ For the best experience on mobile devices, it's recommended to install the Full 
 
 - **Theme**: Auto, Light, Dark, Parchment, Green, Wood, Bamboo
 - **Cell Size**: Adjustable board cell size (15–100 px)
-- **Layout**: Toolbar position — right / bottom
+- **Layout**: Auto — switches between single-column and double-column based on screen orientation and width
 - **Coordinate Labels**: Show/hide board coordinates
 
 ### Game Hints
@@ -125,18 +125,13 @@ For the best experience on mobile devices, it's recommended to install the Full 
 
 ### Code Block Names
 
-Customize code block aliases in **Settings > Chess > Code Block Names**:
+Customize code block aliases in **Settings > Chess > Code Block Names** (requires restart):
 
-- **List mode** (xiangqi): Default `xiangqi`, add custom aliases separated by commas
-- **FEN generation mode** (xq): Default `xq`, add custom aliases
-- **Branch diagram mode** (tree): Default `tree`, add custom aliases
-- **FEN save type**: Choose which code block type to save as (List mode / Branch diagram mode)
-
-> **Note**: Changes require restarting the plugin or Obsidian to take effect.
+- **Tree mode** (xiangqi/tree): Default `xiangqi, tree`, add custom aliases separated by commas
 
 ### Engine Analysis
 
-- **Engine Depth**: Search depth for Pikafish analysis (1–30, default 18)
+- **Engine Depth**: Adjustable slider for Pikafish analysis depth (1–30, default 18)
 - **Engine Skill Level**: Skill level for engine play (0–20, default 20)
 - **Save Eval by Default**: Automatically include eval data when saving (default off)
 - **Save Eval Prompt**: Show prompt when saving with eval data (default on)
@@ -171,11 +166,14 @@ Enable/disable PGN file view and customize file extensions:
 - **Board Markers**: Draw arrows and highlights on the board
 - **Jump to AI**: Package move list to Pikafish web version for analysis
 - **Engine Analysis**: Built-in Pikafish WASM engine with single position analysis, batch analysis, and auto-analysis
+  - **Analyze Button**: Three states — default, active (highlighted), busy (pulsing animation)
+  - **Auto-analysis**: Skips nodes already analyzed at current depth
   - **Best Move Arrow**: Green arrow shows the engine's best move; yellow arrow shows the ponder move
   - **Eval Bar**: Left sidebar bar showing evaluation (green = red advantage, red = black advantage)
   - **Eval Trend Chart**: Vertical polyline in the slider background showing evaluation across moves
   - **Eval Color Bar**: Color bar on tree nodes indicating evaluation (green = red advantage, red = black advantage, gray = equal)
   - **Eval Persistence**: Engine evaluations saved as `%e:` comments in PGN
+- **Responsive Layout**: Automatically switches between single-column (portrait/narrow) and double-column (landscape/wide) layout
 - **Mobile Friendly**: Adjust board size for small screens
 
 ## Usage
@@ -206,7 +204,9 @@ Enable/disable PGN file view and customize file extensions:
 4. Switch between icon mode and text mode for node labels
 5. Click the fold button (triangle) on a node with multiple children to collapse/expand its variations
 6. Use engine analysis:
-   - Click **Analyze** for single position analysis, **Batch** to analyze all nodes, or enable auto-analysis
+   - Analyze menu: Set depth, Analyze Once, Auto-analyze (toggle), Batch analyze
+   - Analyze button: default → active (highlighted when auto-analyze on) → busy (pulsing when engine running)
+   - Auto-analysis skips nodes already analyzed at current depth
    - Green arrow = best move, yellow arrow = ponder move
    - Eval bar on the left shows position evaluation
    - Eval color bars on nodes and eval trend chart on the slider show evaluation across the game
