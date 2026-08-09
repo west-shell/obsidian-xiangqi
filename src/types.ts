@@ -105,6 +105,7 @@ export interface ITreeHost extends IHost {
   markedPos: Square | null;
   Chess: SvelteComponent | null;
   editing: boolean;
+  isFenMode: boolean;
   parser: PGNParser;
   tags: string;
   root: ChessNode;

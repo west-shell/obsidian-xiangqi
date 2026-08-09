@@ -58,6 +58,7 @@
   "genfen.clear": "Clear",
   "genfen.fill": "Fill",
   "genfen.save": "Save",
+  "genfen.back": "Cancel",
   "annotation.b+": "Disadvantage",
   "annotation.eq": "Equal",
   "annotation.key": "Key move",

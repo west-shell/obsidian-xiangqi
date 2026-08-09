@@ -18,11 +18,13 @@ const BoardModule = {
         props: {
           nodeMap: host.nodeMap,
           settings: host.settings,
-          fen: host.currentNode.fen,
+          fen: host.editing ? host.fen : (host.currentNode?.fen ?? ""),
           eventBus: host.eventBus,
           currentNode: host.currentNode,
           currentPath: host.currentPath,
           options: host.options || {},
+          editing: host.editing,
+          isFenMode: host.isFenMode,
         },
       });
     });
@@ -35,12 +37,13 @@ const BoardModule = {
       host.Chess?.$set?.({
         settings: { ...host.settings },
         nodeMap: new Map(host.nodeMap),
-        fen: host.currentNode.fen,
+        fen: host.editing ? host.fen : (host.currentNode?.fen ?? ""),
         currentNode: host.currentNode,
         currentPath: host.currentPath,
         options: { ...host.options },
         editing: host.editing,
         selectedPiece: host.selectedPiece,
+        isFenMode: host.isFenMode,
       });
     });
 
@@ -50,6 +53,37 @@ const BoardModule = {
     });
 
     eventBus.on("save", async () => {
+      if (host.isFenMode) {
+        const view =
+          host.plugin.app.workspace.getActiveViewOfType(MarkdownView);
+        if (!view?.file) return;
+        const fen = host.fen;
+        const saveBlockName = host.settings.fenSaveBlockName;
+        const newContent = `[FEN "${fen}"]`;
+
+        void host.plugin.app.vault.process(view.file, (fileContent) => {
+          const section = host.ctx.getSectionInfo(host.containerEl);
+          if (!section) return fileContent;
+
+          const { lineStart, lineEnd } = section;
+          const lines = fileContent.split("\n");
+          const firstLine = lines[lineStart];
+          const newFirstLine = firstLine.replace(
+            /^```\S+/,
+            "```" + saveBlockName,
+          );
+          const updated = [newFirstLine, newContent, lines[lineEnd]];
+          const newLines = [
+            ...lines.slice(0, lineStart),
+            ...updated,
+            ...lines.slice(lineEnd + 1),
+          ];
+          return newLines.join("\n");
+        });
+        new Notice(t("notice.fenSaved"));
+        return;
+      }
+
       const includeEval = await promptSaveEval(host);
       if (includeEval === null) return;
 

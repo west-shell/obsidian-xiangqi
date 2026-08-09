@@ -60,6 +60,7 @@
     options: IOptions;
     editing?: boolean;
     selectedPiece?: Piece | null;
+    isFenMode?: boolean;
   }
 
   let {
@@ -72,6 +73,7 @@
     options,
     editing = false,
     selectedPiece = null,
+    isFenMode = false,
   }: Props = $props();
 
   let lastMove: [Square, Square] | null = $derived(
@@ -152,6 +154,7 @@
     <GenFENToolbar
       {eventBus}
       currentTurn={fen.split(" ")[1] === "b" ? "black" : "white"}
+      {isFenMode}
     />
   </div>
 {:else}

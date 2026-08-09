@@ -42,6 +42,7 @@ const SourceModule = {
 
       switch (renderChild) {
         case "tree": {
+          host.isFenMode = false;
           host.options = options;
           const parser = new PGNParser(cleanSource);
           host.parser = parser;
@@ -67,6 +68,7 @@ const SourceModule = {
         }
 
         case "fen": {
+          host.isFenMode = true;
           const parsed = parseSource(host.source);
           host.fen = parsed.fen;
           host.editing = true;

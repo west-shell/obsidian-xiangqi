@@ -339,6 +339,22 @@ const ActionsModule = {
           }
           case "save": {
             if (host.editing) {
+              if (host.isFenMode) {
+                const fen = host.fen;
+                host.root.children = [];
+                host.root.comments = [];
+                host.root.fen = fen;
+                host.nodeMap.clear();
+                host.nodeMap.set(host.root.id, host.root);
+                host.currentNode = host.root;
+                host.fen = fen;
+                host.tags = updateFenTag(host.tags, fen);
+                host.selectedPiece = null;
+                host.markedPos = null;
+                eventBus.emit("updateUI");
+                eventBus.emit("save");
+                break;
+              }
               const fen = host.fen;
               host.root.children = [];
               host.root.comments = [];
@@ -406,6 +422,7 @@ const ActionsModule = {
     });
 
     eventBus.on("exit-edit", () => {
+      if (host.isFenMode) return;
       host.editing = false;
       host.selectedPiece = null;
       host.markedPos = null;
@@ -423,10 +440,12 @@ const ActionsModule = {
       host.currentNode = host.root;
       host.fen = fen;
       host.tags = updateFenTag(host.tags, fen);
-      host.editing = false;
       host.selectedPiece = null;
       host.markedPos = null;
-      eventBus.emit("updateMainPath");
+      if (!host.isFenMode) {
+        host.editing = false;
+        eventBus.emit("updateMainPath");
+      }
       eventBus.emit("updateUI");
       eventBus.emit("save");
     });

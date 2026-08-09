@@ -5,8 +5,9 @@
   interface Props {
     eventBus: EventBus;
     currentTurn: string;
+    isFenMode?: boolean;
   }
-  let { eventBus, currentTurn }: Props = $props();
+  let { eventBus, currentTurn, isFenMode = false }: Props = $props();
 
   let _lv = $state(0);
   onLangChange(() => _lv++);
@@ -16,6 +17,16 @@
     { title: t("genfen.clear", _lv), text: "空", action: "empty" },
     { title: t("genfen.fill", _lv), text: "满", action: "full" },
     { title: t("genfen.save", _lv), text: "存", action: "save" },
+    ...(!isFenMode
+      ? [
+          {
+            title: t("genfen.back", _lv),
+            text: "退",
+            action: "exit-edit" as string,
+            color: false as boolean | undefined,
+          },
+        ]
+      : []),
   ]);
 </script>
 
@@ -24,7 +35,13 @@
     <button
       {title}
       class={`toolbar-btn ${color ? currentTurn : ""}`}
-      onclick={() => eventBus.emit("btn-click", action)}
+      onclick={() => {
+        if (action === "exit-edit") {
+          eventBus.emit("exit-edit");
+        } else {
+          eventBus.emit("btn-click", action);
+        }
+      }}
     >
       {text}
     </button>
