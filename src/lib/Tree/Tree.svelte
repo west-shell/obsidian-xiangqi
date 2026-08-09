@@ -793,7 +793,9 @@
                     : node.side === "black"
                       ? "var(--piece-black)"
                       : "green"}
-                  stroke="var(--xq-board-line)"
+                  stroke={node.id === currentNode?.id
+                    ? "var(--interactive-accent)"
+                    : "var(--xq-board-line)"}
                 />
                 <g
                   transform="translate(-4, -4) scale(0.333)"
@@ -821,7 +823,9 @@
                     : node.side === "black"
                       ? "var(--piece-black)"
                       : "green"}
-                  stroke="var(--xq-board-line)"
+                  stroke={node.id === currentNode?.id
+                    ? "var(--interactive-accent)"
+                    : "var(--xq-board-line)"}
                 />
                 {#if nodeMode === 0}
                   <text
