@@ -38,10 +38,14 @@ const TreeViewModule = {
         props: {
           nodeMap: host.nodeMap,
           settings: host.settings,
-          fen: host.currentNode.fen,
+          fen: host.editing ? host.fen : (host.currentNode?.fen ?? ""),
           eventBus: host.eventBus,
           currentNode: host.currentNode,
           currentPath: host.currentPath,
+          options: host.options || {},
+          editing: host.editing,
+          selectedPiece: host.selectedPiece,
+          isFenMode: host.isFenMode,
         },
       });
     });
@@ -50,9 +54,14 @@ const TreeViewModule = {
       host.Chess?.$set?.({
         settings: { ...host.settings },
         nodeMap: new Map(host.nodeMap),
-        fen: host.currentNode?.fen ?? "",
+        fen: host.editing ? host.fen : (host.currentNode?.fen ?? ""),
+        eventBus: host.eventBus,
         currentNode: host.currentNode,
         currentPath: host.currentPath,
+        options: { ...host.options },
+        editing: host.editing,
+        selectedPiece: host.selectedPiece,
+        isFenMode: host.isFenMode,
       });
     });
 
@@ -62,10 +71,10 @@ const TreeViewModule = {
         case "never":
           break;
         case "always":
-          eventBus.emit("btn-click", "toEnd");
+          eventBus.emit("btn-click", { name: "toEnd" });
           break;
         case "auto":
-          if (!host.haveFEN) eventBus.emit("btn-click", "toEnd");
+          if (!host.haveFEN) eventBus.emit("btn-click", { name: "toEnd" });
           break;
       }
     });

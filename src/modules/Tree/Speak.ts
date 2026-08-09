@@ -16,7 +16,7 @@ function speak(move: Move) {
 
   if (!window.speechSynthesis) return;
   const utter = new SpeechSynthesisUtterance(finalSpeech);
-  utter.lang = "en-US";
+  utter.lang = "zh-CN";
   window.speechSynthesis.cancel();
   window.speechSynthesis.speak(utter);
 }

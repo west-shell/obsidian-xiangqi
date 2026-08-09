@@ -39,7 +39,7 @@
         if (action === "exit-edit") {
           eventBus.emit("exit-edit");
         } else {
-          eventBus.emit("btn-click", action);
+          eventBus.emit("btn-click", { name: action });
         }
       }}
     >
