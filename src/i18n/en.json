@@ -135,5 +135,6 @@
   "engine.downloadBtn": "Download",
   "engine.downloadCancel": "Cancel",
   "engine.downloadFailed": "Download failed, you can manually download files to the plugin directory",
+  "engine.downloadSource": "Download source",
   "engine.retry": "Retry"
 }

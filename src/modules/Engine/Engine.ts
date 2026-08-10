@@ -3,9 +3,30 @@ import { DownloadModal } from "../../utils/confirmModal";
 import { requestUrl } from "obsidian";
 import { t } from "../../i18n";
 
-const BASE_URL =
+const BASE_GITHUB =
   "https://raw.githubusercontent.com/west-shell/obsidian-xiangqi/main/assets/pikafish";
+const BASE_GITEE =
+  "https://gitee.com/wesnell/obsidian-xiangqi/raw/main/assets/pikafish";
 const ENGINE_FILES = ["pikafish.js", "pikafish.wasm", "pikafish.data"] as const;
+
+interface DownloadSource {
+  key: string;
+  label: string;
+  baseUrl: string;
+}
+
+const DOWNLOAD_SOURCES: DownloadSource[] = [
+  {
+    key: "github",
+    label: "GitHub",
+    baseUrl: BASE_GITHUB,
+  },
+  {
+    key: "gitee",
+    label: "Gitee",
+    baseUrl: BASE_GITEE,
+  },
+];
 
 export interface EngineResult {
   bestmove: string;
@@ -58,7 +79,11 @@ export class XiangqiEngine {
 
     const files = missingFiles.map((f) => ({
       name: f,
-      url: `${BASE_URL}/${f}`,
+      sources: DOWNLOAD_SOURCES.map((s) => ({
+        key: s.key,
+        label: s.label,
+        url: `${s.baseUrl}/${f}`,
+      })),
     }));
     const modal = new DownloadModal(
       plugin.app,
@@ -66,13 +91,18 @@ export class XiangqiEngine {
       files,
       t("engine.downloadBtn", 0),
       t("engine.downloadCancel", 0),
+      t("engine.downloadSource", 0),
     );
     modal.open();
     const doDownload = async (confirmed: boolean) => {
       if (!confirmed) return;
-      for (let i = 0; i < ENGINE_FILES.length; i++) {
-        const file = ENGINE_FILES[i];
-        const url = `${BASE_URL}/${file}`;
+      const sourceKey = modal.getSelectedSource();
+      const source =
+        DOWNLOAD_SOURCES.find((s) => s.key === sourceKey) ??
+        DOWNLOAD_SOURCES[0];
+      for (let i = 0; i < missingFiles.length; i++) {
+        const file = missingFiles[i];
+        const url = `${source.baseUrl}/${file}`;
         const destPath = `${baseDir}/${file}`;
         modal.showProgress(i);
         try {
@@ -84,12 +114,8 @@ export class XiangqiEngine {
             await adapter.writeBinary(destPath, buffer.buffer);
           }
           modal.done(i);
-        } catch (err) {
-          const msg =
-            err instanceof TypeError
-              ? t("engine.downloadFailed", 0)
-              : String(err);
-          modal.error(i, msg);
+        } catch {
+          modal.error(i, t("engine.downloadFailed", 0));
           return;
         }
       }

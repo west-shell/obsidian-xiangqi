@@ -137,29 +137,41 @@ export class ConfirmModal extends Modal {
   }
 }
 
+export interface DownloadFileSource {
+  name: string;
+  sources: { key: string; label: string; url: string }[];
+}
+
 export class DownloadModal extends Modal {
   private resolvePromise: (value: boolean) => void;
   public promise: Promise<boolean>;
   private readonly fileRows: {
     name: string;
-    url: string;
     status: HTMLSpanElement;
     nameSpan: HTMLSpanElement;
   }[] = [];
   private downloadBtn!: HTMLButtonElement;
+  private readonly selectedSourceKey: string;
+  private sourceSelect!: HTMLSelectElement;
 
   constructor(
     app: App,
     private readonly title: string,
-    private readonly files: { name: string; url: string }[],
+    private readonly files: DownloadFileSource[],
     private readonly confirmText: string,
     private readonly cancelText: string,
+    private readonly sourceLabel: string,
   ) {
     super(app);
     this.resolvePromise = () => {};
     this.promise = new Promise((resolve) => {
       this.resolvePromise = resolve;
     });
+    this.selectedSourceKey = files[0]?.sources[0]?.key ?? "github";
+  }
+
+  getSelectedSource(): string {
+    return this.sourceSelect?.value ?? this.selectedSourceKey;
   }
 
   onOpen() {
@@ -167,26 +179,62 @@ export class DownloadModal extends Modal {
 
     contentEl.createEl("p", { text: this.title });
 
+    const allSources = this.files[0]?.sources ?? [];
+    if (allSources.length > 0) {
+      const sourceRow = contentEl.createDiv({
+        cls: "modal-download-source",
+      });
+      sourceRow.createSpan({ text: this.sourceLabel });
+      this.sourceSelect = sourceRow.createEl("select");
+      for (const src of allSources) {
+        this.sourceSelect.createEl("option", {
+          text: src.label,
+          attr: { value: src.key },
+        });
+      }
+    }
+
     for (const file of this.files) {
       const row = contentEl.createEl("p");
 
       const nameSpan = row.createSpan({ text: file.name });
       row.appendText("（");
-      const link = row.createEl("a", {
-        text: "GitHub",
-        attr: { href: file.url, target: "_blank" },
+
+      const updateLinks = () => {
+        const selectedKey = this.sourceSelect?.value ?? this.selectedSourceKey;
+        const currentSrc = file.sources.find((s) => s.key === selectedKey);
+        const linkContainer = row.querySelector(".download-link-container");
+        if (linkContainer) {
+          const link = linkContainer.querySelector("a");
+          if (link && currentSrc) {
+            link.textContent = currentSrc.label;
+            link.setAttribute("href", currentSrc.url);
+          }
+        }
+      };
+
+      const linkWrap = row.createSpan({ cls: "download-link-container" });
+      const firstSrc = file.sources[0];
+      const link = linkWrap.createEl("a", {
+        text: firstSrc?.label ?? "Download",
+        attr: { href: firstSrc?.url ?? "#", target: "_blank" },
       });
       link.addEventListener("click", (e) => {
         e.preventDefault();
-        window.open(file.url, "_blank");
+        const href = link.getAttribute("href");
+        if (href && href !== "#") window.open(href, "_blank");
       });
+
+      if (this.sourceSelect) {
+        this.sourceSelect.addEventListener("change", updateLinks);
+      }
+
       row.appendText("）");
 
       const status = row.createSpan({ cls: "download-status", text: "" });
 
       this.fileRows.push({
         name: file.name,
-        url: file.url,
         status,
         nameSpan,
       });
