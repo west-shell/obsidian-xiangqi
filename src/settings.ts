@@ -59,6 +59,8 @@ export const DEFAULT_SETTINGS: ISettings = {
   pgnFileExtensions: ["pgn"],
   engineDepth: 18,
   engineSkillLevel: 20,
+  showEngineBestMove: true,
+  showEnginePonder: true,
   saveEvalByDefault: false,
   saveEvalPrompt: true,
 };
@@ -239,6 +241,16 @@ export class ChessSettingTab extends PluginSettingTab {
               max: 20,
               step: 1,
             },
+          },
+          {
+            name: t("engine.showBestMove"),
+            desc: t("engine.showBestMove.desc"),
+            control: { type: "toggle", key: "showEngineBestMove" },
+          },
+          {
+            name: t("engine.showPonder"),
+            desc: t("engine.showPonder.desc"),
+            control: { type: "toggle", key: "showEnginePonder" },
           },
         ],
       },
@@ -424,6 +436,8 @@ export class ChessSettingTab extends PluginSettingTab {
         "fontSize",
         "boardMarginTop",
         "boardMarginBottom",
+        "showEngineBestMove",
+        "showEnginePonder",
       ].includes(key)
     ) {
       this.plugin.refresh();
@@ -594,6 +608,26 @@ export class ChessSettingTab extends PluginSettingTab {
         void this.plugin.saveSettings();
       },
     );
+
+    new Setting(containerEl)
+      .setName(t("engine.showBestMove"))
+      .setDesc(t("engine.showBestMove.desc"))
+      .addToggle((toggle) =>
+        toggle.setValue(settings.showEngineBestMove).onChange((value) => {
+          settings.showEngineBestMove = value;
+          this.plugin.refresh();
+        }),
+      );
+
+    new Setting(containerEl)
+      .setName(t("engine.showPonder"))
+      .setDesc(t("engine.showPonder.desc"))
+      .addToggle((toggle) =>
+        toggle.setValue(settings.showEnginePonder).onChange((value) => {
+          settings.showEnginePonder = value;
+          this.plugin.refresh();
+        }),
+      );
 
     new Setting(containerEl).setName(t("save.title")).setHeading();
 

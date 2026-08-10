@@ -106,10 +106,10 @@
   }
 
   let engineShapes: DrawShape[] = $derived([
-    ...(engineBestMove
+    ...(settings.showEngineBestMove && engineBestMove
       ? [{ orig: engineBestMove.from, dest: engineBestMove.to, brush: "green" }]
       : []),
-    ...(enginePonder
+    ...(settings.showEnginePonder && enginePonder
       ? [{ orig: enginePonder.from, dest: enginePonder.to, brush: "yellow" }]
       : []),
   ]);

@@ -49,6 +49,8 @@ export interface ISettings {
   pgnFileExtensions: string[];
   engineDepth: number;
   engineSkillLevel: number;
+  showEngineBestMove: boolean;
+  showEnginePonder: boolean;
   saveEvalByDefault: boolean;
   saveEvalPrompt: boolean;
 }
