@@ -19,6 +19,7 @@ function initEngine(host: object) {
   let batchQueue: string[] = [];
   let pendingNodeId: string | null = null;
   let stopped = false;
+  let lastNodeId: string | null = null;
   let lastResult: {
     bestmove: string;
     ponder?: string;
@@ -125,6 +126,19 @@ function initEngine(host: object) {
 
     if (batchAnalyzing) {
       needRebuildBatch = true;
+    }
+  });
+
+  eventBus.on("updateUI", () => {
+    if (!autoAnalyze) return;
+    const nodeId = h.currentNode.id;
+    if (nodeId === lastNodeId) return;
+    lastNodeId = nodeId;
+    if (analyzing) {
+      pendingNodeId = nodeId;
+      engine.stop();
+    } else {
+      eventBus.emit("engine-analyze", true);
     }
   });
 
