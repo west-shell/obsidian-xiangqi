@@ -6,10 +6,9 @@
 
   interface Props {
     eventBus: EventBus;
-    fen?: string;
     options?: IOptions;
   }
-  let { eventBus, fen = "", options = {} }: Props = $props();
+  let { eventBus, options = {} }: Props = $props();
 
   let _lv = $state(0);
   onLangChange(() => _lv++);
@@ -34,63 +33,43 @@
   let autoAnalyze = $state(false);
   let engineBusy = $state(false);
   let batchAnalyzing = $state(false);
-  let pendingBatch = false;
-  let singleAnalyzing = false;
 
   $effect(() => {
     eventBus.on("engine-busy", () => {
       engineBusy = true;
-      if (pendingBatch) {
-        batchAnalyzing = true;
-        pendingBatch = false;
-      } else if (autoAnalyze) {
-        // autoAnalyze already set
-      } else {
-        singleAnalyzing = true;
-      }
     });
     eventBus.on("engine-result", () => {
       engineBusy = false;
-      singleAnalyzing = false;
+    });
+    eventBus.on("engine-batch-start", () => {
+      batchAnalyzing = true;
     });
     eventBus.on("engine-batch-done", () => {
       engineBusy = false;
       batchAnalyzing = false;
     });
+    eventBus.on("engine-auto-on", () => {
+      autoAnalyze = true;
+    });
+    eventBus.on("engine-auto-off", () => {
+      autoAnalyze = false;
+    });
     eventBus.on("engine-stop", () => {
-      batchAnalyzing = false;
       autoAnalyze = false;
       engineBusy = false;
-      singleAnalyzing = false;
+      batchAnalyzing = false;
     });
     eventBus.on("engine-batch-stop", () => {
       batchAnalyzing = false;
-      engineBusy = false;
     });
   });
-
-  $effect(() => {
-    if (autoAnalyze && fen) {
-      eventBus.emit("engine-analyze", true);
-    }
-  });
-
-  function toggleAutoAnalyze() {
-    if (autoAnalyze) {
-      autoAnalyze = false;
-      eventBus.emit("engine-stop");
-    } else {
-      autoAnalyze = true;
-      eventBus.emit("engine-analyze");
-    }
-  }
 
   let analyzeBtnClass = $derived(
     autoAnalyze && engineBusy
       ? " engine-active engine-busy"
       : autoAnalyze
         ? " engine-active"
-        : singleAnalyzing
+        : engineBusy
           ? " engine-busy"
           : batchAnalyzing
             ? " engine-active engine-busy"
@@ -238,7 +217,7 @@
     menu.addItem((mi) => {
       mi.setTitle(t("toolbar.analyze", _lv))
         .setIcon("brain")
-        .onClick(() => eventBus.emit("engine-analyze"));
+        .onClick(() => eventBus.emit("analyze-btn-click", "once"));
     });
 
     menu.addItem((mi) => {
@@ -246,7 +225,7 @@
         autoAnalyze ? t("toolbar.stop", _lv) : t("toolbar.autoAnalyze", _lv),
       )
         .setIcon(autoAnalyze ? "circle-stop" : "play")
-        .onClick(() => toggleAutoAnalyze());
+        .onClick(() => eventBus.emit("analyze-btn-click", "auto"));
     });
 
     menu.addItem((mi) => {
@@ -260,8 +239,7 @@
           if (batchAnalyzing) {
             eventBus.emit("engine-batch-stop");
           } else {
-            pendingBatch = true;
-            eventBus.emit("engine-analyze-batch");
+            eventBus.emit("analyze-btn-click", "batch");
           }
         });
     });

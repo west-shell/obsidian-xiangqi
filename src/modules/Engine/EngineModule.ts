@@ -13,7 +13,10 @@ function initEngine(host: object) {
 
   let analyzing = false;
   let batchCancelled = false;
-  let engineFileExists = false;
+  let autoAnalyze = false;
+  let batchAnalyzing = false;
+  let needRebuildBatch = false;
+  let batchQueue: string[] = [];
   let pendingNodeId: string | null = null;
   let stopped = false;
   let lastResult: {
@@ -47,6 +50,47 @@ function initEngine(host: object) {
     return s;
   }
 
+  function dispatchMode(mode: string) {
+    if (mode === "once") {
+      eventBus.emit("engine-analyze");
+    } else if (mode === "auto") {
+      eventBus.emit("engine-auto-toggle");
+    } else if (mode === "batch") {
+      eventBus.emit("engine-analyze-batch");
+    }
+  }
+
+  eventBus.on<string>("analyze-btn-click", async (mode) => {
+    if (engine.isReady()) {
+      dispatchMode(mode);
+      return;
+    }
+    const missing = await engine.checkFileExists();
+    if (missing.length > 0) {
+      engine.openDownloadModal(missing);
+      return;
+    }
+    try {
+      await engine.ensureReady();
+    } catch (e) {
+      console.error("[Engine] ensureReady failed:", e);
+      return;
+    }
+    dispatchMode(mode);
+  });
+
+  eventBus.on("engine-auto-toggle", () => {
+    if (autoAnalyze) {
+      autoAnalyze = false;
+      eventBus.emit("engine-auto-off");
+      eventBus.emit("engine-stop");
+    } else {
+      autoAnalyze = true;
+      eventBus.emit("engine-auto-on");
+      eventBus.emit("engine-analyze", true);
+    }
+  });
+
   eventBus.on<Move>("runmove", (move) => {
     if (!move || !lastResult || lastResult.bestmove === "(none)") return;
     const moveUci = move.from + move.to;
@@ -68,17 +112,23 @@ function initEngine(host: object) {
       lastResult = null;
       eventBus.emit("engine-result", null);
     }
+
+    if (autoAnalyze) {
+      const nodeId = h.currentNode.id;
+      if (analyzing) {
+        pendingNodeId = nodeId;
+        engine.stop();
+      } else {
+        eventBus.emit("engine-analyze", true);
+      }
+    }
+
+    if (batchAnalyzing) {
+      needRebuildBatch = true;
+    }
   });
 
   eventBus.on("engine-analyze", async (skipExisting?: boolean) => {
-    if (!engineFileExists) {
-      const missing = await engine.checkFileExists();
-      if (missing.length > 0) {
-        engine.openDownloadModal(missing);
-        return;
-      }
-      engineFileExists = true;
-    }
     try {
       await engine.ensureReady();
     } catch (e) {
@@ -149,15 +199,6 @@ function initEngine(host: object) {
   });
 
   eventBus.on("engine-analyze-batch", async () => {
-    if (!engineFileExists) {
-      const missing = await engine.checkFileExists();
-      if (missing.length > 0) {
-        engine.openDownloadModal(missing);
-        eventBus.emit("engine-stop");
-        return;
-      }
-      engineFileExists = true;
-    }
     try {
       await engine.ensureReady();
     } catch (e) {
@@ -168,27 +209,36 @@ function initEngine(host: object) {
     analyzing = true;
     stopped = false;
     batchCancelled = false;
+    batchAnalyzing = true;
+    needRebuildBatch = false;
     applyOptions();
     eventBus.emit("engine-busy");
+    eventBus.emit("engine-batch-start");
     try {
-      const pathSet = new Set<string>(h.currentPath);
-      const pathQueue: string[] = [];
-      const restQueue: string[] = [];
       const nodeMap = h.nodeMap;
-      for (const [, node] of nodeMap) {
-        if (!node.eval || node.eval.depth < settings.engineDepth) {
-          if (pathSet.has(node.id)) {
-            pathQueue.push(node.id);
-          } else {
-            restQueue.push(node.id);
+      const buildQueue = (): string[] => {
+        const pathSet = new Set<string>(h.currentPath);
+        const pathQueue: string[] = [];
+        const restQueue: string[] = [];
+        for (const [, node] of nodeMap) {
+          if (!node.eval || node.eval.depth < settings.engineDepth) {
+            if (pathSet.has(node.id)) {
+              pathQueue.push(node.id);
+            } else {
+              restQueue.push(node.id);
+            }
           }
         }
-      }
-      const queue = pathQueue.concat(restQueue);
-      for (const nodeId of queue) {
+        return pathQueue.concat(restQueue);
+      };
+      batchQueue = buildQueue();
+
+      for (let i = 0; i < batchQueue.length; i++) {
         if (batchCancelled || stopped) break;
+        const nodeId = batchQueue[i];
         const node = nodeMap.get(nodeId);
         if (!node) continue;
+        if (node.eval && node.eval.depth >= settings.engineDepth) continue;
         try {
           const result = await engine.analyze(node.fen, settings.engineDepth);
           if (stopped || batchCancelled) break;
@@ -217,6 +267,11 @@ function initEngine(host: object) {
         } catch {
           break;
         }
+        if (needRebuildBatch && !batchCancelled && !stopped) {
+          needRebuildBatch = false;
+          batchQueue = buildQueue();
+          i = -1;
+        }
       }
       if (stopped) return;
       const currentNodeEval = h.currentNode?.eval;
@@ -243,6 +298,7 @@ function initEngine(host: object) {
       return;
     } finally {
       analyzing = false;
+      batchAnalyzing = false;
     }
   });
 
@@ -253,6 +309,14 @@ function initEngine(host: object) {
     analyzing = false;
     pendingNodeId = null;
     lastResult = null;
+    if (autoAnalyze) {
+      autoAnalyze = false;
+      eventBus.emit("engine-auto-off");
+    }
+    if (batchAnalyzing) {
+      batchAnalyzing = false;
+      eventBus.emit("engine-batch-done");
+    }
   });
 
   eventBus.on("engine-batch-stop", () => {
