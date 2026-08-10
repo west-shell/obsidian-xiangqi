@@ -5,26 +5,26 @@ import { t } from "../../i18n";
 
 const BASE_GITHUB =
   "https://raw.githubusercontent.com/west-shell/obsidian-xiangqi/main/assets/pikafish";
-const BASE_GITEE =
-  "https://gitee.com/wesnell/obsidian-xiangqi/raw/main/assets/pikafish";
+const BASE_GITEE_RELEASE =
+  "https://gitee.com/wesnell/obsidian-xiangqi/releases/download/pikafish";
 const ENGINE_FILES = ["pikafish.js", "pikafish.wasm", "pikafish.data"] as const;
 
 interface DownloadSource {
   key: string;
   label: string;
-  baseUrl: string;
+  getUrl: (file: string) => string;
 }
 
 const DOWNLOAD_SOURCES: DownloadSource[] = [
   {
     key: "github",
     label: "GitHub",
-    baseUrl: BASE_GITHUB,
+    getUrl: (file) => `${BASE_GITHUB}/${file}`,
   },
   {
     key: "gitee",
     label: "Gitee",
-    baseUrl: BASE_GITEE,
+    getUrl: (file) => `${BASE_GITEE_RELEASE}/${file}`,
   },
 ];
 
@@ -82,7 +82,7 @@ export class XiangqiEngine {
       sources: DOWNLOAD_SOURCES.map((s) => ({
         key: s.key,
         label: s.label,
-        url: `${s.baseUrl}/${f}`,
+        url: s.getUrl(f),
       })),
     }));
     const modal = new DownloadModal(
@@ -102,7 +102,7 @@ export class XiangqiEngine {
         void (async () => {
           for (let i = 0; i < missingFiles.length; i++) {
             const file = missingFiles[i];
-            const url = `${source.baseUrl}/${file}`;
+            const url = source.getUrl(file);
             const destPath = `${baseDir}/${file}`;
             modal.showProgress(i);
             try {
