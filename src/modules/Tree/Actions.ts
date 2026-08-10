@@ -456,27 +456,70 @@ const ActionsModule = {
     host.stringifyPGN = (root: ChessNode, includeEval = true) =>
       stringifyPGN(root, includeEval);
 
-    eventBus.on("set-depth", () => {
-      const depthModal = new Modal(host.plugin.app);
+    eventBus.on("open-engine-settings", () => {
+      const engineModal = new Modal(host.plugin.app);
       let depthValue = host.settings.engineDepth;
-      depthModal.onOpen = () => {
-        const { contentEl } = depthModal;
-        contentEl.createEl("h3", { text: t("engine.depth") });
-        const slider = contentEl.createEl("input", {
-          type: "range",
-        });
-        slider.setAttribute("min", "1");
-        slider.setAttribute("max", "30");
-        slider.setAttribute("step", "1");
-        slider.value = String(depthValue);
-        const label = contentEl.createDiv({
+      let skillValue = host.settings.engineSkillLevel;
+      let showBestMove = host.settings.showEngineBestMove;
+      let showPonder = host.settings.showEnginePonder;
+
+      engineModal.onOpen = () => {
+        const { contentEl } = engineModal;
+        contentEl.createEl("h3", { text: t("engine.title") });
+
+        // Depth
+        contentEl.createEl("label", { text: t("engine.depth") });
+        const depthSlider = contentEl.createEl("input", { type: "range" });
+        depthSlider.setAttribute("min", "1");
+        depthSlider.setAttribute("max", "30");
+        depthSlider.setAttribute("step", "1");
+        depthSlider.value = String(depthValue);
+        const depthLabel = contentEl.createDiv({
           text: String(depthValue),
           cls: "depth-slider-label",
         });
-        slider.addEventListener("input", () => {
-          depthValue = Number.parseInt(slider.value) || 18;
-          label.textContent = String(depthValue);
+        depthSlider.addEventListener("input", () => {
+          depthValue = Number.parseInt(depthSlider.value) || 18;
+          depthLabel.textContent = String(depthValue);
         });
+
+        // Skill Level
+        contentEl.createEl("label", { text: t("engine.skillLevel") });
+        const skillSlider = contentEl.createEl("input", { type: "range" });
+        skillSlider.setAttribute("min", "0");
+        skillSlider.setAttribute("max", "20");
+        skillSlider.setAttribute("step", "1");
+        skillSlider.value = String(skillValue);
+        const skillLabel = contentEl.createDiv({
+          text: String(skillValue),
+          cls: "depth-slider-label",
+        });
+        skillSlider.addEventListener("input", () => {
+          skillValue = Number.parseInt(skillSlider.value) || 20;
+          skillLabel.textContent = String(skillValue);
+        });
+
+        // Show best move
+        const bmContainer = contentEl.createDiv("engine-setting-toggle");
+        const bmToggle = bmContainer.createEl("input", { type: "checkbox" });
+        bmToggle.checked = showBestMove;
+        bmContainer.createEl("label", { text: t("engine.showBestMove") });
+        bmToggle.addEventListener("change", () => {
+          showBestMove = bmToggle.checked;
+        });
+
+        // Show ponder
+        const ponderContainer = contentEl.createDiv("engine-setting-toggle");
+        const ponderToggle = ponderContainer.createEl("input", {
+          type: "checkbox",
+        });
+        ponderToggle.checked = showPonder;
+        ponderContainer.createEl("label", { text: t("engine.showPonder") });
+        ponderToggle.addEventListener("change", () => {
+          showPonder = ponderToggle.checked;
+        });
+
+        // Buttons
         const btnContainer = contentEl.createDiv("modal-button-container");
         const okBtn = btnContainer.createEl("button", {
           text: t("confirm.yes"),
@@ -485,19 +528,25 @@ const ActionsModule = {
         okBtn.addEventListener("click", () => {
           if (depthValue >= 1 && depthValue <= 30) {
             host.settings.engineDepth = depthValue;
-            void host.plugin.saveSettings();
           }
-          depthModal.close();
+          if (skillValue >= 0 && skillValue <= 20) {
+            host.settings.engineSkillLevel = skillValue;
+          }
+          host.settings.showEngineBestMove = showBestMove;
+          host.settings.showEnginePonder = showPonder;
+          void host.plugin.saveSettings();
+          host.plugin.refresh();
+          engineModal.close();
         });
         const cancelBtn = btnContainer.createEl("button", {
           text: t("confirm.cancel"),
         });
-        cancelBtn.addEventListener("click", () => depthModal.close());
+        cancelBtn.addEventListener("click", () => engineModal.close());
       };
-      depthModal.onClose = () => {
-        (depthModal as { contentEl: HTMLElement }).contentEl.empty();
+      engineModal.onClose = () => {
+        (engineModal as { contentEl: HTMLElement }).contentEl.empty();
       };
-      depthModal.open();
+      engineModal.open();
     });
   },
 };

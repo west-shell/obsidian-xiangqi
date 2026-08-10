@@ -15,3 +15,12 @@
 .ws-setting-tab .setting-item {
   border-top: none;
 }
+.engine-setting-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0;
+}
+.engine-setting-toggle label {
+  cursor: pointer;
+}

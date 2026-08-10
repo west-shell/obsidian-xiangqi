@@ -51,7 +51,7 @@
   "toolbar.editMenu": "Edit",
   "toolbar.nodeMenu": "Node",
   "toolbar.analyzeMenu": "Analyze",
-  "toolbar.analyzeDepth": "Set Depth",
+  "toolbar.engineSettings": "Settings",
   "toolbar.autoAnalyze": "Auto Analyze",
   "toolbar.annotate": "Annotate",
   "genfen.turn": "Turn",

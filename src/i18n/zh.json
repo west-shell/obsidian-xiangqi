@@ -51,7 +51,7 @@
   "toolbar.editMenu": "编辑",
   "toolbar.nodeMenu": "节点",
   "toolbar.analyzeMenu": "分析",
-  "toolbar.analyzeDepth": "设置深度",
+  "toolbar.engineSettings": "设置",
   "toolbar.autoAnalyze": "自动分析",
   "toolbar.annotate": "标注",
   "genfen.turn": "先手",

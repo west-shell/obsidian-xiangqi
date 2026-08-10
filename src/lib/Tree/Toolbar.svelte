@@ -209,9 +209,9 @@
     const menu = new Menu();
 
     menu.addItem((mi) => {
-      mi.setTitle(t("toolbar.analyzeDepth", _lv))
+      mi.setTitle(t("toolbar.engineSettings", _lv))
         .setIcon("sliders-horizontal")
-        .onClick(() => eventBus.emit("set-depth"));
+        .onClick(() => eventBus.emit("open-engine-settings"));
     });
 
     menu.addItem((mi) => {
