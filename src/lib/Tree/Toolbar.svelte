@@ -169,6 +169,20 @@
         .onClick(() => emitEvent("edit-tags"));
     });
 
+    menu.addSeparator();
+
+    menu.addItem((mi) => {
+      mi.setTitle(t("toolbar.copyFEN", _lv))
+        .setIcon("clipboard-copy")
+        .onClick(() => eventBus.emit("copy-fen"));
+    });
+
+    menu.addItem((mi) => {
+      mi.setTitle(t("toolbar.copyPGN", _lv))
+        .setIcon("clipboard-paste")
+        .onClick(() => eventBus.emit("copy-pgn"));
+    });
+
     menu.showAtMouseEvent(evt);
   }
 

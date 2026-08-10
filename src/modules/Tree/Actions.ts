@@ -7,7 +7,7 @@ import { t } from "../../i18n";
 import type { ChessNode, ITreeHost } from "../../types";
 import { DEFAULT_FEN } from "../../types";
 import { ConfirmModal } from "../../utils/confirmModal";
-import { Modal, Setting } from "obsidian";
+import { Modal, Notice, Setting } from "obsidian";
 
 const ActionsModule = {
   init(host: ITreeHost) {
@@ -455,6 +455,22 @@ const ActionsModule = {
 
     host.stringifyPGN = (root: ChessNode, includeEval = true) =>
       stringifyPGN(root, includeEval);
+
+    eventBus.on("copy-fen", () => {
+      const fen = host.currentNode.fen;
+      navigator.clipboard
+        .writeText(fen)
+        .then(() => new Notice(t("notice.fenCopied")))
+        .catch(() => {});
+    });
+
+    eventBus.on("copy-pgn", () => {
+      const pgn = host.tags + "\n\n" + stringifyPGN(host.root, true);
+      navigator.clipboard
+        .writeText(pgn)
+        .then(() => new Notice(t("notice.pgnCopied")))
+        .catch(() => {});
+    });
 
     eventBus.on("open-engine-settings", () => {
       const engineModal = new Modal(host.plugin.app);
