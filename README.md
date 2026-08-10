@@ -224,35 +224,22 @@ This plugin is available on the official Obsidian plugin marketplace. Search for
 
 ## Build
 
-1. Clone this repository and its dependencies [xiangqiground](https://github.com/west-shell/xiangqiground) and [xiangqi.js](https://github.com/west-shell/xiangqi.js) into the same parent directory:
+1. Clone this repository:
 
    ```bash
-   git clone https://github.com/west-shell/xiangqiground.git
-   git clone https://github.com/west-shell/xiangqi.js.git
    git clone https://github.com/west-shell/obsidian-xiangqi.git
    ```
 
-2. Build xiangqiground first:
+2. Install dependencies (xiangqi.js and xiangqiground are fetched automatically from GitHub):
 
    ```bash
-   cd xiangqiground
+   cd obsidian-xiangqi
    npm install
-   npm run dist
    ```
 
-3. Build xiangqi.js:
+3. Build the plugin:
 
    ```bash
-   cd ../xiangqi.js
-   npm install
-   npm run dist
-   ```
-
-4. Then build the plugin:
-
-   ```bash
-   cd ../obsidian-xiangqi
-   npm install
    npm run build        # Dev build (unminified, with sourcemaps)
    npm run build:min    # Minified build (for release)
    ```

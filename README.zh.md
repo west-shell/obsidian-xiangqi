@@ -223,35 +223,22 @@ p:true
 
 ## 构建
 
-1. 克隆本项目及其依赖 [xiangqiground](https://github.com/west-shell/xiangqiground) 和 [xiangqi.js](https://github.com/west-shell/xiangqi.js) 到同一目录：
+1. 克隆本项目：
 
    ```bash
-   git clone https://github.com/west-shell/xiangqiground.git
-   git clone https://github.com/west-shell/xiangqi.js.git
    git clone https://github.com/west-shell/obsidian-xiangqi.git
    ```
 
-2. 先构建 xiangqiground：
+2. 安装依赖（xiangqi.js 和 xiangqiground 会自动从 GitHub 拉取）：
 
    ```bash
-   cd xiangqiground
+   cd obsidian-xiangqi
    npm install
-   npm run dist
    ```
 
-3. 再构建 xiangqi.js：
+3. 构建插件：
 
    ```bash
-   cd ../xiangqi.js
-   npm install
-   npm run dist
-   ```
-
-4. 最后构建本插件：
-
-   ```bash
-   cd ../obsidian-xiangqi
-   npm install
    npm run build        # 开发版本（不压缩，带 sourcemap）
    npm run build:min    # 精简版本（压缩，适合发布）
    ```
