@@ -93,34 +93,37 @@ export class XiangqiEngine {
       t("engine.downloadCancel", 0),
       t("engine.downloadSource", 0),
     );
-    modal.open();
-    const doDownload = async (confirmed: boolean) => {
-      if (!confirmed) return;
-      const sourceKey = modal.getSelectedSource();
-      const source =
-        DOWNLOAD_SOURCES.find((s) => s.key === sourceKey) ??
-        DOWNLOAD_SOURCES[0];
-      for (let i = 0; i < missingFiles.length; i++) {
-        const file = missingFiles[i];
-        const url = `${source.baseUrl}/${file}`;
-        const destPath = `${baseDir}/${file}`;
-        modal.showProgress(i);
-        try {
-          const resp = await requestUrl({ url });
-          const buffer = new Uint8Array(resp.arrayBuffer);
-          if (file === "pikafish.js") {
-            await adapter.write(destPath, new TextDecoder().decode(buffer));
-          } else {
-            await adapter.writeBinary(destPath, buffer.buffer);
+    modal.setCallbacks(
+      () => {
+        const sourceKey = modal.getSelectedSource();
+        const source =
+          DOWNLOAD_SOURCES.find((s) => s.key === sourceKey) ??
+          DOWNLOAD_SOURCES[0];
+        void (async () => {
+          for (let i = 0; i < missingFiles.length; i++) {
+            const file = missingFiles[i];
+            const url = `${source.baseUrl}/${file}`;
+            const destPath = `${baseDir}/${file}`;
+            modal.showProgress(i);
+            try {
+              const resp = await requestUrl({ url });
+              const buffer = new Uint8Array(resp.arrayBuffer);
+              if (file === "pikafish.js") {
+                await adapter.write(destPath, new TextDecoder().decode(buffer));
+              } else {
+                await adapter.writeBinary(destPath, buffer.buffer);
+              }
+              modal.done(i);
+            } catch {
+              modal.error(i, t("engine.downloadFailed", 0));
+              return;
+            }
           }
-          modal.done(i);
-        } catch {
-          modal.error(i, t("engine.downloadFailed", 0));
-          return;
-        }
-      }
-    };
-    void modal.promise.then(doDownload);
+        })();
+      },
+      () => {},
+    );
+    modal.open();
   }
 
   private async loadPikafishSource(): Promise<string> {

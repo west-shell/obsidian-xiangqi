@@ -143,8 +143,6 @@ export interface DownloadFileSource {
 }
 
 export class DownloadModal extends Modal {
-  private resolvePromise: (value: boolean) => void;
-  public promise: Promise<boolean>;
   private readonly fileRows: {
     name: string;
     status: HTMLSpanElement;
@@ -153,6 +151,8 @@ export class DownloadModal extends Modal {
   private downloadBtn!: HTMLButtonElement;
   private readonly selectedSourceKey: string;
   private sourceSelect!: HTMLSelectElement;
+  private onConfirm: (() => void) | null = null;
+  private onCancel: (() => void) | null = null;
 
   constructor(
     app: App,
@@ -163,15 +163,16 @@ export class DownloadModal extends Modal {
     private readonly sourceLabel: string,
   ) {
     super(app);
-    this.resolvePromise = () => {};
-    this.promise = new Promise((resolve) => {
-      this.resolvePromise = resolve;
-    });
     this.selectedSourceKey = files[0]?.sources[0]?.key ?? "github";
   }
 
   getSelectedSource(): string {
     return this.sourceSelect?.value ?? this.selectedSourceKey;
+  }
+
+  setCallbacks(onConfirm: () => void, onCancel: () => void): void {
+    this.onConfirm = onConfirm;
+    this.onCancel = onCancel;
   }
 
   onOpen() {
@@ -247,14 +248,14 @@ export class DownloadModal extends Modal {
       cls: "mod-cta",
     });
     this.downloadBtn.addEventListener("click", () => {
-      this.resolvePromise(true);
+      this.onConfirm?.();
     });
 
     const cancelBtn = btnContainer.createEl("button", {
       text: this.cancelText,
     });
     cancelBtn.addEventListener("click", () => {
-      this.resolvePromise(false);
+      this.onCancel?.();
       this.close();
     });
   }
@@ -289,17 +290,9 @@ export class DownloadModal extends Modal {
     });
     retryLink.addEventListener("click", (e) => {
       e.preventDefault();
-      this.retry(index);
+      this.onConfirm?.();
     });
     this.downloadBtn.disabled = false;
-  }
-
-  private retry(index: number) {
-    const row = this.fileRows[index];
-    if (!row) return;
-    row.status.empty();
-    row.nameSpan.textContent = row.name;
-    this.resolvePromise(true);
   }
 
   onClose() {
