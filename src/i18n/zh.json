@@ -131,6 +131,8 @@
   "engine.showBestMove.desc": "在棋盘上以绿色箭头显示引擎推荐的最佳着法",
   "engine.showPonder": "显示预期应着箭头",
   "engine.showPonder.desc": "在棋盘上以黄色箭头显示引擎预期的对方应着",
+  "engine.showMoveAnnotations": "显示着法标注",
+  "engine.showMoveAnnotations.desc": "根据引擎评估在棋盘上显示着法质量图标（不准确、失误、严重失误等）",
   "save.title": "保存",
   "save.saveEval": "默认保存评估",
   "save.saveEval.desc": "分析后自动将评估结果保存到棋谱中",

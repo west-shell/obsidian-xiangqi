@@ -51,6 +51,7 @@ export interface ISettings {
   engineSkillLevel: number;
   showEngineBestMove: boolean;
   showEnginePonder: boolean;
+  showMoveAnnotations: boolean;
   saveEvalByDefault: boolean;
   saveEvalPrompt: boolean;
 }
@@ -70,6 +71,14 @@ export type NodeEval = {
   ponder?: string;
 };
 
+export type MoveGlyph =
+  | { symbol: "?!"; name: "Inaccuracy"; color: string }
+  | { symbol: "?"; name: "Mistake"; color: string }
+  | { symbol: "??"; name: "Blunder"; color: string }
+  | { symbol: "!"; name: "Good move"; color: string }
+  | { symbol: "!!"; name: "Brilliant"; color: string }
+  | { symbol: "!?"; name: "Interesting"; color: string };
+
 export type ChessNode = {
   id: string;
   fen: string;
@@ -83,6 +92,8 @@ export type ChessNode = {
   children: ChessNode[];
   comments?: string[];
   eval?: NodeEval;
+  glyph?: MoveGlyph | null;
+  isCheckmate?: boolean;
 };
 
 export type NodeMap = Map<string, ChessNode>;

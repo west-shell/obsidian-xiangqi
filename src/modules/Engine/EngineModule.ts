@@ -1,10 +1,11 @@
-import type { IPGNViewHost, ITreeHost, NodeEval } from "../../types";
+import type { ChessNode, IPGNViewHost, ITreeHost, NodeEval } from "../../types";
 import type { Move } from "../../chess";
 import {
   registerPGNViewModule,
   registerTreeModule,
 } from "../../core/module-system";
 import { engine } from "./Engine";
+import { computeGlyph } from "../../utils/winningChances";
 
 function initEngine(host: object) {
   const h = host as ITreeHost | IPGNViewHost;
@@ -51,6 +52,20 @@ function initEngine(host: object) {
     return s;
   }
 
+  function setNodeGlyph(node: ChessNode) {
+    if (!node.parentID) {
+      node.glyph = null;
+      return;
+    }
+    const parent = h.nodeMap.get(node.parentID);
+    node.glyph = computeGlyph(parent?.eval, node.eval, node.side);
+    for (const child of node.children) {
+      if (child.eval) {
+        child.glyph = computeGlyph(node.eval, child.eval, child.side);
+      }
+    }
+  }
+
   function dispatchMode(mode: string) {
     if (mode === "once") {
       eventBus.emit("engine-analyze");
@@ -62,6 +77,7 @@ function initEngine(host: object) {
   }
 
   eventBus.on<string>("analyze-btn-click", async (mode) => {
+    if (!mode) return;
     if (engine.isReady()) {
       dispatchMode(mode);
       return;
@@ -186,6 +202,9 @@ function initEngine(host: object) {
           ponder: result.ponder,
         };
         node.eval = nodeEval;
+        if (settings.showMoveAnnotations) {
+          setNodeGlyph(node);
+        }
         if (h.currentNode.id === nodeId) {
           h.currentNode = node;
         }
@@ -266,6 +285,9 @@ function initEngine(host: object) {
                 result.bestmove !== "(none)" ? result.bestmove : undefined,
               ponder: result.ponder,
             };
+            if (settings.showMoveAnnotations) {
+              setNodeGlyph(node);
+            }
             if (h.currentNode.id === nodeId) {
               h.currentNode = node;
               h.eventBus.emit("engine-result", {

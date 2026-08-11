@@ -61,6 +61,7 @@ export const DEFAULT_SETTINGS: ISettings = {
   engineSkillLevel: 20,
   showEngineBestMove: true,
   showEnginePonder: true,
+  showMoveAnnotations: false,
   saveEvalByDefault: false,
   saveEvalPrompt: true,
 };
@@ -252,6 +253,11 @@ export class ChessSettingTab extends PluginSettingTab {
             desc: t("engine.showPonder.desc"),
             control: { type: "toggle", key: "showEnginePonder" },
           },
+          {
+            name: t("engine.showMoveAnnotations"),
+            desc: t("engine.showMoveAnnotations.desc"),
+            control: { type: "toggle", key: "showMoveAnnotations" },
+          },
         ],
       },
       {
@@ -438,6 +444,7 @@ export class ChessSettingTab extends PluginSettingTab {
         "boardMarginBottom",
         "showEngineBestMove",
         "showEnginePonder",
+        "showMoveAnnotations",
       ].includes(key)
     ) {
       this.plugin.refresh();
@@ -625,6 +632,16 @@ export class ChessSettingTab extends PluginSettingTab {
       .addToggle((toggle) =>
         toggle.setValue(settings.showEnginePonder).onChange((value) => {
           settings.showEnginePonder = value;
+          this.plugin.refresh();
+        }),
+      );
+
+    new Setting(containerEl)
+      .setName(t("engine.showMoveAnnotations"))
+      .setDesc(t("engine.showMoveAnnotations.desc"))
+      .addToggle((toggle) =>
+        toggle.setValue(settings.showMoveAnnotations).onChange((value) => {
+          settings.showMoveAnnotations = value;
           this.plugin.refresh();
         }),
       );

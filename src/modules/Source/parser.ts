@@ -96,6 +96,7 @@ export class PGNParser {
       children: [],
       mainID: null,
       comments: [],
+      isCheckmate: move.isCheckmate ?? false,
     };
     this.nodeMap.set(node.id, node);
     return node;

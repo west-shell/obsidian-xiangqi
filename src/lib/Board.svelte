@@ -34,6 +34,7 @@
     userShapes?: DrawShape[];
     engineBestMove?: { from: Square; to: Square } | null;
     enginePonder?: { from: Square; to: Square } | null;
+    glyphShapes?: DrawShape[];
   }
 
   let {
@@ -49,6 +50,7 @@
     userShapes = [],
     engineBestMove = null,
     enginePonder = null,
+    glyphShapes = [],
   }: Props = $props();
 
   let boardElement: HTMLDivElement;
@@ -116,6 +118,7 @@
   let shapes = $derived([
     ...(settings.showNextMove ? computeVariationShapes(variations) : []),
     ...engineShapes,
+    ...glyphShapes,
   ]);
   let dests = $derived(computeDests(fen));
 

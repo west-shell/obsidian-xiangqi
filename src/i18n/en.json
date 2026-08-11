@@ -130,6 +130,8 @@
   "engine.showBestMove.desc": "Display the engine's best move as a green arrow on the board",
   "engine.showPonder": "Show ponder arrow",
   "engine.showPonder.desc": "Display the engine's ponder (expected response) as a yellow arrow on the board",
+  "engine.showMoveAnnotations": "Show move annotations",
+  "engine.showMoveAnnotations.desc": "Display move quality glyphs (Inaccuracy, Mistake, Blunder, etc.) on the board based on engine evaluation",
   "save.title": "Save",
   "save.saveEval": "Save eval by default",
   "save.saveEval.desc": "Automatically save evaluation results to the game record after analysis",

@@ -10,7 +10,7 @@
   } from "../../types";
   import { onLangChange, t } from "../../i18n";
   import { calculateTreeLayout } from "./layout";
-  import { iconPaths, iconSvg } from "../../utils/icon";
+  import { iconSvg } from "../../utils/icon";
   import { scrollToBTN } from "../../utils/utils";
   import { setIcon } from "obsidian";
   import * as d3 from "d3";
@@ -99,35 +99,106 @@
 
   const ANNOTATION_DEFINITIONS: Record<
     string,
-    { symbol: string; color: string; icon?: string }
+    { symbol: string; color: string; icon?: string; bgColor: string }
   > = {
     "W+": {
       symbol: "白优",
-      color: "var(--piece-red)",
-      icon: iconPaths("thumbs-up"),
+      color: "#fff",
+      icon: "thumbs-up",
+      bgColor: "#22ac38",
     },
     "B+": {
       symbol: "黑优",
-      color: "var(--piece-black)",
-      icon: iconPaths("thumbs-down"),
+      color: "#fff",
+      icon: "thumbs-down",
+      bgColor: "#df5353",
     },
-    "=": { symbol: "均势", color: "green", icon: iconPaths("handshake") },
+    "=": {
+      symbol: "均势",
+      color: "#fff",
+      icon: "handshake",
+      bgColor: "#82c2ef",
+    },
     "?": {
       symbol: "问题",
-      color: "var(--text-warning)",
-      icon: iconPaths("bookmark"),
+      color: "#fff",
+      icon: "bookmark",
+      bgColor: "#e69f00",
     },
     "!": {
       symbol: "妙手",
-      color: "var(--color-yellow)",
-      icon: iconPaths("star"),
+      color: "#fff",
+      icon: "star",
+      bgColor: "#22ac38",
     },
-    "W#": { symbol: "白胜", color: "red", icon: iconPaths("thumbs-up") },
-    "B#": { symbol: "黑胜", color: "black", icon: iconPaths("thumbs-up") },
-    "=#": { symbol: "和棋", color: "gray", icon: iconPaths("handshake") },
+    "W#": {
+      symbol: "白胜",
+      color: "#fff",
+      icon: "thumbs-up",
+      bgColor: "#bbb",
+    },
+    "B#": {
+      symbol: "黑胜",
+      color: "#fff",
+      icon: "thumbs-down",
+      bgColor: "#333",
+    },
+    "=#": {
+      symbol: "和棋",
+      color: "#fff",
+      icon: "handshake",
+      bgColor: "#6e7781",
+    },
   };
 
   const ALL_ANNOTATION_KEYS = Object.keys(ANNOTATION_DEFINITIONS);
+
+  const GLYPH_PATHS: Record<string, string> = {
+    "?!": '<path fill="#fff" d="M37.734 21.947c-3.714 0-7.128.464-10.242 1.393-3.113.928-6.009 2.13-8.685 3.605l4.343 8.766c2.35-1.202 4.644-2.157 6.883-2.867a22.366 22.366 0 0 1 6.799-1.065c2.294 0 4.07.464 5.326 1.393 1.311.874 1.967 2.186 1.967 3.933 0 1.748-.546 3.277-1.639 4.588-1.038 1.257-2.786 2.758-5.244 4.506-2.786 2.021-4.751 3.961-5.898 5.819-1.147 1.857-1.721 4.15-1.721 6.88v2.952h10.568v-2.377c0-1.147.137-2.103.41-2.868.328-.764.93-1.557 1.803-2.376.874-.82 2.104-1.803 3.688-2.95 2.13-1.584 3.906-3.058 5.326-4.424 1.42-1.42 2.485-2.95 3.195-4.59.71-1.638 1.065-3.576 1.065-5.816 0-4.206-1.584-7.675-4.752-10.406-3.114-2.731-7.51-4.096-13.192-4.096zm24.745.819 2.048 39.084h9.75l2.047-39.084zM35.357 68.73c-1.966 0-3.632.52-4.998 1.557-1.365.983-2.047 2.732-2.047 5.244 0 2.404.682 4.152 2.047 5.244 1.366 1.038 3.032 1.557 4.998 1.557 1.912 0 3.55-.519 4.916-1.557 1.366-1.092 2.05-2.84 2.05-5.244 0-2.512-.684-4.26-2.05-5.244-1.365-1.038-3.004-1.557-4.916-1.557zm34.004 0c-1.966 0-3.632.52-4.998 1.557-1.365.983-2.049 2.732-2.049 5.244 0 2.404.684 4.152 2.05 5.244 1.365 1.038 3.03 1.557 4.997 1.557 1.912 0 3.55-.519 4.916-1.557 1.366-1.092 2.047-2.84 2.047-5.244 0-2.512-.681-4.26-2.047-5.244-1.365-1.038-3.004-1.557-4.916-1.557z"/>',
+    "?": '<path fill="#fff" d="M40.436 60.851q0-4.66 1.957-7.83 1.958-3.17 6.712-6.619 4.195-2.983 5.967-5.127 1.864-2.237 1.864-5.22 0-2.983-2.237-4.475-2.144-1.585-6.06-1.585-3.915 0-7.737 1.212t-7.83 3.263l-4.941-9.975q4.568-2.517 9.881-4.101 5.314-1.585 11.653-1.585 9.695 0 15.008 4.661 5.407 4.661 5.407 11.839 0 3.822-1.212 6.619-1.212 2.796-3.635 5.22-2.424 2.33-6.06 5.034-2.703 1.958-4.195 3.356-1.491 1.398-2.05 2.703-.467 1.305-.467 3.263v2.703H40.436zm-1.492 18.924q0-4.288 2.33-5.966 2.331-1.771 5.687-1.771 3.263 0 5.594 1.771 2.33 1.678 2.33 5.966 0 4.102-2.33 5.966-2.331 1.772-5.594 1.772-3.356 0-5.686-1.772-2.33-1.864-2.33-5.966z"/>',
+    "??": '<path fill="#fff" d="M31.8 22.22c-3.675 0-7.052.46-10.132 1.38-3.08.918-5.945 2.106-8.593 3.565l4.298 8.674c2.323-1.189 4.592-2.136 6.808-2.838a22.138 22.138 0 0 1 6.728-1.053c2.27 0 4.025.46 5.268 1.378 1.297.865 1.946 2.16 1.946 3.89s-.541 3.242-1.622 4.539c-1.027 1.243-2.756 2.73-5.188 4.458-2.756 2-4.7 3.918-5.836 5.755-1.134 1.837-1.702 4.107-1.702 6.808v2.92h10.457v-2.35c0-1.135.135-2.082.406-2.839.324-.756.918-1.54 1.783-2.35.864-.81 2.079-1.784 3.646-2.918 2.107-1.568 3.863-3.026 5.268-4.376 1.405-1.405 2.46-2.92 3.162-4.541.703-1.621 1.054-3.54 1.054-5.755 0-4.161-1.568-7.592-4.702-10.294-3.08-2.702-7.43-4.052-13.05-4.052zm38.664 0c-3.675 0-7.053.46-10.133 1.38-3.08.918-5.944 2.106-8.591 3.565l4.295 8.674c2.324-1.189 4.593-2.136 6.808-2.838a22.138 22.138 0 0 1 6.728-1.053c2.27 0 4.026.46 5.269 1.378 1.297.865 1.946 2.16 1.946 3.89s-.54 3.242-1.62 4.539c-1.027 1.243-2.757 2.73-5.189 4.458-2.756 2-4.7 3.918-5.835 5.755-1.135 1.837-1.703 4.107-1.703 6.808v2.92h10.457v-2.35c0-1.135.134-2.082.404-2.839.324-.756.918-1.54 1.783-2.35.865-.81 2.081-1.784 3.648-2.918 2.108-1.568 3.864-3.026 5.269-4.376 1.405-1.405 2.46-2.92 3.162-4.541.702-1.621 1.053-3.54 1.053-5.755 0-4.161-1.567-7.592-4.702-10.294-3.08-2.702-7.43-4.052-13.05-4.052zM29.449 68.504c-1.945 0-3.593.513-4.944 1.54-1.351.973-2.027 2.703-2.027 5.188 0 2.378.676 4.108 2.027 5.188 1.35 1.027 3 1.54 4.944 1.54 1.892 0 3.512-.513 4.863-1.54 1.35-1.08 2.026-2.81 2.026-5.188 0-2.485-.675-4.215-2.026-5.188-1.351-1.027-2.971-1.54-4.863-1.54zm38.663 0c-1.945 0-3.592.513-4.943 1.54-1.35.973-2.026 2.703-2.026 5.188 0 2.378.675 4.108 2.026 5.188 1.351 1.027 2.998 1.54 4.943 1.54 1.891 0 3.513-.513 4.864-1.54 1.351-1.08 2.027-2.81 2.027-5.188 0-2.485-.676-4.215-2.027-5.188-1.35-1.027-2.973-1.54-4.864-1.54z"/>',
+    "!": '<path fill="#fff" d="M54.967 62.349h-9.75l-2.049-39.083h13.847zM43.004 76.032q0-3.77 2.049-5.244 2.048-1.557 4.998-1.557 2.867 0 4.916 1.557 2.048 1.475 2.048 5.244 0 3.605-2.048 5.244-2.049 1.556-4.916 1.556-2.95 0-4.998-1.556-2.049-1.64-2.049-5.244z" vector-effect="non-scaling-stroke"/>',
+    "!!": '<path fill="#fff" d="M71.967 62.349h-9.75l-2.049-39.083h13.847zM60.004 76.032q0-3.77 2.049-5.244 2.048-1.557 4.998-1.557 2.867 0 4.916 1.557 2.048 1.475 2.048 5.244 0 3.605-2.048 5.244-2.049 1.556-4.916 1.556-2.95 0-4.998-1.556-2.049-1.64-2.049-5.244zM37.967 62.349h-9.75l-2.049-39.083h13.847zM26.004 76.032q0-3.77 2.049-5.244 2.048-1.557 4.998-1.557 2.867 0 4.916 1.557 2.048 1.475 2.048 5.244 0 3.605-2.048 5.244-2.049 1.556-4.916 1.556-2.95 0-4.998-1.556-2.049-1.64-2.049-5.244z" vector-effect="non-scaling-stroke"/>',
+    "!?": '<path fill="#fff" d="M60.823 58.9q0-4.098 1.72-6.883 1.721-2.786 5.9-5.818 3.687-2.622 5.243-4.506 1.64-1.966 1.64-4.588t-1.967-3.933q-1.885-1.393-5.326-1.393t-6.8 1.065q-3.36 1.065-6.883 2.868l-4.343-8.767q4.015-2.212 8.685-3.605 4.67-1.393 10.242-1.393 8.521 0 13.192 4.097 4.752 4.096 4.752 10.405 0 3.36-1.065 5.818-1.066 2.458-3.196 4.588-2.13 2.048-5.326 4.424-2.376 1.72-3.687 2.95-1.31 1.229-1.802 2.376-.41 1.147-.41 2.868v2.376h-10.57zm-1.311 16.632q0-3.77 2.048-5.244 2.049-1.557 4.998-1.557 2.868 0 4.916 1.557 2.049 1.475 2.049 5.244 0 3.605-2.049 5.244-2.048 1.556-4.916 1.556-2.95 0-4.998-1.556-2.048-1.64-2.048-5.244zM36.967 61.849h-9.75l-2.049-39.083h13.847zM25.004 75.532q0-3.77 2.049-5.244 2.048-1.557 4.998-1.557 2.867 0 4.916 1.557 2.048 1.475 2.048 5.244 0 3.605-2.048 5.244-2.049 1.556-4.916 1.556-2.95 0-4.998-1.556-2.049-1.64-2.049-5.244z" vector-effect="non-scaling-stroke"/>',
+  };
+
+  function glyphPath(symbol: string): string {
+    return GLYPH_PATHS[symbol] ?? "";
+  }
+
+  function annotationIconSvg(icon: string, fill: string): string {
+    const icons: Record<string, string[]> = {
+      "thumbs-up": [
+        "M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z",
+        "M7 10v12",
+      ],
+      "thumbs-down": [
+        "M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22a3.13 3.13 0 0 1-3-3.88Z",
+        "M17 14V2",
+      ],
+      handshake: [
+        "m11 17 2 2a1 1 0 1 0 3-3",
+        "m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4",
+        "m21 3 1 11h-2",
+        "M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3",
+        "M3 4h8",
+      ],
+      bookmark: [
+        "M17 3a2 2 0 0 1 2 2v15a1 1 0 0 1-1.496.868l-4.512-2.578a2 2 0 0 0-1.984 0l-4.512 2.578A1 1 0 0 1 5 20V5a2 2 0 0 1 2-2z",
+      ],
+      star: [
+        "M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z",
+      ],
+      crown: ["M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14v2H5v-2z"],
+    };
+    const paths = icons[icon];
+    if (!paths) return "";
+    return paths
+      .map(
+        (d) => `<path fill="none" stroke="${fill}" stroke-width="2" d="${d}"/>`,
+      )
+      .join("");
+  }
 
   // ---- 工具函数 ----
   function getPrimaryAnnotation(node: ChessNode): string | undefined {
@@ -519,7 +590,7 @@
     return Math.max(13, zh.length * 5.5);
   }
 
-  let canFold = $derived(currentNode?.children?.length > 1);
+  let canFold = $derived((currentNode?.children?.length ?? 0) > 1);
   let toolbarBTN = $derived([
     { title: "放大", icon: "plus", event: zoomIn },
     { title: "缩小", icon: "minus", event: zoomOut },
@@ -781,73 +852,40 @@
               stroke-width={node.id === currentNode?.id ? 1 : 0.5}
               onclick={() => eventBus.emit("node-click", node.id)}
             >
-              {#if primaryAnnotation}
-                {@const def = ANNOTATION_DEFINITIONS[primaryAnnotation]}
-                <rect
-                  x={-nw / 2}
-                  y={-nodeHeight / 2}
-                  width={nw}
-                  height={nodeHeight}
-                  rx="2.5"
-                  ry="2.5"
-                  fill={node.side === "white"
-                    ? "var(--piece-red)"
-                    : node.side === "black"
-                      ? "var(--piece-black)"
-                      : "green"}
-                  stroke={node.id === currentNode?.id
-                    ? "var(--interactive-accent)"
-                    : "var(--xq-board-line)"}
-                />
-                <g
-                  transform="translate(-4, -4) scale(0.333)"
-                  fill={node.side === "white"
-                    ? "var(--piece-red)"
-                    : "var(--piece-black)"}
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+              <rect
+                x={-nw / 2}
+                y={-nodeHeight / 2}
+                width={nw}
+                height={nodeHeight}
+                rx="2.5"
+                ry="2.5"
+                fill={node.side === "white"
+                  ? "var(--piece-red)"
+                  : node.side === "black"
+                    ? "var(--piece-black)"
+                    : "green"}
+                stroke={node.id === currentNode?.id
+                  ? "var(--interactive-accent)"
+                  : "var(--xq-board-line)"}
+              />
+              {#if nodeMode === 0}
+                <text
+                  dy="3.5"
+                  text-anchor="middle"
+                  fill="white"
+                  font-size="9px"
                 >
-                  <!-- eslint-disable-next-line svelte/no-at-html-tags -->
-                  {@html def.icon}
-                </g>
+                  {node.move?.piece ? pieceLabel(node.move) : "始"}
+                </text>
               {:else}
-                <rect
-                  x={-nw / 2}
-                  y={-nodeHeight / 2}
-                  width={nw}
-                  height={nodeHeight}
-                  rx="2.5"
-                  ry="2.5"
-                  fill={node.side === "white"
-                    ? "var(--piece-red)"
-                    : node.side === "black"
-                      ? "var(--piece-black)"
-                      : "green"}
-                  stroke={node.id === currentNode?.id
-                    ? "var(--interactive-accent)"
-                    : "var(--xq-board-line)"}
-                />
-                {#if nodeMode === 0}
-                  <text
-                    dy="3.5"
-                    text-anchor="middle"
-                    fill="white"
-                    font-size="9px"
-                  >
-                    {node.move?.piece ? pieceLabel(node.move) : "始"}
-                  </text>
-                {:else}
-                  <text
-                    dominant-baseline="central"
-                    text-anchor="middle"
-                    fill="white"
-                    font-size="5px"
-                  >
-                    {node.move?.zh ?? "开局"}
-                  </text>
-                {/if}
+                <text
+                  dominant-baseline="central"
+                  text-anchor="middle"
+                  fill="white"
+                  font-size="5px"
+                >
+                  {node.move?.zh ?? "开局"}
+                </text>
               {/if}
               {#if node.eval}
                 {@const intensity =
@@ -872,6 +910,44 @@
                   fill={color}
                   style="pointer-events: none"
                 />
+              {/if}
+              {#if primaryAnnotation}
+                {@const def = ANNOTATION_DEFINITIONS[primaryAnnotation]}
+                <g
+                  transform="translate({-nw / 2 - 3} {nodeHeight / 2 -
+                    3}) scale(0.06)"
+                  style="pointer-events: none"
+                >
+                  <circle cx="50" cy="50" r="50" fill={def.bgColor} />
+                  <g transform="translate(14,14) scale(3)">
+                    <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+                    {@html annotationIconSvg(def.icon ?? "", def.color)}
+                  </g>
+                </g>
+              {/if}
+              {#if node.isCheckmate}
+                <g
+                  transform="translate({-nw / 2 - 3} {-nodeHeight / 2 -
+                    3}) scale(0.06)"
+                  style="pointer-events: none"
+                >
+                  <circle cx="50" cy="50" r="50" fill="#df5353" />
+                  <g transform="translate(14,14) scale(3)">
+                    <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+                    {@html annotationIconSvg("crown", "#fff")}
+                  </g>
+                </g>
+              {/if}
+              {#if node.glyph}
+                <g
+                  transform="translate({nw / 2 - 3} {nodeHeight / 2 -
+                    3}) scale(0.06)"
+                  style="pointer-events: none"
+                >
+                  <circle cx="50" cy="50" r="50" fill={node.glyph.color} />
+                  <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+                  {@html glyphPath(node.glyph.symbol)}
+                </g>
               {/if}
               {#if getRegularComments(node).length > 0}
                 <g
