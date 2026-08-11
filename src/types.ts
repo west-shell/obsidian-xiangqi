@@ -92,7 +92,6 @@ export type ChessNode = {
   x?: number;
   y?: number;
   parentID?: string | null;
-  mainID?: string | null;
   children: ChessNode[];
   comments?: string[];
   eval?: NodeEval;

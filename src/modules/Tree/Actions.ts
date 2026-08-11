@@ -68,7 +68,6 @@ const ActionsModule = {
         side: move.color === "w" ? "white" : "black",
         parentID: host.currentNode.id,
         children: [],
-        mainID: null,
         comments: [],
         isCheckmate: move.isCheckmate ?? false,
       };
@@ -205,7 +204,6 @@ const ActionsModule = {
               parent = host.nodeMap.get(parent.parentID);
               if (!parent) break;
             }
-            for (const child of parent!.children) child.mainID = null;
             const idx = parent!.children.findIndex(
               (c: ChessNode) => c.id === nodeToPromote.id,
             );

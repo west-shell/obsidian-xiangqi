@@ -35,7 +35,6 @@ export class PGNParser {
       side: null,
       parentID: null,
       children: [],
-      mainID: null,
       comments: [],
     };
     this.nodeMap.set(this.rootNode.id, this.rootNode);
@@ -94,7 +93,6 @@ export class PGNParser {
       side,
       parentID: this.currentNode.id,
       children: [],
-      mainID: null,
       comments: [],
       isCheckmate: move.isCheckmate ?? false,
     };
