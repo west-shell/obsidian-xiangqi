@@ -11,7 +11,7 @@ import {
 } from "obsidian";
 
 import type { EventBus } from "../core/event-bus";
-import { createTreeModuleRegistry } from "../core/module-system";
+import { createBlockModuleRegistry } from "../core/module-system";
 import type ChessPlugin from "../main";
 import type { ISettings } from "../types";
 
@@ -27,7 +27,7 @@ export class TreeRenderChild extends MarkdownRenderChild {
     super(containerEl);
     this.settings = this.plugin.settings;
     containerEl.classList.add("tree-codeblock");
-    createTreeModuleRegistry(this);
+    createBlockModuleRegistry(this);
   }
 
   onload(): void {

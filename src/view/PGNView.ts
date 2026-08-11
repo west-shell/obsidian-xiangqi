@@ -8,8 +8,8 @@ import { Scope, TextFileView, type WorkspaceLeaf } from "obsidian";
 
 import { type EventBus } from "../core/event-bus";
 import {
-  createPGNViewModuleRegistry,
-  destroyPGNViewModuleRegistry,
+  createFileModuleRegistry,
+  destroyFileModuleRegistry,
 } from "../core/module-system";
 import type ChessPlugin from "../main";
 import type { ISettings } from "../types";
@@ -25,7 +25,7 @@ export class PGNView extends TextFileView {
     super(leaf);
     this.settings = this.plugin.settings;
     this.data = "";
-    createPGNViewModuleRegistry(this);
+    createFileModuleRegistry(this);
   }
 
   setViewData(data: string, clear: boolean = true): void {
@@ -104,6 +104,6 @@ export class PGNView extends TextFileView {
   }
 
   clear(): void {
-    destroyPGNViewModuleRegistry(this);
+    destroyFileModuleRegistry(this);
   }
 }

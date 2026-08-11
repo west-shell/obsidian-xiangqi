@@ -1,9 +1,9 @@
 import {
-  registerPGNViewModule,
-  registerTreeModule,
+  registerBlockModule,
+  registerFileModule,
 } from "../../core/module-system";
 import type { Move } from "../../chess";
-import type { ITreeHost } from "../../types";
+import type { IHost } from "../../types";
 
 function speak(move: Move) {
   const { zh } = move;
@@ -22,7 +22,7 @@ function speak(move: Move) {
 }
 
 const SpeakerModule = {
-  init(host: ITreeHost) {
+  init(host: IHost) {
     const eventBus = host.eventBus;
     let lastSpokenNodeId: string | null = null;
 
@@ -40,5 +40,5 @@ const SpeakerModule = {
   },
 };
 
-registerPGNViewModule("speech", SpeakerModule);
-registerTreeModule("speech", SpeakerModule);
+registerFileModule("speech", SpeakerModule);
+registerBlockModule("speech", SpeakerModule);

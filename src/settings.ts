@@ -61,7 +61,7 @@ export const DEFAULT_SETTINGS: ISettings = {
   engineSkillLevel: 20,
   showEngineBestMove: true,
   showEnginePonder: true,
-  showMoveAnnotations: false,
+  showMoveAnnotations: true,
   saveEvalByDefault: false,
   saveEvalPrompt: true,
 };
@@ -91,6 +91,7 @@ function addSliderWithValue(
       valueDisplay.setText(`${v}${unit}`);
       onChange(v);
     });
+    // 拖动时实时更新
     slider.sliderEl.addEventListener("input", () => {
       const v = slider.getValue();
       currentValue = v;
@@ -425,11 +426,12 @@ export class ChessSettingTab extends PluginSettingTab {
   }
 
   override setControlValue(key: string, value: unknown): void | Promise<void> {
+    if (!(key in DEFAULT_SETTINGS)) return;
     (this.plugin.settings as unknown as Record<string, unknown>)[key] = value;
     void this.plugin.saveSettings();
-    if (key === "lang") {
-      initI18n(value as string);
-      this.update?.();
+    if (key === "lang" && typeof value === "string") {
+      initI18n(value);
+      // this.update?.();
     }
     if (
       [
@@ -788,7 +790,7 @@ export class ChessSettingTab extends PluginSettingTab {
     containerEl.parentElement?.classList.add("ws-setting-tab");
   }
 
-  hide() {
+  hide(): void {
     this.plugin.refresh();
     void this.plugin.saveSettings();
   }

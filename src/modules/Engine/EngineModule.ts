@@ -1,14 +1,14 @@
-import type { ChessNode, IPGNViewHost, ITreeHost, NodeEval } from "../../types";
+import type { ChessNode, IHost, NodeEval } from "../../types";
 import type { Move } from "../../chess";
 import {
-  registerPGNViewModule,
-  registerTreeModule,
+  registerBlockModule,
+  registerFileModule,
 } from "../../core/module-system";
 import { engine } from "./Engine";
 import { computeGlyph } from "../../utils/winningChances";
 
 function initEngine(host: object) {
-  const h = host as ITreeHost | IPGNViewHost;
+  const h = host as IHost;
   engine.setPlugin(h.plugin);
   const { eventBus, settings } = h;
 
@@ -202,9 +202,7 @@ function initEngine(host: object) {
           ponder: result.ponder,
         };
         node.eval = nodeEval;
-        if (settings.showMoveAnnotations) {
-          setNodeGlyph(node);
-        }
+        setNodeGlyph(node);
         if (h.currentNode.id === nodeId) {
           h.currentNode = node;
         }
@@ -285,9 +283,7 @@ function initEngine(host: object) {
                 result.bestmove !== "(none)" ? result.bestmove : undefined,
               ponder: result.ponder,
             };
-            if (settings.showMoveAnnotations) {
-              setNodeGlyph(node);
-            }
+            setNodeGlyph(node);
             if (h.currentNode.id === nodeId) {
               h.currentNode = node;
               h.eventBus.emit("engine-result", {
@@ -377,5 +373,5 @@ function initEngine(host: object) {
   };
 }
 
-registerTreeModule("engine", { init: initEngine });
-registerPGNViewModule("engine", { init: initEngine });
+registerBlockModule("engine", { init: initEngine });
+registerFileModule("engine", { init: initEngine });

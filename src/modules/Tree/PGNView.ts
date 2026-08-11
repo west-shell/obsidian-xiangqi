@@ -1,14 +1,14 @@
 import { Modal, Setting } from "obsidian";
 import { mount, unmount } from "svelte";
 
-import { registerPGNViewModule } from "../../core/module-system";
+import { registerFileModule } from "../../core/module-system";
 import Chess from "../../lib/Tree/Chess.svelte";
-import type { ChessNode, IPGNViewHost } from "../../types";
+import type { ChessNode, IFileHost } from "../../types";
 import { PGNParser } from "../Source/parser";
 import { t } from "../../i18n";
 
 const TreeViewModule = {
-  init(host: IPGNViewHost) {
+  init(host: IFileHost) {
     const eventBus = host.eventBus;
 
     eventBus.on("setViewData", () => {
@@ -100,7 +100,7 @@ const TreeViewModule = {
   },
 };
 
-registerPGNViewModule("Tree", TreeViewModule);
+registerFileModule("Tree", TreeViewModule);
 
 function hasEvalInTree(root: ChessNode): boolean {
   const stack: ChessNode[] = [root];
@@ -112,7 +112,7 @@ function hasEvalInTree(root: ChessNode): boolean {
   return false;
 }
 
-async function promptSaveEval(host: IPGNViewHost): Promise<boolean | null> {
+async function promptSaveEval(host: IFileHost): Promise<boolean | null> {
   if (!hasEvalInTree(host.root)) return true;
 
   if (!host.settings.saveEvalPrompt) {

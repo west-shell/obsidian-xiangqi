@@ -1,18 +1,10 @@
 import { Chess, type Square } from "../chess";
-import {
-  registerPGNViewModule,
-  registerTreeModule,
-} from "../core/module-system";
-import type { IPGNViewHost, ITreeHost } from "../types";
+import { registerBlockModule, registerFileModule } from "../core/module-system";
+import type { IHost } from "../types";
 
 type TryMovePayload = { from: Square; to: Square };
 
-function tryMove(
-  chess: Chess,
-  host: ITreeHost | IPGNViewHost,
-  from: Square,
-  to: Square,
-): void {
+function tryMove(chess: Chess, host: IHost, from: Square, to: Square): void {
   const eventBus = host.eventBus;
   try {
     chess.load(host.fen);
@@ -30,7 +22,7 @@ function tryMove(
   }
 }
 
-function handleEditClick(host: ITreeHost, clickedKey: Square): void {
+function handleEditClick(host: IHost, clickedKey: Square): void {
   const eventBus = host.eventBus;
   const chess = new Chess(host.fen, { skipValidation: true });
 
@@ -66,7 +58,7 @@ function handleEditClick(host: ITreeHost, clickedKey: Square): void {
 }
 
 const BoardClickModule = {
-  init(host: ITreeHost | IPGNViewHost) {
+  init(host: IHost) {
     const eventBus = host.eventBus;
     const chess = new Chess();
 
@@ -91,5 +83,5 @@ const BoardClickModule = {
   },
 };
 
-registerPGNViewModule("BoardClick", BoardClickModule);
-registerTreeModule("BoardClick", BoardClickModule);
+registerFileModule("BoardClick", BoardClickModule);
+registerBlockModule("BoardClick", BoardClickModule);

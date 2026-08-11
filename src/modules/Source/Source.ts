@@ -1,5 +1,5 @@
-import { registerTreeModule } from "../../core/module-system";
-import { DEFAULT_FEN, type IOptions, type ITreeHost } from "../../types";
+import { registerBlockModule } from "../../core/module-system";
+import { DEFAULT_FEN, type IBlockHost, type IOptions } from "../../types";
 import { parseOption, parsePikafishUrl, parseSource } from "../../utils/parse";
 
 import { PGNParser } from "./parser";
@@ -35,7 +35,7 @@ function prepareSource(raw: string): { options: IOptions; clean: string } {
 }
 
 const SourceModule = {
-  init(host: ITreeHost) {
+  init(host: IBlockHost) {
     const eventBus = host.eventBus;
     eventBus.on<string>("load", (renderChild) => {
       const { options, clean: cleanSource } = prepareSource(host.source);
@@ -92,7 +92,7 @@ const SourceModule = {
   },
 };
 
-registerTreeModule("source", SourceModule);
+registerBlockModule("source", SourceModule);
 
 function getTurnFromFen(fen: string): "white" | "black" {
   return fen.split(" ")[1] === "b" ? "black" : "white";

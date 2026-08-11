@@ -1,4 +1,8 @@
-import type { MarkdownPostProcessorContext } from "obsidian";
+import type {
+  MarkdownPostProcessorContext,
+  MarkdownRenderChild,
+  TextFileView,
+} from "obsidian";
 
 import type { Move, Piece, Square } from "./chess";
 import type { EventBus } from "./core/event-bus";
@@ -104,21 +108,16 @@ type SvelteComponent = {
 };
 
 export interface IHost {
-  containerEl: HTMLElement;
-  ctx: MarkdownPostProcessorContext;
   plugin: ChessPlugin;
   eventBus: EventBus;
   settings: ISettings;
-  source: string;
-}
-
-export interface ITreeHost extends IHost {
   fen: string;
   selectedPiece: Piece | null;
   markedPos: Square | null;
   Chess: SvelteComponent | null;
   editing: boolean;
   isFenMode: boolean;
+  modified: boolean;
   parser: PGNParser;
   tags: string;
   root: ChessNode;
@@ -127,14 +126,18 @@ export interface ITreeHost extends IHost {
   currentTurn: ITurn;
   currentNode: ChessNode;
   currentPath: string[];
-  modified: boolean;
   haveFEN: boolean;
   options: IOptions;
   stringifyPGN: (root: ChessNode, includeEval?: boolean) => string;
 }
 
-export interface IPGNViewHost extends ITreeHost {
-  data: string;
-  contentEl: HTMLElement;
-  saveFile: () => void;
-}
+export type IBlockHost = IHost &
+  MarkdownRenderChild & {
+    ctx: MarkdownPostProcessorContext;
+    source: string;
+  };
+
+export type IFileHost = IHost &
+  TextFileView & {
+    saveFile: () => void;
+  };
