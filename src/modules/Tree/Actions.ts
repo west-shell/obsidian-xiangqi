@@ -465,8 +465,12 @@ const ActionsModule = {
     });
 
     eventBus.on("export", () => {
-      const branchPgn = stringifyCurrentBranchPGN(host);
-      const modal = new ExportModal(host.plugin.app, host, branchPgn);
+      const modal = new ExportModal(
+        host.plugin.app,
+        host,
+        (inclComments, inclEval) =>
+          stringifyCurrentBranchPGN(host, inclComments, inclEval),
+      );
       modal.open();
     });
 
@@ -655,7 +659,11 @@ function emitNodeEval(host: IHost) {
   }
 }
 
-function stringifyCurrentBranchPGN(host: IHost): string {
+function stringifyCurrentBranchPGN(
+  host: IHost,
+  includeComments = true,
+  includeEval = true,
+): string {
   const pathIds: string[] = [];
   let n: ChessNode | null = host.currentNode;
   while (n) {
@@ -678,10 +686,10 @@ function stringifyCurrentBranchPGN(host: IHost): string {
       }
       stepNum++;
     }
-    if (node.comments?.length) {
+    if (includeComments && node.comments?.length) {
       for (const c of node.comments) result += `{${c}}`;
     }
-    if (node.eval) {
+    if (includeEval && node.eval) {
       const absScore = Math.abs(node.eval.score);
       const evalStr =
         node.eval.scoreType === "mate"

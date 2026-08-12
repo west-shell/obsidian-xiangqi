@@ -480,10 +480,18 @@ export class ImportModal extends Modal {
 }
 
 export class ExportModal extends Modal {
+  private includeComments = true;
+  private includeEval = true;
+  private allPgnArea!: HTMLTextAreaElement;
+  private branchPgnArea!: HTMLTextAreaElement;
+
   constructor(
     app: App,
     private readonly host: IHost,
-    private readonly currentBranchPGN: string,
+    private readonly getCurrentBranchPGN: (
+      includeComments: boolean,
+      includeEval: boolean,
+    ) => string,
   ) {
     super(app);
   }
@@ -494,15 +502,44 @@ export class ExportModal extends Modal {
 
     new Setting(contentEl).setName(t("export.title")).setHeading();
 
+    new Setting(contentEl)
+      .setName(t("export.includeComments"))
+      .addToggle((toggle) => {
+        toggle.setValue(this.includeComments).onChange((val) => {
+          this.includeComments = val;
+          this.refreshPgn();
+        });
+      });
+
+    new Setting(contentEl)
+      .setName(t("export.includeEval"))
+      .addToggle((toggle) => {
+        toggle.setValue(this.includeEval).onChange((val) => {
+          this.includeEval = val;
+          this.refreshPgn();
+        });
+      });
+
     const rootFen = host.root.fen;
     const currentFen = host.currentNode.fen;
-    const allPgn = host.tags + "\n\n" + host.stringifyPGN(host.root, true);
-    const branchPgn = this.currentBranchPGN;
 
-    this.addExportSection(contentEl, t("export.rootFen"), rootFen);
-    this.addExportSection(contentEl, t("export.currentFen"), currentFen);
-    this.addExportSection(contentEl, t("export.allPgn"), allPgn);
-    this.addExportSection(contentEl, t("export.currentBranchPgn"), branchPgn);
+    this.addExportSection(contentEl, t("export.rootFen"), rootFen, null);
+    this.addExportSection(contentEl, t("export.currentFen"), currentFen, null);
+
+    const allPgn =
+      host.tags + "\n\n" + host.stringifyPGN(host.root, this.includeEval);
+    this.addExportSection(contentEl, t("export.allPgn"), allPgn, "allPgn");
+
+    const branchPgn = this.getCurrentBranchPGN(
+      this.includeComments,
+      this.includeEval,
+    );
+    this.addExportSection(
+      contentEl,
+      t("export.currentBranchPgn"),
+      branchPgn,
+      "branchPgn",
+    );
 
     const btnContainer = contentEl.createDiv("modal-button-container");
     const closeBtn = btnContainer.createEl("button", {
@@ -511,10 +548,23 @@ export class ExportModal extends Modal {
     closeBtn.addEventListener("click", () => this.close());
   }
 
+  private refreshPgn() {
+    const host = this.host;
+    const allPgn =
+      host.tags + "\n\n" + host.stringifyPGN(host.root, this.includeEval);
+    if (this.allPgnArea) this.allPgnArea.value = allPgn;
+    const branchPgn = this.getCurrentBranchPGN(
+      this.includeComments,
+      this.includeEval,
+    );
+    if (this.branchPgnArea) this.branchPgnArea.value = branchPgn;
+  }
+
   private addExportSection(
     container: HTMLElement,
     label: string,
     value: string,
+    areaKey: "allPgn" | "branchPgn" | null,
   ) {
     new Setting(container).setName(label);
     const area = container.createEl("textarea", {
@@ -526,13 +576,16 @@ export class ExportModal extends Modal {
     });
     area.value = value;
 
+    if (areaKey === "allPgn") this.allPgnArea = area;
+    else if (areaKey === "branchPgn") this.branchPgnArea = area;
+
     const copyBtn = container.createEl("button", {
       text: t("export.copy"),
       cls: "mod-cta",
     });
     copyBtn.addEventListener("click", () => {
       void navigator.clipboard
-        .writeText(value)
+        .writeText(area.value)
         .then(() => {
           new Notice(t("notice.fenCopied"));
           return undefined;

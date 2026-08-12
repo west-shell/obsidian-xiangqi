@@ -87,6 +87,8 @@
   "export.currentFen": "当前节点 FEN",
   "export.allPgn": "全部 PGN",
   "export.currentBranchPgn": "当前分支 PGN",
+  "export.includeComments": "包含评论标注",
+  "export.includeEval": "包含引擎评分",
   "export.copy": "复制",
   "export.close": "关闭",
   "notice.fenImported": "FEN 已导入",

@@ -86,6 +86,8 @@
   "export.currentFen": "Current FEN",
   "export.allPgn": "All PGN",
   "export.currentBranchPgn": "Current Branch PGN",
+  "export.includeComments": "Include comments",
+  "export.includeEval": "Include evaluation",
   "export.copy": "Copy",
   "export.close": "Close",
   "notice.fenImported": "FEN imported",
