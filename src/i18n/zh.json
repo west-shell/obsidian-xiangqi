@@ -166,7 +166,7 @@
   "engine.showPonder": "显示预期应着箭头",
   "engine.showPonder.desc": "在棋盘上以黄色箭头显示引擎预期的对方应着",
   "engine.showMoveAnnotations": "实时引擎评注",
-  "engine.showMoveAnnotations.desc": "引擎分析时自动标注着法质量（不准确、失误、严重失误等）",
+  "engine.showMoveAnnotations.desc": "引擎分析时自动标注着法质量。符号含义：!! 妙手，! 好棋，!? 有趣，?! 不准确，? 失误，?? 严重失误",
   "save.title": "保存",
   "save.saveEval": "默认保存评估",
   "save.saveEval.desc": "分析后自动将评估结果保存到棋谱中",

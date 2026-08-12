@@ -165,7 +165,7 @@
   "engine.showPonder": "Show ponder arrow",
   "engine.showPonder.desc": "Display the engine's ponder (expected response) as a yellow arrow on the board",
   "engine.showMoveAnnotations": "Live engine annotations",
-  "engine.showMoveAnnotations.desc": "Auto-annotate move quality (Inaccuracy, Mistake, Blunder, etc.) during engine analysis",
+  "engine.showMoveAnnotations.desc": "Auto-annotate move quality during engine analysis. Symbols: !! Brilliant, ! Good move, !? Interesting, ?! Inaccuracy, ? Mistake, ?? Blunder",
   "save.title": "Save",
   "save.saveEval": "Save eval by default",
   "save.saveEval.desc": "Automatically save evaluation results to the game record after analysis",
