@@ -676,6 +676,9 @@ function stringifyCurrentBranchPGN(
   pathIds.reverse();
 
   let result = "";
+  if (host.root.fen !== DEFAULT_FEN) {
+    result = `[FEN "${host.root.fen}"]\n\n`;
+  }
   let stepNum = 1;
   for (let i = 1; i < pathIds.length; i++) {
     const node = host.nodeMap.get(pathIds[i])!;
