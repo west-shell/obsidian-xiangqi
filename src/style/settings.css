@@ -24,3 +24,29 @@
 .engine-setting-toggle label {
   cursor: pointer;
 }
+.import-textarea,
+.export-textarea {
+  width: 100%;
+  min-height: 40px;
+  padding: 8px;
+  font-family: var(--font-monospace);
+  font-size: 13px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 4px;
+  background: var(--background-primary);
+  color: var(--text-normal);
+  resize: vertical;
+  box-sizing: border-box;
+}
+.export-textarea {
+  resize: none;
+}
+.import-fen-warning {
+  color: var(--text-error);
+  font-size: 13px;
+  margin: 4px 0 8px;
+}
+.import-separator {
+  border-top: 1px solid var(--background-modifier-border);
+  margin: 16px 0;
+}

@@ -6,7 +6,11 @@ import {
 import { t } from "../../i18n";
 import type { ChessNode, IHost } from "../../types";
 import { DEFAULT_FEN } from "../../types";
-import { ConfirmModal } from "../../utils/confirmModal";
+import {
+  ConfirmModal,
+  ExportModal,
+  ImportModal,
+} from "../../utils/confirmModal";
 import { Modal, Notice, Setting } from "obsidian";
 
 const ActionsModule = {
@@ -455,20 +459,15 @@ const ActionsModule = {
     host.stringifyPGN = (root: ChessNode, includeEval = true) =>
       stringifyPGN(root, includeEval);
 
-    eventBus.on("copy-fen", () => {
-      const fen = host.currentNode.fen;
-      navigator.clipboard
-        .writeText(fen)
-        .then(() => new Notice(t("notice.fenCopied")))
-        .catch(() => {});
+    eventBus.on("import", () => {
+      const modal = new ImportModal(host.plugin.app, host);
+      modal.open();
     });
 
-    eventBus.on("copy-pgn", () => {
-      const pgn = host.tags + "\n\n" + stringifyPGN(host.root, true);
-      navigator.clipboard
-        .writeText(pgn)
-        .then(() => new Notice(t("notice.pgnCopied")))
-        .catch(() => {});
+    eventBus.on("export", () => {
+      const branchPgn = stringifyCurrentBranchPGN(host);
+      const modal = new ExportModal(host.plugin.app, host, branchPgn);
+      modal.open();
     });
 
     eventBus.on("open-engine-settings", () => {
@@ -654,4 +653,48 @@ function emitNodeEval(host: IHost) {
   } else {
     host.eventBus.emit("clear-engine-bestmove");
   }
+}
+
+function stringifyCurrentBranchPGN(host: IHost): string {
+  const pathIds: string[] = [];
+  let n: ChessNode | null = host.currentNode;
+  while (n) {
+    pathIds.push(n.id);
+    n = n.parentID ? (host.nodeMap.get(n.parentID) ?? null) : null;
+  }
+  pathIds.reverse();
+
+  let result = "";
+  let stepNum = 1;
+  for (let i = 1; i < pathIds.length; i++) {
+    const node = host.nodeMap.get(pathIds[i])!;
+    if (node.side === "white") {
+      result += `${stepNum}. ${node.move!.iccs}`;
+    } else if (node.side === "black") {
+      if (i === 1) {
+        result += `${stepNum}... ${node.move!.iccs}`;
+      } else {
+        result += ` ${node.move!.iccs}`;
+      }
+      stepNum++;
+    }
+    if (node.comments?.length) {
+      for (const c of node.comments) result += `{${c}}`;
+    }
+    if (node.eval) {
+      const absScore = Math.abs(node.eval.score);
+      const evalStr =
+        node.eval.scoreType === "mate"
+          ? `m${node.eval.score >= 0 ? "+" : "-"}${absScore}`
+          : `${node.eval.score >= 0 ? "+" : "-"}${(absScore / 100).toFixed(2)}`;
+      let annotation = `%e:${evalStr}`;
+      if (node.eval.bestmove) {
+        annotation += `,${node.eval.bestmove}`;
+        if (node.eval.ponder) annotation += `,${node.eval.ponder}`;
+      }
+      result += `{${annotation}}`;
+    }
+    if (i < pathIds.length - 1) result += " ";
+  }
+  return result;
 }

@@ -1,5 +1,9 @@
-import { type App, Modal, Setting } from "obsidian";
+import { type App, Modal, Notice, Setting } from "obsidian";
 import { t } from "../i18n";
+import type { ChessNode, IHost } from "../types";
+import { PGNParser } from "../modules/Source/parser";
+import { validateFen } from "./chessEngine";
+import { computeGlyph } from "./winningChances";
 
 export class SaveConfirmModal extends Modal {
   private resolvePromise: (value: "save" | "saveAll" | "cancel") => void;
@@ -298,5 +302,261 @@ export class DownloadModal extends Modal {
   onClose() {
     const { contentEl } = this;
     contentEl.empty();
+  }
+}
+
+export class ImportModal extends Modal {
+  private fenValue = "";
+  private pgnValue = "";
+
+  constructor(
+    app: App,
+    private readonly host: IHost,
+  ) {
+    super(app);
+  }
+
+  onOpen() {
+    const { contentEl } = this;
+
+    new Setting(contentEl).setName(t("import.title")).setHeading();
+
+    new Setting(contentEl).setName(t("import.fen"));
+    const fenArea = contentEl.createEl("textarea", {
+      cls: "import-textarea",
+      attr: {
+        rows: "3",
+        placeholder:
+          "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w",
+      },
+    });
+    fenArea.addEventListener("input", () => {
+      this.fenValue = fenArea.value;
+    });
+
+    contentEl.createDiv({
+      cls: "import-fen-warning",
+      text: t("import.fenWarning"),
+    });
+
+    const fenBtnContainer = contentEl.createDiv("modal-button-container");
+    const importFenBtn = fenBtnContainer.createEl("button", {
+      text: t("import.importFen"),
+      cls: "mod-cta",
+    });
+    importFenBtn.addEventListener("click", () => this.handleImportFen());
+
+    contentEl.createDiv({ cls: "import-separator" });
+
+    new Setting(contentEl).setName(t("import.pgn"));
+    const pgnArea = contentEl.createEl("textarea", {
+      cls: "import-textarea",
+      attr: { rows: "6", placeholder: "H2-E2 H8-E8 ..." },
+    });
+    pgnArea.addEventListener("input", () => {
+      this.pgnValue = pgnArea.value;
+    });
+
+    const pgnBtnContainer = contentEl.createDiv("modal-button-container");
+    const overwriteBtn = pgnBtnContainer.createEl("button", {
+      text: t("import.overwrite"),
+      cls: "mod-cta",
+    });
+    overwriteBtn.addEventListener("click", () =>
+      this.handleImportPgn("overwrite"),
+    );
+    const addBranchBtn = pgnBtnContainer.createEl("button", {
+      text: t("import.addBranch"),
+    });
+    addBranchBtn.addEventListener("click", () =>
+      this.handleImportPgn("branch"),
+    );
+
+    const cancelContainer = contentEl.createDiv("modal-button-container");
+    const cancelBtn = cancelContainer.createEl("button", {
+      text: t("confirm.cancel"),
+    });
+    cancelBtn.addEventListener("click", () => this.close());
+  }
+
+  private handleImportFen() {
+    const fen = this.fenValue.trim();
+    if (!fen) {
+      new Notice(t("import.emptyFen"));
+      return;
+    }
+    const validation = validateFen(fen);
+    if (!validation.ok) {
+      new Notice(t("import.invalidFen"));
+      return;
+    }
+
+    const host = this.host;
+    const eventBus = host.eventBus;
+
+    host.root.children = [];
+    host.root.comments = [];
+    host.root.fen = fen;
+    host.nodeMap.clear();
+    host.nodeMap.set(host.root.id, host.root);
+    host.currentNode = host.root;
+    host.fen = fen;
+    host.tags = updateFenTag(host.tags, fen);
+    host.selectedPiece = null;
+    host.markedPos = null;
+
+    eventBus.emit("updateMainPath");
+    eventBus.emit("updateUI");
+    eventBus.emit("modified", null);
+
+    this.close();
+    new Notice(t("notice.fenImported"));
+  }
+
+  private handleImportPgn(mode: "overwrite" | "branch") {
+    const pgn = this.pgnValue.trim();
+    if (!pgn) {
+      new Notice(t("import.emptyPgn"));
+      return;
+    }
+
+    let parser: PGNParser;
+    try {
+      parser = new PGNParser(pgn);
+    } catch {
+      new Notice(t("import.invalidPgn"));
+      return;
+    }
+
+    const host = this.host;
+    const eventBus = host.eventBus;
+    const newRoot = parser.getRoot();
+    const newMap = parser.getMap();
+    const newTags = parser.getTags();
+
+    if (mode === "overwrite") {
+      host.parser = parser;
+      host.root = newRoot;
+      host.nodeMap = newMap;
+      host.tags = newTags;
+      host.haveFEN = parser.haveFEN;
+      computeAllGlyphs(host);
+    } else {
+      function reassignIds(node: ChessNode, parentId: string | null) {
+        const newId = `node-${host.parser.nodeId++}`;
+        node.parentID = parentId;
+        node.id = newId;
+        host.nodeMap.set(newId, node);
+        for (const child of node.children) {
+          reassignIds(child, newId);
+        }
+      }
+      for (const child of newRoot.children) {
+        reassignIds(child, host.root.id);
+        host.root.children.push(child);
+      }
+    }
+
+    host.currentNode = host.nodeMap.get("node-root")!;
+    host.fen = host.currentNode.fen;
+    host.currentTurn = host.currentNode.move?.color === "w" ? "black" : "white";
+
+    eventBus.emit("updateMainPath");
+    eventBus.emit("updateUI");
+    eventBus.emit("modified", null);
+
+    this.close();
+    new Notice(
+      mode === "overwrite"
+        ? t("notice.pgnImported")
+        : t("notice.pgnImportedAsBranch"),
+    );
+  }
+
+  onClose() {
+    const { contentEl } = this;
+    contentEl.empty();
+  }
+}
+
+export class ExportModal extends Modal {
+  constructor(
+    app: App,
+    private readonly host: IHost,
+    private readonly currentBranchPGN: string,
+  ) {
+    super(app);
+  }
+
+  onOpen() {
+    const { contentEl } = this;
+    const host = this.host;
+
+    new Setting(contentEl).setName(t("export.title")).setHeading();
+
+    const rootFen = host.root.fen;
+    const currentFen = host.currentNode.fen;
+    const allPgn = host.tags + "\n\n" + host.stringifyPGN(host.root, true);
+    const branchPgn = this.currentBranchPGN;
+
+    this.addExportSection(contentEl, t("export.rootFen"), rootFen);
+    this.addExportSection(contentEl, t("export.currentFen"), currentFen);
+    this.addExportSection(contentEl, t("export.allPgn"), allPgn);
+    this.addExportSection(contentEl, t("export.currentBranchPgn"), branchPgn);
+
+    const btnContainer = contentEl.createDiv("modal-button-container");
+    const closeBtn = btnContainer.createEl("button", {
+      text: t("export.close"),
+    });
+    closeBtn.addEventListener("click", () => this.close());
+  }
+
+  private addExportSection(
+    container: HTMLElement,
+    label: string,
+    value: string,
+  ) {
+    new Setting(container).setName(label);
+    const area = container.createEl("textarea", {
+      cls: "export-textarea",
+      attr: {
+        rows: String(Math.max(2, Math.min(value.split("\n").length, 10))),
+        readonly: "",
+      },
+    });
+    area.value = value;
+
+    const copyBtn = container.createEl("button", {
+      text: t("export.copy"),
+      cls: "mod-cta",
+    });
+    copyBtn.addEventListener("click", () => {
+      navigator.clipboard
+        .writeText(value)
+        .then(() => {
+          new Notice(t("notice.fenCopied"));
+        })
+        .catch(() => {});
+    });
+  }
+
+  onClose() {
+    const { contentEl } = this;
+    contentEl.empty();
+  }
+}
+
+function updateFenTag(tags: string, newFen: string): string {
+  if (tags.includes('[FEN "')) {
+    return tags.replace(/\[FEN "[^"]*"\]/, `[FEN "${newFen}"]`);
+  }
+  return `[FEN "${newFen}"]\n${tags}`;
+}
+
+function computeAllGlyphs(host: IHost) {
+  for (const [, node] of host.nodeMap) {
+    if (!node.eval || !node.parentID) continue;
+    const parent = host.nodeMap.get(node.parentID);
+    node.glyph = computeGlyph(parent?.eval, node.eval, node.side);
   }
 }

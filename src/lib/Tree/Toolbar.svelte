@@ -172,15 +172,15 @@
     menu.addSeparator();
 
     menu.addItem((mi) => {
-      mi.setTitle(t("toolbar.copyFEN", _lv))
-        .setIcon("clipboard-copy")
-        .onClick(() => eventBus.emit("copy-fen"));
+      mi.setTitle(t("toolbar.import", _lv))
+        .setIcon("log-in")
+        .onClick(() => eventBus.emit("import"));
     });
 
     menu.addItem((mi) => {
-      mi.setTitle(t("toolbar.copyPGN", _lv))
-        .setIcon("clipboard-paste")
-        .onClick(() => eventBus.emit("copy-pgn"));
+      mi.setTitle(t("toolbar.export", _lv))
+        .setIcon("log-out")
+        .onClick(() => eventBus.emit("export"));
     });
 
     menu.showAtMouseEvent(evt);
