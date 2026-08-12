@@ -4,7 +4,8 @@ import { DEFAULT_FEN } from "../../types";
 
 import { type Token, tokenize, type TokenType } from "./Tokenizer";
 
-const EVAL_RE = /^%e:([m+-]?)(\d+(?:\.\d+)?),?([a-i0-9]+)?,?([a-i0-9]+)?$/;
+const EVAL_RE =
+  /^%e:([m+-]?)(\d+(?:\.\d+)?),?([a-i0-9]+)?,?([a-i0-9]+)?,?(!\?|\?!|\?\?|[?!]|!!)?$/;
 
 export class PGNParser {
   haveFEN: boolean = false;
@@ -185,6 +186,7 @@ export class PGNParser {
       const numStr = evalMatch[2];
       const bestmove = evalMatch[3] || undefined;
       const ponder = evalMatch[4] || undefined;
+      const glyphSymbol = evalMatch[5] || undefined;
       let scoreType: "cp" | "mate" = "cp";
       let score: number;
       if (prefix === "m") {
@@ -206,6 +208,21 @@ export class PGNParser {
         score = Number.parseFloat(numStr) * 100;
       }
       this.currentNode.eval = { score, scoreType, depth: 0, bestmove, ponder };
+      if (glyphSymbol) {
+        const GLYPH_DEFS: Record<
+          string,
+          { symbol: string; name: string; color: string }
+        > = {
+          "?!": { symbol: "?!", name: "Inaccuracy", color: "#56b4e9" },
+          "?": { symbol: "?", name: "Mistake", color: "#e69f00" },
+          "??": { symbol: "??", name: "Blunder", color: "#df5353" },
+          "!": { symbol: "!", name: "Good move", color: "#22ac38" },
+          "!!": { symbol: "!!", name: "Brilliant", color: "#168226" },
+          "!?": { symbol: "!?", name: "Interesting", color: "#ea45d8" },
+        };
+        const glyphDef = GLYPH_DEFS[glyphSymbol];
+        if (glyphDef) this.currentNode.glyph = glyphDef;
+      }
       return;
     }
 

@@ -619,6 +619,9 @@ export function stringifyPGN(root: ChessNode, includeEval = true): string {
         annotation += `,${node.eval.bestmove}`;
         if (node.eval.ponder) annotation += `,${node.eval.ponder}`;
       }
+      if (node.glyph) {
+        annotation += `,${node.glyph.symbol}`;
+      }
       result += `{${annotation}}`;
     }
     const brothers = nodeBrothers.get(node);
@@ -699,6 +702,9 @@ function stringifyCurrentBranchPGN(
       if (node.eval.bestmove) {
         annotation += `,${node.eval.bestmove}`;
         if (node.eval.ponder) annotation += `,${node.eval.ponder}`;
+      }
+      if (node.glyph) {
+        annotation += `,${node.glyph.symbol}`;
       }
       result += `{${annotation}}`;
     }
