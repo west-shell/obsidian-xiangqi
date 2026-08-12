@@ -248,8 +248,8 @@
       mi.setTitle(t("boardMenu.showLastMove", _lv))
         .setChecked(settings?.showLastMove ?? true)
         .onClick(() => {
-          if (!settings || !plugin) return;
-          settings.showLastMove = !settings.showLastMove;
+          if (!plugin) return;
+          plugin.settings.showLastMove = !plugin.settings.showLastMove;
           void plugin.saveSettings();
           eventBus.emit("updateUI");
         });
@@ -259,8 +259,8 @@
       mi.setTitle(t("boardMenu.showNextMove", _lv))
         .setChecked(settings?.showNextMove ?? true)
         .onClick(() => {
-          if (!settings || !plugin) return;
-          settings.showNextMove = !settings.showNextMove;
+          if (!plugin) return;
+          plugin.settings.showNextMove = !plugin.settings.showNextMove;
           void plugin.saveSettings();
           eventBus.emit("updateUI");
         });
@@ -271,8 +271,9 @@
         mi.setTitle(t("boardMenu.showOtherVariations", _lv))
           .setChecked(settings.showOtherVariations ?? true)
           .onClick(() => {
-            if (!settings || !plugin) return;
-            settings.showOtherVariations = !settings.showOtherVariations;
+            if (!plugin) return;
+            plugin.settings.showOtherVariations =
+              !plugin.settings.showOtherVariations;
             void plugin.saveSettings();
             eventBus.emit("updateUI");
           });
@@ -285,8 +286,9 @@
       mi.setTitle(t("boardMenu.showEngineBestMove", _lv))
         .setChecked(settings?.showEngineBestMove ?? true)
         .onClick(() => {
-          if (!settings || !plugin) return;
-          settings.showEngineBestMove = !settings.showEngineBestMove;
+          if (!plugin) return;
+          plugin.settings.showEngineBestMove =
+            !plugin.settings.showEngineBestMove;
           void plugin.saveSettings();
           eventBus.emit("updateUI");
         });
@@ -296,8 +298,8 @@
       mi.setTitle(t("boardMenu.showEnginePonder", _lv))
         .setChecked(settings?.showEnginePonder ?? true)
         .onClick(() => {
-          if (!settings || !plugin) return;
-          settings.showEnginePonder = !settings.showEnginePonder;
+          if (!plugin) return;
+          plugin.settings.showEnginePonder = !plugin.settings.showEnginePonder;
           void plugin.saveSettings();
           eventBus.emit("updateUI");
         });
@@ -307,8 +309,9 @@
       mi.setTitle(t("boardMenu.showAnnotations", _lv))
         .setChecked(settings?.showMoveAnnotations ?? true)
         .onClick(() => {
-          if (!settings || !plugin) return;
-          settings.showMoveAnnotations = !settings.showMoveAnnotations;
+          if (!plugin) return;
+          plugin.settings.showMoveAnnotations =
+            !plugin.settings.showMoveAnnotations;
           void plugin.saveSettings();
           eventBus.emit("updateUI");
         });
