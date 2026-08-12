@@ -46,6 +46,7 @@ const TreeViewModule = {
           editing: host.editing,
           selectedPiece: host.selectedPiece,
           isFenMode: host.isFenMode,
+          plugin: host.plugin,
         },
       });
     });
@@ -62,6 +63,7 @@ const TreeViewModule = {
         editing: host.editing,
         selectedPiece: host.selectedPiece,
         isFenMode: host.isFenMode,
+        plugin: host.plugin,
       });
     });
 

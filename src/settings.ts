@@ -44,6 +44,7 @@ export const DEFAULT_SETTINGS: ISettings = {
   showCoordinateLabels: true,
   showLastMove: true,
   showNextMove: true,
+  showOtherVariations: true,
   showTurnBorder: true,
   autoJump: "auto",
   enableSpeech: true,
@@ -524,6 +525,16 @@ export class ChessSettingTab extends PluginSettingTab {
       .addToggle((toggle) =>
         toggle.setValue(settings.showNextMove).onChange((value) => {
           settings.showNextMove = value;
+          this.plugin.refresh();
+        }),
+      );
+
+    new Setting(containerEl)
+      .setName(t("game.otherVariations"))
+      .setDesc(t("game.otherVariations.desc"))
+      .addToggle((toggle) =>
+        toggle.setValue(settings.showOtherVariations).onChange((value) => {
+          settings.showOtherVariations = value;
           this.plugin.refresh();
         }),
       );

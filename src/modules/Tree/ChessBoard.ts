@@ -25,6 +25,7 @@ const BoardModule = {
           options: host.options || {},
           editing: host.editing,
           isFenMode: host.isFenMode,
+          plugin: host.plugin,
         },
       });
     });
@@ -45,6 +46,7 @@ const BoardModule = {
         editing: host.editing,
         selectedPiece: host.selectedPiece,
         isFenMode: host.isFenMode,
+        plugin: host.plugin,
       });
     });
 

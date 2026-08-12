@@ -1,14 +1,24 @@
 <script lang="ts">
   import { Menu, setIcon } from "obsidian";
   import type { EventBus } from "../../core/event-bus";
-  import type { IOptions } from "../../types";
+  import type { IOptions, ISettings } from "../../types";
+  import type ChessPlugin from "../../main";
   import { onLangChange, t } from "../../i18n";
 
   interface Props {
     eventBus: EventBus;
     options?: IOptions;
+    settings?: ISettings;
+    plugin?: ChessPlugin;
+    rotated?: boolean;
   }
-  let { eventBus, options = {} }: Props = $props();
+  let {
+    eventBus,
+    options = {},
+    settings,
+    plugin,
+    rotated = false,
+  }: Props = $props();
 
   let _lv = $state(0);
   onLangChange(() => _lv++);
@@ -89,7 +99,11 @@
     { title: t("toolbar.back", v), icon: "arrow-left", event: "back" },
     { title: t("toolbar.forward", v), icon: "arrow-right", event: "next" },
     { title: t("toolbar.end", v), icon: "arrow-right-to-line", event: "toEnd" },
-    { title: t("toolbar.flip", v), icon: "flip-vertical", event: "rotate" },
+    {
+      title: t("toolbar.board", v),
+      icon: "layout-grid",
+      event: "toggle-board-menu",
+    },
     {
       title: t("toolbar.editMenu", v),
       icon: "file-pen-line",
@@ -219,6 +233,90 @@
     menu.showAtMouseEvent(evt);
   }
 
+  function handleBoardMenu(evt: MouseEvent) {
+    const menu = new Menu();
+
+    menu.addItem((mi) => {
+      mi.setTitle(t("boardMenu.flip", _lv))
+        .setChecked(rotated)
+        .onClick(() => eventBus.emit("rotate"));
+    });
+
+    menu.addSeparator();
+
+    menu.addItem((mi) => {
+      mi.setTitle(t("boardMenu.showLastMove", _lv))
+        .setChecked(settings?.showLastMove ?? true)
+        .onClick(() => {
+          if (!settings || !plugin) return;
+          settings.showLastMove = !settings.showLastMove;
+          void plugin.saveSettings();
+          eventBus.emit("updateUI");
+        });
+    });
+
+    menu.addItem((mi) => {
+      mi.setTitle(t("boardMenu.showNextMove", _lv))
+        .setChecked(settings?.showNextMove ?? true)
+        .onClick(() => {
+          if (!settings || !plugin) return;
+          settings.showNextMove = !settings.showNextMove;
+          void plugin.saveSettings();
+          eventBus.emit("updateUI");
+        });
+    });
+
+    if (settings?.showNextMove) {
+      menu.addItem((mi) => {
+        mi.setTitle(t("boardMenu.showOtherVariations", _lv))
+          .setChecked(settings.showOtherVariations ?? true)
+          .onClick(() => {
+            if (!settings || !plugin) return;
+            settings.showOtherVariations = !settings.showOtherVariations;
+            void plugin.saveSettings();
+            eventBus.emit("updateUI");
+          });
+      });
+    }
+
+    menu.addSeparator();
+
+    menu.addItem((mi) => {
+      mi.setTitle(t("boardMenu.showEngineBestMove", _lv))
+        .setChecked(settings?.showEngineBestMove ?? true)
+        .onClick(() => {
+          if (!settings || !plugin) return;
+          settings.showEngineBestMove = !settings.showEngineBestMove;
+          void plugin.saveSettings();
+          eventBus.emit("updateUI");
+        });
+    });
+
+    menu.addItem((mi) => {
+      mi.setTitle(t("boardMenu.showEnginePonder", _lv))
+        .setChecked(settings?.showEnginePonder ?? true)
+        .onClick(() => {
+          if (!settings || !plugin) return;
+          settings.showEnginePonder = !settings.showEnginePonder;
+          void plugin.saveSettings();
+          eventBus.emit("updateUI");
+        });
+    });
+
+    menu.addItem((mi) => {
+      mi.setTitle(t("boardMenu.showAnnotations", _lv))
+        .setChecked(settings?.showMoveAnnotations ?? true)
+        .onClick(() => {
+          if (!settings || !plugin) return;
+          settings.showMoveAnnotations = !settings.showMoveAnnotations;
+          void plugin.saveSettings();
+          eventBus.emit("updateUI");
+        });
+    });
+
+    menu.showAtMouseEvent(evt);
+  }
+
   function handleAnalyzeMenu(evt: MouseEvent) {
     const menu = new Menu();
 
@@ -273,8 +371,8 @@
           handleEditMenu(e);
         } else if (event === "toggle-node-menu") {
           handleNodeMenu(e);
-        } else if (event === "rotate") {
-          eventBus.emit("rotate");
+        } else if (event === "toggle-board-menu") {
+          handleBoardMenu(e);
         } else {
           emitEvent(event);
         }
