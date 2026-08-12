@@ -442,6 +442,10 @@ export class ImportModal extends Modal {
       host.haveFEN = parser.haveFEN;
       computeAllGlyphs(host);
     } else {
+      if (newRoot.fen !== host.root.fen) {
+        new Notice(t("import.fenMismatch"));
+        return;
+      }
       function reassignIds(node: ChessNode, parentId: string | null) {
         const newId = `node-${host.parser.nodeId++}`;
         node.parentID = parentId;

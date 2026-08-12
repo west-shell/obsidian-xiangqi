@@ -82,6 +82,7 @@
   "import.invalidPgn": "无效的 PGN",
   "import.emptyFen": "FEN 不能为空",
   "import.emptyPgn": "PGN 不能为空",
+  "import.fenMismatch": "无法添加为分支：PGN 的起始局面（FEN）与当前树不同",
   "export.title": "导出",
   "export.rootFen": "根节点 FEN",
   "export.currentFen": "当前节点 FEN",

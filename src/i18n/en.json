@@ -81,6 +81,7 @@
   "import.invalidPgn": "Invalid PGN",
   "import.emptyFen": "FEN cannot be empty",
   "import.emptyPgn": "PGN cannot be empty",
+  "import.fenMismatch": "Cannot add as branch: the PGN has a different starting position (FEN) than the current tree",
   "export.title": "Export",
   "export.rootFen": "Root FEN",
   "export.currentFen": "Current FEN",
