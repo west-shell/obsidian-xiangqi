@@ -5,7 +5,7 @@ import { DEFAULT_FEN } from "../../types";
 import { type Token, tokenize, type TokenType } from "./Tokenizer";
 
 const EVAL_RE =
-  /^%e:([m+-]?)(\d+(?:\.\d+)?),?([a-i0-9]+)?,?([a-i0-9]+)?,?(!\?|\?!|\?\?|[?!]|!!)?$/;
+  /^%e:([m+-]?\d+(?:\.\d+)?|[m+-]?[+-]\d+(?:\.\d+)?),?([a-i0-9]+)?,?([a-i0-9]+)?,?(!\?|\?!|\?\?|[?!]|!!)?$/;
 
 export class PGNParser {
   haveFEN: boolean = false;
@@ -182,30 +182,20 @@ export class PGNParser {
 
     const evalMatch = comment.match(EVAL_RE);
     if (evalMatch) {
-      const prefix = evalMatch[1];
-      const numStr = evalMatch[2];
-      const bestmove = evalMatch[3] || undefined;
-      const ponder = evalMatch[4] || undefined;
-      const glyphSymbol = evalMatch[5] || undefined;
+      const evalStr = evalMatch[1];
+      const bestmove = evalMatch[2] || undefined;
+      const ponder = evalMatch[3] || undefined;
+      const glyphSymbol = evalMatch[4] || undefined;
       let scoreType: "cp" | "mate" = "cp";
       let score: number;
-      if (prefix === "m") {
+      if (evalStr.startsWith("m")) {
         scoreType = "mate";
-        score = numStr.startsWith("-")
-          ? -Number.parseInt(numStr.slice(1))
-          : Number.parseInt(numStr);
+        const mateStr = evalStr.slice(1);
+        const isNeg = mateStr.startsWith("-");
+        const mateVal = Number.parseInt(mateStr.replace(/[^0-9]/g, ""));
+        score = isNeg ? -mateVal : mateVal;
       } else {
-        score =
-          prefix === "-"
-            ? -Number.parseFloat(numStr) * 100
-            : Number.parseFloat(numStr) * 100;
-      }
-      if (prefix === "+" && !numStr.startsWith("-")) {
-        score = Number.parseFloat(numStr) * 100;
-      } else if (prefix === "-") {
-        score = -Number.parseFloat(numStr) * 100;
-      } else if (!prefix) {
-        score = Number.parseFloat(numStr) * 100;
+        score = Math.round(Number.parseFloat(evalStr) * 100);
       }
       this.currentNode.eval = { score, scoreType, depth: 0, bestmove, ponder };
       if (glyphSymbol) {
