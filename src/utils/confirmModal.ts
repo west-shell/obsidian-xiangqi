@@ -502,6 +502,12 @@ export class ExportModal extends Modal {
 
     new Setting(contentEl).setName(t("export.title")).setHeading();
 
+    const rootFen = host.root.fen;
+    const currentFen = host.currentNode.fen;
+
+    this.addExportSection(contentEl, t("export.rootFen"), rootFen, null);
+    this.addExportSection(contentEl, t("export.currentFen"), currentFen, null);
+
     new Setting(contentEl)
       .setName(t("export.includeComments"))
       .addToggle((toggle) => {
@@ -519,12 +525,6 @@ export class ExportModal extends Modal {
           this.refreshPgn();
         });
       });
-
-    const rootFen = host.root.fen;
-    const currentFen = host.currentNode.fen;
-
-    this.addExportSection(contentEl, t("export.rootFen"), rootFen, null);
-    this.addExportSection(contentEl, t("export.currentFen"), currentFen, null);
 
     const allPgn =
       host.tags + "\n\n" + host.stringifyPGN(host.root, this.includeEval);
