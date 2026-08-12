@@ -5,8 +5,8 @@ import {
   Notice,
   PluginSettingTab,
   Setting,
-  type SettingDefinitionItem,
-  type SettingGroupItem,
+  // type SettingDefinitionItem,
+  // type SettingGroupItem,
 } from "obsidian";
 
 import { initI18n, t } from "./i18n";
@@ -110,348 +110,348 @@ export class ChessSettingTab extends PluginSettingTab {
     this.plugin = plugin;
   }
 
-  getSettingDefinitions(): SettingDefinitionItem[] {
-    const settings = this.plugin.settings;
-    return [
-      {
-        name: "Language / 语言",
-        control: {
-          type: "dropdown",
-          key: "lang",
-          options: { auto: "Auto/跟随软件", en: "English", zh: "中文" },
-        },
-      },
-      {
-        type: "group",
-        heading: t("board.title"),
-        items: [
-          {
-            name: t("board.theme"),
-            desc: t("board.theme.desc"),
-            control: {
-              type: "dropdown",
-              key: "theme",
-              options: Object.fromEntries(
-                THEME_KEYS.map((k) => [k, t(`theme.${k}`)]),
-              ),
-            },
-          },
-          {
-            name: t("board.zoom"),
-            desc: t("board.zoom.desc"),
-            control: {
-              type: "slider",
-              key: "zoom",
-              min: 0,
-              max: 100,
-              step: 1,
-              displayFormat: (v) => `${v}%`,
-            },
-          },
-          {
-            name: t("board.coordinates"),
-            desc: t("board.coordinates.desc"),
-            control: { type: "toggle", key: "showCoordinateLabels" },
-          },
-        ],
-      },
-      {
-        type: "group",
-        heading: t("game.title"),
-        items: [
-          {
-            name: t("game.lastMove"),
-            desc: t("game.lastMove.desc"),
-            control: { type: "toggle", key: "showLastMove" },
-          },
-          {
-            name: t("game.legalMoves"),
-            desc: t("game.legalMoves.desc"),
-            control: { type: "toggle", key: "showNextMove" },
-          },
-          {
-            name: t("game.turnBorder"),
-            desc: t("game.turnBorder.desc"),
-            control: { type: "toggle", key: "showTurnBorder" },
-          },
-          {
-            name: t("game.speech"),
-            desc: t("game.speech.desc"),
-            control: { type: "toggle", key: "enableSpeech" },
-            visible: () => !!window.speechSynthesis,
-          },
-          {
-            name: t("movelist.autoJump"),
-            desc: t("movelist.autoJump.desc"),
-            control: {
-              type: "dropdown",
-              key: "autoJump",
-              options: {
-                never: t("movelist.autoJump.never"),
-                always: t("movelist.autoJump.always"),
-                auto: t("movelist.autoJump.auto"),
-              },
-            },
-          },
-        ],
-      },
-      {
-        type: "group",
-        heading: t("movelist.title"),
-        items: [
-          {
-            name: t("movelist.show"),
-            desc: t("movelist.show.desc"),
-            control: { type: "toggle", key: "showMovelist" },
-          },
-          {
-            name: t("movelist.fontSize"),
-            desc: t("movelist.fontSize.desc"),
-            control: {
-              type: "slider",
-              key: "fontSize",
-              min: 10,
-              max: 25,
-              step: 1,
-              displayFormat: (v) => `${v}px`,
-            },
-          },
-        ],
-      },
-      {
-        type: "group",
-        heading: t("engine.title"),
-        items: [
-          {
-            name: t("engine.depth"),
-            desc: t("engine.depth.desc"),
-            control: {
-              type: "slider",
-              key: "engineDepth",
-              min: 1,
-              max: 30,
-              step: 1,
-            },
-          },
-          {
-            name: t("engine.skillLevel"),
-            desc: t("engine.skillLevel.desc"),
-            control: {
-              type: "slider",
-              key: "engineSkillLevel",
-              min: 0,
-              max: 20,
-              step: 1,
-            },
-          },
-          {
-            name: t("engine.showBestMove"),
-            desc: t("engine.showBestMove.desc"),
-            control: { type: "toggle", key: "showEngineBestMove" },
-          },
-          {
-            name: t("engine.showPonder"),
-            desc: t("engine.showPonder.desc"),
-            control: { type: "toggle", key: "showEnginePonder" },
-          },
-          {
-            name: t("engine.showMoveAnnotations"),
-            desc: t("engine.showMoveAnnotations.desc"),
-            control: { type: "toggle", key: "showMoveAnnotations" },
-          },
-        ],
-      },
-      {
-        type: "group",
-        heading: t("save.title"),
-        items: [
-          {
-            name: t("save.saveEval"),
-            desc: t("save.saveEval.desc"),
-            control: { type: "toggle", key: "saveEvalByDefault" },
-          },
-          {
-            name: t("save.saveEvalPrompt"),
-            desc: t("save.saveEvalPrompt.desc"),
-            control: { type: "toggle", key: "saveEvalPrompt" },
-          },
-        ],
-      },
-      {
-        type: "group",
-        heading: t("margin.title"),
-        items: [
-          {
-            name: t("margin.top"),
-            desc: t("margin.top.desc"),
-            control: {
-              type: "slider",
-              key: "boardMarginTop",
-              min: 0,
-              max: 100,
-              step: 1,
-              displayFormat: (v) => `${v}px`,
-            },
-          },
-          {
-            name: t("margin.bottom"),
-            desc: t("margin.bottom.desc"),
-            control: {
-              type: "slider",
-              key: "boardMarginBottom",
-              min: 0,
-              max: 100,
-              step: 1,
-              displayFormat: (v) => `${v}px`,
-            },
-          },
-        ],
-      },
-      {
-        type: "group",
-        heading: t("settings.restartRequired.title"),
-        desc: t("settings.restartRequired.desc"),
-        items: [
-          ...(
-            [
-              {
-                key: "treeBlockNames" as const,
-                i18n: "treeAliases",
-                fallback: "xiangqi, tree",
-                defaults: ["xiangqi", "tree"] as const,
-              },
-            ] as const
-          ).flatMap((cfg): SettingGroupItem[] => {
-            return [
-              {
-                name: t(`codeblock.${cfg.i18n}`),
-                desc: t(`codeblock.${cfg.i18n}.desc`),
-                render: (setting: Setting) => {
-                  setting.addText((text) =>
-                    text
-                      .setValue(settings[cfg.key].join(", "))
-                      .setPlaceholder(cfg.fallback)
-                      .onChange((value) => {
-                        const { valid, invalid } = parseAndValidateNames(value);
-                        if (invalid.length) {
-                          new Notice(
-                            t("codeblock.invalidName").replace(
-                              "{name}",
-                              invalid[0],
-                            ),
-                          );
-                          const input =
-                            setting.controlEl.querySelector("input")!;
-                          input.value = valid.length
-                            ? valid.join(", ")
-                            : cfg.fallback;
-                        }
-                        if (!valid.length) return;
-                        settings[cfg.key] = valid;
-                        void this.plugin.saveSettings();
-                      }),
-                  );
-                  setting.addButton((button) =>
-                    button.setIcon("rotate-ccw").onClick(() => {
-                      settings[cfg.key] = [...cfg.defaults];
-                      const input = setting.controlEl.querySelector("input")!;
-                      input.value = cfg.fallback;
-                      void this.plugin.saveSettings();
-                    }),
-                  );
-                },
-              },
-            ];
-          }),
-          {
-            name: t("codeblock.fenSaveBlockName"),
-            desc: t("codeblock.fenSaveBlockName.desc"),
-            control: {
-              type: "dropdown",
-              key: "fenSaveBlockName",
-              options: Object.fromEntries(
-                settings.treeBlockNames.map((n) => [n, n]),
-              ),
-            },
-          },
-        ],
-      },
-      {
-        type: "group",
-        heading: t("pgn.title"),
-        items: [
-          {
-            name: t("pgn.enable"),
-            desc: t("pgn.enable.desc"),
-            control: { type: "toggle", key: "enablePGNView" },
-          },
-          {
-            name: t("pgn.extensions"),
-            desc: t("pgn.extensions.desc"),
-            render: (setting: Setting) => {
-              setting.addText((text) =>
-                text
-                  .setValue(settings.pgnFileExtensions.join(", "))
-                  .setPlaceholder("pgn")
-                  .onChange((value) => {
-                    const { valid, invalid } = parseAndValidateNames(value);
-                    if (invalid.length) {
-                      new Notice(
-                        t("codeblock.invalidName").replace(
-                          "{name}",
-                          invalid[0],
-                        ),
-                      );
-                      const input = setting.controlEl.querySelector("input")!;
-                      input.value = valid.length ? valid.join(", ") : "pgn";
-                    }
-                    if (!valid.length) return;
-                    settings.pgnFileExtensions = valid;
-                    void this.plugin.saveSettings();
-                  }),
-              );
-              setting.addButton((button) =>
-                button.setIcon("rotate-ccw").onClick(() => {
-                  settings.pgnFileExtensions = ["pgn"];
-                  const input = setting.controlEl.querySelector("input")!;
-                  input.value = "pgn";
-                  void this.plugin.saveSettings();
-                }),
-              );
-            },
-          },
-        ],
-      },
-    ];
-  }
+  // getSettingDefinitions(): SettingDefinitionItem[] {
+  //   const settings = this.plugin.settings;
+  //   return [
+  //     {
+  //       name: "Language / 语言",
+  //       control: {
+  //         type: "dropdown",
+  //         key: "lang",
+  //         options: { auto: "Auto/跟随软件", en: "English", zh: "中文" },
+  //       },
+  //     },
+  //     {
+  //       type: "group",
+  //       heading: t("board.title"),
+  //       items: [
+  //         {
+  //           name: t("board.theme"),
+  //           desc: t("board.theme.desc"),
+  //           control: {
+  //             type: "dropdown",
+  //             key: "theme",
+  //             options: Object.fromEntries(
+  //               THEME_KEYS.map((k) => [k, t(`theme.${k}`)]),
+  //             ),
+  //           },
+  //         },
+  //         {
+  //           name: t("board.zoom"),
+  //           desc: t("board.zoom.desc"),
+  //           control: {
+  //             type: "slider",
+  //             key: "zoom",
+  //             min: 0,
+  //             max: 100,
+  //             step: 1,
+  //             displayFormat: (v) => `${v}%`,
+  //           },
+  //         },
+  //         {
+  //           name: t("board.coordinates"),
+  //           desc: t("board.coordinates.desc"),
+  //           control: { type: "toggle", key: "showCoordinateLabels" },
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       type: "group",
+  //       heading: t("game.title"),
+  //       items: [
+  //         {
+  //           name: t("game.lastMove"),
+  //           desc: t("game.lastMove.desc"),
+  //           control: { type: "toggle", key: "showLastMove" },
+  //         },
+  //         {
+  //           name: t("game.legalMoves"),
+  //           desc: t("game.legalMoves.desc"),
+  //           control: { type: "toggle", key: "showNextMove" },
+  //         },
+  //         {
+  //           name: t("game.turnBorder"),
+  //           desc: t("game.turnBorder.desc"),
+  //           control: { type: "toggle", key: "showTurnBorder" },
+  //         },
+  //         {
+  //           name: t("game.speech"),
+  //           desc: t("game.speech.desc"),
+  //           control: { type: "toggle", key: "enableSpeech" },
+  //           visible: () => !!window.speechSynthesis,
+  //         },
+  //         {
+  //           name: t("movelist.autoJump"),
+  //           desc: t("movelist.autoJump.desc"),
+  //           control: {
+  //             type: "dropdown",
+  //             key: "autoJump",
+  //             options: {
+  //               never: t("movelist.autoJump.never"),
+  //               always: t("movelist.autoJump.always"),
+  //               auto: t("movelist.autoJump.auto"),
+  //             },
+  //           },
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       type: "group",
+  //       heading: t("movelist.title"),
+  //       items: [
+  //         {
+  //           name: t("movelist.show"),
+  //           desc: t("movelist.show.desc"),
+  //           control: { type: "toggle", key: "showMovelist" },
+  //         },
+  //         {
+  //           name: t("movelist.fontSize"),
+  //           desc: t("movelist.fontSize.desc"),
+  //           control: {
+  //             type: "slider",
+  //             key: "fontSize",
+  //             min: 10,
+  //             max: 25,
+  //             step: 1,
+  //             displayFormat: (v) => `${v}px`,
+  //           },
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       type: "group",
+  //       heading: t("engine.title"),
+  //       items: [
+  //         {
+  //           name: t("engine.depth"),
+  //           desc: t("engine.depth.desc"),
+  //           control: {
+  //             type: "slider",
+  //             key: "engineDepth",
+  //             min: 1,
+  //             max: 30,
+  //             step: 1,
+  //           },
+  //         },
+  //         {
+  //           name: t("engine.skillLevel"),
+  //           desc: t("engine.skillLevel.desc"),
+  //           control: {
+  //             type: "slider",
+  //             key: "engineSkillLevel",
+  //             min: 0,
+  //             max: 20,
+  //             step: 1,
+  //           },
+  //         },
+  //         {
+  //           name: t("engine.showBestMove"),
+  //           desc: t("engine.showBestMove.desc"),
+  //           control: { type: "toggle", key: "showEngineBestMove" },
+  //         },
+  //         {
+  //           name: t("engine.showPonder"),
+  //           desc: t("engine.showPonder.desc"),
+  //           control: { type: "toggle", key: "showEnginePonder" },
+  //         },
+  //         {
+  //           name: t("engine.showMoveAnnotations"),
+  //           desc: t("engine.showMoveAnnotations.desc"),
+  //           control: { type: "toggle", key: "showMoveAnnotations" },
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       type: "group",
+  //       heading: t("save.title"),
+  //       items: [
+  //         {
+  //           name: t("save.saveEval"),
+  //           desc: t("save.saveEval.desc"),
+  //           control: { type: "toggle", key: "saveEvalByDefault" },
+  //         },
+  //         {
+  //           name: t("save.saveEvalPrompt"),
+  //           desc: t("save.saveEvalPrompt.desc"),
+  //           control: { type: "toggle", key: "saveEvalPrompt" },
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       type: "group",
+  //       heading: t("margin.title"),
+  //       items: [
+  //         {
+  //           name: t("margin.top"),
+  //           desc: t("margin.top.desc"),
+  //           control: {
+  //             type: "slider",
+  //             key: "boardMarginTop",
+  //             min: 0,
+  //             max: 100,
+  //             step: 1,
+  //             displayFormat: (v) => `${v}px`,
+  //           },
+  //         },
+  //         {
+  //           name: t("margin.bottom"),
+  //           desc: t("margin.bottom.desc"),
+  //           control: {
+  //             type: "slider",
+  //             key: "boardMarginBottom",
+  //             min: 0,
+  //             max: 100,
+  //             step: 1,
+  //             displayFormat: (v) => `${v}px`,
+  //           },
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       type: "group",
+  //       heading: t("settings.restartRequired.title"),
+  //       desc: t("settings.restartRequired.desc"),
+  //       items: [
+  //         ...(
+  //           [
+  //             {
+  //               key: "treeBlockNames" as const,
+  //               i18n: "treeAliases",
+  //               fallback: "xiangqi, tree",
+  //               defaults: ["xiangqi", "tree"] as const,
+  //             },
+  //           ] as const
+  //         ).flatMap((cfg): SettingGroupItem[] => {
+  //           return [
+  //             {
+  //               name: t(`codeblock.${cfg.i18n}`),
+  //               desc: t(`codeblock.${cfg.i18n}.desc`),
+  //               render: (setting: Setting) => {
+  //                 setting.addText((text) =>
+  //                   text
+  //                     .setValue(settings[cfg.key].join(", "))
+  //                     .setPlaceholder(cfg.fallback)
+  //                     .onChange((value) => {
+  //                       const { valid, invalid } = parseAndValidateNames(value);
+  //                       if (invalid.length) {
+  //                         new Notice(
+  //                           t("codeblock.invalidName").replace(
+  //                             "{name}",
+  //                             invalid[0],
+  //                           ),
+  //                         );
+  //                         const input =
+  //                           setting.controlEl.querySelector("input")!;
+  //                         input.value = valid.length
+  //                           ? valid.join(", ")
+  //                           : cfg.fallback;
+  //                       }
+  //                       if (!valid.length) return;
+  //                       settings[cfg.key] = valid;
+  //                       void this.plugin.saveSettings();
+  //                     }),
+  //                 );
+  //                 setting.addButton((button) =>
+  //                   button.setIcon("rotate-ccw").onClick(() => {
+  //                     settings[cfg.key] = [...cfg.defaults];
+  //                     const input = setting.controlEl.querySelector("input")!;
+  //                     input.value = cfg.fallback;
+  //                     void this.plugin.saveSettings();
+  //                   }),
+  //                 );
+  //               },
+  //             },
+  //           ];
+  //         }),
+  //         {
+  //           name: t("codeblock.fenSaveBlockName"),
+  //           desc: t("codeblock.fenSaveBlockName.desc"),
+  //           control: {
+  //             type: "dropdown",
+  //             key: "fenSaveBlockName",
+  //             options: Object.fromEntries(
+  //               settings.treeBlockNames.map((n) => [n, n]),
+  //             ),
+  //           },
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       type: "group",
+  //       heading: t("pgn.title"),
+  //       items: [
+  //         {
+  //           name: t("pgn.enable"),
+  //           desc: t("pgn.enable.desc"),
+  //           control: { type: "toggle", key: "enablePGNView" },
+  //         },
+  //         {
+  //           name: t("pgn.extensions"),
+  //           desc: t("pgn.extensions.desc"),
+  //           render: (setting: Setting) => {
+  //             setting.addText((text) =>
+  //               text
+  //                 .setValue(settings.pgnFileExtensions.join(", "))
+  //                 .setPlaceholder("pgn")
+  //                 .onChange((value) => {
+  //                   const { valid, invalid } = parseAndValidateNames(value);
+  //                   if (invalid.length) {
+  //                     new Notice(
+  //                       t("codeblock.invalidName").replace(
+  //                         "{name}",
+  //                         invalid[0],
+  //                       ),
+  //                     );
+  //                     const input = setting.controlEl.querySelector("input")!;
+  //                     input.value = valid.length ? valid.join(", ") : "pgn";
+  //                   }
+  //                   if (!valid.length) return;
+  //                   settings.pgnFileExtensions = valid;
+  //                   void this.plugin.saveSettings();
+  //                 }),
+  //             );
+  //             setting.addButton((button) =>
+  //               button.setIcon("rotate-ccw").onClick(() => {
+  //                 settings.pgnFileExtensions = ["pgn"];
+  //                 const input = setting.controlEl.querySelector("input")!;
+  //                 input.value = "pgn";
+  //                 void this.plugin.saveSettings();
+  //               }),
+  //             );
+  //           },
+  //         },
+  //       ],
+  //     },
+  //   ];
+  // }
 
-  override setControlValue(key: string, value: unknown): void | Promise<void> {
-    if (!(key in DEFAULT_SETTINGS)) return;
-    (this.plugin.settings as unknown as Record<string, unknown>)[key] = value;
-    void this.plugin.saveSettings();
-    if (key === "lang" && typeof value === "string") {
-      initI18n(value);
-      // this.update?.();
-    }
-    if (
-      [
-        "theme",
-        "zoom",
-        "showLastMove",
-        "showNextMove",
-        "showTurnBorder",
-        "showMovelist",
-        "fontSize",
-        "boardMarginTop",
-        "boardMarginBottom",
-        "showEngineBestMove",
-        "showEnginePonder",
-        "showMoveAnnotations",
-      ].includes(key)
-    ) {
-      this.plugin.refresh();
-    }
-  }
+  // override setControlValue(key: string, value: unknown): void | Promise<void> {
+  //   if (!(key in DEFAULT_SETTINGS)) return;
+  //   (this.plugin.settings as unknown as Record<string, unknown>)[key] = value;
+  //   void this.plugin.saveSettings();
+  //   if (key === "lang" && typeof value === "string") {
+  //     initI18n(value);
+  //     // this.update?.();
+  //   }
+  //   if (
+  //     [
+  //       "theme",
+  //       "zoom",
+  //       "showLastMove",
+  //       "showNextMove",
+  //       "showTurnBorder",
+  //       "showMovelist",
+  //       "fontSize",
+  //       "boardMarginTop",
+  //       "boardMarginBottom",
+  //       "showEngineBestMove",
+  //       "showEnginePonder",
+  //       "showMoveAnnotations",
+  //     ].includes(key)
+  //   ) {
+  //     this.plugin.refresh();
+  //   }
+  // }
 
   display(): void {
     const settings = this.plugin.settings;
