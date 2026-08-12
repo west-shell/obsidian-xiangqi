@@ -11,7 +11,7 @@ import {
   ExportModal,
   ImportModal,
 } from "../../utils/confirmModal";
-import { Modal, Notice, Setting } from "obsidian";
+import { Modal, Setting } from "obsidian";
 
 const ActionsModule = {
   init(host: IHost) {

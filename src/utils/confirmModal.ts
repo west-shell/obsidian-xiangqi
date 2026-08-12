@@ -531,7 +531,7 @@ export class ExportModal extends Modal {
       cls: "mod-cta",
     });
     copyBtn.addEventListener("click", () => {
-      navigator.clipboard
+      void navigator.clipboard
         .writeText(value)
         .then(() => {
           new Notice(t("notice.fenCopied"));
