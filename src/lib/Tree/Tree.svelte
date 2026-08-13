@@ -45,6 +45,18 @@
   let textareaEl: HTMLTextAreaElement | undefined = $state();
   let svgEl: SVGSVGElement | undefined = $state();
   let renderedNodes: ChessNode[] = $state([]);
+  let sortedRenderedNodes = $derived.by(() => {
+    if (!currentNode) return renderedNodes;
+    const cur = currentNode.id;
+    const rest: ChessNode[] = [];
+    let curNode: ChessNode | undefined;
+    for (const n of renderedNodes) {
+      if (n.id === cur) curNode = n;
+      else rest.push(n);
+    }
+    if (curNode) rest.push(curNode);
+    return rest;
+  });
   // eslint-disable-next-line svelte/no-unnecessary-state-wrap
   let foldedNodes = $state(new SvelteSet<string>());
 
@@ -730,22 +742,23 @@
           {/each}
 
           <!-- 节点 -->
-          {#each renderedNodes as node (node.id)}
+          {#each sortedRenderedNodes as node (node.id)}
             {@const primaryAnnotation = getPrimaryAnnotation(node)}
             {@const nw = getNodeWidth(node)}
+            {@const isCurrent = node.id === currentNode?.id}
             <!-- svelte-ignore a11y_click_events_have_key_events -->
             <!-- svelte-ignore a11y_no_static_element_interactions -->
             <g
               class="node-group"
               transform="translate({node.x! * spacingX} {node.y! *
-                spacingY}){node.id === currentNode?.id ? ' scale(1.2)' : ''}"
+                spacingY}){isCurrent ? ' scale(1.2)' : ''}"
               opacity={currentPath.includes(node.id) ? 1 : 0.8}
               filter={!currentPath.includes(node.id)
                 ? "grayscale(100%) brightness(0.75)"
-                : node.id === currentNode?.id
+                : isCurrent
                   ? "drop-shadow(0 0 4px var(--interactive-accent))"
                   : undefined}
-              stroke-width={node.id === currentNode?.id ? 1 : 0.5}
+              stroke-width={isCurrent ? 1 : 0.5}
               onclick={() => eventBus.emit("node-click", node.id)}
             >
               <rect
@@ -760,7 +773,7 @@
                   : node.side === "black"
                     ? "var(--piece-black)"
                     : "green"}
-                stroke={node.id === currentNode?.id
+                stroke={isCurrent
                   ? "var(--interactive-accent)"
                   : "var(--xq-board-line)"}
               />
