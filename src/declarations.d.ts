@@ -3,6 +3,11 @@ declare module "*.css" {
   export default content;
 }
 
+declare module "*.scss" {
+  const content: string;
+  export default content;
+}
+
 declare module "*?base64" {
   const content: string;
   export default content;

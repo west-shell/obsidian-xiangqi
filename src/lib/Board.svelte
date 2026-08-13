@@ -431,4 +431,10 @@
     user-select: none;
     -webkit-user-select: none;
   }
+
+  :global(xq-board square.last-move-orig) {
+    background: linear-gradient(rgba(0, 0, 139, 0.41), rgba(0, 0, 139, 0.8))
+      center / 30% 30% no-repeat;
+    z-index: 1;
+  }
 </style>
