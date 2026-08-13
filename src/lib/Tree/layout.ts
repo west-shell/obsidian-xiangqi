@@ -80,7 +80,7 @@ function buildWNode(
 const NODE_H = 1;
 
 function nodeBottom(w: WNode): number {
-  return w.y + NODE_H;
+  return w.y + (w.children.length === 0 ? 2 : 1);
 }
 
 // ─── 核心布局 ───────────────────────
