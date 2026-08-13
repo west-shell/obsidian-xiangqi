@@ -1,6 +1,7 @@
 import { Chess, type Move } from "../../chess";
 import type { ChessNode } from "../../types";
 import { DEFAULT_FEN } from "../../types";
+import { normalizeAnnotationKey } from "../../utils/icon";
 
 import { type Token, tokenize, type TokenType } from "./Tokenizer";
 
@@ -217,7 +218,7 @@ export class PGNParser {
     }
 
     this.currentNode.comments ??= [];
-    this.currentNode.comments.push(comment);
+    this.currentNode.comments.push(normalizeAnnotationKey(comment));
   }
 
   parseResult() {
@@ -225,16 +226,16 @@ export class PGNParser {
     let result = "";
     switch (token.value) {
       case "1-0":
-        result = "R+";
+        result = "1-0";
         break;
       case "0-1":
-        result = "B+";
+        result = "0-1";
         break;
       case "1/2-1/2":
-        result = "=";
+        result = "1/2-1/2";
         break;
       case "*":
-        result = "?";
+        result = "*";
         break;
     }
     this.currentNode.comments ??= [];

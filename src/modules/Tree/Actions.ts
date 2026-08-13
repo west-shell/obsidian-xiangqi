@@ -6,6 +6,7 @@ import {
 import { t } from "../../i18n";
 import type { ChessNode, IHost } from "../../types";
 import { DEFAULT_FEN } from "../../types";
+import { isAnnotationKey, normalizeAnnotationKey } from "../../utils/icon";
 import {
   ConfirmModal,
   ExportModal,
@@ -127,26 +128,17 @@ const ActionsModule = {
             if (!host.currentNode) break;
             const node = host.currentNode;
             node.comments ??= [];
-            const ALL_ANNOTATIONS = [
-              "W+",
-              "B+",
-              "=",
-              "?",
-              "!",
-              "1-0",
-              "0-1",
-              "1/2-1/2",
-            ];
-            const isClickedDataAnnotation = ALL_ANNOTATIONS.includes(data);
+            const isClickedDataAnnotation = isAnnotationKey(data);
             if (isClickedDataAnnotation) {
-              const existingAnnotationIndex = node.comments.indexOf(data);
+              const normalized = normalizeAnnotationKey(data);
+              const existingAnnotationIndex = node.comments.indexOf(normalized);
               if (existingAnnotationIndex !== -1) {
                 node.comments.splice(existingAnnotationIndex, 1);
               } else {
                 node.comments = node.comments.filter(
-                  (comment: string) => !ALL_ANNOTATIONS.includes(comment),
+                  (comment: string) => !isAnnotationKey(comment),
                 );
-                node.comments.push(data);
+                node.comments.push(normalized);
               }
             }
             eventBus.emit("modified", null);
