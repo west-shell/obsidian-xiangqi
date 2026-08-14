@@ -4,15 +4,20 @@
   import Toolbar from "./Toolbar.svelte";
   import PieceBTNs from "../GenFEN/PieceBTNs.svelte";
   import GenFENToolbar from "../GenFEN/Toolbar.svelte";
-  import type { ChessNode, IOptions, ISettings, NodeMap } from "../../types";
+  import type {
+    ChessNode,
+    IOptions,
+    ISettings,
+    NodeMap,
+    NodeShape,
+  } from "../../types";
   import type { EventBus } from "../../core/event-bus";
   import type { cg, DrawShape, Move, Piece, Square } from "../../chess";
   import type ChessPlugin from "../../main";
   import { onMount, tick } from "svelte";
   import { annotationShapes } from "../../utils/glyphs";
-  import { badgeBoardSvg, isAnnotationKey } from "../../utils/icon";
+  import { badgeBoardSvg } from "../../utils/icon";
 
-  const SHAPES_RE = /^([a-i][0-9])([a-i][0-9])?:([gryb])$/;
   const BRUSH_MAP: Record<string, string> = {
     green: "g",
     red: "r",
@@ -27,35 +32,24 @@
   };
 
   function loadShapes(node: ChessNode): DrawShape[] {
-    if (!node.comments) return [];
-    const shapes: DrawShape[] = [];
-    for (const c of node.comments) {
-      const m = c.match(SHAPES_RE);
-      if (m) {
-        const brush = BRUSH_REV[m[3]];
-        shapes.push({
-          orig: m[1] as cg.Key,
-          dest: m[2] as cg.Key | undefined,
-          brush,
-        });
-      }
-    }
-    return shapes;
+    if (!node.shapes) return [];
+    return node.shapes.map((s: NodeShape) => ({
+      orig: s.orig as cg.Key,
+      dest: s.dest as cg.Key | undefined,
+      brush: BRUSH_REV[s.brush] ?? s.brush,
+    }));
   }
 
-  /** Convert DrawShape[] to comment strings and save to node */
   function saveShapes(node: ChessNode, shapes: DrawShape[]) {
-    const shapeComments = shapes.map(
-      (s) => s.orig + (s.dest ?? "") + ":" + BRUSH_MAP[s.brush ?? "green"],
-    );
-    node.comments = [
-      ...(node.comments ?? []).filter((c) => !SHAPES_RE.test(c)),
-      ...shapeComments,
-    ];
+    node.shapes = shapes.map((s) => ({
+      orig: s.orig,
+      dest: s.dest,
+      brush: BRUSH_MAP[s.brush ?? "green"] ?? s.brush,
+    }));
   }
 
   function getPrimaryAnnotation(node: ChessNode): string | undefined {
-    return node.comments?.find((c) => isAnnotationKey(c));
+    return node.annotation;
   }
 
   interface Props {

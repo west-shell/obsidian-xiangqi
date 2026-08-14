@@ -6,7 +6,11 @@ import {
 import { t } from "../../i18n";
 import type { ChessNode, IHost } from "../../types";
 import { DEFAULT_FEN } from "../../types";
-import { isAnnotationKey, normalizeAnnotationKey } from "../../utils/icon";
+import {
+  ANNOTATION_PREFIX,
+  isAnnotationKey,
+  SHAPES_PREFIX,
+} from "../../utils/icon";
 import {
   ConfirmModal,
   ExportModal,
@@ -127,18 +131,11 @@ const ActionsModule = {
           case "annotation": {
             if (!host.currentNode) break;
             const node = host.currentNode;
-            node.comments ??= [];
-            const isClickedDataAnnotation = isAnnotationKey(data);
-            if (isClickedDataAnnotation) {
-              const normalized = normalizeAnnotationKey(data);
-              const existingAnnotationIndex = node.comments.indexOf(normalized);
-              if (existingAnnotationIndex !== -1) {
-                node.comments.splice(existingAnnotationIndex, 1);
+            if (isAnnotationKey(data)) {
+              if (node.annotation === data) {
+                node.annotation = undefined;
               } else {
-                node.comments = node.comments.filter(
-                  (comment: string) => !isAnnotationKey(comment),
-                );
-                node.comments.push(normalized);
+                node.annotation = data;
               }
             }
             eventBus.emit("modified", null);
@@ -600,6 +597,15 @@ export function stringifyPGN(root: ChessNode, includeEval = true): string {
     if (node.comments?.length) {
       for (const c of node.comments) result += `{${c}}`;
     }
+    if (node.annotation) {
+      result += `{${ANNOTATION_PREFIX}${node.annotation}}`;
+    }
+    if (node.shapes?.length) {
+      const shapeStr = node.shapes
+        .map((s) => s.orig + (s.dest ?? "") + ":" + s.brush)
+        .join(",");
+      result += `{${SHAPES_PREFIX}${shapeStr}}`;
+    }
     if (includeEval && node.eval) {
       const absScore = Math.abs(node.eval.score);
       const evalStr =
@@ -686,6 +692,15 @@ function stringifyCurrentBranchPGN(
     }
     if (includeComments && node.comments?.length) {
       for (const c of node.comments) result += `{${c}}`;
+    }
+    if (node.annotation) {
+      result += `{${ANNOTATION_PREFIX}${node.annotation}}`;
+    }
+    if (node.shapes?.length) {
+      const shapeStr = node.shapes
+        .map((s) => s.orig + (s.dest ?? "") + ":" + s.brush)
+        .join(",");
+      result += `{${SHAPES_PREFIX}${shapeStr}}`;
     }
     if (includeEval && node.eval) {
       const absScore = Math.abs(node.eval.score);

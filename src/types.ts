@@ -84,6 +84,12 @@ export type MoveGlyph =
   | { symbol: "!!"; name: "Brilliant"; color: string }
   | { symbol: "!?"; name: "Interesting"; color: string };
 
+export type NodeShape = {
+  orig: string;
+  dest?: string;
+  brush: string;
+};
+
 export type ChessNode = {
   id: string;
   fen: string;
@@ -97,6 +103,8 @@ export type ChessNode = {
   comments?: string[];
   eval?: NodeEval;
   glyph?: MoveGlyph | null;
+  annotation?: string;
+  shapes?: NodeShape[];
   isCheckmate?: boolean;
 };
 

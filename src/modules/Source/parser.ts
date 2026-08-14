@@ -1,7 +1,12 @@
 import { Chess, type Move } from "../../chess";
 import type { ChessNode } from "../../types";
 import { DEFAULT_FEN } from "../../types";
-import { normalizeAnnotationKey } from "../../utils/icon";
+import type { NodeShape } from "../../types";
+import {
+  ANNOTATION_PREFIX,
+  isAnnotationKey,
+  SHAPES_PREFIX,
+} from "../../utils/icon";
 
 import { type Token, tokenize, type TokenType } from "./Tokenizer";
 
@@ -217,8 +222,29 @@ export class PGNParser {
       return;
     }
 
+    if (comment.startsWith(ANNOTATION_PREFIX)) {
+      const key = comment.slice(ANNOTATION_PREFIX.length);
+      if (isAnnotationKey(key)) {
+        this.currentNode.annotation = key;
+        return;
+      }
+    }
+
+    if (comment.startsWith(SHAPES_PREFIX)) {
+      const shapesStr = comment.slice(SHAPES_PREFIX.length);
+      const shapes: NodeShape[] = [];
+      for (const part of shapesStr.split(",")) {
+        const m = part.match(/^([a-i][0-9])([a-i][0-9])?:([gryb])$/);
+        if (m) shapes.push({ orig: m[1], dest: m[2], brush: m[3] });
+      }
+      if (shapes.length > 0) {
+        this.currentNode.shapes = shapes;
+        return;
+      }
+    }
+
     this.currentNode.comments ??= [];
-    this.currentNode.comments.push(normalizeAnnotationKey(comment));
+    this.currentNode.comments.push(comment);
   }
 
   parseResult() {

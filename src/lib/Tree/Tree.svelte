@@ -10,7 +10,7 @@
   } from "../../types";
   import { onLangChange, t } from "../../i18n";
   import { calculateTreeLayout } from "./layout";
-  import { badgeSvg, iconSvg, isAnnotationKey } from "../../utils/icon";
+  import { badgeSvg, iconSvg } from "../../utils/icon";
   import { scrollToBTN } from "../../utils/utils";
   import { setIcon } from "obsidian";
   import * as d3 from "d3";
@@ -111,25 +111,21 @@
 
   // ---- 工具函数 ----
   function getPrimaryAnnotation(node: ChessNode): string | undefined {
-    if (!node.comments) return undefined;
-    return node.comments.find((c) => isAnnotationKey(c));
+    return node.annotation;
   }
 
   function getAllAnnotations(node: ChessNode): string[] {
-    return node.comments?.filter((c) => isAnnotationKey(c)) ?? [];
+    return node.annotation ? [node.annotation] : [];
   }
 
-  const SHAPES_RE = /^([a-i][0-9])([a-i][0-9])?:([gryb])$/;
-
   function getRegularComments(node: ChessNode): string[] {
-    return (
-      node.comments?.filter((c) => !isAnnotationKey(c) && !SHAPES_RE.test(c)) ??
-      []
-    );
+    return node.comments ?? [];
   }
 
   function getAllShapes(node: ChessNode): string[] {
-    return node.comments?.filter((c) => SHAPES_RE.test(c)) ?? [];
+    return (
+      node.shapes?.map((s) => s.orig + (s.dest ?? "") + ":" + s.brush) ?? []
+    );
   }
 
   // ---- 自动保存逻辑 ----
@@ -193,19 +189,12 @@
     const regularComments = commentsText
       .split("\n")
       .filter((c) => c.trim() !== "");
-    const existingAnnotations = getAllAnnotations(currentNode);
-    const existingShapes = getAllShapes(currentNode);
-    const newComments = [
-      ...existingAnnotations,
-      ...existingShapes,
-      ...regularComments,
-    ];
     const oldComments = currentNode.comments ?? [];
     const changed =
-      newComments.length !== oldComments.length ||
-      newComments.some((c, i) => c !== oldComments[i]);
+      regularComments.length !== oldComments.length ||
+      regularComments.some((c, i) => c !== oldComments[i]);
     if (!changed) return;
-    currentNode.comments = newComments;
+    currentNode.comments = regularComments;
     eventBus.emit("updateUI", null);
     eventBus.emit("modified", null);
   }
