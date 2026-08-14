@@ -72,9 +72,9 @@ const BADGE_DEFS: Record<
   string,
   { icon?: string; glyph?: string; bgColor: string; fgColor: string }
 > = {
-  "++": { icon: "thumbs-up", bgColor: "#22ac38", fgColor: "#fff" },
-  "--": { icon: "thumbs-down", bgColor: "#df5353", fgColor: "#fff" },
-  "==": { icon: "handshake", bgColor: "#82c2ef", fgColor: "#fff" },
+  "+": { icon: "thumbs-up", bgColor: "#22ac38", fgColor: "#fff" },
+  "-": { icon: "thumbs-down", bgColor: "#df5353", fgColor: "#fff" },
+  "=": { icon: "handshake", bgColor: "#82c2ef", fgColor: "#fff" },
   bm: { icon: "bookmark", bgColor: "#e69f00", fgColor: "#fff" },
   st: { icon: "star", bgColor: "#22ac38", fgColor: "#fff" },
   checkmate: { icon: "crown", bgColor: "#df5353", fgColor: "#fff" },
@@ -116,7 +116,7 @@ const BADGE_DEFS: Record<
   },
 };
 
-export const ANNOTATION_KEYS = ["++", "--", "==", "bm", "st"];
+export const ANNOTATION_KEYS = ["+", "-", "=", "bm", "st"];
 export const ANNOTATION_PREFIX = "#a:";
 export const SHAPES_PREFIX = "&s:";
 

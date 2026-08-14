@@ -121,19 +121,19 @@
     {
       title: t("annotation.w+", v),
       icon: "thumbs-up",
-      symbol: "++",
+      symbol: "+",
       event: "annotation",
     },
     {
       title: t("annotation.b+", v),
       icon: "thumbs-down",
-      symbol: "--",
+      symbol: "-",
       event: "annotation",
     },
     {
       title: t("annotation.eq", v),
       icon: "handshake",
-      symbol: "==",
+      symbol: "=",
       event: "annotation",
     },
     {
