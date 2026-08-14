@@ -109,15 +109,6 @@
   const spacingY = 15;
   const nodeHeight = 11;
 
-  // ---- 工具函数 ----
-  function getPrimaryAnnotation(node: ChessNode): string | undefined {
-    return node.annotation;
-  }
-
-  function getRegularComments(node: ChessNode): string[] {
-    return node.comments ?? [];
-  }
-
   // ---- 自动保存逻辑 ----
   let saveTimeout: number | undefined;
 
@@ -584,7 +575,7 @@
     }
 
     const node = currentNode;
-    commentsText = getRegularComments(node).join("\n");
+    commentsText = (node.comments ?? []).join("\n");
 
     void tick().then(() => {
       if (textareaEl) adjustTextareaHeight();
@@ -722,7 +713,7 @@
 
           <!-- 节点 -->
           {#each sortedRenderedNodes as node (node.id)}
-            {@const primaryAnnotation = getPrimaryAnnotation(node)}
+            {@const primaryAnnotation = node.annotation}
             {@const nw = getNodeWidth(node)}
             {@const isCurrent = node.id === currentNode?.id}
             <!-- svelte-ignore a11y_click_events_have_key_events -->
@@ -826,7 +817,7 @@
                   {@html badgeSvg(`glyph:${node.glyph.symbol}`)}
                 </g>
               {/if}
-              {#if getRegularComments(node).length > 0}
+              {#if (node.comments ?? []).length > 0}
                 <g
                   transform="translate({0.3 * nw} {-0.65 * nodeHeight})"
                   style="pointer-events: none"

@@ -48,10 +48,6 @@
     }));
   }
 
-  function getPrimaryAnnotation(node: ChessNode): string | undefined {
-    return node.annotation;
-  }
-
   interface Props {
     settings: ISettings;
     fen: string;
@@ -117,7 +113,7 @@
       const engineShapes = annotationShapes(dest, node.glyph);
       shapes.push(...engineShapes);
     }
-    const ann = getPrimaryAnnotation(node);
+    const ann = node.annotation;
     if (ann && dest) {
       const svg = badgeBoardSvg(ann, shapes.filter((s) => s.customSvg).length);
       if (svg) {
