@@ -242,6 +242,17 @@
         .onClick(() => eventBus.emit("rotate"));
     });
 
+    menu.addItem((mi) => {
+      mi.setTitle(t("boardMenu.showTurnBorder", _lv))
+        .setChecked(settings?.showTurnBorder ?? true)
+        .onClick(() => {
+          if (!plugin) return;
+          plugin.settings.showTurnBorder = !plugin.settings.showTurnBorder;
+          void plugin.saveSettings();
+          eventBus.emit("updateUI");
+        });
+    });
+
     menu.addSeparator();
 
     menu.addItem((mi) => {
