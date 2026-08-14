@@ -814,7 +814,7 @@
                   style="pointer-events: none"
                 >
                   <!-- eslint-disable-next-line svelte/no-at-html-tags -->
-                  {@html badgeSvg(`glyph:${node.glyph.symbol}`)}
+                  {@html badgeSvg(`glyph_${node.glyph.symbol}`)}
                 </g>
               {/if}
               {#if (node.comments ?? []).length > 0}
@@ -823,7 +823,7 @@
                   style="pointer-events: none"
                 >
                   <!-- eslint-disable-next-line svelte/no-at-html-tags -->
-                  {@html iconSvg("message-square-text", 7, 1.5, "royalblue")}
+                  {@html iconSvg("message_square_text", 7, 1.5, "royalblue")}
                 </g>
               {/if}
             </g>
