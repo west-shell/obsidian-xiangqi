@@ -114,18 +114,8 @@
     return node.annotation;
   }
 
-  function getAllAnnotations(node: ChessNode): string[] {
-    return node.annotation ? [node.annotation] : [];
-  }
-
   function getRegularComments(node: ChessNode): string[] {
     return node.comments ?? [];
-  }
-
-  function getAllShapes(node: ChessNode): string[] {
-    return (
-      node.shapes?.map((s) => s.orig + (s.dest ?? "") + ":" + s.brush) ?? []
-    );
   }
 
   // ---- 自动保存逻辑 ----
