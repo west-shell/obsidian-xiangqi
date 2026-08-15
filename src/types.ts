@@ -110,6 +110,20 @@ export type ChessNode = {
 
 export type NodeMap = Map<string, ChessNode>;
 
+export type ParsedGame = {
+  root: ChessNode;
+  nodeMap: NodeMap;
+  tags: string;
+  haveFEN: boolean;
+  parser: PGNParser;
+};
+
+export type GameSlot = {
+  raw: string;
+  headers: Map<string, string>;
+  parsed?: ParsedGame;
+};
+
 type SvelteComponent = {
   $set?(props: Partial<Record<string, unknown>>): void;
   $destroy?(): void;
@@ -137,6 +151,8 @@ export interface IHost {
   haveFEN: boolean;
   options: IOptions;
   stringifyPGN: (root: ChessNode, includeEval?: boolean) => string;
+  games: GameSlot[];
+  currentGameIndex: number;
 }
 
 export type IBlockHost = IHost &

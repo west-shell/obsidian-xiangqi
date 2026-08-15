@@ -26,6 +26,8 @@ const BoardModule = {
           editing: host.editing,
           isFenMode: host.isFenMode,
           plugin: host.plugin,
+          games: host.games,
+          currentGameIndex: host.currentGameIndex,
         },
       });
     });
@@ -47,6 +49,8 @@ const BoardModule = {
         selectedPiece: host.selectedPiece,
         isFenMode: host.isFenMode,
         plugin: host.plugin,
+        games: host.games,
+        currentGameIndex: host.currentGameIndex,
       });
     });
 

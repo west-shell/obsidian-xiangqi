@@ -1,5 +1,10 @@
 import { registerBlockModule } from "../../core/module-system";
-import { DEFAULT_FEN, type IBlockHost, type IOptions } from "../../types";
+import {
+  DEFAULT_FEN,
+  type IBlockHost,
+  type IOptions,
+  type ParsedGame,
+} from "../../types";
 import { parseOption, parsePikafishUrl, parseSource } from "../../utils/parse";
 
 import { PGNParser } from "./parser";
@@ -50,6 +55,15 @@ const SourceModule = {
           host.root = parser.getRoot();
           host.nodeMap = parser.getMap();
           host.tags = parser.getTags();
+          const game: ParsedGame = {
+            root: host.root,
+            nodeMap: host.nodeMap,
+            tags: host.tags,
+            haveFEN: host.haveFEN,
+            parser,
+          };
+          host.games = [{ raw: cleanSource, headers: new Map(), parsed: game }];
+          host.currentGameIndex = 0;
           host.currentNode = host.nodeMap.get("node-root")!;
           host.fen = host.currentNode.fen;
           host.currentTurn = getTurnFromFen(host.currentNode.fen);
@@ -80,6 +94,8 @@ const SourceModule = {
           host.currentTurn = getTurnFromFen(parsed.fen);
           host.tags = "";
           host.options = {};
+          host.games = [];
+          host.currentGameIndex = 0;
           eventBus.emit("updateMainPath");
           break;
         }

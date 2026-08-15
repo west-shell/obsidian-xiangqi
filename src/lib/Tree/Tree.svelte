@@ -4,6 +4,7 @@
   import type { EventBus } from "../../core/event-bus";
   import {
     type ChessNode,
+    type GameSlot,
     type ISettings,
     type NodeMap,
     PIECE_CHARS,
@@ -12,7 +13,7 @@
   import { calculateTreeLayout } from "./layout";
   import { badgeSvg, iconSvg } from "../../utils/icon";
   import { scrollToBTN } from "../../utils/utils";
-  import { setIcon } from "obsidian";
+  import { Menu, setIcon } from "obsidian";
   import * as d3 from "d3";
   import type { Move } from "../../chess";
 
@@ -28,6 +29,8 @@
     currentNode: ChessNode | null;
     currentPath: string[];
     settings?: ISettings;
+    games?: GameSlot[];
+    currentGameIndex?: number;
   }
 
   let {
@@ -36,10 +39,67 @@
     currentNode = $bindable(),
     currentPath,
     settings,
+    games = [],
+    currentGameIndex = 0,
   }: Props = $props();
 
   let _lv = $state(0);
   onLangChange(() => _lv++);
+
+  let showGameNav = $derived(games && games.length > 1);
+  let showGameInfo = $derived.by(() => {
+    if (!games || games.length < 1) return false;
+    const slot = games[currentGameIndex ?? 0];
+    if (!slot) return false;
+    return slot.headers.size > 0;
+  });
+  let gameLabel = $derived(
+    showGameNav
+      ? t("game.label", _lv)
+          .replace("{current}", String((currentGameIndex ?? 0) + 1))
+          .replace("{total}", String(games!.length))
+      : "",
+  );
+  let gameTitle = $derived.by(() => {
+    if (!showGameInfo) return "";
+    const slot = games![currentGameIndex ?? 0];
+    if (!slot) return "";
+    const h = slot.headers;
+    const white = h.get("Red") || h.get("White") || "?";
+    const black = h.get("Black") || "?";
+    const event = h.get("Event") || "";
+    const date = h.get("Date") || "";
+    const result = h.get("Result") || "";
+    return `${white} - ${black}${result ? " " + result : ""}${event ? ", " + event : ""}${date ? " " + date : ""}`;
+  });
+
+  function prevGame() {
+    const idx = (currentGameIndex ?? 0) - 1;
+    if (idx >= 0) eventBus.emit("switch-game", idx);
+  }
+  function nextGame() {
+    const idx = (currentGameIndex ?? 0) + 1;
+    if (games && idx < games.length) eventBus.emit("switch-game", idx);
+  }
+  function handleGameMenu(evt: MouseEvent) {
+    if (!games || games.length <= 1) return;
+    const menu = new Menu();
+    games.forEach((slot, i) => {
+      const h = slot.headers;
+      const white = h.get("Red") || h.get("White") || "?";
+      const black = h.get("Black") || "?";
+      const event = h.get("Event") || "";
+      const date = h.get("Date") || "";
+      const result = h.get("Result") || "";
+      const label = `${i + 1}. ${white} - ${black}${result ? " " + result : ""}${event ? ", " + event : ""}${date ? " " + date : ""}`;
+      menu.addItem((mi) => {
+        mi.setTitle(label)
+          .setChecked(i === (currentGameIndex ?? 0))
+          .onClick(() => eventBus.emit("switch-game", i));
+      });
+    });
+    menu.showAtMouseEvent(evt);
+  }
 
   let commentsText = $state("");
   let textareaEl: HTMLTextAreaElement | undefined = $state();
@@ -592,6 +652,38 @@
 </script>
 
 <div class="tree-container xq-layout__tools">
+  {#if showGameInfo}
+    <div class="game-nav-bar">
+      <div class="game-nav-info">
+        <span class="game-nav-title">{gameTitle}</span>
+        {#if showGameNav}
+          <span class="game-nav-index">{gameLabel}</span>
+        {/if}
+      </div>
+      {#if showGameNav}
+        <div class="game-nav-arrows">
+          <button
+            class="toolbar-btn game-nav-arrow"
+            aria-label={t("game.prev", _lv)}
+            disabled={currentGameIndex <= 0}
+            onclick={prevGame}>◀</button
+          >
+          <button
+            class="toolbar-btn game-nav-arrow"
+            aria-label={t("game.next", _lv)}
+            disabled={!games || currentGameIndex >= games.length - 1}
+            onclick={nextGame}>▶</button
+          >
+        </div>
+        <button
+          class="toolbar-btn game-nav-arrow game-nav-menu-btn"
+          aria-label={t("game.select", _lv)}
+          use:useSetIcon={"list"}
+          onclick={handleGameMenu}
+        ></button>
+      {/if}
+    </div>
+  {/if}
   <div class="tools-row">
     <div class="svg-wrapper">
       {#if nodeMap.get(currentNode?.id ?? "")?.eval}
@@ -1368,5 +1460,59 @@
   textarea:focus {
     border-color: var(--interactive-accent);
     box-shadow: 0 0 5px var(--interactive-accent);
+  }
+
+  .game-nav-bar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 4px;
+    flex-shrink: 0;
+    border-bottom: 1px solid var(--background-modifier-border);
+    background: var(--background-secondary);
+  }
+  .game-nav-info {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+    padding: 2px 6px;
+    min-width: 0;
+  }
+  .game-nav-info:hover {
+    background: var(--background-modifier-hover);
+    border-radius: 4px;
+  }
+  .game-nav-title {
+    font-size: 11px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    line-height: 1.3;
+  }
+  .game-nav-index {
+    font-size: 9px;
+    color: var(--text-muted);
+    line-height: 1.2;
+  }
+  .game-nav-arrows {
+    display: flex;
+    flex-direction: row;
+    gap: 1px;
+    flex-shrink: 0;
+  }
+  .game-nav-arrow {
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    font-size: 12px;
+  }
+  .game-nav-menu-btn {
+    width: 24px;
+    height: 24px;
+    padding: 0;
   }
 </style>

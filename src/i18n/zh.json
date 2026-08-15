@@ -182,5 +182,9 @@
   "engine.downloadCancel": "取消",
   "engine.downloadFailed": "下载失败，可手动下载文件放到本插件根目录",
   "engine.downloadSource": "下载源：",
-  "engine.retry": "重试"
+  "engine.retry": "重试",
+  "game.prev": "上一局",
+  "game.next": "下一局",
+  "game.label": "第 {current}/{total} 局",
+  "game.select": "选择对局"
 }

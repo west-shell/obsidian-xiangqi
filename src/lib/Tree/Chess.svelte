@@ -6,6 +6,7 @@
   import GenFENToolbar from "../GenFEN/Toolbar.svelte";
   import type {
     ChessNode,
+    GameSlot,
     IOptions,
     ISettings,
     NodeMap,
@@ -60,6 +61,8 @@
     selectedPiece?: Piece | null;
     isFenMode?: boolean;
     plugin?: ChessPlugin;
+    games?: GameSlot[];
+    currentGameIndex?: number;
   }
 
   let {
@@ -74,6 +77,8 @@
     selectedPiece = null,
     isFenMode = false,
     plugin,
+    games = [],
+    currentGameIndex = 0,
   }: Props = $props();
 
   let lastMove: [Square, Square] | null = $derived(
@@ -220,7 +225,15 @@
       {glyphShapes}
     />
     <Toolbar {eventBus} {options} {settings} {plugin} {rotated} />
-    <Tree {nodeMap} {eventBus} {currentNode} {currentPath} {settings} />
+    <Tree
+      {nodeMap}
+      {eventBus}
+      {currentNode}
+      {currentPath}
+      {settings}
+      {games}
+      {currentGameIndex}
+    />
   </div>
 {/if}
 

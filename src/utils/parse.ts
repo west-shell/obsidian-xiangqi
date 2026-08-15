@@ -1,6 +1,13 @@
 import { Chess, type Move } from "../chess";
-import type { IOptions, ITurn } from "../types";
-import { DEFAULT_FEN } from "../types";
+import { PGNParser } from "../modules/Source/parser";
+import {
+  DEFAULT_FEN,
+  type GameSlot,
+  type IHost,
+  type IOptions,
+  type ITurn,
+  type ParsedGame,
+} from "../types";
 
 export function parseSource(source: string): {
   haveFEN: boolean;
@@ -146,4 +153,122 @@ export function parseOption(source: string): IOptions {
     }
   }
   return options;
+}
+
+export function splitPGN(pgn: string): GameSlot[] {
+  const lines = pgn.split("\n");
+  const games: GameSlot[] = [];
+  let currentLines: string[] = [];
+  let hasMovetext = false;
+  let hasTags = false;
+  let commentDepth = 0;
+  let blankAfterTags = false;
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+
+    for (let i = 0; i < trimmed.length; i++) {
+      if (trimmed[i] === "{") commentDepth++;
+      else if (trimmed[i] === "}") commentDepth = Math.max(0, commentDepth - 1);
+    }
+    const inComment = commentDepth > 0;
+
+    const isTagLine = /^\[\w+\s+"[^"]*"\]$/.test(trimmed);
+
+    if (isTagLine && !inComment) {
+      if (hasMovetext && currentLines.length > 0) {
+        games.push(makeSlot(currentLines));
+        currentLines = [];
+        hasMovetext = false;
+        hasTags = false;
+        blankAfterTags = false;
+      } else if (blankAfterTags && hasTags) {
+        games.push(makeSlot(currentLines));
+        currentLines = [];
+        hasMovetext = false;
+        hasTags = false;
+        blankAfterTags = false;
+      }
+      currentLines.push(line);
+      hasTags = true;
+      blankAfterTags = false;
+    } else if (trimmed === "") {
+      if (hasTags && !hasMovetext) {
+        blankAfterTags = true;
+      }
+      currentLines.push(line);
+    } else if (!inComment) {
+      hasMovetext = true;
+      blankAfterTags = false;
+      currentLines.push(line);
+    } else {
+      currentLines.push(line);
+    }
+  }
+
+  if (currentLines.some((l) => l.trim() !== "")) {
+    games.push(makeSlot(currentLines));
+  }
+
+  if (games.length === 0) {
+    games.push(makeSlot([""]));
+  }
+
+  return games;
+}
+
+function makeSlot(lines: string[]): GameSlot {
+  const raw = lines.join("\n");
+  const headers = extractHeaders(raw);
+  return { raw, headers };
+}
+
+export function extractHeaders(raw: string): Map<string, string> {
+  const headers = new Map<string, string>();
+  const tagRe = /^\[(\w+)\s+"([^"]*)"\]$/gm;
+  let m: RegExpExecArray | null;
+  while ((m = tagRe.exec(raw)) !== null) {
+    headers.set(m[1], m[2]);
+  }
+  return headers;
+}
+
+export function activateGame(host: IHost, index: number): void {
+  const slot = host.games[index];
+  if (!slot) return;
+
+  if (!slot.parsed) {
+    const parser = new PGNParser(slot.raw);
+    const game: ParsedGame = {
+      root: parser.getRoot(),
+      nodeMap: parser.getMap(),
+      tags: parser.getTags(),
+      haveFEN: parser.haveFEN,
+      parser,
+    };
+    slot.parsed = game;
+  }
+
+  const game = slot.parsed;
+  host.parser = game.parser;
+  host.root = game.root;
+  host.nodeMap = game.nodeMap;
+  host.tags = game.tags;
+  host.haveFEN = game.haveFEN;
+  host.currentNode = game.root;
+  host.fen = game.root.fen;
+  host.currentGameIndex = index;
+  host.eventBus.emit("updateMainPath");
+
+  const shouldJump =
+    host.settings.autoJump === "always" ||
+    (host.settings.autoJump === "auto" && !host.haveFEN);
+  if (shouldJump && host.currentPath.length > 0) {
+    host.currentNode = host.nodeMap.get(
+      host.currentPath[host.currentPath.length - 1],
+    )!;
+    host.fen = host.currentNode.fen;
+  }
+
+  host.eventBus.emit("updateUI");
 }

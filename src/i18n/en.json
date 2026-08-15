@@ -181,5 +181,9 @@
   "engine.downloadCancel": "Cancel",
   "engine.downloadFailed": "Download failed, you can manually download files to the plugin directory",
   "engine.downloadSource": "Download source:",
-  "engine.retry": "Retry"
+  "engine.retry": "Retry",
+  "game.prev": "Previous game",
+  "game.next": "Next game",
+  "game.label": "Game {current}/{total}",
+  "game.select": "Select game"
 }
