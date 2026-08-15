@@ -3,7 +3,6 @@ import { t } from "../i18n";
 import type { ChessNode, IHost } from "../types";
 import { PGNParser } from "../modules/Source/parser";
 import { validateFen } from "./chessEngine";
-import { computeGlyph } from "./winningChances";
 
 export class SaveConfirmModal extends Modal {
   private resolvePromise: (value: "save" | "saveAll" | "cancel") => void;
@@ -440,7 +439,6 @@ export class ImportModal extends Modal {
       host.nodeMap = newMap;
       host.tags = newTags;
       host.haveFEN = parser.haveFEN;
-      computeAllGlyphs(host);
     } else {
       if (newRoot.fen !== host.root.fen) {
         new Notice(t("import.fenMismatch"));
@@ -609,12 +607,4 @@ function updateFenTag(tags: string, newFen: string): string {
     return tags.replace(/\[FEN "[^"]*"\]/, `[FEN "${newFen}"]`);
   }
   return `[FEN "${newFen}"]\n${tags}`;
-}
-
-function computeAllGlyphs(host: IHost) {
-  for (const [, node] of host.nodeMap) {
-    if (!node.eval || !node.parentID) continue;
-    const parent = host.nodeMap.get(node.parentID);
-    node.glyph = computeGlyph(parent?.eval, node.eval, node.side);
-  }
 }

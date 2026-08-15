@@ -24,6 +24,16 @@ const TreeViewModule = {
       host.currentTurn =
         host.currentNode.fen.split(" ")[1] === "b" ? "black" : "white";
       eventBus.emit("updateMainPath");
+
+      const shouldJump =
+        host.settings.autoJump === "always" ||
+        (host.settings.autoJump === "auto" && !host.haveFEN);
+      if (shouldJump && host.currentPath.length > 0) {
+        host.currentNode = host.nodeMap.get(
+          host.currentPath[host.currentPath.length - 1],
+        )!;
+        host.fen = host.currentNode.fen;
+      }
     });
 
     eventBus.on("createUI", () => {
@@ -65,20 +75,6 @@ const TreeViewModule = {
         isFenMode: host.isFenMode,
         plugin: host.plugin,
       });
-    });
-
-    eventBus.on("ready", () => {
-      if (!host.settings.autoJump) return;
-      switch (host.settings.autoJump) {
-        case "never":
-          break;
-        case "always":
-          eventBus.emit("btn-click", { name: "toEnd" });
-          break;
-        case "auto":
-          if (!host.haveFEN) eventBus.emit("btn-click", { name: "toEnd" });
-          break;
-      }
     });
 
     eventBus.on("reset", () => {
