@@ -185,5 +185,12 @@
   "game.prev": "Previous game",
   "game.next": "Next game",
   "game.label": "Game {current}/{total}",
-  "game.select": "Select game"
+  "game.select": "Select game",
+  "game.win": "Win",
+  "game.loss": "Loss",
+  "game.draw": "Draw",
+  "game.win": "Win",
+  "game.loss": "Loss",
+  "game.draw": "Draw",
+  "game.incomplete": "*"
 }

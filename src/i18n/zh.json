@@ -186,5 +186,8 @@
   "game.prev": "上一局",
   "game.next": "下一局",
   "game.label": "第 {current}/{total} 局",
-  "game.select": "选择对局"
+  "game.select": "选择对局",
+  "game.win": "胜",
+  "game.loss": "负",
+  "game.draw": "平"
 }

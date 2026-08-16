@@ -69,9 +69,18 @@
     const black = h.get("Black") || "?";
     const event = h.get("Event") || "";
     const date = h.get("Date") || "";
-    const result = h.get("Result") || "";
-    return `${white} - ${black}${result ? " " + result : ""}${event ? ", " + event : ""}${date ? " " + date : ""}`;
+    const resultRaw = h.get("Result") || "";
+    const result = formatResult(resultRaw, _lv);
+    return `${white} ${result} ${black}${event ? ", " + event : ""}${date ? " " + date : ""}`;
   });
+
+  function formatResult(raw: string, v: number): string {
+    if (!raw || raw === "*") return "-";
+    if (raw === "1-0") return t("game.win", v);
+    if (raw === "0-1") return t("game.loss", v);
+    if (raw === "1/2-1/2") return t("game.draw", v);
+    return raw;
+  }
 
   function prevGame() {
     const idx = (currentGameIndex ?? 0) - 1;
@@ -90,8 +99,9 @@
       const black = h.get("Black") || "?";
       const event = h.get("Event") || "";
       const date = h.get("Date") || "";
-      const result = h.get("Result") || "";
-      const label = `${i + 1}. ${white} - ${black}${result ? " " + result : ""}${event ? ", " + event : ""}${date ? " " + date : ""}`;
+      const resultRaw = h.get("Result") || "";
+      const result = formatResult(resultRaw, _lv);
+      const label = `${i + 1}. ${white} ${result} ${black}${event ? ", " + event : ""}${date ? " " + date : ""}`;
       menu.addItem((mi) => {
         mi.setTitle(label)
           .setChecked(i === (currentGameIndex ?? 0))
