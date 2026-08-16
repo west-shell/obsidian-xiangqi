@@ -169,7 +169,7 @@ export class PGNParser {
         this.parseVariation();
       } else if (this.match("result")) {
         const token = this.consume();
-        const validResults = ["1-0", "0-1", "1/2-1/2", "*"];
+        const validResults = ["1-0", "0-1", "1/2-1/2"];
         if (validResults.includes(token.value)) {
           this.currentNode.result = token.value;
         }
@@ -255,7 +255,9 @@ export class PGNParser {
     const token = this.consume();
     const validResults = ["1-0", "0-1", "1/2-1/2", "*"];
     if (validResults.includes(token.value)) {
-      this.currentNode.result = token.value;
+      if (token.value !== "*") {
+        this.currentNode.result = token.value;
+      }
       this.tags.set("Result", token.value);
     }
   }
