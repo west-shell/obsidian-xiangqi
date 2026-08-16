@@ -104,6 +104,7 @@
       const label = `${i + 1}. ${white} ${result} ${black}${event ? ", " + event : ""}${date ? " " + date : ""}`;
       menu.addItem((mi) => {
         mi.setTitle(label)
+          .setIcon("grip-vertical")
           .setChecked(i === (currentGameIndex ?? 0))
           .onClick(() => eventBus.emit("switch-game", i));
       });
@@ -703,7 +704,7 @@
 <div class="tree-container xq-layout__tools">
   {#if showGameInfo}
     <div class="game-nav-bar">
-      <div class="game-nav-info">
+      <div class="game-nav-info" role="button" tabindex="0" onclick={handleGameMenu} onkeydown={(e) => { if (e.key === "Enter" || e.key === " ") handleGameMenu(e as unknown as MouseEvent); }}>
         <span class="game-nav-title">{gameTitle}</span>
         {#if showGameNav}
           <span class="game-nav-index">{gameLabel}</span>
