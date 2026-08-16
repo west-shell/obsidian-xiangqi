@@ -106,6 +106,7 @@ export type ChessNode = {
   annotation?: string;
   shapes?: NodeShape[];
   isCheckmate?: boolean;
+  result?: string;
 };
 
 export type NodeMap = Map<string, ChessNode>;

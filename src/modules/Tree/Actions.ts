@@ -640,6 +640,8 @@ export function stringifyPGN(root: ChessNode, includeEval = true): string {
     if (node.children[0]) {
       const next = node.children[0];
       result += ` ${walk(next, next.side === "white" ? stepNum + 1 : stepNum)}`;
+    } else if (node.result) {
+      result += ` ${node.result}`;
     }
     return result;
   }

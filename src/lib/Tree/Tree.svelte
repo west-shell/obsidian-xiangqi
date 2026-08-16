@@ -901,7 +901,15 @@
                   {@html badgeSvg(primaryAnnotation)}
                 </g>
               {/if}
-              {#if node.isCheckmate}
+              {#if node.result}
+                <g
+                  transform="translate({-nw / 2} {-nodeHeight / 2})"
+                  style="pointer-events: none"
+                >
+                  <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+                  {@html badgeSvg(`result_${node.result}`)}
+                </g>
+              {:else if node.isCheckmate}
                 <g
                   transform="translate({-nw / 2} {-nodeHeight / 2})"
                   style="pointer-events: none"
