@@ -67,8 +67,11 @@ const TreeViewModule = {
     });
 
     eventBus.on("reset", () => {
-      eventBus.emit("setViewData");
-      eventBus.emit("updateUI");
+      const slot = host.games[host.currentGameIndex];
+      if (slot) {
+        slot.parsed = undefined;
+      }
+      activateGame(host, host.currentGameIndex);
     });
 
     eventBus.on("save", async () => {
@@ -76,12 +79,14 @@ const TreeViewModule = {
       if (includeEval === null) return;
 
       const parts: string[] = [];
-      for (const slot of host.games) {
+      for (let i = 0; i < host.games.length; i++) {
+        const slot = host.games[i];
         if (slot.parsed) {
           const pgn = host.stringifyPGN(slot.parsed.root, includeEval);
           const content = [slot.parsed.tags?.trim(), pgn]
             .filter(Boolean)
             .join("\n");
+          slot.raw = content;
           parts.push(content);
         } else {
           parts.push(slot.raw.trim());

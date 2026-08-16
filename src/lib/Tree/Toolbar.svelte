@@ -38,6 +38,9 @@
     eventBus.on("save", () => {
       modified = false;
     });
+    eventBus.on("reset", () => {
+      modified = false;
+    });
   });
 
   let autoAnalyze = $state(false);

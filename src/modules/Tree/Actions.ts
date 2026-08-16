@@ -32,6 +32,12 @@ const ActionsModule = {
     eventBus.on("load", () => {
       host.modified = false;
     });
+    eventBus.on("setViewData", () => {
+      host.modified = false;
+    });
+    eventBus.on("reset", () => {
+      host.modified = false;
+    });
 
     eventBus.on("updateMainPath", () => {
       const { currentNode, nodeMap } = host;
