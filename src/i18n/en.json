@@ -192,5 +192,7 @@
   "game.win": "Win",
   "game.loss": "Loss",
   "game.draw": "Draw",
-  "game.incomplete": "*"
+  "game.incomplete": "*",
+  "confirm.switchGameTitle": "Unsaved Changes",
+  "confirm.switchGameMsg": "Current game has unsaved changes. Switch anyway?"
 }

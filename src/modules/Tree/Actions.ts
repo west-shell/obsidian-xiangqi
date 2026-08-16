@@ -23,6 +23,16 @@ const ActionsModule = {
   init(host: IHost) {
     const eventBus = host.eventBus;
 
+    eventBus.on("modified", () => {
+      host.modified = true;
+    });
+    eventBus.on("save", () => {
+      host.modified = false;
+    });
+    eventBus.on("load", () => {
+      host.modified = false;
+    });
+
     eventBus.on("updateMainPath", () => {
       const { currentNode, nodeMap } = host;
       if (!currentNode) {
@@ -121,9 +131,20 @@ const ActionsModule = {
       host.eventBus.emit("updateUI");
     });
 
-    eventBus.on<number>("switch-game", (index) => {
+    eventBus.on<number>("switch-game", async (index) => {
       if (index === undefined || index < 0 || index >= host.games.length)
         return;
+      if (host.modified) {
+        const modal = new ConfirmModal(
+          host.plugin.app,
+          t("confirm.switchGameTitle"),
+          t("confirm.switchGameMsg"),
+          t("confirm.yes"),
+          t("confirm.cancel"),
+        );
+        modal.open();
+        if (!(await modal.promise)) return;
+      }
       activateGame(host, index);
       host.eventBus.emit("clear-engine-bestmove");
     });

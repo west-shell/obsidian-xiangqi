@@ -189,5 +189,7 @@
   "game.select": "选择对局",
   "game.win": "胜",
   "game.loss": "负",
-  "game.draw": "平"
+  "game.draw": "平",
+  "confirm.switchGameTitle": "未保存的修改",
+  "confirm.switchGameMsg": "当前对局有未保存的修改，是否切换？"
 }
