@@ -249,23 +249,10 @@ export class PGNParser {
 
   parseResult() {
     const token = this.consume();
-    let result = "";
-    switch (token.value) {
-      case "1-0":
-        result = "1-0";
-        break;
-      case "0-1":
-        result = "0-1";
-        break;
-      case "1/2-1/2":
-        result = "1/2-1/2";
-        break;
-      case "*":
-        result = "*";
-        break;
+    const validResults = ["1-0", "0-1", "1/2-1/2", "*"];
+    if (validResults.includes(token.value)) {
+      this.tags.set("Result", token.value);
     }
-    this.currentNode.comments ??= [];
-    this.currentNode.comments.push(result);
   }
 
   public getTags(): string {
