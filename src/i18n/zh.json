@@ -187,9 +187,15 @@
   "game.next": "下一局",
   "game.label": "第 {current}/{total} 局",
   "game.select": "选择对局",
+  "game.new": "新建对局",
+  "game.delete": "删除对局",
+  "game.moveUp": "上移",
+  "game.moveDown": "下移",
   "game.win": "胜",
   "game.loss": "负",
   "game.draw": "平",
   "confirm.switchGameTitle": "未保存的修改",
-  "confirm.switchGameMsg": "当前对局有未保存的修改，是否切换？"
+  "confirm.switchGameMsg": "当前对局有未保存的修改，是否切换？",
+  "confirm.deleteGameTitle": "删除对局",
+  "confirm.deleteGameMsg": "删除当前对局？"
 }

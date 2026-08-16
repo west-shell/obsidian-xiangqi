@@ -91,7 +91,7 @@
     if (games && idx < games.length) eventBus.emit("switch-game", idx);
   }
   function handleGameMenu(evt: MouseEvent) {
-    if (!games || games.length <= 1) return;
+    if (!games) return;
     const menu = new Menu();
     games.forEach((slot, i) => {
       const h = slot.headers;
@@ -108,6 +108,32 @@
           .onClick(() => eventBus.emit("switch-game", i));
       });
     });
+    menu.addSeparator();
+    menu.addItem((mi) => {
+      mi.setTitle(t("game.new", _lv))
+        .setIcon("plus")
+        .onClick(() => eventBus.emit("create-game"));
+    });
+    const idx = currentGameIndex ?? 0;
+    if (games.length > 1) {
+      menu.addItem((mi) => {
+        mi.setTitle(t("game.moveUp", _lv))
+          .setIcon("arrow-up")
+          .setDisabled(idx <= 0)
+          .onClick(() => eventBus.emit("move-game", -1));
+      });
+      menu.addItem((mi) => {
+        mi.setTitle(t("game.moveDown", _lv))
+          .setIcon("arrow-down")
+          .setDisabled(idx >= games.length - 1)
+          .onClick(() => eventBus.emit("move-game", 1));
+      });
+      menu.addItem((mi) => {
+        mi.setTitle(t("game.delete", _lv))
+          .setIcon("trash")
+          .onClick(() => eventBus.emit("delete-game"));
+      });
+    }
     menu.showAtMouseEvent(evt);
   }
 
@@ -698,13 +724,13 @@
             onclick={nextGame}>▶</button
           >
         </div>
-        <button
-          class="toolbar-btn game-nav-arrow game-nav-menu-btn"
-          aria-label={t("game.select", _lv)}
-          use:useSetIcon={"list"}
-          onclick={handleGameMenu}
-        ></button>
       {/if}
+      <button
+        class="toolbar-btn game-nav-arrow game-nav-menu-btn"
+        aria-label={t("game.select", _lv)}
+        use:useSetIcon={"list"}
+        onclick={handleGameMenu}
+      ></button>
     </div>
   {/if}
   <div class="tools-row">

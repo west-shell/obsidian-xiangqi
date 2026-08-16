@@ -4,7 +4,7 @@ import {
   registerFileModule,
 } from "../../core/module-system";
 import { t } from "../../i18n";
-import type { ChessNode, IHost } from "../../types";
+import type { ChessNode, GameSlot, IHost } from "../../types";
 import { DEFAULT_FEN } from "../../types";
 import { activateGame } from "../../utils/parse";
 import {
@@ -146,6 +146,49 @@ const ActionsModule = {
         if (!(await modal.promise)) return;
       }
       activateGame(host, index);
+      host.eventBus.emit("clear-engine-bestmove");
+    });
+
+    eventBus.on("create-game", () => {
+      const newSlot: GameSlot = {
+        raw: "",
+        headers: new Map(),
+      };
+      host.games.push(newSlot);
+      host.eventBus.emit("modified", null);
+      activateGame(host, host.games.length - 1);
+      host.eventBus.emit("clear-engine-bestmove");
+    });
+
+    eventBus.on("delete-game", async () => {
+      if (host.games.length <= 1) return;
+      const modal = new ConfirmModal(
+        host.plugin.app,
+        t("confirm.deleteGameTitle"),
+        t("confirm.deleteGameMsg"),
+        t("confirm.yes"),
+        t("confirm.cancel"),
+      );
+      modal.open();
+      if (!(await modal.promise)) return;
+      const idx = host.currentGameIndex;
+      host.games.splice(idx, 1);
+      const newIdx = Math.min(idx, host.games.length - 1);
+      host.eventBus.emit("modified", null);
+      activateGame(host, newIdx);
+      host.eventBus.emit("clear-engine-bestmove");
+    });
+
+    eventBus.on<number>("move-game", (direction) => {
+      if (!direction) return;
+      const idx = host.currentGameIndex;
+      const targetIdx = idx + direction;
+      if (targetIdx < 0 || targetIdx >= host.games.length) return;
+      const temp = host.games[idx];
+      host.games[idx] = host.games[targetIdx];
+      host.games[targetIdx] = temp;
+      host.eventBus.emit("modified", null);
+      activateGame(host, targetIdx);
       host.eventBus.emit("clear-engine-bestmove");
     });
 

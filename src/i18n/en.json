@@ -186,6 +186,10 @@
   "game.next": "Next game",
   "game.label": "Game {current}/{total}",
   "game.select": "Select game",
+  "game.new": "New game",
+  "game.delete": "Delete game",
+  "game.moveUp": "Move up",
+  "game.moveDown": "Move down",
   "game.win": "Win",
   "game.loss": "Loss",
   "game.draw": "Draw",
@@ -194,5 +198,7 @@
   "game.draw": "Draw",
   "game.incomplete": "*",
   "confirm.switchGameTitle": "Unsaved Changes",
-  "confirm.switchGameMsg": "Current game has unsaved changes. Switch anyway?"
+  "confirm.switchGameMsg": "Current game has unsaved changes. Switch anyway?",
+  "confirm.deleteGameTitle": "Delete Game",
+  "confirm.deleteGameMsg": "Delete the current game?"
 }
