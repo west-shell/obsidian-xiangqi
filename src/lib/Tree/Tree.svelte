@@ -153,6 +153,19 @@
     })();
   });
 
+  let gameIndexChanged = $state(false);
+  $effect(() => {
+    void currentGameIndex;
+    if (!gameIndexChanged) {
+      gameIndexChanged = true;
+      return;
+    }
+    (async () => {
+      await tick();
+      resetView();
+    })();
+  });
+
   function onClickStep(step: number) {
     const nodeId = step === 0 ? currentPath[0] : currentPath[step];
     if (nodeId) eventBus.emit("slider-navigate", nodeId);
