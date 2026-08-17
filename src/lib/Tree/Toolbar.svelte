@@ -123,13 +123,13 @@
   const buildAnnotations = (v: number) => [
     {
       title: t("annotation.w+", v),
-      icon: "thumbs_up",
+      icon: "thumbs-up",
       symbol: "+",
       event: "annotation",
     },
     {
       title: t("annotation.b+", v),
-      icon: "thumbs_down",
+      icon: "thumbs-down",
       symbol: "-",
       event: "annotation",
     },

@@ -25,6 +25,11 @@ const FileHostModule = {
       for (let i = 0; i < host.games.length; i++) {
         const slot = host.games[i];
         if (slot.parsed) {
+          if (i === host.currentGameIndex) {
+            slot.parsed.tags = host.tags;
+            slot.parsed.root = host.root;
+            slot.parsed.nodeMap = host.nodeMap;
+          }
           const pgn = host.stringifyPGN(slot.parsed.root, includeEval);
           const content = [slot.parsed.tags?.trim(), pgn]
             .filter(Boolean)
