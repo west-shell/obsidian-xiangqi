@@ -5,6 +5,7 @@ export type ChessModule = {
 
 export type ModuleRegistry = Map<string, ChessModule>;
 
+// 工厂函数：创建模块系统
 function createModuleSystem() {
   const moduleMap = new Map<string, ChessModule>();
   const registryMap = new WeakMap<object, ModuleRegistry>();
