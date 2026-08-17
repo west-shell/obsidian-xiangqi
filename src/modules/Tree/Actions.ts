@@ -4,7 +4,13 @@ import {
   registerFileModule,
 } from "../../core/module-system";
 import { t } from "../../i18n";
-import type { ChessNode, GameSlot, IHost } from "../../types";
+import type {
+  ChessNode,
+  GameSlot,
+  IBlockHost,
+  IFileHost,
+  IHost,
+} from "../../types";
 import { DEFAULT_FEN } from "../../types";
 import { activateGame } from "../../utils/parse";
 import {
@@ -18,6 +24,8 @@ import {
   ImportModal,
 } from "../../utils/confirmModal";
 import { Modal, Setting } from "obsidian";
+import { mount, unmount } from "svelte";
+import Chess from "../../lib/Tree/Chess.svelte";
 
 const ActionsModule = {
   init(host: IHost) {
@@ -37,6 +45,57 @@ const ActionsModule = {
     });
     eventBus.on("reset", () => {
       host.modified = false;
+    });
+
+    function chessProps() {
+      return {
+        nodeMap: host.nodeMap,
+        settings: { ...host.settings },
+        fen: host.editing ? host.fen : (host.currentNode?.fen ?? ""),
+        eventBus: host.eventBus,
+        currentNode: host.currentNode,
+        currentPath: host.currentPath,
+        options: { ...host.options },
+        editing: host.editing,
+        isFenMode: host.isFenMode,
+        selectedPiece: host.selectedPiece,
+        plugin: host.plugin,
+        games: host.games,
+        currentGameIndex: host.currentGameIndex,
+      };
+    }
+
+    function isFileHost(h: IHost): h is IFileHost {
+      return "saveFile" in h && typeof (h as IFileHost).saveFile === "function";
+    }
+
+    eventBus.on("createUI", () => {
+      if (host.Chess) {
+        void unmount(host.Chess);
+        host.Chess = null;
+      }
+
+      let container: HTMLElement;
+      if (isFileHost(host)) {
+        container = host.contentEl;
+        container.classList.add("pgn-view");
+      } else {
+        container = (host as IBlockHost).containerEl.createDiv();
+      }
+
+      host.modified = false;
+      host.Chess = mount(Chess, {
+        target: container,
+        props: chessProps(),
+      });
+    });
+
+    eventBus.on("updateUI", () => {
+      host.Chess?.$set?.(chessProps());
+    });
+
+    eventBus.on("unload", () => {
+      if (host.Chess) void unmount(host.Chess);
     });
 
     eventBus.on("updateMainPath", () => {

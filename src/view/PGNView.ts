@@ -1,6 +1,6 @@
 import "../core/event-bus";
 import "../modules/BoardClick";
-import "../modules/Tree/PGNView";
+import "../modules/Tree/FileHost";
 import "../modules/Tree/Actions";
 import "../modules/Tree/Speak";
 

@@ -1,7 +1,6 @@
 import "../core/event-bus";
-import "../modules/Source/Source";
 import "../modules/BoardClick";
-import "../modules/Tree/ChessBoard";
+import "../modules/Tree/BlockHost";
 import "../modules/Tree/Actions";
 import "../modules/Engine/EngineModule";
 
@@ -42,7 +41,7 @@ export class TreeRenderChild extends MarkdownRenderChild {
       }
     }
     this.eventBus.emit("load", isFenBlock ? "fen" : "tree");
-    this.eventBus.emit("creatUI");
+    this.eventBus.emit("createUI");
   }
 
   refresh(): void {
