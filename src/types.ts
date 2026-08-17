@@ -115,7 +115,6 @@ export type ParsedGame = {
   root: ChessNode;
   nodeMap: NodeMap;
   tags: string;
-  haveFEN: boolean;
   parser: PGNParser;
 };
 
@@ -149,7 +148,6 @@ export interface IHost {
   currentTurn: ITurn;
   currentNode: ChessNode;
   currentPath: string[];
-  haveFEN: boolean;
   options: IOptions;
   stringifyPGN: (root: ChessNode, includeEval?: boolean) => string;
   games: GameSlot[];

@@ -438,7 +438,6 @@ export class ImportModal extends Modal {
       host.root = newRoot;
       host.nodeMap = newMap;
       host.tags = newTags;
-      host.haveFEN = parser.haveFEN;
     } else {
       if (newRoot.fen !== host.root.fen) {
         new Notice(t("import.fenMismatch"));

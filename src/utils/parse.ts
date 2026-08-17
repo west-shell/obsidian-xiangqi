@@ -9,8 +9,11 @@ import {
   type ParsedGame,
 } from "../types";
 
+export function hasFenTag(tags: string): boolean {
+  return /\[FEN\s+"[^"]*"\]/.test(tags);
+}
+
 export function parseSource(source: string): {
-  haveFEN: boolean;
   fen: string;
   initFEN: string;
   PGN: Move[];
@@ -53,9 +56,7 @@ export function parseSource(source: string): {
     }
   }
 
-  const haveFEN = fen !== DEFAULT_FEN;
   return {
-    haveFEN,
     fen: chess.fen(),
     initFEN: fen,
     PGN,
@@ -65,7 +66,6 @@ export function parseSource(source: string): {
 }
 
 export function parsePikafishUrl(source: string): {
-  haveFEN: boolean;
   fen: string;
   initFEN: string;
   PGN: Move[];
@@ -112,7 +112,6 @@ export function parsePikafishUrl(source: string): {
   }
 
   return {
-    haveFEN: true,
     fen: chess.fen(),
     initFEN: fenPart,
     PGN,
@@ -243,7 +242,6 @@ export function activateGame(host: IHost, index: number): void {
       root: parser.getRoot(),
       nodeMap: parser.getMap(),
       tags: parser.getTags(),
-      haveFEN: parser.haveFEN,
       parser,
     };
     slot.parsed = game;
@@ -254,7 +252,6 @@ export function activateGame(host: IHost, index: number): void {
   host.root = game.root;
   host.nodeMap = game.nodeMap;
   host.tags = game.tags;
-  host.haveFEN = game.haveFEN;
   host.currentNode = game.root;
   host.fen = game.root.fen;
   host.currentGameIndex = index;
@@ -262,7 +259,7 @@ export function activateGame(host: IHost, index: number): void {
 
   const shouldJump =
     host.settings.autoJump === "always" ||
-    (host.settings.autoJump === "auto" && !host.haveFEN);
+    (host.settings.autoJump === "auto" && !hasFenTag(host.tags));
   if (shouldJump && host.currentPath.length > 0) {
     host.currentNode = host.nodeMap.get(
       host.currentPath[host.currentPath.length - 1],

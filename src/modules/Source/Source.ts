@@ -5,7 +5,12 @@ import {
   type IOptions,
   type ParsedGame,
 } from "../../types";
-import { parseOption, parsePikafishUrl, parseSource } from "../../utils/parse";
+import {
+  hasFenTag,
+  parseOption,
+  parsePikafishUrl,
+  parseSource,
+} from "../../utils/parse";
 
 import { PGNParser } from "./parser";
 
@@ -51,7 +56,6 @@ const SourceModule = {
           host.options = options;
           const parser = new PGNParser(cleanSource);
           host.parser = parser;
-          host.haveFEN = parser.haveFEN;
           host.root = parser.getRoot();
           host.nodeMap = parser.getMap();
           host.tags = parser.getTags();
@@ -59,7 +63,6 @@ const SourceModule = {
             root: host.root,
             nodeMap: host.nodeMap,
             tags: host.tags,
-            haveFEN: host.haveFEN,
             parser,
           };
           host.games = [{ raw: cleanSource, headers: new Map(), parsed: game }];
@@ -71,7 +74,7 @@ const SourceModule = {
 
           const shouldJump =
             host.settings.autoJump === "always" ||
-            (host.settings.autoJump === "auto" && !host.haveFEN);
+            (host.settings.autoJump === "auto" && !hasFenTag(host.tags));
           if (shouldJump && host.currentPath.length > 0) {
             host.currentNode = host.nodeMap.get(
               host.currentPath[host.currentPath.length - 1],
