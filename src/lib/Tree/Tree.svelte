@@ -47,12 +47,7 @@
   onLangChange(() => _lv++);
 
   let showGameNav = $derived(games && games.length > 1);
-  let showGameInfo = $derived.by(() => {
-    if (!games || games.length < 1) return false;
-    const slot = games[currentGameIndex ?? 0];
-    if (!slot) return false;
-    return slot.headers.size > 0;
-  });
+  let showGameInfo = $derived(games != null && games.length > 0);
   let gameLabel = $derived(
     showGameNav
       ? t("game.label", _lv)

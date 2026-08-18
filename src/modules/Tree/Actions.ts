@@ -49,7 +49,7 @@ const ActionsModule = {
 
     function chessProps() {
       return {
-        nodeMap: host.nodeMap,
+        nodeMap: new Map(host.nodeMap),
         settings: { ...host.settings },
         fen: host.editing ? host.fen : (host.currentNode?.fen ?? ""),
         eventBus: host.eventBus,
