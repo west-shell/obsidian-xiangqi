@@ -211,6 +211,12 @@ const ActionsModule = {
         modal.open();
         if (!(await modal.promise)) return;
       }
+      const prevSlot = host.games[host.currentGameIndex];
+      if (prevSlot?.parsed) {
+        prevSlot.parsed.tags = host.tags;
+        prevSlot.parsed.root = host.root;
+        prevSlot.parsed.nodeMap = host.nodeMap;
+      }
       activateGame(host, index);
       host.eventBus.emit("clear-engine-bestmove");
     });
