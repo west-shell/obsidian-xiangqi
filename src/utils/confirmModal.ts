@@ -1,8 +1,9 @@
 import { type App, Modal, Notice, Setting } from "obsidian";
 import { t } from "../i18n";
-import type { ChessNode, IHost } from "../types";
+import type { ChessNode, GameSlot, IHost } from "../types";
 import { PGNParser } from "../modules/Source/parser";
 import { validateFen } from "./chessEngine";
+import { activateGame } from "./parse";
 
 export class SaveConfirmModal extends Modal {
   private resolvePromise: (value: "save" | "saveAll" | "cancel") => void;
@@ -370,6 +371,10 @@ export class ImportModal extends Modal {
     addBranchBtn.addEventListener("click", () =>
       this.handleImportPgn("branch"),
     );
+    const addGameBtn = pgnBtnContainer.createEl("button", {
+      text: t("import.addGame"),
+    });
+    addGameBtn.addEventListener("click", () => this.handleImportPgn("game"));
 
     const cancelContainer = contentEl.createDiv("modal-button-container");
     const cancelBtn = cancelContainer.createEl("button", {
@@ -412,7 +417,7 @@ export class ImportModal extends Modal {
     new Notice(t("notice.fenImported"));
   }
 
-  private handleImportPgn(mode: "overwrite" | "branch") {
+  private handleImportPgn(mode: "overwrite" | "branch" | "game") {
     const pgn = this.pgnValue.trim();
     if (!pgn) {
       new Notice(t("import.emptyPgn"));
@@ -429,6 +434,31 @@ export class ImportModal extends Modal {
 
     const host = this.host;
     const eventBus = host.eventBus;
+
+    if (mode === "game") {
+      const newSlot: GameSlot = {
+        raw: pgn,
+        headers: new Map(),
+        parsed: {
+          root: parser.getRoot(),
+          nodeMap: parser.getMap(),
+          tags: parser.getTags(),
+          parser,
+        },
+      };
+      host.games.push(newSlot);
+      activateGame(host, host.games.length - 1);
+      host.currentTurn =
+        host.currentNode.move?.color === "w" ? "black" : "white";
+      eventBus.emit("updateMainPath");
+      eventBus.emit("updateUI");
+      eventBus.emit("modified", null);
+      eventBus.emit("clear-engine-bestmove");
+      this.close();
+      new Notice(t("notice.pgnImportedAsGame"));
+      return;
+    }
+
     const newRoot = parser.getRoot();
     const newMap = parser.getMap();
     const newTags = parser.getTags();
