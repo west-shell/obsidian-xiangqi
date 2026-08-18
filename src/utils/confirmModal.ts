@@ -312,6 +312,7 @@ export class ImportModal extends Modal {
   constructor(
     app: App,
     private readonly host: IHost,
+    private readonly isBlockMode = false,
   ) {
     super(app);
   }
@@ -371,10 +372,12 @@ export class ImportModal extends Modal {
     addBranchBtn.addEventListener("click", () =>
       this.handleImportPgn("branch"),
     );
-    const addGameBtn = pgnBtnContainer.createEl("button", {
-      text: t("import.addGame"),
-    });
-    addGameBtn.addEventListener("click", () => this.handleImportPgn("game"));
+    if (!this.isBlockMode) {
+      const addGameBtn = pgnBtnContainer.createEl("button", {
+        text: t("import.addGame"),
+      });
+      addGameBtn.addEventListener("click", () => this.handleImportPgn("game"));
+    }
 
     const cancelContainer = contentEl.createDiv("modal-button-container");
     const cancelBtn = cancelContainer.createEl("button", {

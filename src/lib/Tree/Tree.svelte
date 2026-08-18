@@ -31,6 +31,7 @@
     settings?: ISettings;
     games?: GameSlot[];
     currentGameIndex?: number;
+    isBlockMode?: boolean;
   }
 
   let {
@@ -41,12 +42,13 @@
     settings,
     games = [],
     currentGameIndex = 0,
+    isBlockMode = false,
   }: Props = $props();
 
   let _lv = $state(0);
   onLangChange(() => _lv++);
 
-  let showGameNav = $derived(games && games.length > 1);
+  let showGameNav = $derived(games && games.length > 1 && !isBlockMode);
   let showGameInfo = $derived(games != null && games.length > 0);
   let gameLabel = $derived(
     showGameNav
@@ -104,13 +106,15 @@
       });
     });
     menu.addSeparator();
-    menu.addItem((mi) => {
-      mi.setTitle(t("game.new", _lv))
-        .setIcon("plus")
-        .onClick(() => eventBus.emit("create-game"));
-    });
+    if (!isBlockMode) {
+      menu.addItem((mi) => {
+        mi.setTitle(t("game.new", _lv))
+          .setIcon("plus")
+          .onClick(() => eventBus.emit("create-game"));
+      });
+    }
     const idx = currentGameIndex ?? 0;
-    if (games.length > 1) {
+    if (!isBlockMode && games.length > 1) {
       menu.addItem((mi) => {
         mi.setTitle(t("game.moveUp", _lv))
           .setIcon("arrow-up")
