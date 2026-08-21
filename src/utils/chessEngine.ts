@@ -5,8 +5,11 @@ import {
   type Move,
   type Piece,
   type PieceSymbol,
+  type Square,
 } from "../chess";
 import { DEFAULT_FEN } from "../types";
+
+export type { Move, Square, PieceSymbol, Color };
 
 let _chess: Chess | null = null;
 
@@ -115,5 +118,5 @@ export function parsePiece(pieceChar: string): Piece | null {
   if (!pieceChar || !/[a-zA-Z]/.test(pieceChar)) return null;
   const lower = pieceChar.toLowerCase() as PieceSymbol;
   const color: Color = pieceChar === pieceChar.toUpperCase() ? "w" : "b";
-  return { color, type: lower };
+  return { type: lower, color };
 }

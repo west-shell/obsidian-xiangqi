@@ -5,30 +5,13 @@ import type {
 } from "obsidian";
 
 import type { Move, Piece, Square } from "./chess";
+import { DEFAULT_FEN, PIECE_CHARS } from "./chess";
 import type { EventBus } from "./core/event-bus";
 import type ChessPlugin from "./main";
 import type { PGNParser } from "./modules/Source/parser";
 import type { ThemeName } from "./themes";
 
-export const DEFAULT_FEN =
-  "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w";
-
-export const PIECE_CHARS = {
-  k: "将",
-  a: "士",
-  b: "象",
-  r: "车",
-  n: "马",
-  c: "砲",
-  p: "卒",
-  K: "帅",
-  A: "仕",
-  B: "相",
-  R: "俥",
-  N: "傌",
-  C: "炮",
-  P: "兵",
-} as const;
+export { DEFAULT_FEN, PIECE_CHARS };
 
 export interface ISettings {
   lang: "auto" | "en" | "zh";

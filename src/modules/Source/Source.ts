@@ -1,71 +1,71 @@
 import { registerBlockModule } from "../../core/module-system";
 import {
   DEFAULT_FEN,
-  type IBlockHost,
-  type IOptions,
-  type ParsedGame,
-} from "../../types";
-import {
-  hasFenTag,
-  parseOption,
-  parsePikafishUrl,
-  parseSource,
-} from "../../utils/parse";
+  FEN_REGEX,
+  getTurnFromFen,
+  parseExternalUrl,
+} from "../../chess";
+import { type IBlockHost, type ParsedGame } from "../../types";
+import { hasFenTag, parseOption } from "../../utils/parse";
 
 import { PGNParser } from "./parser";
 
-function pikafishToPgn(source: string): string | null {
-  const data = parsePikafishUrl(source);
-  if (!data) return null;
-  const { initFEN, PGN } = data;
-  const lines: string[] = [`[FEN "${initFEN}"]`];
-  const moves = PGN.map((m) => m.iccs ?? "").filter(Boolean);
-  for (let i = 0; i < moves.length; i += 2) {
-    lines.push(
-      `${Math.ceil((i + 1) / 2)}. ${moves[i]} ${moves[i + 1] || ""}`.trim(),
-    );
-  }
-  return lines.join("\n");
-}
-
-function prepareSource(raw: string): { options: IOptions; clean: string } {
-  const source = pikafishToPgn(raw) ?? raw;
+function prepareSource(raw: string): {
+  cleaned: string;
+  options: ReturnType<typeof parseOption>;
+} {
+  const source = parseExternalUrl(raw) ?? raw;
   const options = parseOption(source);
-  let clean = source
-    .replace(/^[pr]\s*[:：].*$/gim, "")
-    .replace(/^(?:protected|rotated)\s*[:：].*$/gim, "")
-    .trim();
+
+  let cleaned = source.replace(
+    /^(protected|P|rotated|R|r)\s*[:：]\s*(true|false)\s*$/gim,
+    "",
+  );
+
+  const fenMatch = cleaned.match(FEN_REGEX);
+  const hasFENTag = /\[FEN\s+"/.test(cleaned);
+  if (fenMatch && !hasFENTag) {
+    cleaned = cleaned.replace(fenMatch[0], `[FEN "${fenMatch[0]}"]`);
+  }
+
   const tags: string[] = [];
   if (options.protected !== undefined)
     tags.push(`[Protected "${options.protected}"]`);
   if (options.rotated !== undefined)
     tags.push(`[Rotated "${options.rotated}"]`);
-  if (tags.length > 0) clean = tags.join("\n") + "\n" + clean;
-  return { options, clean };
+  if (tags.length > 0) {
+    cleaned = tags.join("\n") + "\n" + cleaned;
+  }
+
+  return { cleaned, options };
+}
+
+function extractFEN(source: string): string {
+  const fen = source.match(FEN_REGEX)?.[0];
+  return fen ?? DEFAULT_FEN;
 }
 
 const SourceModule = {
   init(host: IBlockHost) {
     const eventBus = host.eventBus;
     eventBus.on<string>("load", (renderChild) => {
-      const { options, clean: cleanSource } = prepareSource(host.source);
-
       switch (renderChild) {
         case "tree": {
           host.isFenMode = false;
-          host.options = options;
-          const parser = new PGNParser(cleanSource);
+          const { cleaned, options: opts } = prepareSource(host.source);
+          const parser = new PGNParser(cleaned);
           host.parser = parser;
           host.root = parser.getRoot();
           host.nodeMap = parser.getMap();
           host.tags = parser.getTags();
+          host.options = opts;
           const game: ParsedGame = {
             root: host.root,
             nodeMap: host.nodeMap,
             tags: host.tags,
             parser,
           };
-          host.games = [{ raw: cleanSource, headers: new Map(), parsed: game }];
+          host.games = [{ raw: cleaned, headers: new Map(), parsed: game }];
           host.currentGameIndex = 0;
           host.currentNode = host.nodeMap.get("node-root")!;
           host.fen = host.currentNode.fen;
@@ -83,18 +83,17 @@ const SourceModule = {
           }
           break;
         }
-
         case "fen": {
           host.isFenMode = true;
-          const parsed = parseSource(host.source);
-          host.fen = parsed.fen;
+          const fen = extractFEN(host.source);
+          host.fen = fen;
           host.editing = true;
           host.parser = new PGNParser("");
           host.root = host.parser.getRoot();
           host.nodeMap = host.parser.getMap();
           host.currentNode = host.nodeMap.get("node-root")!;
-          host.currentNode.fen = parsed.fen;
-          host.currentTurn = getTurnFromFen(parsed.fen);
+          host.currentNode.fen = fen;
+          host.currentTurn = getTurnFromFen(fen);
           host.tags = "";
           host.options = {};
           host.games = [];
@@ -112,7 +111,3 @@ const SourceModule = {
 };
 
 registerBlockModule("source", SourceModule);
-
-function getTurnFromFen(fen: string): "white" | "black" {
-  return fen.split(" ")[1] === "b" ? "black" : "white";
-}

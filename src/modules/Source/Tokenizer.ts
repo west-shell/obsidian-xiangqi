@@ -1,6 +1,12 @@
+import {
+  FEN_REGEX,
+  getMoveTokenType,
+  MOVE_REGEX,
+  type MoveTokenType,
+} from "../../chess";
+
 export type TokenType =
-  | "iccs-move"
-  | "wxf-move"
+  | MoveTokenType
   | "left-paren"
   | "right-paren"
   | "comment"
@@ -47,45 +53,27 @@ export function tokenize(pgn: string): Token[] {
     const rest = pgn.slice(pos);
     const char = rest[0];
 
-    // 跳过空白
     if (/^\s/.test(rest)) {
       advance(1);
       continue;
     }
 
-    // 跳过着法序号及 ...
     const step = matchAndConsume(/^\d+\.(\s*\.\.\.)?/);
     if (step) {
       continue;
     }
 
-    // ICCS Move: A0-B9（直接匹配，交给 xiangqi.js 解析大小写和分隔符）
-    const iccs = matchAndConsume(/^[A-Ia-i][0-9]-?[A-Ia-i][0-9]/);
-    if (iccs) {
+    const move = matchAndConsume(MOVE_REGEX);
+    if (move) {
       tokens.push({
-        type: "iccs-move",
-        value: iccs,
+        type: getMoveTokenType(move),
+        value: move,
         line: startLine,
         column: startCol,
       });
       continue;
     }
 
-    // 中文 WXF 着法
-    const wxf = matchAndConsume(
-      /^[兵卒车马炮相士帅将][一二三四五六七八九123456789进退平前后左右]*/,
-    );
-    if (wxf) {
-      tokens.push({
-        type: "wxf-move",
-        value: wxf,
-        line: startLine,
-        column: startCol,
-      });
-      continue;
-    }
-
-    // 注释 { ... }，支持嵌套大括号（如 JSON 数据）
     if (char === "{") {
       let depth = 1;
       let end = pos + 1;
@@ -105,7 +93,6 @@ export function tokenize(pgn: string): Token[] {
       continue;
     }
 
-    // 标签 [ ... ]
     const tag = matchAndConsume(/^\[[^\]]*\]/);
     if (tag) {
       tokens.push({
@@ -117,7 +104,6 @@ export function tokenize(pgn: string): Token[] {
       continue;
     }
 
-    // 结果
     const result = matchAndConsume(/^(1-0|0-1|1\/2-1\/2|\*)/);
     if (result) {
       tokens.push({
@@ -129,7 +115,6 @@ export function tokenize(pgn: string): Token[] {
       continue;
     }
 
-    // 左括号
     if (char === "(") {
       advance(1);
       tokens.push({
@@ -141,7 +126,6 @@ export function tokenize(pgn: string): Token[] {
       continue;
     }
 
-    // 右括号
     if (char === ")") {
       advance(1);
       tokens.push({
@@ -153,12 +137,8 @@ export function tokenize(pgn: string): Token[] {
       continue;
     }
 
-    // 尝试识别FEN字符串
-    const fen = matchAndConsume(
-      /^[rnbakcpRNBAKCP1-9]+(\/[rnbakcpRNBAKCP1-9]+){8}(\s+[wb])?/,
-    );
+    const fen = matchAndConsume(FEN_REGEX);
     if (fen) {
-      // 将FEN转换为标签格式
       tokens.push({
         type: "tag",
         value: `[FEN "${fen}"]`,
@@ -168,7 +148,6 @@ export function tokenize(pgn: string): Token[] {
       continue;
     }
 
-    // 其他无法识别的字符 → 跳过（不再抛出错误）
     advance(1);
   }
 

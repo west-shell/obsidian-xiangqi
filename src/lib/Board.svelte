@@ -8,17 +8,25 @@
     Chessground,
     type Config,
     type DrawShape,
+    GRID_SVG,
+    HAS_PROMOTION,
+    LAYOUT_CHANGE_EVENT,
     type Move,
+    PROMOTION_PIECES,
+    RESIZE_EVENT,
     type Square,
+    WRAP_CLASS,
+    ZOOM_CHANGE_EVENT,
   } from "../chess";
   import type { EventBus } from "../core/event-bus";
-  import { GRID_SVG } from "../themes";
+  import { iconSvg } from "../utils/icon";
   import type { ISettings } from "../types";
 
   function injectGridSVG(boardEl: HTMLElement): void {
-    const xqBoard = boardEl.querySelector("xq-board");
-    if (!xqBoard || xqBoard.querySelector("svg.xq-grid")) return;
-    xqBoard.insertAdjacentHTML("afterbegin", GRID_SVG);
+    if (!GRID_SVG) return;
+    const boardElInner = boardEl.querySelector("cg-board, xq-board");
+    if (!boardElInner || boardElInner.querySelector("svg.xq-grid")) return;
+    boardElInner.insertAdjacentHTML("afterbegin", GRID_SVG);
   }
 
   interface Props {
@@ -55,12 +63,14 @@
     glyphShapes = [],
   }: Props = $props();
 
-  let boardElement: HTMLDivElement;
+  let boardElement!: HTMLDivElement;
   let api: Api | null = $state(null);
   let layoutChangeHandler: (() => void) | null = null;
   let boardResizeRo: ResizeObserver | null = null;
   let resizeTimer: ReturnType<typeof setTimeout> | null = null;
-
+  let promoIconSize = $derived(
+    boardElement?.offsetWidth ? boardElement.offsetWidth * 0.11 : 30,
+  );
   function handleWheel(e: WheelEvent) {
     if (Math.abs(e.deltaY) < Math.abs(e.deltaX)) return;
     e.preventDefault();
@@ -71,6 +81,29 @@
     }
   }
 
+  let promotingMove: { from: Square; to: Square } | null = $state(null);
+  let promotingColor: "w" | "b" = $state("w");
+
+  function completePromotion(pieceType: "q" | "r" | "b" | "n") {
+    if (!promotingMove) return;
+    try {
+      chess.load(fen);
+      const moveArgs: { from: string; to: string; promotion?: string } = {
+        from: promotingMove.from,
+        to: promotingMove.to,
+      };
+      if (HAS_PROMOTION) moveArgs.promotion = pieceType;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const move = chess.move(moveArgs as any);
+      if (move) {
+        eventBus.emit("runmove", move);
+      }
+    } catch {
+      // ignore invalid move
+    }
+    promotingMove = null;
+  }
+
   let turnColor: cg.Color = $derived(
     fen.split(" ")[1] === "b" ? "black" : "white",
   );
@@ -79,10 +112,10 @@
       ? `turn-${fen.split(" ")[1] === "b" ? "black" : "white"}`
       : "",
   );
-  let _check: cg.Color | false = $derived(checkColor || false);
+
   const chess = new Chess();
 
-  function computeDests(fen: string): SvelteMap<cg.Key, cg.Key[]> {
+  function computeDests(fen: string): Map<cg.Key, cg.Key[]> {
     try {
       chess.load(fen);
       const dests = new SvelteMap<cg.Key, cg.Key[]>();
@@ -128,7 +161,7 @@
     ...glyphShapes,
   ]);
   let dests = $derived(computeDests(fen));
-
+  let _check: cg.Color | false = $derived(checkColor || false);
   onMount(async () => {
     const events: Config["events"] = freeMode
       ? {
@@ -178,6 +211,7 @@
         },
       },
       events,
+      ...(freeMode ? { draggable: { deleteOnDropOff: true } } : {}),
       ...(_check ? { check: _check } : {}),
       ...(lastMove ? { lastMove } : {}),
       ...(selectedSquare ? { selected: selectedSquare } : {}),
@@ -210,6 +244,17 @@
     });
     boardResizeRo.observe(boardElement);
 
+    if (HAS_PROMOTION) {
+      eventBus.on<{ from: Square; to: Square; color: "w" | "b" }>(
+        "promote",
+        (payload) => {
+          if (!payload) return;
+          promotingMove = { from: payload.from, to: payload.to };
+          promotingColor = payload.color;
+        },
+      );
+    }
+
     layoutChangeHandler = () => {
       if (api && boardElement.offsetWidth) {
         api.state.dom.bounds.clear();
@@ -217,7 +262,7 @@
       }
     };
     activeDocument.body.addEventListener(
-      "xq-layout-change",
+      LAYOUT_CHANGE_EVENT,
       layoutChangeHandler,
     );
   });
@@ -233,7 +278,7 @@
     }
     if (layoutChangeHandler) {
       activeDocument.body.removeEventListener(
-        "xq-layout-change",
+        LAYOUT_CHANGE_EVENT,
         layoutChangeHandler,
       );
     }
@@ -243,7 +288,7 @@
   });
 
   $effect(() => {
-    if (!api) return;
+    if (!api || (HAS_PROMOTION && promotingMove)) return;
     if (freeMode) {
       api.set({ fen, turnColor, check: _check });
     } else {
@@ -326,10 +371,10 @@
       zoom = Math.round(Math.min(100, Math.max(0, initialZoom + delta / 5)));
       const boardScale = (zoom / 100) * 0.75 + 0.25;
       activeDocument.body.style.setProperty(
-        "--xq-board-scale",
+        "--chess-board-scale",
         `${boardScale}`,
       );
-      activeDocument.body.dispatchEvent(new Event("xiangqiground.resize"));
+      activeDocument.body.dispatchEvent(new Event(RESIZE_EVENT));
     };
 
     activeDocument.body.classList.add("resizing");
@@ -340,7 +385,7 @@
         activeDocument.removeEventListener(moveEvent, resize);
         activeDocument.body.classList.remove("resizing");
         activeDocument.body.dispatchEvent(
-          new CustomEvent("xq-zoom-changed", { detail: zoom }),
+          new CustomEvent(ZOOM_CHANGE_EVENT, { detail: zoom }),
         );
       },
       { once: true },
@@ -348,8 +393,30 @@
   }
 </script>
 
-<div class="board-wrapper xq-layout__board" onwheel={handleWheel}>
-  <div bind:this={boardElement} class="xq-wrap {turnClass}"></div>
+<div
+  class="board-wrapper chess-layout__board {turnClass}"
+  onwheel={handleWheel}
+>
+  <div bind:this={boardElement} class="{WRAP_CLASS} {turnClass}"></div>
+  {#if HAS_PROMOTION && promotingMove}
+    <!-- svelte-ignore a11y_click_events_have_key_events -->
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
+    <div class="promotion-overlay">
+      <!-- svelte-ignore a11y_click_events_have_key_events -->
+      <!-- svelte-ignore a11y_no_static_element_interactions -->
+      <div
+        class="promotion-choices {promotingColor}"
+        onclick={(e) => e.stopPropagation()}
+      >
+        {#each PROMOTION_PIECES ?? [] as { type, icon } (type)}
+          <button class="promotion-btn" onclick={() => completePromotion(type)}>
+            <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+            {@html iconSvg(icon, promoIconSize, 1.2)}
+          </button>
+        {/each}
+      </div>
+    </div>
+  {/if}
   <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div
     class="board-resize"
@@ -359,38 +426,142 @@
 </div>
 
 <style>
-  .board-wrapper {
-    --bh: var(
-      --xq-board-height,
-      min(var(--xq-board-max-size, 100vh) * var(--xq-board-scale, 0.85), 100%)
-    );
-    width: calc(0.9 * var(--bh));
-    position: relative;
-    margin: 1.5px;
-  }
-  .xq-wrap :global(xq-board) {
-    background:
-      var(--xq-board-texture, none) center / cover no-repeat,
-      var(--xq-board-bg, #d0b899);
+  :global(.cg-wrap),
+  :global(.xq-wrap) {
+    container-type: inline-size;
+    flex-shrink: 0;
+    aspect-ratio: 1;
+    border-radius: 2px;
   }
 
-  .xq-wrap :global(piece) {
+  :global(cg-container) {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+  }
+
+  :global(.cg-wrap) :global(coords) {
+    display: var(--chess-coords-display, flex);
+    font-size: clamp(7px, 2.5cqw, 14px);
+  }
+
+  :global(.cg-wrap) :global(coords.ranks) {
+    left: 0;
+    top: 0;
+    width: 12.5%;
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
+
+  :global(.cg-wrap) :global(coords.files) {
+    bottom: 0;
+    left: 0;
+    height: 12.5%;
+    align-items: flex-end;
+    justify-content: flex-end;
+  }
+
+  :global(.cg-wrap) :global(coords coord) {
+    line-height: 1;
+  }
+
+  :global(.cg-wrap) :global(coords.ranks coord) {
+    transform: none;
+    padding-left: 2%;
+    padding-top: 2%;
+  }
+
+  :global(.cg-wrap) :global(coords.files coord) {
+    padding-right: 0%;
+    padding-bottom: 0%;
+    text-align: right;
+  }
+
+  :global(.cg-wrap) :global(cg-board) {
+    background-color: var(--chess-board-bg, #f0d9b5);
+  }
+
+  :global(.xq-wrap) :global(xq-board) {
+    background:
+      var(--chess-board-texture, none) center / cover no-repeat,
+      var(--chess-board-bg, #d0b899);
+  }
+
+  :global(.cg-wrap) :global(piece),
+  :global(.xq-wrap) :global(piece) {
     touch-action: none;
   }
-  .xq-wrap {
-    aspect-ratio: 9 / 10;
-    flex-shrink: 0;
+
+  :global(.xq-wrap) {
+    --piece-red: var(--chess-piece-red, var(--color-red));
+    --piece-black: var(--chess-piece-black, var(--color-blue));
+  }
+
+  :global(.cg-wrap) :global(cg-board square.oc.move-dest) {
+    background: radial-gradient(
+      transparent 0%,
+      transparent 75%,
+      rgba(20, 85, 0, 0.3) 75%
+    );
+  }
+
+  .board-wrapper {
+    --bw: var(
+      --chess-board-width,
+      min(
+        var(--chess-board-max-size, 100vh) * var(--chess-board-scale, 0.85),
+        100%
+      )
+    );
+    width: var(--bw);
+    position: relative;
     border-radius: 2px;
-    --piece-red: var(--xq-piece-red, var(--color-red));
-    --piece-black: var(--xq-piece-black, var(--color-blue));
   }
 
-  .xq-wrap.turn-white {
-    box-shadow: 0 0 0.12em 0.15em var(--xq-piece-red, var(--color-red));
+  .board-wrapper.turn-white {
+    background: rgba(255, 255, 255, 0.7);
+    box-shadow: 0 0 12px 3px rgba(255, 255, 255, 0.7);
   }
 
-  .xq-wrap.turn-black {
-    box-shadow: 0 0 0.15em 0.15em var(--xq-piece-black, var(--color-blue));
+  .board-wrapper.turn-black {
+    background: rgba(0, 0, 0, 0.7);
+    box-shadow: 0 0 12px 3px rgba(0, 0, 0, 0.7);
+  }
+
+  .promotion-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+  }
+
+  .promotion-choices {
+    display: flex;
+    gap: 4px;
+    padding: 6px;
+    border-radius: 6px;
+    background: var(--background-primary);
+    color: var(--text-normal);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .promotion-btn {
+    all: unset;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    color: var(--text-normal);
+    transition: background 0.15s;
+  }
+
+  .promotion-btn:hover {
+    background: var(--background-modifier-hover);
+    border-color: var(--color-accent);
   }
 
   .board-resize {

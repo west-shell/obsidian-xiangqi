@@ -377,7 +377,7 @@
   }
 </script>
 
-<div class="toolbar-container xq-layout__toolbar">
+<div class="toolbar-container chess-layout__toolbar">
   {#each buttons as { title, icon, event } (event)}
     <button
       class="toolbar-btn"
@@ -430,8 +430,8 @@
   }
 
   .toolbar-container :global(.toolbar-btn) {
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
     padding: 0;
     margin: 0;
     display: flex;

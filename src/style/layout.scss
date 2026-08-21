@@ -6,7 +6,7 @@
 
 $local-block-gap: 2px;
 
-.xq-layout {
+.chess-layout {
   display: grid;
   gap: $local-block-gap;
 
@@ -46,7 +46,7 @@ $local-block-gap: 2px;
 
   // ====== col2：双栏（宽屏或横屏） ======
   @include mq-is-col2 {
-    --xq-board-height: var(---col2-uniboard-height);
+    --chess-board-height: var(---col2-uniboard-height);
     height: var(---col2-uniboard-height);
     grid-template-columns: var(---col2-uniboard-width) auto $uniboard-table;
     grid-template-rows: var(---col2-uniboard-height) 1fr;
@@ -60,7 +60,7 @@ $local-block-gap: 2px;
       }
     }
 
-    .xq-layout__toolbar.toolbar-container {
+    .chess-layout__toolbar.toolbar-container {
       flex-direction: column;
       flex-wrap: wrap;
       max-height: var(---col2-uniboard-height);
@@ -75,7 +75,7 @@ $local-block-gap: 2px;
   }
 }
 
-.xq-layout__toolbar {
+.chess-layout__toolbar {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
@@ -85,7 +85,7 @@ $local-block-gap: 2px;
 }
 
 // ====== GenFEN 编辑器专用 ======
-.xq-layout--genfen {
+.chess-layout--genfen {
   grid-template-columns: 1fr;
   grid-template-rows: auto auto auto;
   grid-template-areas:
@@ -99,7 +99,7 @@ $local-block-gap: 2px;
     grid-template-rows: auto;
     grid-template-areas: "board piecebtns toolbar";
 
-    .xq-layout__toolbar {
+    .chess-layout__toolbar {
       flex-direction: column;
       flex-wrap: wrap;
       align-items: center;
@@ -107,7 +107,7 @@ $local-block-gap: 2px;
     }
   }
 
-  .xq-layout__piecebtns.piece-btn-container {
+  .chess-layout__piecebtns.piece-btn-container {
     container-type: size;
     grid-template-columns: repeat(7, 1fr);
     grid-template-rows: repeat(2, 1fr);
@@ -132,14 +132,14 @@ $local-block-gap: 2px;
 }
 
 // ====== PGN 文件视图专用 ======
-.pgn-view .xq-layout {
+.pgn-view .chess-layout {
   container-type: size;
   display: flex;
   flex-direction: column;
   height: 100%;
 
   &__board {
-    --xq-board-height: min(111.111cqw, 60cqh);
+    --chess-board-height: min(111.111cqw, 60cqh);
     align-self: center;
     .board-resize {
       display: none;
@@ -164,7 +164,7 @@ $local-block-gap: 2px;
     ---col2-uniboard-height: 100cqh;
 
     &__board {
-      --xq-board-height: min(60cqw, 100cqh);
+      --chess-board-height: min(60cqw, 100cqh);
       align-self: center;
     }
 
@@ -176,7 +176,7 @@ $local-block-gap: 2px;
       height: auto;
     }
 
-    .xq-layout--genfen &__toolbar {
+    .chess-layout--genfen &__toolbar {
       align-self: stretch;
     }
 
@@ -189,11 +189,11 @@ $local-block-gap: 2px;
 .pgn-view {
   overflow: hidden !important;
   margin: 0 !important;
-  padding-top: var(--xq-board-margin-top, 0px) !important;
-  padding-bottom: var(--xq-board-margin-bottom, 0px) !important;
+  padding-top: var(--chess-board-margin-top, 0px) !important;
+  padding-bottom: var(--chess-board-margin-bottom, 0px) !important;
 }
 
 // ====== tree codeblock 专用 ======
-.tree-codeblock .xq-layout {
+.tree-codeblock .chess-layout {
   margin: 1rem 0;
 }

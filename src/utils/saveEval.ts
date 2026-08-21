@@ -56,7 +56,7 @@ export async function promptSaveEval(host: IHost): Promise<boolean | null> {
     });
   };
   modal.onClose = () => {
-    modal.contentEl.empty();
+    (modal as { contentEl: HTMLElement }).contentEl.empty();
   };
   modal.open();
   return promise;

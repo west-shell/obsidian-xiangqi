@@ -1,5 +1,19 @@
 import { type Move, type Piece } from "../../chess";
 import {
+  buildDefaultEditFen,
+  DEFAULT_FEN,
+  EMPTY_FEN,
+  getSaveNotation,
+  isMoveCheckmate,
+  matchMove,
+  PRIMARY_PLAYER_KEY,
+} from "../../chess";
+import {
+  ANNOTATION_PREFIX,
+  isAnnotationKey,
+  SHAPES_PREFIX,
+} from "../../utils/icon";
+import {
   registerBlockModule,
   registerFileModule,
 } from "../../core/module-system";
@@ -11,18 +25,12 @@ import type {
   IFileHost,
   IHost,
 } from "../../types";
-import { DEFAULT_FEN } from "../../types";
-import { activateGame } from "../../utils/parse";
-import {
-  ANNOTATION_PREFIX,
-  isAnnotationKey,
-  SHAPES_PREFIX,
-} from "../../utils/icon";
 import {
   ConfirmModal,
   ExportModal,
   ImportModal,
 } from "../../utils/confirmModal";
+import { activateGame } from "../../utils/parse";
 import { Modal, Setting } from "obsidian";
 import { mount, unmount } from "svelte";
 import Chess from "../../lib/Tree/Chess.svelte";
@@ -106,9 +114,8 @@ const ActionsModule = {
         return;
       }
 
-      // 先向上遍历收集祖先节点（包括当前节点）
       const ancestors: string[] = [];
-      let node: ChessNode | null = currentNode; // 明确允许 null
+      let node: ChessNode | null = currentNode;
       while (node) {
         ancestors.push(node.id);
         if (node.parentID) {
@@ -118,9 +125,8 @@ const ActionsModule = {
           node = null;
         }
       }
-      ancestors.reverse(); // 反转为根到当前节点顺序
+      ancestors.reverse();
 
-      // 向下遍历主线子节点（跳过当前节点）
       const descendants: string[] = [];
       node = currentNode.children?.[0] || null;
       while (node) {
@@ -128,16 +134,13 @@ const ActionsModule = {
         node = node.children?.[0] || null;
       }
 
-      // 合并路径
       host.currentPath = [...ancestors, ...descendants];
     });
-
     eventBus.on<Move>("runmove", (move) => {
       if (!move) return;
-      const { from, to } = move;
       const currentNode = host.currentNode;
       for (let node of currentNode.children) {
-        if (node.move && node.move.from === from && node.move.to === to) {
+        if (node.move && matchMove(node.move, move)) {
           host.currentNode = node;
           host.fen = node.fen;
           emitNodeEval(host);
@@ -151,11 +154,11 @@ const ActionsModule = {
         fen: move.after,
         move,
         step: host.currentStep,
-        side: move.color === "w" ? "white" : "black",
+        side: move.color === "w" ? "black" : "white",
         parentID: host.currentNode.id,
         children: [],
         comments: [],
-        isCheckmate: move.isCheckmate ?? false,
+        isCheckmate: isMoveCheckmate(move),
       };
       host.nodeMap.set(newNode.id, newNode);
       host.currentNode.children.push(newNode);
@@ -182,7 +185,7 @@ const ActionsModule = {
       if (step === undefined) return;
       const nodeId = step === 0 ? host.currentPath[0] : host.currentPath[step];
       if (nodeId) {
-        eventBus.emit("slider-navigate", nodeId);
+        eventBus.emit("node-click", nodeId);
       }
     });
 
@@ -294,7 +297,7 @@ const ActionsModule = {
                 host.plugin.app,
                 t("confirm.deleteTitle"),
                 t("confirm.deleteMsg"),
-                t("confirm.saveBtn"),
+                t("confirm.yes"),
                 t("confirm.cancel"),
               );
               modal.open();
@@ -311,7 +314,6 @@ const ActionsModule = {
             const removeNode = host.currentNode;
             const parentNode = host.nodeMap.get(removeNode.parentID!);
             host.currentNode = parentNode!;
-            host.fen = host.currentNode.fen;
             if (parentNode) {
               const idx = parentNode.children.indexOf(removeNode);
               if (idx !== -1) parentNode.children.splice(idx, 1);
@@ -376,12 +378,13 @@ const ActionsModule = {
             }
             break;
           }
-          case "toEnd":
+          case "toEnd": {
             host.currentNode = host.nodeMap.get(
               host.currentPath[host.currentPath.length - 1],
             )!;
             host.fen = host.currentNode.fen;
             break;
+          }
           case "edit-board": {
             const modal = new ConfirmModal(
               host.plugin.app,
@@ -412,7 +415,7 @@ const ActionsModule = {
               "Site",
               "Date",
               "Round",
-              "Red",
+              PRIMARY_PLAYER_KEY,
               "Black",
               "Result",
             ];
@@ -481,23 +484,11 @@ const ActionsModule = {
           }
           case "save": {
             if (host.editing) {
-              if (host.isFenMode) {
-                const fen = host.fen;
-                host.root.children = [];
-                host.root.comments = [];
-                host.root.fen = fen;
-                host.nodeMap.clear();
-                host.nodeMap.set(host.root.id, host.root);
-                host.currentNode = host.root;
-                host.fen = fen;
-                host.tags = updateFenTag(host.tags, fen);
-                host.selectedPiece = null;
-                host.markedPos = null;
-                eventBus.emit("updateUI");
-                eventBus.emit("save");
-                break;
-              }
-              const fen = host.fen;
+              const fen = data
+                ? data
+                : host.isFenMode
+                  ? host.fen
+                  : buildDefaultEditFen(host.fen.split(" ")[0]);
               host.root.children = [];
               host.root.comments = [];
               host.root.fen = fen;
@@ -506,10 +497,12 @@ const ActionsModule = {
               host.currentNode = host.root;
               host.fen = fen;
               host.tags = updateFenTag(host.tags, fen);
-              host.editing = false;
+              if (!host.isFenMode) {
+                host.editing = false;
+                eventBus.emit("updateMainPath");
+              }
               host.selectedPiece = null;
               host.markedPos = null;
-              eventBus.emit("updateMainPath");
               eventBus.emit("updateUI");
               eventBus.emit("save");
               break;
@@ -519,7 +512,7 @@ const ActionsModule = {
           }
           case "empty": {
             if (!host.editing) break;
-            host.fen = "4k4/9/9/9/9/9/9/9/9/4K4 w - - 0 1";
+            host.fen = EMPTY_FEN;
             host.selectedPiece = null;
             break;
           }
@@ -571,27 +564,6 @@ const ActionsModule = {
       eventBus.emit("updateUI");
     });
 
-    eventBus.on("saveFen", () => {
-      if (!host.editing) return;
-      const fen = host.fen;
-      host.root.children = [];
-      host.root.comments = [];
-      host.root.fen = fen;
-      host.nodeMap.clear();
-      host.nodeMap.set(host.root.id, host.root);
-      host.currentNode = host.root;
-      host.fen = fen;
-      host.tags = updateFenTag(host.tags, fen);
-      host.selectedPiece = null;
-      host.markedPos = null;
-      if (!host.isFenMode) {
-        host.editing = false;
-        eventBus.emit("updateMainPath");
-      }
-      eventBus.emit("updateUI");
-      eventBus.emit("save");
-    });
-
     host.stringifyPGN = (root: ChessNode, includeEval = true) =>
       stringifyPGN(root, includeEval);
 
@@ -622,7 +594,6 @@ const ActionsModule = {
         const { contentEl } = engineModal;
         contentEl.createEl("h3", { text: t("engine.title") });
 
-        // Depth
         contentEl.createEl("label", { text: t("engine.depth") });
         const depthSlider = contentEl.createEl("input", { type: "range" });
         depthSlider.setAttribute("min", "1");
@@ -638,7 +609,6 @@ const ActionsModule = {
           depthLabel.textContent = String(depthValue);
         });
 
-        // Skill Level
         contentEl.createEl("label", { text: t("engine.skillLevel") });
         const skillSlider = contentEl.createEl("input", { type: "range" });
         skillSlider.setAttribute("min", "0");
@@ -654,7 +624,6 @@ const ActionsModule = {
           skillLabel.textContent = String(skillValue);
         });
 
-        // Show best move
         const bmContainer = contentEl.createDiv("engine-setting-toggle");
         const bmToggle = bmContainer.createEl("input", { type: "checkbox" });
         bmToggle.checked = showBestMove;
@@ -663,7 +632,6 @@ const ActionsModule = {
           showBestMove = bmToggle.checked;
         });
 
-        // Show ponder
         const ponderContainer = contentEl.createDiv("engine-setting-toggle");
         const ponderToggle = ponderContainer.createEl("input", {
           type: "checkbox",
@@ -674,7 +642,6 @@ const ActionsModule = {
           showPonder = ponderToggle.checked;
         });
 
-        // Show move annotations
         const annContainer = contentEl.createDiv("engine-setting-toggle");
         const annToggle = annContainer.createEl("input", { type: "checkbox" });
         annToggle.checked = showAnnotations;
@@ -685,7 +652,6 @@ const ActionsModule = {
           showAnnotations = annToggle.checked;
         });
 
-        // Buttons
         const btnContainer = contentEl.createDiv("modal-button-container");
         const okBtn = btnContainer.createEl("button", {
           text: t("confirm.yes"),
@@ -721,7 +687,14 @@ const ActionsModule = {
 registerFileModule("actions", ActionsModule);
 registerBlockModule("actions", ActionsModule);
 
-export function stringifyPGN(root: ChessNode, includeEval = true): string {
+function updateFenTag(tags: string, newFen: string): string {
+  if (tags.includes('[FEN "')) {
+    return tags.replace(/\[FEN "[^"]*"\]/, `[FEN "${newFen}"]`);
+  }
+  return `[FEN "${newFen}"]\n${tags}`;
+}
+
+function stringifyPGN(root: ChessNode, includeEval = true): string {
   const nodeBrothers = genNodeBrothers(root);
 
   function genNodeBrothers(root: ChessNode): Map<ChessNode, ChessNode[]> {
@@ -739,8 +712,12 @@ export function stringifyPGN(root: ChessNode, includeEval = true): string {
 
   function walk(node: ChessNode, stepNum: number): string {
     let result = "";
-    if (node.side === "white") result += `${stepNum}. ${node.move!.iccs}`;
-    else if (node.side === "black") result += `${node.move!.iccs}`;
+    const notation = getSaveNotation(node.move!);
+    if (node.side === "white") {
+      result += `${stepNum}. ${notation}`;
+    } else if (node.side === "black") {
+      result += `${notation}`;
+    }
     if (node.comments?.length) {
       for (const c of node.comments) result += `{${c}}`;
     }
@@ -772,13 +749,17 @@ export function stringifyPGN(root: ChessNode, includeEval = true): string {
     const brothers = nodeBrothers.get(node);
     if (brothers?.length) {
       for (const brother of brothers) {
-        if (brother.side === "white") result += ` (${walk(brother, stepNum)})`;
-        else result += ` (${stepNum}. ... ${walk(brother, stepNum)})`;
+        if (brother.side === "white") {
+          result += ` (${walk(brother, stepNum)})`;
+        } else if (brother.side === "black") {
+          result += ` (${stepNum}. ... ${walk(brother, stepNum)})`;
+        }
       }
     }
     if (node.children[0]) {
       const next = node.children[0];
-      result += ` ${walk(next, next.side === "white" ? stepNum + 1 : stepNum)}`;
+      const nextStepNum = next.side === "white" ? stepNum + 1 : stepNum;
+      result += ` ${walk(next, nextStepNum)}`;
     } else if (node.result) {
       result += ` ${node.result}`;
     } else {
@@ -787,13 +768,6 @@ export function stringifyPGN(root: ChessNode, includeEval = true): string {
     return result;
   }
   return walk(root, 0);
-}
-
-function updateFenTag(tags: string, newFen: string): string {
-  if (tags.includes('[FEN "')) {
-    return tags.replace(/\[FEN "[^"]*"\]/, `[FEN "${newFen}"]`);
-  }
-  return `[FEN "${newFen}"]\n${tags}`;
 }
 
 function emitNodeEval(host: IHost) {
@@ -831,13 +805,14 @@ function stringifyCurrentBranchPGN(
   let stepNum = 1;
   for (let i = 1; i < pathIds.length; i++) {
     const node = host.nodeMap.get(pathIds[i])!;
+    const notation = getSaveNotation(node.move!);
     if (node.side === "white") {
-      result += `${stepNum}. ${node.move!.iccs}`;
+      result += `${stepNum}. ${notation}`;
     } else if (node.side === "black") {
       if (i === 1) {
-        result += `${stepNum}... ${node.move!.iccs}`;
+        result += `${stepNum}... ${notation}`;
       } else {
-        result += ` ${node.move!.iccs}`;
+        result += ` ${notation}`;
       }
       stepNum++;
     }

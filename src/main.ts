@@ -1,30 +1,31 @@
-import "@west-shell/xiangqiground/assets/xiangqiground.base.css";
-import "@west-shell/xiangqiground/assets/xiangqiground.piece.css";
-import "./style/layout.scss";
+import "./css-imports";
 
 import { MarkdownView, Plugin, TFile } from "obsidian";
 
 import { initI18n, t } from "./i18n";
 import { TreeRenderChild } from "./renderChild/TreeRenderChild";
 import { ChessSettingTab, DEFAULT_SETTINGS } from "./settings";
-import { applyThemes, ensureBoardAssets, registerIcon } from "./themes";
+import { applyThemes } from "./themes";
 import type { ISettings } from "./types";
 import { PGNView } from "./view/PGNView";
-import "./modules/Engine/EngineModule";
+import {
+  DEFAULT_FILENAME,
+  LAYOUT_CHANGE_EVENT,
+  RIBBON_ICON,
+  ZOOM_CHANGE_EVENT,
+} from "./chess";
 
 export default class ChessPlugin extends Plugin {
   settings: ISettings = DEFAULT_SETTINGS;
   instances: Set<{ refresh(): void }> = new Set();
   async onload() {
     await this.loadSettings();
+
     initI18n(this.settings.lang);
 
     this.addSettingTab(new ChessSettingTab(this.app, this));
 
-    await ensureBoardAssets(this.app);
-    applyThemes(this.app, this.settings);
-
-    registerIcon();
+    applyThemes(this.settings);
 
     this.registerCodeBlocks();
 
@@ -35,8 +36,8 @@ export default class ChessPlugin extends Plugin {
         PGNView.VIEW_TYPE,
       );
 
-      this.addRibbonIcon("xiangqi-icon", t("pgn.newFile"), async () => {
-        let baseFileName = "未命名";
+      this.addRibbonIcon(RIBBON_ICON, t("pgn.newFile"), async () => {
+        let baseFileName = DEFAULT_FILENAME;
         let fileExtension = `.${this.settings.pgnFileExtensions[0] ?? "pgn"}`;
         let fileName = baseFileName + fileExtension;
         let counter = 0;
@@ -79,7 +80,7 @@ export default class ChessPlugin extends Plugin {
             menu.addItem((item) =>
               item
                 .setTitle(t("menu.pgn"))
-                .setIcon("xiangqi-icon")
+                .setIcon(RIBBON_ICON)
                 .onClick(() => this.changeView(file, PGNView.VIEW_TYPE)),
             );
           }
@@ -89,7 +90,13 @@ export default class ChessPlugin extends Plugin {
 
     this.registerEvent(
       this.app.workspace.on("resize", () => {
-        activeDocument.body.dispatchEvent(new CustomEvent("xq-layout-change"));
+        activeDocument.body.dispatchEvent(new CustomEvent(LAYOUT_CHANGE_EVENT));
+      }),
+    );
+
+    this.registerEvent(
+      this.app.workspace.on("css-change", () => {
+        applyThemes(this.settings);
       }),
     );
 
@@ -97,21 +104,14 @@ export default class ChessPlugin extends Plugin {
       this.settings.zoom = (e as CustomEvent<number>).detail;
       void this.saveSettings();
     };
-    activeDocument.body.addEventListener("xq-zoom-changed", onZoomChanged);
+    activeDocument.body.addEventListener(ZOOM_CHANGE_EVENT, onZoomChanged);
     this.register(() => {
-      activeDocument.body.removeEventListener("xq-zoom-changed", onZoomChanged);
+      activeDocument.body.removeEventListener(ZOOM_CHANGE_EVENT, onZoomChanged);
     });
-
-    this.registerEvent(
-      this.app.workspace.on("css-change", () => {
-        if (this.settings.theme === "auto") {
-          applyThemes(this.app, this.settings);
-        }
-      }),
-    );
   }
 
   refresh() {
+    applyThemes(this.settings);
     this.instances.forEach((instance) => {
       instance.refresh();
     });
@@ -139,6 +139,10 @@ export default class ChessPlugin extends Plugin {
     });
   }
 
+  onunload() {
+    void this.saveSettings();
+  }
+
   async loadSettings() {
     const savedData = (await this.loadData()) as Record<string, unknown> | null;
     if (savedData) {
@@ -157,10 +161,6 @@ export default class ChessPlugin extends Plugin {
 
   async saveSettings() {
     await this.saveData(this.settings);
-    applyThemes(this.app, this.settings);
-  }
-
-  onunload() {
-    void this.saveSettings();
+    applyThemes(this.settings);
   }
 }

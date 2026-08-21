@@ -9,6 +9,7 @@ import {
   // type SettingGroupItem,
 } from "obsidian";
 
+import { DEFAULT_FEN_BLOCK_NAMES, DEFAULT_TREE_BLOCK_NAMES } from "./chess";
 import { initI18n, t } from "./i18n";
 import type ChessPlugin from "./main";
 import { THEME_KEYS } from "./themes";
@@ -53,8 +54,8 @@ export const DEFAULT_SETTINGS: ISettings = {
   boardMarginBottom: 20,
   viewOnly: false,
   rotated: false,
-  treeBlockNames: ["xiangqi", "tree"],
-  fenBlockNames: ["fen", "xq"],
+  treeBlockNames: DEFAULT_TREE_BLOCK_NAMES,
+  fenBlockNames: DEFAULT_FEN_BLOCK_NAMES,
   fenSaveBlockName: "tree",
   enablePGNView: true,
   pgnFileExtensions: ["pgn"],
@@ -318,8 +319,8 @@ export class ChessSettingTab extends PluginSettingTab {
   //             {
   //               key: "treeBlockNames" as const,
   //               i18n: "treeAliases",
-  //               fallback: "xiangqi, tree",
-  //               defaults: ["xiangqi", "tree"] as const,
+  //               fallback: "chess, tree",
+  //               defaults: ["chess", "tree"] as const,
   //             },
   //           ] as const
   //         ).flatMap((cfg): SettingGroupItem[] => {
@@ -432,7 +433,7 @@ export class ChessSettingTab extends PluginSettingTab {
   //   void this.plugin.saveSettings();
   //   if (key === "lang" && typeof value === "string") {
   //     initI18n(value);
-  //     // this.update?.();
+  //     this.update();
   //   }
   //   if (
   //     [
@@ -470,6 +471,7 @@ export class ChessSettingTab extends PluginSettingTab {
         }),
     );
 
+    // ==================== 棋盘外观 ====================
     new Setting(containerEl).setName(t("board.title")).setHeading();
 
     new Setting(containerEl)
@@ -507,6 +509,7 @@ export class ChessSettingTab extends PluginSettingTab {
         }),
       );
 
+    // ==================== 对局提示 ====================
     new Setting(containerEl).setName(t("game.title")).setHeading();
 
     new Setting(containerEl)
@@ -576,6 +579,7 @@ export class ChessSettingTab extends PluginSettingTab {
           });
       });
 
+    // ==================== 着法列表 ====================
     new Setting(containerEl).setName(t("movelist.title")).setHeading();
 
     new Setting(containerEl)
@@ -601,6 +605,7 @@ export class ChessSettingTab extends PluginSettingTab {
       },
     );
 
+    // ---- 引擎 ----
     new Setting(containerEl).setName(t("engine.title")).setHeading();
 
     addSliderWithValue(
@@ -659,6 +664,7 @@ export class ChessSettingTab extends PluginSettingTab {
         }),
       );
 
+    // ---- 保存 ----
     new Setting(containerEl).setName(t("save.title")).setHeading();
 
     new Setting(containerEl)
@@ -681,6 +687,7 @@ export class ChessSettingTab extends PluginSettingTab {
         }),
       );
 
+    // ---- 边距 ----
     new Setting(containerEl).setName(t("margin.title")).setHeading();
 
     addSliderWithValue(
@@ -709,16 +716,18 @@ export class ChessSettingTab extends PluginSettingTab {
       },
     );
 
+    // ==================== 重启后生效的设置 ====================
     new Setting(containerEl)
       .setName(t("settings.restartRequired.title"))
       .setDesc(t("settings.restartRequired.desc"))
       .setHeading();
 
+    // ---- 代码块名称 ----
     new Setting(containerEl).setName(t("codeblock.title")).setHeading();
 
     const treeSetting = new Setting(containerEl)
       .setName(t("codeblock.treeAliases"))
-      .setDesc(t("codeblock.treeAliases.desc") + " (默认: xiangqi, tree)")
+      .setDesc(t("codeblock.treeAliases.desc") + " (默认: chess, tree)")
       .addText((text) =>
         text.setValue(settings.treeBlockNames.join(", ")).onChange((value) => {
           const { valid, invalid } = parseAndValidateNames(value);
@@ -727,7 +736,7 @@ export class ChessSettingTab extends PluginSettingTab {
               t("codeblock.invalidName").replace("{name}", invalid[0]),
             );
             const input = treeSetting.controlEl.querySelector("input")!;
-            input.value = valid.length ? valid.join(", ") : "xiangqi, tree";
+            input.value = valid.length ? valid.join(", ") : "chess";
           }
           if (!valid.length) return;
           settings.treeBlockNames = valid;
@@ -736,8 +745,8 @@ export class ChessSettingTab extends PluginSettingTab {
       )
       .addButton((button) =>
         button.setIcon("rotate-ccw").onClick(() => {
-          settings.treeBlockNames = ["xiangqi", "tree"];
-          treeSetting.controlEl.querySelector("input")!.value = "xiangqi, tree";
+          settings.treeBlockNames = ["chess", "tree"];
+          treeSetting.controlEl.querySelector("input")!.value = "chess, tree";
           void this.plugin.saveSettings();
         }),
       );
@@ -757,7 +766,6 @@ export class ChessSettingTab extends PluginSettingTab {
       });
 
     // ---- PGN 文件视图 ----
-
     new Setting(containerEl).setName(t("pgn.title")).setHeading();
 
     new Setting(containerEl)

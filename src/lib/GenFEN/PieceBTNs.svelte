@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { PIECE_CHARS } from "../../types";
+  import { setIcon } from "obsidian";
   import type { Piece } from "../../chess";
   import type { EventBus } from "../../core/event-bus";
 
@@ -10,79 +10,123 @@
   }
   let { fen, eventBus, selectedPiece }: Props = $props();
 
-  const MAX_COUNT: Record<string, number> = {
-    K: 1,
-    A: 2,
-    B: 2,
-    N: 2,
-    R: 2,
-    C: 2,
-    P: 5,
-    k: 1,
-    a: 2,
-    b: 2,
-    n: 2,
-    r: 2,
-    c: 2,
-    p: 5,
-  };
+  const PIECE_DEFS: {
+    key: string;
+    color: "white" | "black";
+    icon: string;
+    maxCount: number;
+  }[] = [
+    { key: "k", color: "black", icon: "chess_king", maxCount: 1 },
+    { key: "q", color: "black", icon: "chess_queen", maxCount: 1 },
+    { key: "r", color: "black", icon: "chess_rook", maxCount: 2 },
+    { key: "b", color: "black", icon: "chess_bishop", maxCount: 2 },
+    { key: "n", color: "black", icon: "chess_knight", maxCount: 2 },
+    { key: "p", color: "black", icon: "chess_pawn", maxCount: 8 },
+    { key: "K", color: "white", icon: "chess_king", maxCount: 1 },
+    { key: "Q", color: "white", icon: "chess_queen", maxCount: 1 },
+    { key: "R", color: "white", icon: "chess_rook", maxCount: 2 },
+    { key: "B", color: "white", icon: "chess_bishop", maxCount: 2 },
+    { key: "N", color: "white", icon: "chess_knight", maxCount: 2 },
+    { key: "P", color: "white", icon: "chess_pawn", maxCount: 8 },
+  ];
 
-  const PIECES: { key: string; piece: Piece; name: string }[] = Object.entries(
-    PIECE_CHARS,
-  ).map(([key, name]) => ({
-    key,
+  const PIECES: {
+    key: string;
+    piece: Piece;
+    color: "white" | "black";
+    icon: string;
+    maxCount: number;
+  }[] = PIECE_DEFS.map((def) => ({
+    ...def,
     piece: {
-      type: key.toLowerCase() as Piece["type"],
-      color: key === key.toUpperCase() ? ("w" as const) : ("b" as const),
+      type: def.key.toLowerCase() as Piece["type"],
+      color:
+        def.key === def.key.toUpperCase() ? ("w" as const) : ("b" as const),
     },
-    name,
   }));
-
-  const isRed = (key: string) => key === key.toUpperCase();
 
   let pieceCount = $derived(
     fen
       .split(" ")[0]
       .split("")
       .reduce((acc: Record<string, number>, c) => {
-        if (/[1-9]/.test(c)) return acc;
-        if (/[a-zA-Z]/.test(c)) acc[c] = (acc[c] || 0) + 1;
+        if (/[1-8]/.test(c)) return acc;
+        if (/[a-zA-Z]/.test(c)) {
+          acc[c] = (acc[c] || 0) + 1;
+        }
         return acc;
       }, {}),
   );
 
   let count = $derived(
-    Object.fromEntries(
-      Object.keys(MAX_COUNT).map((p) => [
-        p,
-        MAX_COUNT[p] - (pieceCount[p] || 0),
-      ]),
-    ),
+    (() => {
+      const whitePromoBudget = 8 - (pieceCount["P"] || 0);
+      const blackPromoBudget = 8 - (pieceCount["p"] || 0);
+      const whiteOverflow = ["Q", "R", "B", "N"].reduce(
+        (s, k) =>
+          s +
+          Math.max(
+            0,
+            (pieceCount[k] || 0) - PIECES.find((p) => p.key === k)!.maxCount,
+          ),
+        0,
+      );
+      const blackOverflow = ["q", "r", "b", "n"].reduce(
+        (s, k) =>
+          s +
+          Math.max(
+            0,
+            (pieceCount[k] || 0) - PIECES.find((p) => p.key === k)!.maxCount,
+          ),
+        0,
+      );
+
+      return Object.fromEntries(
+        PIECES.map(({ key, maxCount }) => {
+          const onBoard = pieceCount[key] || 0;
+          const isWhite = key === key.toUpperCase();
+          const isPawn = key === "P" || key === "p";
+          const isKing = key === "K" || key === "k";
+          if (isKing) return [key, maxCount - onBoard];
+          if (isPawn) {
+            const overflow = isWhite ? whiteOverflow : blackOverflow;
+            return [key, maxCount - onBoard - overflow];
+          }
+          const promoBudget = isWhite ? whitePromoBudget : blackPromoBudget;
+          const selfOverflow = Math.max(0, onBoard - maxCount);
+          const otherOverflow =
+            (isWhite ? whiteOverflow : blackOverflow) - selfOverflow;
+          return [key, maxCount + promoBudget - onBoard - otherOverflow];
+        }),
+      );
+    })(),
   );
+
+  function useIcon(el: HTMLElement, icon: string) {
+    setIcon(el, icon);
+  }
 </script>
 
-<div class="piece-btn-container xq-layout__piecebtns">
-  {#each PIECES as { key, piece, name } (key)}
+<div class="piece-btn-container chess-layout__piecebtns">
+  {#each PIECES as { key, color, icon, piece } (key)}
+    <!-- svelte-ignore a11y_consider_explicit_label -->
     <button
-      class={`piece-btn ${isRed(key) ? "red-piece" : "black-piece"}`}
+      class="piece-btn {color}"
       class:empty={count[key] === 0}
       class:active={selectedPiece &&
         selectedPiece.type === piece.type &&
         selectedPiece.color === piece.color}
+      use:useIcon={icon}
       onclick={() => eventBus.emit("clickPieceBTN", piece)}
-    >
-      {name}
-    </button>
+    ></button>
   {/each}
 </div>
 
 <style>
   .piece-btn-container {
-    --piece-red: var(--xq-piece-red, var(--color-red));
-    --piece-black: var(--xq-piece-black, var(--color-blue));
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(7, 1fr);
+    grid-template-rows: repeat(6, 1fr);
     height: 100%;
     width: auto;
     justify-content: left;
@@ -103,14 +147,19 @@
     color: white;
   }
 
-  .red-piece {
-    background-color: var(--piece-red);
-    color: white;
+  .piece-btn :global(svg) {
+    width: 18px;
+    height: 18px;
+  }
+
+  .piece-btn.white {
+    background-color: var(--chess-piece-white);
+    color: black;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
   }
 
-  .black-piece {
-    background-color: var(--piece-black);
+  .piece-btn.black {
+    background-color: var(--chess-piece-black);
     color: white;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
   }

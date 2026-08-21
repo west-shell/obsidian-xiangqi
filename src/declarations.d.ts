@@ -8,7 +8,12 @@ declare module "*.scss" {
   export default content;
 }
 
-declare module "*?base64" {
+declare module "*.txt?raw" {
   const content: string;
   export default content;
+}
+
+interface HTMLElementEventMap {
+  "chess-zoom-changed": CustomEvent<number>;
+  "chess-layout-change": Event;
 }

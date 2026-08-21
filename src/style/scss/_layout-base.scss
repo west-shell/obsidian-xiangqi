@@ -4,12 +4,12 @@
 @use "uniboard" as *;
 
 body {
-  --xq-header-height: 0px;
-  --xq-block-gap: 4px;
+  --chess-header-height: 0px;
+  --chess-block-gap: 4px;
 }
 
 .view-content.pgn-view {
-  --xq-header-height: var(--size-header-height, 40px);
+  --chess-header-height: var(--size-header-height, 40px);
 }
 
 body {

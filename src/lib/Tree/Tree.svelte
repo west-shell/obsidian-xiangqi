@@ -7,21 +7,25 @@
     type GameSlot,
     type ISettings,
     type NodeMap,
-    PIECE_CHARS,
   } from "../../types";
+  import {
+    getMoveListSideClass,
+    getMoveNotation,
+    getNodeDisplay,
+    getNodeFill,
+    getNodeLabel,
+    getNodeTextColor,
+    getNodeWidth,
+    getStartLabel,
+    LAYOUT_CHANGE_EVENT,
+    PRIMARY_PLAYER_KEY,
+  } from "../../chess";
+  import { Menu, setIcon } from "obsidian";
   import { onLangChange, t } from "../../i18n";
   import { calculateTreeLayout } from "./layout";
   import { badgeSvg, iconSvg } from "../../utils/icon";
   import { scrollToBTN } from "../../utils/utils";
-  import { Menu, setIcon } from "obsidian";
   import * as d3 from "d3";
-  import type { Move } from "../../chess";
-
-  function pieceLabel(move: Move): string {
-    const raw = move.piece;
-    const char = move.color === "w" ? raw.toUpperCase() : raw;
-    return (PIECE_CHARS as Record<string, string>)[char] || raw;
-  }
 
   interface Props {
     nodeMap: NodeMap;
@@ -44,97 +48,6 @@
     currentGameIndex = 0,
     isBlockMode = false,
   }: Props = $props();
-
-  let _lv = $state(0);
-  onLangChange(() => _lv++);
-
-  let showGameNav = $derived(games && games.length > 1 && !isBlockMode);
-  let showGameInfo = $derived(games != null && games.length > 0);
-  let gameLabel = $derived(
-    showGameNav
-      ? t("game.label", _lv)
-          .replace("{current}", String((currentGameIndex ?? 0) + 1))
-          .replace("{total}", String(games!.length))
-      : "",
-  );
-  let gameTitle = $derived.by(() => {
-    if (!showGameInfo) return "";
-    const slot = games![currentGameIndex ?? 0];
-    if (!slot) return "";
-    const h = slot.headers;
-    const white = h.get("Red") || h.get("White") || "?";
-    const black = h.get("Black") || "?";
-    const event = h.get("Event") || "";
-    const date = h.get("Date") || "";
-    const resultRaw = h.get("Result") || "";
-    const result = formatResult(resultRaw, _lv);
-    return `${white} ${result} ${black}${event ? ", " + event : ""}${date ? " " + date : ""}`;
-  });
-
-  function formatResult(raw: string, v: number): string {
-    if (!raw || raw === "*") return "-";
-    if (raw === "1-0") return t("game.win", v);
-    if (raw === "0-1") return t("game.loss", v);
-    if (raw === "1/2-1/2") return t("game.draw", v);
-    return raw;
-  }
-
-  function prevGame() {
-    const idx = (currentGameIndex ?? 0) - 1;
-    if (idx >= 0) eventBus.emit("switch-game", idx);
-  }
-  function nextGame() {
-    const idx = (currentGameIndex ?? 0) + 1;
-    if (games && idx < games.length) eventBus.emit("switch-game", idx);
-  }
-  function handleGameMenu(evt: MouseEvent) {
-    if (!games) return;
-    const menu = new Menu();
-    games.forEach((slot, i) => {
-      const h = slot.headers;
-      const white = h.get("Red") || h.get("White") || "?";
-      const black = h.get("Black") || "?";
-      const event = h.get("Event") || "";
-      const date = h.get("Date") || "";
-      const resultRaw = h.get("Result") || "";
-      const result = formatResult(resultRaw, _lv);
-      const label = `${i + 1}. ${white} ${result} ${black}${event ? ", " + event : ""}${date ? " " + date : ""}`;
-      menu.addItem((mi) => {
-        mi.setTitle(label)
-          .setChecked(i === (currentGameIndex ?? 0))
-          .onClick(() => eventBus.emit("switch-game", i));
-      });
-    });
-    menu.addSeparator();
-    if (!isBlockMode) {
-      menu.addItem((mi) => {
-        mi.setTitle(t("game.new", _lv))
-          .setIcon("plus")
-          .onClick(() => eventBus.emit("create-game"));
-      });
-    }
-    const idx = currentGameIndex ?? 0;
-    if (!isBlockMode && games.length > 1) {
-      menu.addItem((mi) => {
-        mi.setTitle(t("game.moveUp", _lv))
-          .setIcon("arrow-up")
-          .setDisabled(idx <= 0)
-          .onClick(() => eventBus.emit("move-game", -1));
-      });
-      menu.addItem((mi) => {
-        mi.setTitle(t("game.moveDown", _lv))
-          .setIcon("arrow-down")
-          .setDisabled(idx >= games.length - 1)
-          .onClick(() => eventBus.emit("move-game", 1));
-      });
-      menu.addItem((mi) => {
-        mi.setTitle(t("game.delete", _lv))
-          .setIcon("trash")
-          .onClick(() => eventBus.emit("delete-game"));
-      });
-    }
-    menu.showAtMouseEvent(evt);
-  }
 
   let commentsText = $state("");
   let textareaEl: HTMLTextAreaElement | undefined = $state();
@@ -212,8 +125,7 @@
     return `translate(${t.x},${t.y}) scale(${t.k})`;
   });
 
-  let nodeMode = $state(0);
-  let spacingX = $derived(nodeMode === 0 ? 18 : 22);
+  const spacingX = 18;
   const spacingY = 15;
   const nodeHeight = 11;
 
@@ -223,13 +135,13 @@
   function handleCommentsInput() {
     adjustTextareaHeight();
 
-    // 防抖：输入暂停 700ms 自动保存
     if (saveTimeout) clearTimeout(saveTimeout);
     saveTimeout = window.setTimeout(() => {
       saveComments();
       saveTimeout = undefined;
     }, 700);
   }
+
   let layoutChangeHandler: (() => void) | null = null;
   let handleSliderMouseMove: ((evt: MouseEvent) => void) | null = null;
   let handleSliderMouseUp: (() => void) | null = null;
@@ -245,7 +157,7 @@
     }
     if (layoutChangeHandler) {
       activeDocument.body.removeEventListener(
-        "layout-change",
+        LAYOUT_CHANGE_EVENT,
         layoutChangeHandler,
       );
       layoutChangeHandler = null;
@@ -264,7 +176,6 @@
     }
   });
 
-  // 离开时立即保存
   function handleCommentsBlur() {
     if (saveTimeout) {
       clearTimeout(saveTimeout);
@@ -282,13 +193,11 @@
     const changed =
       regularComments.length !== oldComments.length ||
       regularComments.some((c, i) => c !== oldComments[i]);
-    if (!changed) return;
     currentNode.comments = regularComments;
-    eventBus.emit("updateUI", null);
-    eventBus.emit("modified", null);
+    eventBus.emit("updateUI");
+    if (changed) eventBus.emit("modified");
   }
 
-  // ---- 自动调整文本框高度 ----
   function adjustTextareaHeight() {
     if (!textareaEl) return;
     textareaEl.classList.add("auto-height");
@@ -299,7 +208,6 @@
     textareaEl.classList.remove("auto-height");
   }
 
-  // ---- 布局计算 ----
   function updateTreeLayout() {
     renderedNodes = calculateTreeLayout(nodeMap, foldedNodes);
   }
@@ -384,7 +292,6 @@
     if (nodeScreenX < padding) dx = padding - nodeScreenX;
     else if (nodeScreenX > clientWidth - padding)
       dx = clientWidth - padding - nodeScreenX;
-
     if (nodeScreenY < padding) dy = padding - nodeScreenY;
     else if (nodeScreenY > clientHeight - padding)
       dy = clientHeight - padding - nodeScreenY;
@@ -404,19 +311,17 @@
     const { x: tx, y: ty, k: sc } = zoomTransform;
     if (!Number.isFinite(tx) || !Number.isFinite(ty) || !Number.isFinite(sc))
       return;
-    const w = svgEl.clientWidth;
-    const h = svgEl.clientHeight;
-    const cx = w / 2;
-    const cy = h / 2;
+    const w = svgEl.clientWidth,
+      h = svgEl.clientHeight;
+    const cx = w / 2,
+      cy = h / 2;
     let translateX = tx,
       translateY = ty,
       scale = sc;
     const prev = scale;
     const next = prev * factor;
-    // 计算当前屏幕中心对应的世界坐标（未缩放坐标系）
     const worldX = (cx - translateX) / prev;
     const worldY = (cy - translateY) / prev;
-    // 应用新缩放并调整 translate 保持屏幕中心不变
     scale = next;
     translateX = cx - worldX * scale;
     translateY = cy - worldY * scale;
@@ -425,7 +330,6 @@
   }
 
   const ZOOM_STEP = 1.15;
-
   function zoomIn() {
     zoomAtCenter(ZOOM_STEP);
   }
@@ -552,16 +456,11 @@
     return { w, h: currentPath.length - 1, midX, segments };
   });
 
-  function toggleCurrentFold() {
-    if (!currentNode || currentNode.children.length <= 1) return;
-    toggleFold(currentNode);
-  }
-
+  let nodeMode = $state(0);
   const MODE_ICONS = ["club", "align-justify"];
   function cycleNodeMode() {
     nodeMode = (nodeMode + 1) % 2;
   }
-  let modeIcon = $derived(MODE_ICONS[nodeMode]);
 
   // svelte-ignore state_referenced_locally
   let listVisible = $state(settings?.showMovelist ?? true);
@@ -570,18 +469,129 @@
     tick().then(() => resetView());
   }
 
-  function getNodeWidth(node: ChessNode): number {
-    if (nodeMode === 0) return 13;
-    const zh = node.move?.zh ?? "始";
-    return Math.max(13, zh.length * 5.5);
+  let _lv = $state(0);
+  onLangChange(() => _lv++);
+
+  let showGameNav = $derived(games && games.length > 1 && !isBlockMode);
+  let showGameInfo = $derived(games != null && games.length > 0);
+  let gameLabel = $derived(
+    showGameNav
+      ? t("game.label", _lv)
+          .replace("{current}", String((currentGameIndex ?? 0) + 1))
+          .replace("{total}", String(games!.length))
+      : "",
+  );
+  let gameTitle = $derived.by(() => {
+    if (!showGameInfo) return "";
+    const slot = games![currentGameIndex ?? 0];
+    if (!slot) return "";
+    const h = slot.headers;
+    const white = h.get(PRIMARY_PLAYER_KEY) || "?";
+    const black = h.get("Black") || "?";
+    const event = h.get("Event") || "";
+    const date = h.get("Date") || "";
+    const resultRaw = h.get("Result") || "";
+    const result = formatResult(resultRaw, _lv);
+    return `${white} ${result} ${black}${event ? ", " + event : ""}${date ? " " + date : ""}`;
+  });
+
+  function formatResult(raw: string, v: number): string {
+    if (!raw || raw === "*") return "-";
+    if (raw === "1-0") return t("game.win", v);
+    if (raw === "0-1") return t("game.loss", v);
+    if (raw === "1/2-1/2") return t("game.draw", v);
+    return raw;
+  }
+
+  function prevGame() {
+    const idx = (currentGameIndex ?? 0) - 1;
+    if (idx >= 0) eventBus.emit("switch-game", idx);
+  }
+  function nextGame() {
+    const idx = (currentGameIndex ?? 0) + 1;
+    if (games && idx < games.length) eventBus.emit("switch-game", idx);
+  }
+  function handleGameMenu(evt: MouseEvent) {
+    if (!games) return;
+    const menu = new Menu();
+    games.forEach((slot, i) => {
+      const h = slot.headers;
+      const white = h.get(PRIMARY_PLAYER_KEY) || "?";
+      const black = h.get("Black") || "?";
+      const event = h.get("Event") || "";
+      const date = h.get("Date") || "";
+      const resultRaw = h.get("Result") || "";
+      const result = formatResult(resultRaw, _lv);
+      const label = `${i + 1}. ${white} ${result} ${black}${event ? ", " + event : ""}${date ? " " + date : ""}`;
+      menu.addItem((mi) => {
+        mi.setTitle(label)
+          .setChecked(i === (currentGameIndex ?? 0))
+          .onClick(() => eventBus.emit("switch-game", i));
+      });
+    });
+    menu.addSeparator();
+    if (!isBlockMode) {
+      menu.addItem((mi) => {
+        mi.setTitle(t("game.new", _lv))
+          .setIcon("plus")
+          .onClick(() => eventBus.emit("create-game"));
+      });
+    }
+    const idx = currentGameIndex ?? 0;
+    if (!isBlockMode && games.length > 1) {
+      menu.addItem((mi) => {
+        mi.setTitle(t("game.moveUp", _lv))
+          .setIcon("arrow-up")
+          .setDisabled(idx <= 0)
+          .onClick(() => eventBus.emit("move-game", -1));
+      });
+      menu.addItem((mi) => {
+        mi.setTitle(t("game.moveDown", _lv))
+          .setIcon("arrow-down")
+          .setDisabled(idx >= games.length - 1)
+          .onClick(() => eventBus.emit("move-game", 1));
+      });
+      menu.addItem((mi) => {
+        mi.setTitle(t("game.delete", _lv))
+          .setIcon("trash")
+          .onClick(() => eventBus.emit("delete-game"));
+      });
+    }
+    menu.showAtMouseEvent(evt);
+  }
+
+  function toggleCurrentFold() {
+    if (!currentNode || currentNode.children.length <= 1) return;
+    toggleFold(currentNode);
   }
 
   let canFold = $derived((currentNode?.children?.length ?? 0) > 1);
-  let toolbarBTN = $derived([
-    { title: "放大", icon: "plus", event: zoomIn },
-    { title: "缩小", icon: "minus", event: zoomOut },
-    { title: "重置", icon: "rotate-ccw", event: resetView },
+  let zoomBTN = $derived([
+    { title: t("tree.zoomIn", _lv), icon: "plus", event: zoomIn },
+    { title: t("tree.zoomOut", _lv), icon: "minus", event: zoomOut },
+    { title: t("tree.resetView", _lv), icon: "rotate-ccw", event: resetView },
   ]);
+  let nodeModeTitle = $derived(t("tree.nodeMode", _lv));
+
+  function nodeLabel(node: ChessNode): string {
+    return getNodeLabel(node.move, nodeMode);
+  }
+  function nodeFontSize(): string {
+    if (nodeMode === 1) return "6px";
+    return "9px";
+  }
+  let _measureCanvas: HTMLCanvasElement | undefined;
+  function measureTextWidth(text: string, fontSize: string): number {
+    if (!_measureCanvas) _measureCanvas = document.createElement("canvas");
+    const ctx = _measureCanvas.getContext("2d")!;
+    ctx.font = `${fontSize} sans-serif`;
+    return ctx.measureText(text).width;
+  }
+  function localGetNodeWidth(node: ChessNode): number {
+    if (nodeMode === 0) return 13;
+    return getNodeWidth(node.move, nodeMode, measureTextWidth);
+  }
+  let modeIcon = $derived(MODE_ICONS[nodeMode]);
   function useSetIcon(el: HTMLElement, icon: string) {
     setIcon(el, icon);
     return {
@@ -593,15 +603,18 @@
 
   onMount(() => {
     if (!svgEl) return;
-
     updateTreeLayout();
-
-    zoomBehavior = d3
-      .zoom<SVGSVGElement, unknown>()
-      // .scaleExtent([0.5, 6])
-      .on("zoom", (event) => {
-        zoomTransform = event.transform;
-      });
+    zoomBehavior = d3.zoom<SVGSVGElement, unknown>().on("zoom", (event) => {
+      const t = event.transform;
+      if (
+        t &&
+        Number.isFinite(t.x) &&
+        Number.isFinite(t.y) &&
+        Number.isFinite(t.k)
+      ) {
+        zoomTransform = t;
+      }
+    });
 
     handleSliderMouseMove = (evt: MouseEvent) => {
       if (!sliderDragging) return;
@@ -639,7 +652,10 @@
       }
       resetView();
     };
-    activeDocument.body.addEventListener("layout-change", layoutChangeHandler);
+    activeDocument.body.addEventListener(
+      "chess-layout-change",
+      layoutChangeHandler,
+    );
 
     tick()
       .then(() => new Promise(requestAnimationFrame))
@@ -675,17 +691,14 @@
       });
   });
 
-  // ---- 响应式更新 ----
   $effect(() => {
     if (!currentNode) {
       commentsText = "";
       return;
     }
-
     const node = currentNode;
     commentsText = (node.comments ?? []).join("\n");
-
-    void tick().then(() => {
+    tick().then(() => {
       if (textareaEl) adjustTextareaHeight();
       panToNodeIfNeeded(node);
       return undefined;
@@ -699,7 +712,10 @@
   });
 </script>
 
-<div class="tree-container xq-layout__tools">
+<div
+  class="tree-container chess-layout__tools"
+  style="--chess-board-line: var(--chess-board-line, var(--text-muted));"
+>
   {#if showGameInfo}
     <div class="game-nav-bar">
       <div
@@ -785,9 +801,8 @@
       {/if}
       <svg bind:this={svgEl} width="100%" height="100%" class="tree-svg">
         <g transform={TRANSFORM_SAFE}>
-          <!-- 连线 -->
           {#each renderedNodes as node (node.id)}
-            {#each node.children as child, idx (child.id)}
+            {#each node.children as child, idx (node.id + "-" + idx)}
               {#if !(foldedNodes.has(node.id) && idx > 0)}
                 <path
                   d={`
@@ -795,7 +810,7 @@
               L ${(child.x! - 0.3 * Math.sign(child.x! - node.x!)) * spacingX} ${node.y! * spacingY}
               L ${child.x! * spacingX} ${child.y! * spacingY}
               `}
-                  stroke="var(--xq-board-line)"
+                  stroke="var(--chess-board-line)"
                   stroke-linejoin="round"
                   stroke-width={currentPath.includes(node.id) &&
                   currentPath.includes(child.id)
@@ -818,7 +833,7 @@
           {#each renderedNodes as node (node.id)}
             {#if node.children.length > 1}
               {@const isLeft = (node.y ?? 0) % 2 === 0}
-              {@const nw = getNodeWidth(node)}
+              {@const nw = localGetNodeWidth(node)}
               <!-- svelte-ignore a11y_click_events_have_key_events -->
               <!-- svelte-ignore a11y_no_static_element_interactions -->
               <g
@@ -841,8 +856,8 @@
                     : isLeft
                       ? "0,-4 0,4 -5,0"
                       : "0,-4 0,4 5,0"}
-                  fill="var(--xq-board-line)"
-                  stroke="var(--xq-board-line)"
+                  fill="var(--chess-board-line)"
+                  stroke="var(--chess-board-line)"
                   stroke-width="1.5"
                   stroke-linejoin="round"
                   opacity={currentPath.includes(node.id) &&
@@ -860,10 +875,9 @@
             {/if}
           {/each}
 
-          <!-- 节点 -->
           {#each sortedRenderedNodes as node (node.id)}
+            {@const nw = localGetNodeWidth(node)}
             {@const primaryAnnotation = node.annotation}
-            {@const nw = getNodeWidth(node)}
             {@const isCurrent = node.id === currentNode?.id}
             <!-- svelte-ignore a11y_click_events_have_key_events -->
             <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -887,33 +901,49 @@
                 height={nodeHeight}
                 rx="2.5"
                 ry="2.5"
-                fill={node.side === "white"
-                  ? "var(--piece-red)"
-                  : node.side === "black"
-                    ? "var(--piece-black)"
-                    : "green"}
+                fill={getNodeFill(node.side)}
                 stroke={isCurrent
                   ? "var(--interactive-accent)"
-                  : "var(--xq-board-line)"}
+                  : "var(--chess-board-line)"}
               />
-              {#if nodeMode === 0}
-                <text
-                  dy="3.5"
-                  text-anchor="middle"
-                  fill="white"
-                  font-size="9px"
-                >
-                  {node.move?.piece ? pieceLabel(node.move) : "始"}
-                </text>
+              {#if nodeMode === 0 && !node.move}
+                <g transform="translate(-4, -4)" color="#fff">
+                  <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+                  {@html iconSvg("house", 8, 1.5)}
+                </g>
+              {:else if nodeMode === 0 && node.move}
+                {@const display = getNodeDisplay(node.move)}
+                {#if display && display.type === "icon"}
+                  <g
+                    transform="translate(-4, -4)"
+                    color={getNodeTextColor(node.side)}
+                  >
+                    <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+                    {@html iconSvg(display.value, 8, 1.5)}
+                  </g>
+                {:else if display && display.type === "char"}
+                  <text
+                    dominant-baseline="central"
+                    text-anchor="middle"
+                    fill="white"
+                    font-size="9px"
+                    dy="3.5">{display.value}</text
+                  >
+                {:else}
+                  <text
+                    dominant-baseline="central"
+                    text-anchor="middle"
+                    fill={getNodeTextColor(node.side)}
+                    font-size={nodeFontSize()}>{nodeLabel(node)}</text
+                  >
+                {/if}
               {:else}
                 <text
                   dominant-baseline="central"
                   text-anchor="middle"
-                  fill="white"
-                  font-size="5px"
+                  fill={getNodeTextColor(node.side)}
+                  font-size={nodeFontSize()}>{nodeLabel(node)}</text
                 >
-                  {node.move?.zh ?? "开局"}
-                </text>
               {/if}
               {#if node.eval}
                 {@const intensity =
@@ -992,22 +1022,22 @@
         {#if canFold}
           <button
             class="toolbar-btn"
-            aria-label={t("tree.fold")}
+            aria-label={t("tree.fold", _lv)}
             use:useSetIcon={"chevrons-right-left"}
             onclick={toggleCurrentFold}
           ></button>
         {/if}
-        {#each toolbarBTN as btn, i (i)}
+        {#each zoomBTN as { title, icon, event } (event)}
           <button
             class="toolbar-btn"
-            aria-label={btn.title}
-            use:useSetIcon={btn.icon}
-            onclick={btn.event}
+            aria-label={title}
+            use:useSetIcon={icon}
+            onclick={event}
           ></button>
         {/each}
         <button
           class="toolbar-btn"
-          aria-label="切换模式"
+          aria-label={nodeModeTitle}
           use:useSetIcon={modeIcon}
           onclick={cycleNodeMode}
         ></button>
@@ -1074,8 +1104,8 @@
           {/if}
           <span class="slider-thumb" style="top: {sliderPercent}%"></span>
           {#if sliderText}
+            <!-- svelte-ignore a11y_no_static_element_interactions -->
             <span
-              role="presentation"
               class="slider-label"
               style="top: {sliderPercent}%"
               onmousedown={handleSliderAreaMouseDown}
@@ -1110,7 +1140,7 @@
             class:active={listCurrentStep === 0}
             onclick={() => onClickStep(0)}
           >
-            = 开 局 =
+            {getStartLabel()}
           </span>
         </li>
         {#each listMoves as move, i (i)}
@@ -1120,21 +1150,24 @@
               <!-- svelte-ignore a11y_click_events_have_key_events -->
               <!-- svelte-ignore a11y_no_static_element_interactions -->
               <span
-                class="move red"
+                class="move {getMoveListSideClass(move.side)}"
                 class:active={listCurrentStep === i + 1}
                 onclick={() => onClickStep(i + 1)}
               >
-                {move.move?.zh ?? "..."}
+                {move.move ? getMoveNotation(move.move) : "..."}
               </span>
               {#if listMoves[i + 1]}
                 <!-- svelte-ignore a11y_click_events_have_key_events -->
                 <!-- svelte-ignore a11y_no_static_element_interactions -->
                 <span
-                  class="move black"
+                  class="move {getMoveListSideClass(listMoves[i + 1].side)}"
                   class:active={listCurrentStep === i + 2}
                   onclick={() => onClickStep(i + 2)}
                 >
-                  {listMoves[i + 1].move?.zh ?? "..."}
+                  {(() => {
+                    const m = listMoves[i + 1].move;
+                    return m ? getMoveNotation(m) : "...";
+                  })()}
                 </span>
               {/if}
             </li>
@@ -1155,8 +1188,10 @@
       rows="1"></textarea>
     <button
       class="toolbar-btn toggle-list-btn"
-      title={listVisible ? t("tree.hideList") : t("tree.showList")}
-      aria-label={listVisible ? t("tree.hideList") : t("tree.showList")}
+      title={listVisible ? t("tree.hideList", _lv) : t("tree.showList", _lv)}
+      aria-label={listVisible
+        ? t("tree.hideList", _lv)
+        : t("tree.showList", _lv)}
       use:useSetIcon={listVisible ? "panel-right-close" : "panel-right-open"}
       onclick={toggleListVisible}
     ></button>
@@ -1169,10 +1204,10 @@
     flex-direction: column;
     height: 100%;
     overflow: hidden;
-    --xq-board-background: transparent;
-    --xq-board-line: var(--text-normal);
-    --piece-red: var(--xq-piece-red, var(--color-red));
-    --piece-black: var(--xq-piece-black, var(--color-blue));
+    --chess-board-background: transparent;
+    --chess-board-line: var(--text-normal);
+    --piece-red: var(--chess-piece-white, var(--color-red));
+    --piece-black: var(--chess-piece-black, var(--color-blue));
     --text-color: var(--text-normal);
   }
 
@@ -1189,7 +1224,7 @@
     max-width: 200px;
     display: flex;
     flex-direction: column;
-    font-size: var(--xq-font-size, 12px);
+    font-size: var(--chess-font-size, 12px);
     overflow-y: auto;
     overflow-x: hidden;
     padding: 0;
@@ -1240,7 +1275,7 @@
     color: var(--text-normal);
   }
 
-  .move-list span.move.red {
+  .move-list span.move.white {
     min-width: 2.5em;
     text-align: left;
   }
@@ -1266,7 +1301,7 @@
   .svg-wrapper {
     flex: 1 1 auto;
     overflow: hidden;
-    background-color: var(--xq-board-background);
+    background-color: var(--chess-board-background);
     position: relative;
     width: 100%;
     height: 100%;
@@ -1342,8 +1377,6 @@
   }
 
   .toolbar .toolbar-btn {
-    /* font-size: large; */
-    /* all: unset; */
     width: 30px;
     height: 30px;
     padding: 0;
@@ -1364,7 +1397,6 @@
     align-items: center;
     border-radius: 3px 0 0 3px;
     margin: 0 0 0 6px;
-    touch-action: none;
   }
 
   .slider:not(.has-eval) {
@@ -1425,8 +1457,6 @@
     width: 100%;
     position: relative;
     cursor: pointer;
-    touch-action: none;
-    overflow: visible;
   }
 
   .slider-thumb {

@@ -3,6 +3,7 @@ import "../modules/BoardClick";
 import "../modules/Tree/FileHost";
 import "../modules/Tree/Actions";
 import "../modules/Tree/Speak";
+import "../modules/Engine/EngineModule";
 
 import { Scope, TextFileView, type WorkspaceLeaf } from "obsidian";
 
@@ -12,6 +13,7 @@ import {
   destroyFileModuleRegistry,
 } from "../core/module-system";
 import type ChessPlugin from "../main";
+import { RIBBON_ICON } from "../chess";
 import type { ISettings } from "../types";
 
 export class PGNView extends TextFileView {
@@ -100,7 +102,7 @@ export class PGNView extends TextFileView {
   }
 
   getIcon() {
-    return "xiangqi-icon";
+    return RIBBON_ICON;
   }
 
   clear(): void {

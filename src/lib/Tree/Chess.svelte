@@ -13,7 +13,17 @@
     NodeShape,
   } from "../../types";
   import type { EventBus } from "../../core/event-bus";
-  import type { cg, DrawShape, Move, Piece, Square } from "../../chess";
+  import {
+    type cg,
+    type DrawShape,
+    getMoveDest,
+    isMoveCheck,
+    LAYOUT_CLASS,
+    LAYOUT_CLASS_GENFEN,
+    type Move,
+    type Piece,
+    type Square,
+  } from "../../chess";
   import type ChessPlugin from "../../main";
   import { onMount, tick } from "svelte";
   import { annotationShapes } from "../../utils/glyphs";
@@ -98,24 +108,14 @@
       .map((child) => child.move)
       .filter((m): m is Move => m != null) ?? [],
   );
-  let checkColor = $derived(
-    currentNode.move &&
-      (currentNode.move.isCheck || currentNode.move.isCheckmate)
-      ? currentNode.move.color === "w"
-        ? "black"
-        : "white"
-      : null,
-  ) as "white" | "black" | null;
   let userShapes = $derived(loadShapes(currentNode));
   let engineBestMove: { from: Square; to: Square } | null = $state(null);
   let enginePonder: { from: Square; to: Square } | null = $state(null);
-
   let glyphShapes = $derived.by(() => {
     if (!settings.showMoveAnnotations) return [];
     const node = currentNode;
     const shapes: DrawShape[] = [];
-    // In xiangqi, no castling — use move.to directly as dest
-    const dest = node.move ? node.move.to : undefined;
+    const dest = node.move ? getMoveDest(node.move) : undefined;
     if (node.glyph && dest) {
       const engineShapes = annotationShapes(dest, node.glyph);
       shapes.push(...engineShapes);
@@ -141,6 +141,13 @@
     }
     return shapes;
   });
+  let checkColor = $derived(
+    currentNode.move && isMoveCheck(currentNode.move)
+      ? currentNode.move.color === "w"
+        ? "black"
+        : "white"
+      : null,
+  ) as "white" | "black" | null;
 
   onMount(async () => {
     await tick();
@@ -193,7 +200,7 @@
 </script>
 
 {#if editing}
-  <div class="xq-layout xq-layout--genfen">
+  <div class="{LAYOUT_CLASS} {LAYOUT_CLASS_GENFEN}">
     <Board
       {settings}
       {fen}
@@ -204,14 +211,10 @@
       {otherVariations}
     />
     <PieceBTNs {fen} {eventBus} {selectedPiece} />
-    <GenFENToolbar
-      {eventBus}
-      currentTurn={fen.split(" ")[1] === "b" ? "black" : "white"}
-      {isFenMode}
-    />
+    <GenFENToolbar {eventBus} {fen} {isFenMode} />
   </div>
 {:else}
-  <div class="xq-layout">
+  <div class={LAYOUT_CLASS}>
     <Board
       {settings}
       {fen}
@@ -239,10 +242,3 @@
     />
   </div>
 {/if}
-
-<style>
-  .xq-layout {
-    --red: #861818;
-    --black: #000080;
-  }
-</style>

@@ -1,7 +1,14 @@
 import { Chess, type Move } from "../../chess";
-import type { ChessNode } from "../../types";
-import { DEFAULT_FEN } from "../../types";
-import type { NodeShape } from "../../types";
+import {
+  DEFAULT_FEN,
+  EVAL_REGEX,
+  isMoveCheckmate,
+  type MoveTokenType,
+  parseMoveInGame,
+  PRIMARY_MOVE_TOKEN_TYPES,
+  SHAPE_PART_REGEX,
+} from "../../chess";
+import { type ChessNode, type NodeShape } from "../../types";
 import {
   ANNOTATION_PREFIX,
   isAnnotationKey,
@@ -9,9 +16,6 @@ import {
 } from "../../utils/icon";
 
 import { type Token, tokenize, type TokenType } from "./Tokenizer";
-
-const EVAL_RE =
-  /^%e:([m+-]?\d+(?:\.\d+)?|[m+-]?[+-]\d+(?:\.\d+)?),?([a-i0-9]+)?,?([a-i0-9]+)?,?(!\?|\?!|\?\?|[?!]|!!)?$/;
 
 export class PGNParser {
   haveFEN: boolean = false;
@@ -53,10 +57,11 @@ export class PGNParser {
     while (!this.match("eof")) {
       if (this.match("tag")) {
         this.parseTag();
-      } else if (this.match("iccs-move")) {
-        this.processSAN(this.consume().value);
-      } else if (this.match("wxf-move")) {
-        this.processWXF(this.consume().value);
+      } else if (this.isMoveToken()) {
+        this.processMove(
+          this.consume().value,
+          this.tokens[this.currentIndex - 1].type as MoveTokenType,
+        );
       } else if (this.match("left-paren")) {
         this.parseVariation();
       } else if (this.match("comment")) {
@@ -67,6 +72,11 @@ export class PGNParser {
         this.consume();
       }
     }
+  }
+
+  isMoveToken(): boolean {
+    const type = this.peek().type;
+    return (PRIMARY_MOVE_TOKEN_TYPES as readonly string[]).includes(type);
   }
 
   parseTag() {
@@ -80,12 +90,12 @@ export class PGNParser {
     this.tags.set(tagName, tagValue);
 
     if (tagName.toUpperCase() === "FEN") {
-      this.haveFEN = true;
       try {
-        this.chess.load(tagValue.trim());
-        this.rootNode.fen = tagValue.trim();
+        this.chess.load(tagValue);
+        this.rootNode.fen = tagValue;
+        this.haveFEN = true;
       } catch {
-        /* invalid FEN */
+        // invalid FEN, keep default
       }
     }
   }
@@ -101,7 +111,7 @@ export class PGNParser {
       parentID: this.currentNode.id,
       children: [],
       comments: [],
-      isCheckmate: move.isCheckmate ?? false,
+      isCheckmate: isMoveCheckmate(move),
     };
     this.nodeMap.set(node.id, node);
     return node;
@@ -110,40 +120,40 @@ export class PGNParser {
   peek(): Token {
     return this.tokens[this.currentIndex];
   }
+
   consume(): Token {
     return this.tokens[this.currentIndex++];
   }
+
   match(type: TokenType): boolean {
     return this.peek().type === type;
   }
 
-  processSAN(san: string) {
+  processMove(token: string, tokenType: MoveTokenType) {
     const fen = this.currentNode.fen;
     this.chess.load(fen);
     try {
-      const move = this.chess.move(san);
+      const move = parseMoveInGame(this.chess, token, tokenType);
       if (!move) return;
+
       const newNode = this.createNode(move, this.chess.fen());
       this.currentNode.children.push(newNode);
       this.currentNode = newNode;
       this.currentStep++;
       this.currentSide = move.color === "w" ? "white" : "black";
     } catch {
-      /* invalid move */
+      // invalid move, skip
     }
   }
 
-  processWXF(wxf: string) {
-    // xiangqi.js engine now supports Chinese WXF directly (e.g. '炮二平五' → Move)
-    this.processSAN(wxf);
-  }
-
   parseVariation() {
-    this.consume(); // consume '('
+    this.consume();
 
     const variationParentID = this.currentNode.parentID;
     if (!variationParentID) {
-      while (!this.match("right-paren") && !this.match("eof")) this.consume();
+      while (!this.match("right-paren") && !this.match("eof")) {
+        this.consume();
+      }
       if (this.match("right-paren")) this.consume();
       return;
     }
@@ -159,10 +169,11 @@ export class PGNParser {
     this.currentSide = variationBase.side;
 
     while (!this.match("right-paren") && !this.match("eof")) {
-      if (this.match("iccs-move")) {
-        this.processSAN(this.consume().value);
-      } else if (this.match("wxf-move")) {
-        this.processWXF(this.consume().value);
+      if (this.isMoveToken()) {
+        this.processMove(
+          this.consume().value,
+          this.tokens[this.currentIndex - 1].type as MoveTokenType,
+        );
       } else if (this.match("comment")) {
         this.parseComment();
       } else if (this.match("left-paren")) {
@@ -179,7 +190,9 @@ export class PGNParser {
       }
     }
 
-    if (this.match("right-paren")) this.consume();
+    if (this.match("right-paren")) {
+      this.consume();
+    }
 
     this.currentNode = prevState.node;
     this.currentStep = prevState.step;
@@ -188,9 +201,9 @@ export class PGNParser {
 
   parseComment() {
     const token = this.consume();
-    const comment = token.value.replace(/^{|}$/g, "").replace(/^;/, "").trim();
+    const raw = token.value.replace(/^{|}$/g, "").replace(/^;/, "").trim();
 
-    const evalMatch = comment.match(EVAL_RE);
+    const evalMatch = raw.match(EVAL_REGEX);
     if (evalMatch) {
       const evalStr = evalMatch[1];
       const bestmove = evalMatch[2] || undefined;
@@ -226,19 +239,19 @@ export class PGNParser {
       return;
     }
 
-    if (comment.startsWith(ANNOTATION_PREFIX)) {
-      const key = comment.slice(ANNOTATION_PREFIX.length);
+    if (raw.startsWith(ANNOTATION_PREFIX)) {
+      const key = raw.slice(ANNOTATION_PREFIX.length);
       if (isAnnotationKey(key)) {
         this.currentNode.annotation = key;
         return;
       }
     }
 
-    if (comment.startsWith(SHAPES_PREFIX)) {
-      const shapesStr = comment.slice(SHAPES_PREFIX.length);
+    if (raw.startsWith(SHAPES_PREFIX)) {
+      const shapesStr = raw.slice(SHAPES_PREFIX.length);
       const shapes: NodeShape[] = [];
       for (const part of shapesStr.split(",")) {
-        const m = part.match(/^([a-i][0-9])([a-i][0-9])?:([gryb])$/);
+        const m = part.match(SHAPE_PART_REGEX);
         if (m) shapes.push({ orig: m[1], dest: m[2], brush: m[3] });
       }
       if (shapes.length > 0) {
@@ -248,7 +261,7 @@ export class PGNParser {
     }
 
     this.currentNode.comments ??= [];
-    this.currentNode.comments.push(comment);
+    this.currentNode.comments.push(raw);
   }
 
   parseResult() {
