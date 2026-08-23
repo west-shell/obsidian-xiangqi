@@ -472,6 +472,13 @@
   let _lv = $state(0);
   onLangChange(() => _lv++);
 
+  let _uiVer = $state(0);
+  onMount(() => {
+    eventBus.on("updateUI", () => {
+      _uiVer++;
+    });
+  });
+
   let showGameNav = $derived(games && games.length > 1 && !isBlockMode);
   let showGameInfo = $derived(games != null && games.length > 0);
   let gameLabel = $derived(
@@ -482,6 +489,7 @@
       : "",
   );
   let gameTitle = $derived.by(() => {
+    void _uiVer;
     if (!showGameInfo) return "";
     const slot = games![currentGameIndex ?? 0];
     if (!slot) return "";
@@ -712,10 +720,7 @@
   });
 </script>
 
-<div
-  class="tree-container chess-layout__tools"
-  style="--chess-board-line: var(--chess-board-line, var(--text-muted));"
->
+<div class="tree-container chess-layout__tools">
   {#if showGameInfo}
     <div class="game-nav-bar">
       <div
@@ -889,7 +894,7 @@
               filter={!currentPath.includes(node.id)
                 ? "grayscale(100%) brightness(0.75)"
                 : isCurrent
-                  ? "drop-shadow(0 0 4px var(--interactive-accent))"
+                  ? "drop-shadow(0 0 4px var(--color-accent))"
                   : undefined}
               stroke-width={isCurrent ? 1 : 0.5}
               onclick={() => eventBus.emit("node-click", node.id)}
@@ -901,13 +906,16 @@
                 height={nodeHeight}
                 rx="2.5"
                 ry="2.5"
-                fill={getNodeFill(node.side)}
-                stroke={isCurrent
-                  ? "var(--interactive-accent)"
-                  : "var(--chess-board-line)"}
+                fill={isCurrent
+                  ? "var(--color-accent)"
+                  : getNodeFill(node.side)}
+                stroke={getNodeFill(node.side)}
               />
               {#if nodeMode === 0 && !node.move}
-                <g transform="translate(-4, -4)" color="#fff">
+                <g
+                  transform="translate(-4, -4)"
+                  color={isCurrent ? "var(--text-on-accent)" : "#fff"}
+                >
                   <!-- eslint-disable-next-line svelte/no-at-html-tags -->
                   {@html iconSvg("house", 8, 1.5)}
                 </g>
@@ -916,7 +924,9 @@
                 {#if display && display.type === "icon"}
                   <g
                     transform="translate(-4, -4)"
-                    color={getNodeTextColor(node.side)}
+                    color={isCurrent
+                      ? "var(--text-on-accent)"
+                      : getNodeTextColor(node.side)}
                   >
                     <!-- eslint-disable-next-line svelte/no-at-html-tags -->
                     {@html iconSvg(display.value, 8, 1.5)}
@@ -925,7 +935,7 @@
                   <text
                     dominant-baseline="central"
                     text-anchor="middle"
-                    fill="white"
+                    fill={isCurrent ? "var(--text-on-accent)" : "white"}
                     font-size="9px"
                     dy="3.5">{display.value}</text
                   >
@@ -933,7 +943,9 @@
                   <text
                     dominant-baseline="central"
                     text-anchor="middle"
-                    fill={getNodeTextColor(node.side)}
+                    fill={isCurrent
+                      ? "var(--text-on-accent)"
+                      : getNodeTextColor(node.side)}
                     font-size={nodeFontSize()}>{nodeLabel(node)}</text
                   >
                 {/if}
@@ -941,7 +953,9 @@
                 <text
                   dominant-baseline="central"
                   text-anchor="middle"
-                  fill={getNodeTextColor(node.side)}
+                  fill={isCurrent
+                    ? "var(--text-on-accent)"
+                    : getNodeTextColor(node.side)}
                   font-size={nodeFontSize()}>{nodeLabel(node)}</text
                 >
               {/if}

@@ -30,7 +30,7 @@ import {
   ExportModal,
   ImportModal,
 } from "../../utils/confirmModal";
-import { activateGame } from "../../utils/parse";
+import { activateGame, extractHeaders } from "../../utils/parse";
 import { Modal, Setting } from "obsidian";
 import { mount, unmount } from "svelte";
 import Chess from "../../lib/Tree/Chess.svelte";
@@ -473,6 +473,11 @@ const ActionsModule = {
                 .map((p) => `[${p.key} "${p.value}"]`)
                 .join("\n");
               host.tags = fenTag ? `${edited}\n${fenTag}` : edited;
+              const slot = host.games[host.currentGameIndex];
+              if (slot) {
+                slot.headers = extractHeaders(host.tags);
+                if (slot.parsed) slot.parsed.tags = host.tags;
+              }
               eventBus.emit("modified", null);
               eventBus.emit("updateUI");
             }
