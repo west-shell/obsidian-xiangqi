@@ -909,7 +909,9 @@
                 fill={isCurrent
                   ? "var(--color-accent)"
                   : getNodeFill(node.side)}
-                stroke={getNodeFill(node.side)}
+                stroke={isCurrent
+                  ? getNodeFill(node.side)
+                  : "var(--chess-board-line)"}
               />
               {#if nodeMode === 0 && !node.move}
                 <g
