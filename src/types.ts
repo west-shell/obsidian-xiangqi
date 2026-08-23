@@ -5,13 +5,13 @@ import type {
 } from "obsidian";
 
 import type { Move, Piece, Square } from "./chess";
-import { DEFAULT_FEN, PIECE_CHARS } from "./chess";
+import { DEFAULT_FEN } from "./chess";
 import type { EventBus } from "./core/event-bus";
 import type ChessPlugin from "./main";
 import type { PGNParser } from "./modules/Source/parser";
 import type { ThemeName } from "./themes";
 
-export { DEFAULT_FEN, PIECE_CHARS };
+export { DEFAULT_FEN };
 
 export interface ISettings {
   lang: "auto" | "en" | "zh";

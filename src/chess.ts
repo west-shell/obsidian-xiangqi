@@ -59,8 +59,6 @@ export const DEFAULT_LANG = "zh";
 
 // ========== Flags ==========
 export const HAS_PROMOTION = false;
-export const HAS_CASTLING = false;
-export const HAS_EN_PASSANT = false;
 export const PRIMARY_PLAYER_KEY = "Red";
 
 // ========== Move Functions ==========
@@ -149,15 +147,6 @@ export function getStartLabel(): string {
 }
 
 // ========== FEN Build Functions ==========
-export function buildFullFen(
-  boardPart: string,
-  turn: string,
-  _castling: string,
-  _enPassant: string,
-): string {
-  return `${boardPart} ${turn}`;
-}
-
 export function buildDefaultEditFen(boardPart: string): string {
   return `${boardPart} w`;
 }
