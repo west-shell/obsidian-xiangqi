@@ -226,9 +226,10 @@ const ActionsModule = {
 
     eventBus.on("create-game", () => {
       if (!isFileHost(host)) return;
+      const tags = '[Result "*"]';
       const newSlot: GameSlot = {
-        raw: "",
-        headers: new Map(),
+        raw: tags,
+        headers: extractHeaders(tags),
       };
       host.games.push(newSlot);
       host.eventBus.emit("modified", null);
@@ -717,11 +718,13 @@ function stringifyPGN(root: ChessNode, includeEval = true): string {
 
   function walk(node: ChessNode, stepNum: number): string {
     let result = "";
-    const notation = getSaveNotation(node.move!);
-    if (node.side === "white") {
-      result += `${stepNum}. ${notation}`;
-    } else if (node.side === "black") {
-      result += `${notation}`;
+    if (node.move) {
+      const notation = getSaveNotation(node.move);
+      if (node.side === "white") {
+        result += `${stepNum}. ${notation}`;
+      } else if (node.side === "black") {
+        result += `${notation}`;
+      }
     }
     if (node.comments?.length) {
       for (const c of node.comments) result += `{${c}}`;
