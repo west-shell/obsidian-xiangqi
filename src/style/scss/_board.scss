@@ -1,0 +1,20 @@
+.cg-wrap cg-board {
+  background-color: var(--chess-board-bg-color, #f0d9b5);
+}
+
+.xq-wrap xq-board {
+  background:
+    var(--chess-board-bg-image, none) center / cover no-repeat,
+    var(--chess-board-texture, none) center / cover no-repeat,
+    var(--chess-board-bg-color, #d0b899);
+}
+
+.cg-wrap piece,
+.xq-wrap piece {
+  touch-action: none;
+}
+
+.xq-wrap {
+  --piece-red: var(--chess-piece-red, var(--color-red));
+  --piece-black: var(--chess-piece-black, var(--color-blue));
+}

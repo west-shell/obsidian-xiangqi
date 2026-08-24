@@ -446,27 +446,6 @@
     margin: auto;
   }
 
-  :global(.cg-wrap) :global(cg-board) {
-    background-color: var(--chess-board-bg-color, #f0d9b5);
-  }
-
-  :global(.xq-wrap) :global(xq-board) {
-    background:
-      var(--chess-board-bg-image, none) center / cover no-repeat,
-      var(--chess-board-texture, none) center / cover no-repeat,
-      var(--chess-board-bg-color, #d0b899);
-  }
-
-  :global(.cg-wrap) :global(piece),
-  :global(.xq-wrap) :global(piece) {
-    touch-action: none;
-  }
-
-  :global(.xq-wrap) {
-    --piece-red: var(--chess-piece-red, var(--color-red));
-    --piece-black: var(--chess-piece-black, var(--color-blue));
-  }
-
   :global(.cg-wrap) :global(cg-board square.oc.move-dest) {
     background: radial-gradient(
       transparent 0%,

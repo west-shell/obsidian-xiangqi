@@ -3,6 +3,8 @@
 @use "scss/media-queries" as *;
 @use "scss/uniboard" as *;
 @use "scss/layout-base" as *;
+@use "scss/board" as *;
+@use "scss/coords" as *;
 
 $local-block-gap: 2px;
 
