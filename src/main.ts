@@ -3,11 +3,11 @@ import "./css-imports";
 import { MarkdownView, Plugin, TFile } from "obsidian";
 
 import { initI18n, t } from "./i18n";
-import { TreeRenderChild } from "./renderChild/TreeRenderChild";
+import { BlockHost } from "./host/BlockHost";
+import { FileHost } from "./host/FileHost";
 import { ChessSettingTab, DEFAULT_SETTINGS } from "./settings";
 import { applyThemes } from "./themes";
 import type { ISettings } from "./types";
-import { PGNView } from "./view/PGNView";
 import {
   DEFAULT_FILENAME,
   LAYOUT_CHANGE_EVENT,
@@ -29,11 +29,11 @@ export default class ChessPlugin extends Plugin {
 
     this.registerCodeBlocks();
 
-    if (this.settings.enablePGNView) {
-      this.registerView(PGNView.VIEW_TYPE, (leaf) => new PGNView(leaf, this));
+    if (this.settings.enableFileHost) {
+      this.registerView(FileHost.VIEW_TYPE, (leaf) => new FileHost(leaf, this));
       this.registerExtensions(
         this.settings.pgnFileExtensions,
-        PGNView.VIEW_TYPE,
+        FileHost.VIEW_TYPE,
       );
 
       this.addRibbonIcon(RIBBON_ICON, t("pgn.newFile"), async () => {
@@ -76,12 +76,12 @@ export default class ChessPlugin extends Plugin {
                 .onClick(() => this.changeView(file, "markdown")),
             );
           }
-          if (!(currentView instanceof PGNView && currentView.file === file)) {
+          if (!(currentView instanceof FileHost && currentView.file === file)) {
             menu.addItem((item) =>
               item
                 .setTitle(t("menu.pgn"))
                 .setIcon(RIBBON_ICON)
-                .onClick(() => this.changeView(file, PGNView.VIEW_TYPE)),
+                .onClick(() => this.changeView(file, FileHost.VIEW_TYPE)),
             );
           }
         }),
@@ -123,7 +123,7 @@ export default class ChessPlugin extends Plugin {
 
     for (const name of allBlockNames) {
       this.registerMarkdownCodeBlockProcessor(name, (source, el, ctx) => {
-        ctx.addChild(new TreeRenderChild(el, ctx, source, this));
+        ctx.addChild(new BlockHost(el, ctx, source, this));
       });
     }
   }

@@ -14,7 +14,7 @@ import { createBlockModuleRegistry } from "../core/module-system";
 import type ChessPlugin from "../main";
 import type { ISettings } from "../types";
 
-export class TreeRenderChild extends MarkdownRenderChild {
+export class BlockHost extends MarkdownRenderChild {
   settings: ISettings;
   eventBus!: EventBus;
   constructor(

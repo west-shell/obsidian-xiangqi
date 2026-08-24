@@ -16,7 +16,7 @@ import type ChessPlugin from "../main";
 import { RIBBON_ICON } from "../chess";
 import type { ISettings } from "../types";
 
-export class PGNView extends TextFileView {
+export class FileHost extends TextFileView {
   static readonly VIEW_TYPE = "PGN_VIEW";
   settings: ISettings;
   eventBus!: EventBus;
@@ -87,7 +87,7 @@ export class PGNView extends TextFileView {
     return super.onClose();
   }
   getViewType() {
-    return PGNView.VIEW_TYPE;
+    return FileHost.VIEW_TYPE;
   }
 
   getViewData(): string {
