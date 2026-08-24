@@ -246,6 +246,18 @@
     });
 
     menu.addItem((mi) => {
+      mi.setTitle(t("boardMenu.showCoordinates", _lv))
+        .setChecked(settings?.showCoordinateLabels ?? true)
+        .onClick(() => {
+          if (!plugin) return;
+          plugin.settings.showCoordinateLabels =
+            !plugin.settings.showCoordinateLabels;
+          void plugin.saveSettings();
+          eventBus.emit("updateUI");
+        });
+    });
+
+    menu.addItem((mi) => {
       mi.setTitle(t("boardMenu.showTurnBorder", _lv))
         .setChecked(settings?.showTurnBorder ?? true)
         .onClick(() => {

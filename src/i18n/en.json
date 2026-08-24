@@ -49,6 +49,7 @@
   "boardMenu.showEngineBestMove": "Show engine best move",
   "boardMenu.showEnginePonder": "Show engine ponder",
   "boardMenu.showAnnotations": "Show annotations",
+  "boardMenu.showCoordinates": "Show coordinates",
   "boardMenu.showTurnBorder": "Show turn border",
   "toolbar.save": "Save",
   "toolbar.delete": "Delete",

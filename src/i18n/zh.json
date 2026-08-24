@@ -50,6 +50,7 @@
   "boardMenu.showEngineBestMove": "显示引擎最佳着法",
   "boardMenu.showEnginePonder": "显示引擎后续着法",
   "boardMenu.showAnnotations": "显示评注",
+  "boardMenu.showCoordinates": "显示坐标标签",
   "boardMenu.showTurnBorder": "显示行棋方边框",
   "toolbar.save": "保存",
   "toolbar.delete": "删除",

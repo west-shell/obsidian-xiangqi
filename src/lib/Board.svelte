@@ -187,7 +187,7 @@
       fen,
       orientation: rotated ? "black" : "white",
       turnColor,
-      coordinates: true,
+      coordinates: settings.showCoordinateLabels,
       viewOnly: settings.viewOnly ?? false,
       movable: freeMode
         ? { free: true, color: "both" }
@@ -338,7 +338,7 @@
   $effect(() => {
     if (!api) return;
     const cfg: Config = {
-      coordinates: true,
+      coordinates: settings.showCoordinateLabels,
       viewOnly: settings.viewOnly ?? false,
     };
     if (!freeMode) {
