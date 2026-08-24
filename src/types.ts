@@ -33,7 +33,7 @@ export interface ISettings {
   treeBlockNames: string[];
   fenBlockNames: string[];
   fenSaveBlockName: string;
-  enablePGNView: boolean;
+  enableFileHost: boolean;
   pgnFileExtensions: string[];
   engineDepth: number;
   engineSkillLevel: number;

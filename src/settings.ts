@@ -57,7 +57,7 @@ export const DEFAULT_SETTINGS: ISettings = {
   treeBlockNames: DEFAULT_TREE_BLOCK_NAMES,
   fenBlockNames: DEFAULT_FEN_BLOCK_NAMES,
   fenSaveBlockName: "tree",
-  enablePGNView: true,
+  enableFileHost: true,
   pgnFileExtensions: ["pgn"],
   engineDepth: 18,
   engineSkillLevel: 20,
@@ -385,7 +385,7 @@ export class ChessSettingTab extends PluginSettingTab {
   //         {
   //           name: t("pgn.enable"),
   //           desc: t("pgn.enable.desc"),
-  //           control: { type: "toggle", key: "enablePGNView" },
+  //           control: { type: "toggle", key: "enableFileHost" },
   //         },
   //         {
   //           name: t("pgn.extensions"),
@@ -774,8 +774,8 @@ export class ChessSettingTab extends PluginSettingTab {
       .setName(t("pgn.enable"))
       .setDesc(t("pgn.enable.desc"))
       .addToggle((toggle) =>
-        toggle.setValue(settings.enablePGNView).onChange((value) => {
-          settings.enablePGNView = value;
+        toggle.setValue(settings.enableFileHost).onChange((value) => {
+          settings.enableFileHost = value;
           void this.plugin.saveSettings();
         }),
       );
