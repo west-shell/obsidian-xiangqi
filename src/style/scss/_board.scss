@@ -1,3 +1,18 @@
+.cg-wrap,
+.xq-wrap {
+  container-type: inline-size;
+  flex-shrink: 0;
+  aspect-ratio: var(--chess-board-ratio, 1);
+  border-radius: 2px;
+}
+
+cg-container {
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+}
+
 .cg-wrap cg-board {
   background-color: var(--chess-board-bg-color, #f0d9b5);
 }
@@ -17,4 +32,12 @@
 .xq-wrap {
   --piece-red: var(--chess-piece-red, var(--color-red));
   --piece-black: var(--chess-piece-black, var(--color-blue));
+}
+
+.cg-wrap cg-board square.oc.move-dest {
+  background: radial-gradient(
+    transparent 0%,
+    transparent 75%,
+    rgba(20, 85, 0, 0.3) 75%
+  );
 }

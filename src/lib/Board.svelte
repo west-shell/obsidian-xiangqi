@@ -431,29 +431,6 @@
 </div>
 
 <style>
-  :global(.cg-wrap),
-  :global(.xq-wrap) {
-    container-type: inline-size;
-    flex-shrink: 0;
-    aspect-ratio: var(--chess-board-ratio, 1);
-    border-radius: 2px;
-  }
-
-  :global(cg-container) {
-    left: 0;
-    right: 0;
-    bottom: 0;
-    margin: auto;
-  }
-
-  :global(.cg-wrap) :global(cg-board square.oc.move-dest) {
-    background: radial-gradient(
-      transparent 0%,
-      transparent 75%,
-      rgba(20, 85, 0, 0.3) 75%
-    );
-  }
-
   .board-wrapper {
     --bw: var(
       --chess-board-width,
