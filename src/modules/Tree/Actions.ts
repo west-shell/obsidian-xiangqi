@@ -436,13 +436,27 @@ const ActionsModule = {
                 .setName(t("confirm.editTagsTitle", 0))
                 .setHeading();
               for (const pair of tagPairs) {
-                new Setting(contentEl)
-                  .setName(t(`tag.${pair.key}`, 0) || pair.key)
-                  .addText((text) => {
+                const setting = new Setting(contentEl).setName(
+                  t(`tag.${pair.key}`, 0) || pair.key,
+                );
+                if (pair.key === "Result") {
+                  setting.addDropdown((dropdown) => {
+                    dropdown.addOption("*", "*");
+                    dropdown.addOption("1-0", "1-0");
+                    dropdown.addOption("0-1", "0-1");
+                    dropdown.addOption("1/2-1/2", "1/2-1/2");
+                    dropdown.setValue(pair.value || "*");
+                    dropdown.onChange((v) => {
+                      pair.value = v;
+                    });
+                  });
+                } else {
+                  setting.addText((text) => {
                     text.setValue(pair.value).onChange((v) => {
                       pair.value = v;
                     });
                   });
+                }
               }
               const btnContainer = contentEl.createDiv(
                 "modal-button-container",
