@@ -197,9 +197,9 @@ export function getTurnFromFen(fen: string): "white" | "black" {
 
 // ========== Theme CSS Vars ==========
 export interface ThemeData {
+  name: string;
+  nameZh: string;
   bg: string;
-  red: string;
-  black: string;
   texture?: string;
   grid?: "dark" | "light" | "none";
   bgImage?: { path: string; base64: string };
@@ -213,7 +213,7 @@ export function applyThemeCSSVars(
     boardMarginBottom: number;
     showCoordinateLabels: boolean;
   },
-  themeData: ThemeData & { bgImage?: { path: string; base64: string } },
+  themeData: ThemeData,
   app?: {
     vault: {
       adapter: { getResourcePath: (p: string) => string };
@@ -229,11 +229,19 @@ export function applyThemeCSSVars(
   let bg = themeData.bg;
   if (app && /\.(png|jpe?g|gif|webp|svg|bmp)$/i.test(bg)) {
     bg = `url('${app.vault.adapter.getResourcePath(app.vault.configDir + "/" + bg)}') center / cover no-repeat`;
+    body.setProperty("--chess-board-bg-color", "#333");
+  } else {
+    body.setProperty("--chess-board-bg-color", bg);
+    body.removeProperty("--chess-board-bg-image");
   }
-  body.setProperty("--chess-board-bg", bg);
+  if (bg.startsWith("url(")) {
+    body.setProperty("--chess-board-bg-image", bg);
+  }
 
   if (themeData.texture) {
     body.setProperty("--chess-board-texture", themeData.texture);
+  } else {
+    body.removeProperty("--chess-board-texture");
   }
   if (themeData.grid) {
     body.setProperty(
@@ -244,9 +252,9 @@ export function applyThemeCSSVars(
           ? "#ccc"
           : "transparent",
     );
+  } else {
+    body.removeProperty("--chess-grid-color");
   }
-  body.setProperty("--chess-piece-red", themeData.red);
-  body.setProperty("--chess-piece-black", themeData.black);
   body.setProperty("--chess-board-margin-top", `${settings.boardMarginTop}px`);
   body.setProperty(
     "--chess-board-margin-bottom",

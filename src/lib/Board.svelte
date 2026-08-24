@@ -484,13 +484,14 @@
   }
 
   :global(.cg-wrap) :global(cg-board) {
-    background-color: var(--chess-board-bg, #f0d9b5);
+    background-color: var(--chess-board-bg-color, #f0d9b5);
   }
 
   :global(.xq-wrap) :global(xq-board) {
     background:
+      var(--chess-board-bg-image, none) center / cover no-repeat,
       var(--chess-board-texture, none) center / cover no-repeat,
-      var(--chess-board-bg, #d0b899);
+      var(--chess-board-bg-color, #d0b899);
   }
 
   :global(.cg-wrap) :global(piece),

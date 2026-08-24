@@ -25,7 +25,7 @@ export default class ChessPlugin extends Plugin {
 
     this.addSettingTab(new ChessSettingTab(this.app, this));
 
-    applyThemes(this.settings);
+    applyThemes(this.settings, this.app);
 
     this.registerCodeBlocks();
 
@@ -96,7 +96,7 @@ export default class ChessPlugin extends Plugin {
 
     this.registerEvent(
       this.app.workspace.on("css-change", () => {
-        applyThemes(this.settings);
+        applyThemes(this.settings, this.app);
       }),
     );
 
@@ -111,7 +111,7 @@ export default class ChessPlugin extends Plugin {
   }
 
   refresh() {
-    applyThemes(this.settings);
+    applyThemes(this.settings, this.app);
     this.instances.forEach((instance) => {
       instance.refresh();
     });
@@ -161,6 +161,6 @@ export default class ChessPlugin extends Plugin {
 
   async saveSettings() {
     await this.saveData(this.settings);
-    applyThemes(this.settings);
+    applyThemes(this.settings, this.app);
   }
 }

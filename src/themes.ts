@@ -6,41 +6,42 @@ import woodB64 from "../assets/wood.jpg?base64";
 import type { ISettings } from "./types";
 import { applyThemeCSSVars, registerCustomIcon, type ThemeData } from "./chess";
 
-interface BgImage {
-  path: string;
-  base64: string;
-}
-
 interface ThemeDef extends ThemeData {
-  bgImage?: BgImage;
+  red: string;
+  black: string;
 }
 
 const tree_red = "#861818";
 const tree_black = "#0A1C3A";
 const themes: Record<string, ThemeDef> = {
   auto: {
+    name: "Auto",
+    nameZh: "自动",
     bg: "var(--background-primary-alt)",
-    texture: "none",
     grid: "dark",
     red: "var(--xq-auto-red)",
     black: "var(--xq-auto-black)",
   },
   light: {
+    name: "Light",
+    nameZh: "亮色",
     bg: "#ebe0d5",
-    texture: "none",
     grid: "dark",
     red: tree_red,
     black: tree_black,
   },
   dark: {
+    name: "Dark",
+    nameZh: "暗色",
     bg: "#2d2d2d",
-    texture: "none",
     grid: "light",
     red: tree_red,
     black: tree_black,
   },
   parchment: {
-    bg: "#d0b899b4",
+    name: "Parchment",
+    nameZh: "羊皮纸",
+    bg: "#d0b899",
     texture:
       "radial-gradient(ellipse at 40% 30%, rgba(180,170,150,0.3) 0%, transparent 70%)",
     grid: "dark",
@@ -48,6 +49,8 @@ const themes: Record<string, ThemeDef> = {
     black: tree_black,
   },
   green: {
+    name: "Green",
+    nameZh: "绿色",
     bg: "#2d5a27",
     texture:
       "repeating-linear-gradient(0deg, rgba(255,255,255,0.04) 0px, rgba(255,255,255,0.04) 1px, transparent 1px, transparent 3px)",
@@ -56,17 +59,19 @@ const themes: Record<string, ThemeDef> = {
     black: tree_black,
   },
   wood: {
+    name: "Wood",
+    nameZh: "木纹",
     bg: "plugins/xiangqi/assets/wood.jpg",
     bgImage: { path: "plugins/xiangqi/assets/wood.jpg", base64: woodB64 },
-    texture: "none",
     grid: "light",
     red: tree_red,
     black: tree_black,
   },
   bamboo: {
+    name: "Bamboo",
+    nameZh: "竹纹",
     bg: "plugins/xiangqi/assets/bamboo.jpg",
     bgImage: { path: "plugins/xiangqi/assets/bamboo.jpg", base64: bambooB64 },
-    texture: "none",
     grid: "none",
     red: tree_red,
     black: tree_black,
@@ -124,7 +129,10 @@ export function registerIcon() {
   registerCustomIcon(addIcon);
 }
 
-export function applyThemes(settings: ISettings) {
+export function applyThemes(settings: ISettings, app?: App) {
   const t = themes[settings.theme] ?? themes.light;
-  applyThemeCSSVars(settings, t);
+  applyThemeCSSVars(settings, t, app);
+  const body = activeDocument.body.style;
+  body.setProperty("--chess-piece-red", t.red);
+  body.setProperty("--chess-piece-black", t.black);
 }
