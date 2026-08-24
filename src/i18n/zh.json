@@ -1,10 +1,4 @@
 {
-  "theme.wood": "木纹",
-  "theme.green": "绿色",
-  "theme.blue": "蓝色",
-  "theme.grey": "灰色",
-  "theme.dark": "暗色",
-  "theme.light": "浅色",
   "board.title": "棋盘外观",
   "board.theme": "主题",
   "board.theme.desc": "棋盘配色方案",

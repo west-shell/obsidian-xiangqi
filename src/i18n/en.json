@@ -1,10 +1,4 @@
 {
-  "theme.wood": "Wood",
-  "theme.green": "Green",
-  "theme.blue": "Blue",
-  "theme.grey": "Grey",
-  "theme.dark": "Dark",
-  "theme.light": "Light",
   "board.title": "Board",
   "board.theme": "Theme",
   "board.theme.desc": "Board color scheme",
