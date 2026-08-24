@@ -446,43 +446,6 @@
     margin: auto;
   }
 
-  :global(.cg-wrap) :global(coords) {
-    display: var(--chess-coords-display, flex);
-    font-size: clamp(7px, 2.5cqw, 14px);
-  }
-
-  :global(.cg-wrap) :global(coords.ranks) {
-    left: 0;
-    top: 0;
-    width: 12.5%;
-    align-items: flex-start;
-    justify-content: flex-start;
-  }
-
-  :global(.cg-wrap) :global(coords.files) {
-    bottom: 0;
-    left: 0;
-    height: 12.5%;
-    align-items: flex-end;
-    justify-content: flex-end;
-  }
-
-  :global(.cg-wrap) :global(coords coord) {
-    line-height: 1;
-  }
-
-  :global(.cg-wrap) :global(coords.ranks coord) {
-    transform: none;
-    padding-left: 2%;
-    padding-top: 2%;
-  }
-
-  :global(.cg-wrap) :global(coords.files coord) {
-    padding-right: 0%;
-    padding-bottom: 0%;
-    text-align: right;
-  }
-
   :global(.cg-wrap) :global(cg-board) {
     background-color: var(--chess-board-bg-color, #f0d9b5);
   }
