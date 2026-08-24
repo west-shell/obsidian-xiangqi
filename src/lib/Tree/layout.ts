@@ -291,6 +291,7 @@ function resolveX(w: WNode, prevSum?: number, parentX?: number): void {
 export function calculateTreeLayout(
   nodeMap: NodeMap,
   foldedNodes: Set<string>,
+  spacing: number = 0.3,
 ): ChessNode[] {
   const root = nodeMap.get("node-root");
   if (!root) return [];
@@ -299,7 +300,7 @@ export function calculateTreeLayout(
   const wRoot = buildWNode(root, null, foldedNodes);
 
   // 2) 布局
-  layoutChildren(wRoot, 0, () => 0.3);
+  layoutChildren(wRoot, 0, () => spacing);
 
   // 3) 解析 x
   resolveX(wRoot);

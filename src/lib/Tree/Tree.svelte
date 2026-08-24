@@ -18,7 +18,10 @@
     getNodeWidth,
     getStartLabel,
     LAYOUT_CHANGE_EVENT,
+    NODE_CHAR_DY,
     PRIMARY_PLAYER_KEY,
+    TREE_LAYOUT_SPACING,
+    TREE_SPACING_X,
   } from "../../chess";
   import { Menu, setIcon } from "obsidian";
   import { onLangChange, t } from "../../i18n";
@@ -125,7 +128,7 @@
     return `translate(${t.x},${t.y}) scale(${t.k})`;
   });
 
-  const spacingX = 18;
+  const spacingX = TREE_SPACING_X;
   const spacingY = 15;
   const nodeHeight = 11;
 
@@ -209,7 +212,11 @@
   }
 
   function updateTreeLayout() {
-    renderedNodes = calculateTreeLayout(nodeMap, foldedNodes);
+    renderedNodes = calculateTreeLayout(
+      nodeMap,
+      foldedNodes,
+      TREE_LAYOUT_SPACING,
+    );
   }
 
   function updateZoomExtent() {
@@ -730,6 +737,7 @@
 <div class="tree-container chess-layout__tools">
   {#if showGameInfo}
     <div class="game-nav-bar">
+      <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
       <div
         class="game-nav-info"
         role={isBlockMode ? undefined : "button"}
@@ -950,7 +958,7 @@
                     text-anchor="middle"
                     fill={isCurrent ? "var(--text-on-accent)" : "white"}
                     font-size="9px"
-                    dy="3.5">{display.value}</text
+                    dy={NODE_CHAR_DY}>{display.value}</text
                   >
                 {:else}
                   <text
