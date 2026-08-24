@@ -81,6 +81,12 @@ const themes: Record<string, ThemeDef> = {
 export type ThemeName = keyof typeof themes;
 export const THEME_KEYS = Object.keys(themes);
 
+export function getThemeDisplayName(key: string, lang: string): string {
+  const def = themes[key];
+  if (!def) return key;
+  return lang === "zh" ? def.nameZh : def.name;
+}
+
 function base64ToArrayBuffer(b64: string): ArrayBuffer {
   const bin = atob(b64);
   const bytes = new Uint8Array(bin.length);

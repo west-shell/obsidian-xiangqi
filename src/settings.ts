@@ -10,9 +10,9 @@ import {
 } from "obsidian";
 
 import { DEFAULT_FEN_BLOCK_NAMES, DEFAULT_TREE_BLOCK_NAMES } from "./chess";
-import { initI18n, t } from "./i18n";
+import { getLang, initI18n, t } from "./i18n";
 import type ChessPlugin from "./main";
-import { THEME_KEYS } from "./themes";
+import { getThemeDisplayName, THEME_KEYS } from "./themes";
 import type { ISettings } from "./types";
 
 const VALID_NAME_RE = /^[a-z0-9-]+$/;
@@ -479,7 +479,9 @@ export class ChessSettingTab extends PluginSettingTab {
       .setDesc(t("board.theme.desc"))
       .addDropdown((dropdown) => {
         dropdown.addOptions(
-          Object.fromEntries(THEME_KEYS.map((k) => [k, t(`theme.${k}`)])),
+          Object.fromEntries(
+            THEME_KEYS.map((k) => [k, getThemeDisplayName(k, getLang())]),
+          ),
         );
         dropdown.setValue(settings.theme).onChange((theme) => {
           settings.theme = theme;
