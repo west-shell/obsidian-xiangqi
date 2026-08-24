@@ -228,14 +228,14 @@ export function applyThemeCSSVars(
 
   let bg = themeData.bg;
   if (app && /\.(png|jpe?g|gif|webp|svg|bmp)$/i.test(bg)) {
-    bg = `url('${app.vault.adapter.getResourcePath(app.vault.configDir + "/" + bg)}') center / cover no-repeat`;
+    const url = app.vault.adapter.getResourcePath(
+      app.vault.configDir + "/" + bg,
+    );
+    body.setProperty("--chess-board-bg-image", `url('${url}')`);
     body.setProperty("--chess-board-bg-color", "#333");
   } else {
     body.setProperty("--chess-board-bg-color", bg);
     body.removeProperty("--chess-board-bg-image");
-  }
-  if (bg.startsWith("url(")) {
-    body.setProperty("--chess-board-bg-image", bg);
   }
 
   if (themeData.texture) {
