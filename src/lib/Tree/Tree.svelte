@@ -480,7 +480,14 @@
   });
 
   let showGameNav = $derived(games && games.length > 1 && !isBlockMode);
-  let showGameInfo = $derived(games != null && games.length > 0);
+  let hasHeaders = $derived.by(() => {
+    if (!games || games.length === 0) return false;
+    const slot = games[currentGameIndex ?? 0];
+    return slot ? slot.headers.size > 0 : false;
+  });
+  let showGameInfo = $derived(
+    games != null && games.length > 0 && (hasHeaders || !isBlockMode),
+  );
   let gameLabel = $derived(
     showGameNav
       ? t("game.label", _lv)
@@ -725,13 +732,15 @@
     <div class="game-nav-bar">
       <div
         class="game-nav-info"
-        role="button"
-        tabindex="0"
-        onclick={handleGameMenu}
-        onkeydown={(e) => {
-          if (e.key === "Enter" || e.key === " ")
-            handleGameMenu(e as unknown as MouseEvent);
-        }}
+        role={isBlockMode ? undefined : "button"}
+        tabindex={isBlockMode ? undefined : 0}
+        onclick={isBlockMode ? undefined : handleGameMenu}
+        onkeydown={isBlockMode
+          ? undefined
+          : (e: KeyboardEvent) => {
+              if (e.key === "Enter" || e.key === " ")
+                handleGameMenu(e as unknown as MouseEvent);
+            }}
       >
         <span class="game-nav-title">{gameTitle}</span>
         {#if showGameNav}
@@ -754,12 +763,14 @@
           >
         </div>
       {/if}
-      <button
-        class="toolbar-btn game-nav-arrow game-nav-menu-btn"
-        aria-label={t("game.select", _lv)}
-        use:useSetIcon={"list"}
-        onclick={handleGameMenu}
-      ></button>
+      {#if !isBlockMode}
+        <button
+          class="toolbar-btn game-nav-arrow game-nav-menu-btn"
+          aria-label={t("game.select", _lv)}
+          use:useSetIcon={"list"}
+          onclick={handleGameMenu}
+        ></button>
+      {/if}
     </div>
   {/if}
   <div class="tools-row">
