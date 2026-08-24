@@ -46,7 +46,7 @@ $local-block-gap: 2px;
 
   // ====== col2：双栏（宽屏或横屏） ======
   @include mq-is-col2 {
-    --chess-board-height: var(---col2-uniboard-height);
+    --chess-board-width: var(---col2-uniboard-width);
     height: var(---col2-uniboard-height);
     grid-template-columns: var(---col2-uniboard-width) auto $uniboard-table;
     grid-template-rows: var(---col2-uniboard-height) 1fr;
@@ -139,7 +139,7 @@ $local-block-gap: 2px;
   height: 100%;
 
   &__board {
-    --chess-board-height: min(111.111cqw, 60cqh);
+    --chess-board-width: min(100cqw, 54cqh);
     align-self: center;
     .board-resize {
       display: none;
@@ -161,10 +161,9 @@ $local-block-gap: 2px;
 
   @include mq-is-col2 {
     flex-direction: row;
-    ---col2-uniboard-height: 100cqh;
 
     &__board {
-      --chess-board-height: min(60cqw, 100cqh);
+      --chess-board-width: min(60cqw, 90cqh);
       align-self: center;
     }
 
