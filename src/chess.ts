@@ -29,6 +29,7 @@ export const LAYOUT_CLASS = "chess-layout";
 export const LAYOUT_CLASS_GENFEN = "chess-layout--genfen";
 export const WRAP_CLASS = "xq-wrap";
 export const BOARD_ELEMENT = "xq-board";
+export const BOARD_ASPECT_RATIO = 0.9;
 export const LAYOUT_CHANGE_EVENT = "chess-layout-change";
 export const ZOOM_CHANGE_EVENT = "chess-zoom-changed";
 export const RESIZE_EVENT = "xiangqiground.resize";

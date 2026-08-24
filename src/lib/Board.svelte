@@ -3,6 +3,7 @@
   import { SvelteMap } from "svelte/reactivity";
   import {
     type Api,
+    BOARD_ASPECT_RATIO,
     type cg,
     Chess,
     Chessground,
@@ -397,7 +398,11 @@
   class="board-wrapper chess-layout__board {turnClass}"
   onwheel={handleWheel}
 >
-  <div bind:this={boardElement} class="{WRAP_CLASS} {turnClass}"></div>
+  <div
+    bind:this={boardElement}
+    class="{WRAP_CLASS} {turnClass}"
+    style="--chess-board-ratio: {BOARD_ASPECT_RATIO}"
+  ></div>
   {#if HAS_PROMOTION && promotingMove}
     <!-- svelte-ignore a11y_click_events_have_key_events -->
     <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -430,7 +435,7 @@
   :global(.xq-wrap) {
     container-type: inline-size;
     flex-shrink: 0;
-    aspect-ratio: 1;
+    aspect-ratio: var(--chess-board-ratio, 1);
     border-radius: 2px;
   }
 
