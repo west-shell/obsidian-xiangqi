@@ -488,6 +488,7 @@
 
   let showGameNav = $derived(games && games.length > 1 && !isBlockMode);
   let hasHeaders = $derived.by(() => {
+    void _uiVer;
     if (!games || games.length === 0) return false;
     const slot = games[currentGameIndex ?? 0];
     return slot ? slot.headers.size > 0 : false;

@@ -6,7 +6,7 @@ import {
   parseExternalUrl,
 } from "../../chess";
 import { type IBlockHost, type ParsedGame } from "../../types";
-import { hasFenTag, parseOption } from "../../utils/parse";
+import { extractHeaders, hasFenTag, parseOption } from "../../utils/parse";
 
 import { PGNParser } from "./parser";
 
@@ -65,7 +65,9 @@ const SourceModule = {
             tags: host.tags,
             parser,
           };
-          host.games = [{ raw: cleaned, headers: new Map(), parsed: game }];
+          host.games = [
+            { raw: cleaned, headers: extractHeaders(host.tags), parsed: game },
+          ];
           host.currentGameIndex = 0;
           host.currentNode = host.nodeMap.get("node-root")!;
           host.fen = host.currentNode.fen;
