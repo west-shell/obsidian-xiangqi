@@ -389,7 +389,8 @@
       if (!n?.eval) return null;
       if (n.eval.scoreType === "mate")
         return n.eval.score >= 0 ? Infinity : -Infinity;
-      return n.eval.score;
+      const s = n.eval.score;
+      return Number.isFinite(s) ? s : null;
     });
   });
 
@@ -409,6 +410,7 @@
     const w = 20;
     const midX = w / 2;
     const maxAbs = evalChartMax;
+    if (!Number.isFinite(maxAbs) || maxAbs === 0) return null;
     const scaleX = (w - 2) / 2 / maxAbs;
     const edgeR = w - 1;
     const edgeL = 1;

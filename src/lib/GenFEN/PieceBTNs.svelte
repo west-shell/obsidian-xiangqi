@@ -62,7 +62,6 @@
 
 <div class="piece-btn-container chess-layout__piecebtns">
   {#each PIECE_KEYS as key (key)}
-    <!-- svelte-ignore a11y_consider_explicit_label -->
     <button
       class="piece-btn {key === key.toUpperCase() ? 'white' : 'black'}"
       class:empty={getCount(key) <= 0}
