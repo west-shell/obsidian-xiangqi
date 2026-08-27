@@ -55,13 +55,18 @@ function initEngine(host: object) {
   function setNodeGlyph(node: ChessNode) {
     if (!node.parentID) {
       node.glyph = null;
+      for (const child of node.children) {
+        if (child.eval) {
+          child.glyph = computeGlyph(node.eval, child.eval, child.color);
+        }
+      }
       return;
     }
     const parent = h.nodeMap.get(node.parentID);
-    node.glyph = computeGlyph(parent?.eval, node.eval, node.side);
+    node.glyph = computeGlyph(parent?.eval, node.eval, node.color);
     for (const child of node.children) {
       if (child.eval) {
-        child.glyph = computeGlyph(node.eval, child.eval, child.side);
+        child.glyph = computeGlyph(node.eval, child.eval, child.color);
       }
     }
   }

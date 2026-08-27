@@ -154,7 +154,7 @@ const ActionsModule = {
         fen: move.after,
         move,
         step: host.currentStep,
-        side: move.color === "w" ? "black" : "white",
+        color: move.color === "w" ? "white" : "black",
         parentID: host.currentNode.id,
         children: [],
         comments: [],
@@ -734,9 +734,9 @@ function stringifyPGN(root: ChessNode, includeEval = true): string {
     let result = "";
     if (node.move) {
       const notation = getSaveNotation(node.move);
-      if (node.side === "white") {
+      if (node.color === "white") {
         result += `${stepNum}. ${notation}`;
-      } else if (node.side === "black") {
+      } else if (node.color === "black") {
         result += `${notation}`;
       }
     }
@@ -771,16 +771,16 @@ function stringifyPGN(root: ChessNode, includeEval = true): string {
     const brothers = nodeBrothers.get(node);
     if (brothers?.length) {
       for (const brother of brothers) {
-        if (brother.side === "white") {
+        if (brother.color === "white") {
           result += ` (${walk(brother, stepNum)})`;
-        } else if (brother.side === "black") {
+        } else if (brother.color === "black") {
           result += ` (${stepNum}. ... ${walk(brother, stepNum)})`;
         }
       }
     }
     if (node.children[0]) {
       const next = node.children[0];
-      const nextStepNum = next.side === "white" ? stepNum + 1 : stepNum;
+      const nextStepNum = next.color === "white" ? stepNum + 1 : stepNum;
       result += ` ${walk(next, nextStepNum)}`;
     } else if (node.result) {
       result += ` ${node.result}`;
@@ -828,9 +828,9 @@ function stringifyCurrentBranchPGN(
   for (let i = 1; i < pathIds.length; i++) {
     const node = host.nodeMap.get(pathIds[i])!;
     const notation = getSaveNotation(node.move!);
-    if (node.side === "white") {
+    if (node.color === "white") {
       result += `${stepNum}. ${notation}`;
-    } else if (node.side === "black") {
+    } else if (node.color === "black") {
       if (i === 1) {
         result += `${stepNum}... ${notation}`;
       } else {

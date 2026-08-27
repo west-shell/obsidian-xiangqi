@@ -77,7 +77,8 @@ export type ChessNode = {
   id: string;
   fen: string;
   move: Move | null;
-  side: string | null;
+  /** Which color made this move ("white" | "black"), null for root node */
+  color: string | null;
   step?: number;
   x?: number;
   y?: number;
@@ -128,6 +129,7 @@ export interface IHost {
   root: ChessNode;
   nodeMap: NodeMap;
   currentStep: number;
+  /** Which side is to move next */
   currentTurn: ITurn;
   currentNode: ChessNode;
   currentPath: string[];

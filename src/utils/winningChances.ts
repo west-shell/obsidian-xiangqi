@@ -28,15 +28,15 @@ function winningChancesFromEval(ev: NodeEval): number {
 export function computeGlyph(
   prevEval: NodeEval | undefined,
   curEval: NodeEval | undefined,
-  side: string | null,
+  color: string | null,
 ): MoveGlyph | null {
-  if (!prevEval || !curEval || !side) return null;
+  if (!prevEval || !curEval || !color) return null;
 
   const prevChances = winningChancesFromEval(prevEval);
   const curChances = winningChancesFromEval(curEval);
 
   let delta = curChances - prevChances;
-  if (side === "black") delta = -delta;
+  if (color === "black") delta = -delta;
 
   if (delta <= -0.3) return GLYPH_DEFS["??"];
   if (delta <= -0.2) return GLYPH_DEFS["?"];

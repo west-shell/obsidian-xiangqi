@@ -930,9 +930,9 @@
                 ry="2.5"
                 fill={isCurrent
                   ? "var(--color-accent)"
-                  : getNodeFill(node.side)}
+                  : getNodeFill(node.color)}
                 stroke={isCurrent
-                  ? getNodeFill(node.side)
+                  ? getNodeFill(node.color)
                   : "var(--chess-board-line)"}
               />
               {#if nodeMode === 0 && !node.move}
@@ -950,7 +950,7 @@
                     transform="translate(-4, -4)"
                     color={isCurrent
                       ? "var(--text-on-accent)"
-                      : getNodeTextColor(node.side)}
+                      : getNodeTextColor(node.color)}
                   >
                     <!-- eslint-disable-next-line svelte/no-at-html-tags -->
                     {@html iconSvg(display.value, 8, 1.5)}
@@ -969,7 +969,7 @@
                     text-anchor="middle"
                     fill={isCurrent
                       ? "var(--text-on-accent)"
-                      : getNodeTextColor(node.side)}
+                      : getNodeTextColor(node.color)}
                     font-size={nodeFontSize()}>{nodeLabel(node)}</text
                   >
                 {/if}
@@ -979,7 +979,7 @@
                   text-anchor="middle"
                   fill={isCurrent
                     ? "var(--text-on-accent)"
-                    : getNodeTextColor(node.side)}
+                    : getNodeTextColor(node.color)}
                   font-size={nodeFontSize()}>{nodeLabel(node)}</text
                 >
               {/if}
@@ -1188,7 +1188,7 @@
               <!-- svelte-ignore a11y_click_events_have_key_events -->
               <!-- svelte-ignore a11y_no_static_element_interactions -->
               <span
-                class="move {getMoveListSideClass(move.side)}"
+                class="move {getMoveListSideClass(move.color)}"
                 class:active={listCurrentStep === i + 1}
                 onclick={() => onClickStep(i + 1)}
               >
@@ -1198,7 +1198,7 @@
                 <!-- svelte-ignore a11y_click_events_have_key_events -->
                 <!-- svelte-ignore a11y_no_static_element_interactions -->
                 <span
-                  class="move {getMoveListSideClass(listMoves[i + 1].side)}"
+                  class="move {getMoveListSideClass(listMoves[i + 1].color)}"
                   class:active={listCurrentStep === i + 2}
                   onclick={() => onClickStep(i + 2)}
                 >

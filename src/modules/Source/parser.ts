@@ -26,7 +26,6 @@ export class PGNParser {
   currentNode: ChessNode;
   nodeId: number;
   currentStep: number = 0;
-  currentSide: string | null = null;
   tags: Map<string, string> = new Map();
   chess: Chess;
 
@@ -43,7 +42,7 @@ export class PGNParser {
       fen: DEFAULT_FEN,
       move: null,
       step: 0,
-      side: null,
+      color: null,
       parentID: null,
       children: [],
       comments: [],
@@ -52,7 +51,6 @@ export class PGNParser {
     this.currentStep++;
 
     this.currentNode = this.rootNode;
-    this.currentSide = null;
 
     while (!this.match("eof")) {
       if (this.match("tag")) {
@@ -101,13 +99,13 @@ export class PGNParser {
   }
 
   createNode(move: Move, fen: string): ChessNode {
-    const side = move.color === "w" ? "white" : "black";
+    const color = move.color === "w" ? "white" : "black";
     const node: ChessNode = {
       id: `node-${this.nodeId++}`,
       fen,
       move,
       step: this.currentStep,
-      side,
+      color,
       parentID: this.currentNode.id,
       children: [],
       comments: [],
@@ -140,7 +138,6 @@ export class PGNParser {
       this.currentNode.children.push(newNode);
       this.currentNode = newNode;
       this.currentStep++;
-      this.currentSide = move.color === "w" ? "white" : "black";
     } catch {
       // invalid move, skip
     }
@@ -161,12 +158,10 @@ export class PGNParser {
     const prevState = {
       node: this.currentNode,
       step: this.currentStep,
-      side: this.currentSide,
     };
 
     this.currentNode = variationBase;
     this.currentStep = variationBase.step!;
-    this.currentSide = variationBase.side;
 
     while (!this.match("right-paren") && !this.match("eof")) {
       if (this.isMoveToken()) {
@@ -196,7 +191,6 @@ export class PGNParser {
 
     this.currentNode = prevState.node;
     this.currentStep = prevState.step;
-    this.currentSide = prevState.side;
   }
 
   parseComment() {
