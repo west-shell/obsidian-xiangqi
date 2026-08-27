@@ -608,7 +608,8 @@ const ActionsModule = {
       let skillValue = host.settings.engineSkillLevel;
       let showBestMove = host.settings.showEngineBestMove;
       let showPonder = host.settings.showEnginePonder;
-      let showAnnotations = host.settings.showMoveAnnotations;
+      let showEngineAnn = host.settings.showEngineAnnotations;
+      let showBoardAnn = host.settings.showBoardAnnotations;
 
       engineModal.onOpen = () => {
         const { contentEl } = engineModal;
@@ -662,14 +663,28 @@ const ActionsModule = {
           showPonder = ponderToggle.checked;
         });
 
-        const annContainer = contentEl.createDiv("engine-setting-toggle");
-        const annToggle = annContainer.createEl("input", { type: "checkbox" });
-        annToggle.checked = showAnnotations;
-        annContainer.createEl("label", {
-          text: t("engine.showMoveAnnotations"),
+        const engineAnnContainer = contentEl.createDiv("engine-setting-toggle");
+        const engineAnnToggle = engineAnnContainer.createEl("input", {
+          type: "checkbox",
         });
-        annToggle.addEventListener("change", () => {
-          showAnnotations = annToggle.checked;
+        engineAnnToggle.checked = showEngineAnn;
+        engineAnnContainer.createEl("label", {
+          text: t("engine.showEngineAnnotations"),
+        });
+        engineAnnToggle.addEventListener("change", () => {
+          showEngineAnn = engineAnnToggle.checked;
+        });
+
+        const boardAnnContainer = contentEl.createDiv("engine-setting-toggle");
+        const boardAnnToggle = boardAnnContainer.createEl("input", {
+          type: "checkbox",
+        });
+        boardAnnToggle.checked = showBoardAnn;
+        boardAnnContainer.createEl("label", {
+          text: t("engine.showBoardAnnotations"),
+        });
+        boardAnnToggle.addEventListener("change", () => {
+          showBoardAnn = boardAnnToggle.checked;
         });
 
         const btnContainer = contentEl.createDiv("modal-button-container");
@@ -686,7 +701,8 @@ const ActionsModule = {
           }
           host.settings.showEngineBestMove = showBestMove;
           host.settings.showEnginePonder = showPonder;
-          host.settings.showMoveAnnotations = showAnnotations;
+          host.settings.showEngineAnnotations = showEngineAnn;
+          host.settings.showBoardAnnotations = showBoardAnn;
           void host.plugin.saveSettings();
           host.plugin.refresh();
           engineModal.close();

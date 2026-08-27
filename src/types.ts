@@ -39,7 +39,8 @@ export interface ISettings {
   engineSkillLevel: number;
   showEngineBestMove: boolean;
   showEnginePonder: boolean;
-  showMoveAnnotations: boolean;
+  showEngineAnnotations: boolean;
+  showBoardAnnotations: boolean;
   saveEvalByDefault: boolean;
   saveEvalPrompt: boolean;
 }

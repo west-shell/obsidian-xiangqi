@@ -63,7 +63,8 @@ export const DEFAULT_SETTINGS: ISettings = {
   engineSkillLevel: 20,
   showEngineBestMove: true,
   showEnginePonder: true,
-  showMoveAnnotations: true,
+  showEngineAnnotations: true,
+  showBoardAnnotations: true,
   saveEvalByDefault: false,
   saveEvalPrompt: true,
 };
@@ -257,9 +258,14 @@ export class ChessSettingTab extends PluginSettingTab {
   //           control: { type: "toggle", key: "showEnginePonder" },
   //         },
   //         {
-  //           name: t("engine.showMoveAnnotations"),
-  //           desc: t("engine.showMoveAnnotations.desc"),
-  //           control: { type: "toggle", key: "showMoveAnnotations" },
+  //           name: t("engine.showEngineAnnotations"),
+  //           desc: t("engine.showEngineAnnotations.desc"),
+  //           control: { type: "toggle", key: "showEngineAnnotations" },
+  //         },
+  //         {
+  //           name: t("engine.showBoardAnnotations"),
+  //           desc: t("engine.showBoardAnnotations.desc"),
+  //           control: { type: "toggle", key: "showBoardAnnotations" },
   //         },
   //       ],
   //     },
@@ -448,7 +454,8 @@ export class ChessSettingTab extends PluginSettingTab {
   //       "boardMarginBottom",
   //       "showEngineBestMove",
   //       "showEnginePonder",
-  //       "showMoveAnnotations",
+  //       "showEngineAnnotations",
+  //       "showBoardAnnotations",
   //     ].includes(key)
   //   ) {
   //     this.plugin.refresh();
@@ -657,11 +664,21 @@ export class ChessSettingTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName(t("engine.showMoveAnnotations"))
-      .setDesc(t("engine.showMoveAnnotations.desc"))
+      .setName(t("engine.showEngineAnnotations"))
+      .setDesc(t("engine.showEngineAnnotations.desc"))
       .addToggle((toggle) =>
-        toggle.setValue(settings.showMoveAnnotations).onChange((value) => {
-          settings.showMoveAnnotations = value;
+        toggle.setValue(settings.showEngineAnnotations).onChange((value) => {
+          settings.showEngineAnnotations = value;
+          this.plugin.refresh();
+        }),
+      );
+
+    new Setting(containerEl)
+      .setName(t("engine.showBoardAnnotations"))
+      .setDesc(t("engine.showBoardAnnotations.desc"))
+      .addToggle((toggle) =>
+        toggle.setValue(settings.showBoardAnnotations).onChange((value) => {
+          settings.showBoardAnnotations = value;
           this.plugin.refresh();
         }),
       );

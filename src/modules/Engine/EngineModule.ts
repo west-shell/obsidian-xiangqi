@@ -53,6 +53,13 @@ function initEngine(host: object) {
   }
 
   function setNodeGlyph(node: ChessNode) {
+    if (!settings.showEngineAnnotations) {
+      node.glyph = null;
+      for (const child of node.children) {
+        child.glyph = null;
+      }
+      return;
+    }
     if (!node.parentID) {
       node.glyph = null;
       for (const child of node.children) {

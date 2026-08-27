@@ -1033,7 +1033,7 @@
                   {@html badgeSvg("checkmate")}
                 </g>
               {/if}
-              {#if node.glyph}
+              {#if node.glyph && settings?.showEngineAnnotations !== false}
                 <g
                   transform="translate({nw / 2} {nodeHeight / 2})"
                   style="pointer-events: none"

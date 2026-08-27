@@ -333,11 +333,11 @@
 
     menu.addItem((mi) => {
       mi.setTitle(t("boardMenu.showAnnotations", _lv))
-        .setChecked(settings?.showMoveAnnotations ?? true)
+        .setChecked(settings?.showBoardAnnotations ?? true)
         .onClick(() => {
           if (!plugin) return;
-          plugin.settings.showMoveAnnotations =
-            !plugin.settings.showMoveAnnotations;
+          plugin.settings.showBoardAnnotations =
+            !plugin.settings.showBoardAnnotations;
           void plugin.saveSettings();
           eventBus.emit("updateUI");
         });
