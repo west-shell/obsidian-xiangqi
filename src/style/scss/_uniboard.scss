@@ -1,5 +1,6 @@
 @use "functions" as *;
 @use "variables" as *;
+@use "variant" as *;
 
 $uniboard-table-min: 240px;
 $uniboard-table: minmax(#{$uniboard-table-min}, 400px);
@@ -17,6 +18,6 @@ $col2-uniboard-max-size: min(
   #{$col2-uniboard-max-width},
   #{$col2-uniboard-max-height}
 );
-$col2-uniboard-height: calc(
+$col2-uniboard-primary: calc(
   #{$col2-uniboard-max-size} * var(--chess-board-scale, 0.85)
 );

@@ -5,8 +5,11 @@
 @use "scss/layout-base" as *;
 @use "scss/board" as *;
 @use "scss/coords" as *;
+@use "scss/variant" as *;
 
 $local-block-gap: 2px;
+
+// ====== 主网格容器 ======
 
 .chess-layout {
   display: grid;
@@ -39,7 +42,17 @@ $local-block-gap: 2px;
     "tools";
 
   &__board {
+    @if $col1-board-scale {
+      --chess-board-scale: #{$col1-board-scale};
+    }
+    @if $col1-board-max-width {
+      max-width: #{$col1-board-max-width};
+    }
     justify-self: center;
+
+    .board-resize {
+      display: none;
+    }
   }
 
   &__tools {
@@ -48,10 +61,12 @@ $local-block-gap: 2px;
 
   // ====== col2：双栏（宽屏或横屏） ======
   @include mq-is-col2 {
-    --chess-board-width: var(---col2-uniboard-width);
-    height: var(---col2-uniboard-height);
+    @if $col2-primary-dimension != "width" {
+      --chess-board-width: var(---col2-uniboard-width);
+    }
+    height: var(---col2-uniboard-#{$col2-primary-dimension});
     grid-template-columns: var(---col2-uniboard-width) auto $uniboard-table;
-    grid-template-rows: var(---col2-uniboard-height) 1fr;
+    grid-template-rows: var(---col2-uniboard-#{$col2-primary-dimension}) 1fr;
     grid-template-areas:
       "board toolbar tools"
       "board toolbar tools";
@@ -65,18 +80,19 @@ $local-block-gap: 2px;
     .chess-layout__toolbar.toolbar-container {
       flex-direction: column;
       flex-wrap: wrap;
-      max-height: var(---col2-uniboard-height);
+      max-height: var(---col2-uniboard-#{$col2-primary-dimension});
       column-gap: 2px;
       grid-row: 1;
     }
 
     &__tools {
-      max-height: var(---col2-uniboard-height);
+      max-height: var(---col2-uniboard-#{$col2-primary-dimension});
       min-width: 160px;
     }
   }
 }
 
+// ====== 工具栏方向自适应 ======
 .chess-layout__toolbar {
   display: flex;
   flex-direction: row;
@@ -103,31 +119,32 @@ $local-block-gap: 2px;
 
     .chess-layout__toolbar {
       flex-direction: column;
-      flex-wrap: wrap;
+      flex-wrap: #{$genfen-toolbar-flex-wrap};
       align-items: center;
-      align-content: start;
+      @if $genfen-toolbar-align-content {
+        align-content: #{$genfen-toolbar-align-content};
+      }
     }
   }
 
   .chess-layout__piecebtns.piece-btn-container {
     container-type: size;
-    grid-template-columns: repeat(7, 1fr);
+    grid-template-columns: repeat(#{$piecebtns-cols}, 1fr);
     grid-template-rows: repeat(2, 1fr);
     width: 100%;
     height: 56px;
     .piece-btn {
-      width: 14.2857cqw;
+      width: #{$piecebtns-col-cqw};
       height: 28px;
     }
-
     @include mq-is-col2 {
       grid-template-columns: repeat(2, 1fr);
-      grid-template-rows: repeat(7, 1fr);
+      grid-template-rows: repeat(#{$piecebtns-cols}, 1fr);
       width: 56px;
       height: 100%;
       .piece-btn {
         width: 28px;
-        height: 14.2857cqh;
+        height: #{$piecebtns-col-cqh};
       }
     }
   }
@@ -141,7 +158,7 @@ $local-block-gap: 2px;
   height: 100%;
 
   &__board {
-    --chess-board-width: min(100cqw, 54cqh);
+    --chess-board-width: min(100cqw, #{$pgn-col1-board-cqh});
     align-self: center;
     .board-resize {
       display: none;
@@ -163,9 +180,11 @@ $local-block-gap: 2px;
 
   @include mq-is-col2 {
     flex-direction: row;
-
+    @if $pgn-col2-override-uniboard-width {
+      ---col2-uniboard-width: 100cqh;
+    }
     &__board {
-      --chess-board-width: min(60cqw, 90cqh);
+      --chess-board-width: min(60cqw, #{$pgn-col2-board-cqh});
       align-self: center;
     }
 

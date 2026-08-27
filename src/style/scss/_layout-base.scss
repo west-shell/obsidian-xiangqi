@@ -2,6 +2,7 @@
 @use "variables" as *;
 @use "media-queries" as *;
 @use "uniboard" as *;
+@use "variant" as *;
 
 body {
   --chess-header-height: 0px;
@@ -25,6 +26,12 @@ body {
 }
 
 body {
-  ---col2-uniboard-height: #{$col2-uniboard-height};
-  ---col2-uniboard-width: calc(#{$col2-uniboard-height} * 0.9);
+  @if $col2-primary-dimension == "width" {
+    ---col2-uniboard-width: #{$col2-uniboard-primary};
+  } @else {
+    ---col2-uniboard-height: #{$col2-uniboard-primary};
+    ---col2-uniboard-width: calc(
+      #{$col2-uniboard-primary} * #{$board-aspect-ratio}
+    );
+  }
 }

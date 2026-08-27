@@ -1,3 +1,45 @@
-.xq-wrap coords {
-  display: var(--chess-coords-display, flex);
+@use "variant" as *;
+
+@if $coords-extra-styles {
+  .cg-wrap coords {
+    display: var(--chess-coords-display, flex);
+    font-size: clamp(7px, 2.5cqw, 14px);
+  }
+
+  .cg-wrap coords.ranks {
+    left: auto;
+    right: 0;
+    top: 0;
+    width: 12.5%;
+    align-items: flex-end;
+    justify-content: flex-start;
+  }
+
+  .cg-wrap coords.files {
+    bottom: 0;
+    left: 0;
+    height: 12.5%;
+    align-items: flex-end;
+    justify-content: flex-start;
+  }
+
+  .cg-wrap coords coord {
+    line-height: 1;
+  }
+
+  .cg-wrap coords.ranks coord {
+    transform: none;
+    padding-right: 2%;
+    padding-top: 2%;
+  }
+
+  .cg-wrap coords.files coord {
+    padding-left: 0;
+    padding-bottom: 0;
+    text-align: left;
+  }
+} @else {
+  .xq-wrap coords {
+    display: var(--chess-coords-display, flex);
+  }
 }
