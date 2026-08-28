@@ -16,14 +16,14 @@ describe('中国象棋PGN解析器', () => {
 
     const move1 = gameTree.children[0];
     expect(move1.move?.zh).toBeTruthy();
-    expect(move1.side).toBe('red');
+    expect(move1.color).toBe('white');
     expect(move1.step).toBe(1);
     expect(move1.children).toHaveLength(1);
     expect(move1.fen).toBeTruthy();
 
     const move2 = move1.children[0];
     expect(move2.move?.zh).toBeTruthy();
-    expect(move2.side).toBe('black');
+    expect(move2.color).toBe('black');
     expect(move2.step).toBe(2);
     expect(move2.fen).toBeTruthy();
   });
