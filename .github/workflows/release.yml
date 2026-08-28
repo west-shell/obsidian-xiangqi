@@ -3,8 +3,7 @@ name: Release Obsidian plugin
 on:
   push:
     tags:
-      - '[0-9]+\.[0-9]+\.[0-9]+'
-      - '[0-9]+\.[0-9]+\.[0-9]+-*'
+      - /^[0-9]+\.[0-9]+\.[0-9]+$/
 
 jobs:
   build:
@@ -16,6 +15,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
 
       - name: Use Node.js
         uses: actions/setup-node@v6
@@ -36,6 +37,14 @@ jobs:
             build/manifest.json
             build/styles.css
 
+      - name: Generate changelog
+        id: changelog
+        uses: requarks/changelog-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ github.ref_name }}
+          writeToFile: false
+
       - name: Create release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -44,5 +53,5 @@ jobs:
 
           gh release create "$tag" \
             --title="$tag" \
-            --generate-notes \
+            --notes-file=- <<< "${{ steps.changelog.outputs.changes }}" \
             build/main.js build/manifest.json build/styles.css
