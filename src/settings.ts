@@ -56,7 +56,7 @@ export const DEFAULT_SETTINGS: ISettings = {
   rotated: false,
   treeBlockNames: DEFAULT_TREE_BLOCK_NAMES,
   fenBlockNames: DEFAULT_FEN_BLOCK_NAMES,
-  fenSaveBlockName: "tree",
+  fenSaveBlockName: DEFAULT_TREE_BLOCK_NAMES[0],
   enableFileHost: true,
   pgnFileExtensions: ["pgn"],
   engineDepth: 18,
@@ -755,7 +755,9 @@ export class ChessSettingTab extends PluginSettingTab {
               t("codeblock.invalidName").replace("{name}", invalid[0]),
             );
             const input = treeSetting.controlEl.querySelector("input")!;
-            input.value = valid.length ? valid.join(", ") : "chess";
+            input.value = valid.length
+              ? valid.join(", ")
+              : DEFAULT_TREE_BLOCK_NAMES[0];
           }
           if (!valid.length) return;
           settings.treeBlockNames = valid;
@@ -764,8 +766,9 @@ export class ChessSettingTab extends PluginSettingTab {
       )
       .addButton((button) =>
         button.setIcon("rotate-ccw").onClick(() => {
-          settings.treeBlockNames = ["chess", "tree"];
-          treeSetting.controlEl.querySelector("input")!.value = "chess, tree";
+          settings.treeBlockNames = [...DEFAULT_TREE_BLOCK_NAMES];
+          treeSetting.controlEl.querySelector("input")!.value =
+            DEFAULT_TREE_BLOCK_NAMES.join(", ");
           void this.plugin.saveSettings();
         }),
       );
