@@ -7,6 +7,7 @@ import { BlockHost } from "./host/BlockHost";
 import { FileHost } from "./host/FileHost";
 import { ChessSettingTab, DEFAULT_SETTINGS } from "./settings";
 import { applyThemes } from "./themes";
+import { registerCustomIcon } from "./chess";
 import type { ISettings } from "./types";
 import {
   DEFAULT_FILENAME,
@@ -25,6 +26,7 @@ export default class ChessPlugin extends Plugin {
 
     this.addSettingTab(new ChessSettingTab(this.app, this));
 
+    registerCustomIcon();
     applyThemes(this.settings, this.app);
 
     this.registerCodeBlocks();

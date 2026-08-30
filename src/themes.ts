@@ -1,10 +1,10 @@
-import { addIcon, type App } from "obsidian";
+import { type App } from "obsidian";
 
 import bambooB64 from "../assets/bamboo.jpg?base64";
 import woodB64 from "../assets/wood.jpg?base64";
 
 import type { ISettings } from "./types";
-import { applyThemeCSSVars, registerCustomIcon, type ThemeData } from "./chess";
+import { applyThemeCSSVars, type ThemeData } from "./chess";
 
 interface ThemeDef extends ThemeData {
   red: string;
@@ -129,10 +129,6 @@ export async function ensureBoardAssets(app: App): Promise<void> {
       console.error(`[xiangqi] 写入背景图失败: ${img.path}`, err);
     }
   }
-}
-
-export function registerIcon() {
-  registerCustomIcon(addIcon);
 }
 
 export function applyThemes(settings: ISettings, app?: App) {
