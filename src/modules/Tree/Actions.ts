@@ -766,7 +766,7 @@ function stringifyCurrentBranchPGN(
   let stepNum = 1;
   for (let i = 1; i < pathIds.length; i++) {
     const node = host.nodeMap.get(pathIds[i])!;
-    const notation = getSaveNotation(node.move!);
+    const notation = getSaveNotation(node.move);
     if (node.color === "white") {
       result += `${stepNum}. ${notation}`;
     } else if (node.color === "black") {
