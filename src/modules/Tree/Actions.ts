@@ -8,6 +8,8 @@ import {
   matchMove,
   PRIMARY_PLAYER_KEY,
 } from "../../chess";
+import { Notice } from "obsidian";
+import { validateFen } from "../../utils/chessEngine";
 import {
   ANNOTATION_PREFIX,
   isAnnotationKey,
@@ -510,6 +512,11 @@ const ActionsModule = {
                 : host.isFenMode
                   ? host.fen
                   : buildDefaultEditFen(host.fen.split(" ")[0]);
+              const validation = validateFen(fen);
+              if (!validation.ok) {
+                new Notice(t("import.invalidFen"));
+                return;
+              }
               host.root.children = [];
               host.root.comments = [];
               host.root.fen = fen;
@@ -766,7 +773,7 @@ function stringifyCurrentBranchPGN(
   let stepNum = 1;
   for (let i = 1; i < pathIds.length; i++) {
     const node = host.nodeMap.get(pathIds[i])!;
-    const notation = getSaveNotation(node.move);
+    const notation = getSaveNotation(node.move!);
     if (node.color === "white") {
       result += `${stepNum}. ${notation}`;
     } else if (node.color === "black") {
