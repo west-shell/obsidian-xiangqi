@@ -218,7 +218,7 @@ This plugin is available on the official Obsidian plugin marketplace. Search for
    git clone https://github.com/west-shell/obsidian-xiangqi.git
    ```
 
-2. Install dependencies (xiangqi.js and xiangqiground are fetched automatically from GitHub):
+2. Install dependencies (xiangqi.js and xiangqiground are installed from npm):
 
    ```bash
    cd obsidian-xiangqi

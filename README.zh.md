@@ -217,7 +217,7 @@ p:true
    git clone https://github.com/west-shell/obsidian-xiangqi.git
    ```
 
-2. 安装依赖（xiangqi.js 和 xiangqiground 会自动从 GitHub 拉取）：
+2. 安装依赖（xiangqi.js 和 xiangqiground 从 npm 安装）：
 
    ```bash
    cd obsidian-xiangqi

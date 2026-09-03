@@ -1,11 +1,11 @@
 import { addIcon } from "obsidian";
 
 // ========== Library Re-exports ==========
-export { Chessground } from "@west-shell/xiangqiground";
-export type { Api } from "@west-shell/xiangqiground/api";
-export type { Config } from "@west-shell/xiangqiground/config";
-export type { DrawShape } from "@west-shell/xiangqiground/draw";
-export type * as cg from "@west-shell/xiangqiground/types";
+export { Chessground } from "@weshell/xiangqiground";
+export type { Api } from "@weshell/xiangqiground/api";
+export type { Config } from "@weshell/xiangqiground/config";
+export type { DrawShape } from "@weshell/xiangqiground/draw";
+export type * as cg from "@weshell/xiangqiground/types";
 export {
   Chess,
   validateFen,
@@ -14,14 +14,14 @@ export {
   type Move,
   type PieceSymbol,
   type Square,
-} from "@west-shell/xiangqi.js";
+} from "@weshell/xiangqi.js";
 
 import type {
   Chess as ChessClass,
   Move,
   Piece,
   Square,
-} from "@west-shell/xiangqi.js";
+} from "@weshell/xiangqi.js";
 
 // ========== Constants ==========
 export const DEFAULT_FEN =
