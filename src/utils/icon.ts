@@ -5,6 +5,9 @@
 
 type IconNode = [string, Record<string, string>][];
 
+export const RIBBON_ICON_SVG: string | null =
+  '<svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="38" fill="var(--background-primary-alt)" stroke="var(--text-normal)" stroke-width="4"/><text x="50%" y="58%" dominant-baseline="middle" text-anchor="middle" font-size="60" fill="var(--text-normal)" font-weight="bold">象</text></svg>';
+
 const ICONS: Record<string, IconNode> = {
   thumbs_up: [
     [

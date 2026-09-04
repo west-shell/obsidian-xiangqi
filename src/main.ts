@@ -1,13 +1,13 @@
 import "./css-imports";
 
-import { MarkdownView, Plugin, TFile } from "obsidian";
+import { addIcon, MarkdownView, Plugin, TFile } from "obsidian";
 
 import { initI18n, t } from "./i18n";
 import { BlockHost } from "./host/BlockHost";
 import { FileHost } from "./host/FileHost";
 import { ChessSettingTab, DEFAULT_SETTINGS } from "./settings";
 import { applyThemes } from "./themes";
-import { registerCustomIcon } from "./chess";
+import { RIBBON_ICON_SVG } from "./utils/icon";
 import type { ISettings } from "./types";
 import {
   DEFAULT_FILENAME,
@@ -26,7 +26,9 @@ export default class ChessPlugin extends Plugin {
 
     this.addSettingTab(new ChessSettingTab(this.app, this));
 
-    registerCustomIcon();
+    if (RIBBON_ICON_SVG) {
+      addIcon(RIBBON_ICON, RIBBON_ICON_SVG);
+    }
     applyThemes(this.settings, this.app);
 
     this.registerCodeBlocks();
