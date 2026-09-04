@@ -16,7 +16,8 @@
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "test": "vitest",
     "test:watch": "vitest watch",
-    "release": "node scripts/release.mjs"
+    "release": "node scripts/release.mjs",
+    "prepare": "simple-git-hooks"
   },
   "keywords": [
     "obsidian",
@@ -43,10 +44,12 @@
     "eslint-plugin-svelte": "^3.20.0",
     "eslint-plugin-unicorn": "^56.0.1",
     "globals": "^17.7.0",
+    "lint-staged": "^17.4.1",
     "obsidian": "^1.13.1",
     "prettier": "^3.9.4",
     "prettier-plugin-svelte": "^4.1.1",
     "sass-embedded": "^1.100.0",
+    "simple-git-hooks": "^2.14.0",
     "svelte": "^5.0.0",
     "svelte-check": "^4.0.0",
     "svelte-eslint-parser": "^1.8.0",
@@ -58,5 +61,17 @@
   },
   "allowScripts": {
     "esbuild": true
+  },
+  "simple-git-hooks": {
+    "pre-commit": "npx lint-staged"
+  },
+  "lint-staged": {
+    "*.{js,mjs,cjs,ts,mts,cts,svelte}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{css,scss,html,json,md}": [
+      "prettier --write"
+    ]
   }
 }
