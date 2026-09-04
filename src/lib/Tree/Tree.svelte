@@ -778,15 +778,15 @@
             aria-label={t("game.prev", _lv)}
             disabled={currentGameIndex <= 0}
             use:useSetIcon={"chevron-left"}
-            onclick={prevGame}></button
-          >
+            onclick={prevGame}
+          ></button>
           <button
             class="toolbar-btn game-nav-arrow"
             aria-label={t("game.next", _lv)}
             disabled={!games || currentGameIndex >= games.length - 1}
             use:useSetIcon={"chevron-right"}
-            onclick={nextGame}></button
-          >
+            onclick={nextGame}
+          ></button>
         </div>
       {/if}
       {#if !isBlockMode}
@@ -869,12 +869,11 @@
             {#if node.children.length > 1}
               {@const isLeft = (node.y ?? 0) % 2 === 0}
               {@const nw = localGetNodeWidth(node)}
-              {@const offPathFold =
-                !(
-                  currentPath.includes(node.id) &&
-                  node.children[0] &&
-                  !currentPath.includes(node.children[0].id)
-                )}
+              {@const offPathFold = !(
+                currentPath.includes(node.id) &&
+                node.children[0] &&
+                !currentPath.includes(node.children[0].id)
+              )}
               <!-- svelte-ignore a11y_click_events_have_key_events -->
               <!-- svelte-ignore a11y_no_static_element_interactions -->
               <g
@@ -1051,7 +1050,12 @@
                   style="pointer-events: none"
                 >
                   <!-- eslint-disable-next-line svelte/no-at-html-tags -->
-                  {@html iconSvg("message_square_text", 7, 1.5, "var(--color-blue)")}
+                  {@html iconSvg(
+                    "message_square_text",
+                    7,
+                    1.5,
+                    "var(--color-blue)",
+                  )}
                 </g>
               {/if}
             </g>
@@ -1415,11 +1419,7 @@
     flex-direction: column;
     gap: 2px;
     margin: 0;
-    background: color-mix(
-      in srgb,
-      var(--background-primary) 72%,
-      transparent
-    );
+    background: color-mix(in srgb, var(--background-primary) 72%, transparent);
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
     box-shadow: var(--shadow-s, 0 1px 2px rgba(0, 0, 0, 0.1));
