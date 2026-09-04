@@ -163,6 +163,8 @@ export function activateGame(host: IHost, index: number): void {
   const slot = host.games[index];
   if (!slot) return;
 
+  host.generation++;
+
   if (!slot.parsed) {
     const parser = new PGNParser(slot.raw);
     const game: ParsedGame = {

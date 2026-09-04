@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Menu, setIcon } from "obsidian";
+  import { onDestroy } from "svelte";
   import type { EventBus } from "../../core/event-bus";
   import type { IOptions, ISettings } from "../../types";
   import type ChessPlugin from "../../main";
@@ -21,26 +22,32 @@
   }: Props = $props();
 
   let _lv = $state(0);
-  onLangChange(() => _lv++);
+  const unsubLang = onLangChange(() => _lv++);
+  onDestroy(() => {
+    unsubLang();
+  });
 
   let modified = $state(false);
 
   $effect(() => {
-    eventBus.on("modified", () => {
+    const onModified = () => {
       modified = true;
-    });
-    eventBus.on("setViewData", () => {
+    };
+    const onResetModified = () => {
       modified = false;
-    });
-    eventBus.on("load", () => {
-      modified = false;
-    });
-    eventBus.on("save", () => {
-      modified = false;
-    });
-    eventBus.on("reset", () => {
-      modified = false;
-    });
+    };
+    eventBus.on("modified", onModified);
+    eventBus.on("setViewData", onResetModified);
+    eventBus.on("load", onResetModified);
+    eventBus.on("save", onResetModified);
+    eventBus.on("reset", onResetModified);
+    return () => {
+      eventBus.off("modified", onModified);
+      eventBus.off("setViewData", onResetModified);
+      eventBus.off("load", onResetModified);
+      eventBus.off("save", onResetModified);
+      eventBus.off("reset", onResetModified);
+    };
   });
 
   let autoAnalyze = $state(false);
@@ -48,33 +55,52 @@
   let batchAnalyzing = $state(false);
 
   $effect(() => {
-    eventBus.on("engine-busy", () => {
+    const onBusy = () => {
       engineBusy = true;
-    });
-    eventBus.on("engine-result", () => {
+    };
+    const onResult = () => {
       engineBusy = false;
-    });
-    eventBus.on("engine-batch-start", () => {
+    };
+    const onBatchStart = () => {
       batchAnalyzing = true;
-    });
-    eventBus.on("engine-batch-done", () => {
+    };
+    const onBatchDone = () => {
       engineBusy = false;
       batchAnalyzing = false;
-    });
-    eventBus.on("engine-auto-on", () => {
+    };
+    const onAutoOn = () => {
       autoAnalyze = true;
-    });
-    eventBus.on("engine-auto-off", () => {
+    };
+    const onAutoOff = () => {
       autoAnalyze = false;
-    });
-    eventBus.on("engine-stop", () => {
+    };
+    const onStop = () => {
       autoAnalyze = false;
       engineBusy = false;
       batchAnalyzing = false;
-    });
-    eventBus.on("engine-batch-stop", () => {
+    };
+    const onBatchStop = () => {
       batchAnalyzing = false;
-    });
+    };
+    eventBus.on("engine-busy", onBusy);
+    eventBus.on("engine-result", onResult);
+    eventBus.on("engine-batch-start", onBatchStart);
+    eventBus.on("engine-batch-done", onBatchDone);
+    eventBus.on("engine-auto-on", onAutoOn);
+    eventBus.on("engine-auto-off", onAutoOff);
+    eventBus.on("engine-stop", onStop);
+    eventBus.on("engine-batch-stop", onBatchStop);
+    eventBus.emit("request-engine-state");
+    return () => {
+      eventBus.off("engine-busy", onBusy);
+      eventBus.off("engine-result", onResult);
+      eventBus.off("engine-batch-start", onBatchStart);
+      eventBus.off("engine-batch-done", onBatchDone);
+      eventBus.off("engine-auto-on", onAutoOn);
+      eventBus.off("engine-auto-off", onAutoOff);
+      eventBus.off("engine-stop", onStop);
+      eventBus.off("engine-batch-stop", onBatchStop);
+    };
   });
 
   let analyzeBtnClass = $derived(
@@ -92,7 +118,7 @@
   let isprotected = $derived(options?.protected || false);
   let saveBtnClass = $derived(modified ? "unsaved" : "saved");
 
-  const buildButtons = (v: number) => [
+  const buildNavButtons = (v: number) => [
     { title: t("toolbar.reset", v), icon: "rotate-ccw", event: "reset" },
     {
       title: t("toolbar.start", v),
@@ -102,6 +128,10 @@
     { title: t("toolbar.back", v), icon: "arrow-left", event: "back" },
     { title: t("toolbar.forward", v), icon: "arrow-right", event: "next" },
     { title: t("toolbar.end", v), icon: "arrow-right-to-line", event: "toEnd" },
+  ];
+  let navButtons = $derived(buildNavButtons(_lv));
+
+  const buildMenuButtons = (v: number) => [
     {
       title: t("toolbar.board", v),
       icon: "layout-grid",
@@ -118,7 +148,7 @@
       event: "toggle-node-menu",
     },
   ];
-  let buttons = $derived(buildButtons(_lv));
+  let menuButtons = $derived(buildMenuButtons(_lv));
 
   const buildAnnotations = (v: number) => [
     {
@@ -153,6 +183,16 @@
     },
   ];
   let annotations = $derived(buildAnnotations(_lv));
+
+  function handleMenuButton(event: string, evt: MouseEvent) {
+    if (event === "toggle-edit-menu") {
+      handleEditMenu(evt);
+    } else if (event === "toggle-node-menu") {
+      handleNodeMenu(evt);
+    } else if (event === "toggle-board-menu") {
+      handleBoardMenu(evt);
+    }
+  }
 
   function emitEvent(name: string, payload: string | null = null) {
     eventBus.emit("btn-click", { name, payload });
@@ -390,34 +430,38 @@
 </script>
 
 <div class="toolbar-container chess-layout__toolbar">
-  {#each buttons as { title, icon, event } (event)}
-    <button
-      class="toolbar-btn"
-      aria-label={title}
-      use:useSetIcon={icon}
-      onclick={(e) => {
-        if (event === "toggle-edit-menu") {
-          handleEditMenu(e);
-        } else if (event === "toggle-node-menu") {
-          handleNodeMenu(e);
-        } else if (event === "toggle-board-menu") {
-          handleBoardMenu(e);
-        } else {
-          emitEvent(event);
-        }
-      }}
-    ></button>
-  {/each}
+  <div class="toolbar-group">
+    {#each navButtons as { title, icon, event }, i (event)}
+      {#if i === 1}<div class="toolbar-sep"></div>{/if}
+      <button
+        class="toolbar-btn"
+        aria-label={title}
+        use:useSetIcon={icon}
+        onclick={() => emitEvent(event)}
+      ></button>
+    {/each}
+  </div>
+
+  <div class="toolbar-group">
+    {#each menuButtons as { title, icon, event } (event)}
+      <button
+        class="toolbar-btn"
+        aria-label={title}
+        use:useSetIcon={icon}
+        onclick={(e) => handleMenuButton(event, e)}
+      ></button>
+    {/each}
+  </div>
 
   <button
-    class="toolbar-btn{analyzeBtnClass}"
+    class="toolbar-btn toolbar-single{analyzeBtnClass}"
     aria-label={t("toolbar.analyzeMenu", _lv)}
     use:useSetIcon={"brain"}
     onclick={(e) => handleAnalyzeMenu(e)}
   ></button>
 
   <button
-    class="toolbar-btn {saveBtnClass}"
+    class="toolbar-btn toolbar-single {saveBtnClass}"
     aria-label={t("toolbar.save", _lv)}
     use:useSetSaveIcon
     disabled={isprotected}
@@ -427,39 +471,45 @@
 
 <style>
   .toolbar-btn.saved {
-    background-color: hsl(122, 39%, 49%);
+    background-color: var(--color-green, hsl(122, 39%, 49%));
+    color: var(--text-on-accent);
+  }
+
+  .toolbar-btn.saved:hover {
+    background-color: var(--color-green, hsl(122, 39%, 49%));
+    filter: brightness(1.1);
   }
 
   .toolbar-btn.unsaved {
-    background-color: hsl(35, 100%, 50%);
+    background-color: var(--color-orange, hsl(35, 100%, 50%));
+    color: var(--text-on-accent);
+  }
+
+  .toolbar-btn.unsaved:hover {
+    background-color: var(--color-orange, hsl(35, 100%, 50%));
+    filter: brightness(1.1);
   }
 
   .toolbar-container {
     display: flex;
     flex-wrap: wrap;
-    gap: 2px;
+    gap: 6px;
     align-items: center;
   }
 
-  .toolbar-container :global(.toolbar-btn) {
-    width: 30px;
-    height: 30px;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
+  .toolbar-single {
+    width: 28px;
+    height: 28px;
   }
 
-  .toolbar-container :global(.toolbar-btn svg) {
-    width: 20px;
-    height: 20px;
-  }
-
-  .engine-active {
+  .toolbar-btn.engine-active {
     background-color: var(--interactive-accent);
     color: var(--text-on-accent);
+  }
+
+  .toolbar-btn.engine-active:hover {
+    background-color: var(--interactive-accent);
+    filter: brightness(1.15);
   }
 
   .engine-busy {

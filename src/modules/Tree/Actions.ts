@@ -107,7 +107,10 @@ const ActionsModule = {
     });
 
     eventBus.on("unload", () => {
-      if (host.Chess) void unmount(host.Chess);
+      if (host.Chess) {
+        void unmount(host.Chess);
+        host.Chess = null;
+      }
     });
 
     eventBus.on("updateMainPath", () => {

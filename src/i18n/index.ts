@@ -29,8 +29,11 @@ export function i18nVer() {
   return _ver;
 }
 
-export function onLangChange(fn: () => void) {
+export function onLangChange(fn: () => void): () => void {
   listeners.add(fn);
+  return () => {
+    listeners.delete(fn);
+  };
 }
 
 export function getLang(): string {

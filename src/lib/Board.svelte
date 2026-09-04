@@ -69,6 +69,10 @@
   let layoutChangeHandler: (() => void) | null = null;
   let boardResizeRo: ResizeObserver | null = null;
   let resizeTimer: ReturnType<typeof setTimeout> | null = null;
+  let promoteHandler:
+    | ((payload?: { from: Square; to: Square; color: "w" | "b" }) => void)
+    | null = null;
+  let destroyed = false;
   let promoIconSize = $derived(
     boardElement?.offsetWidth ? boardElement.offsetWidth * 0.11 : 30,
   );
@@ -228,6 +232,7 @@
         });
         ro.observe(boardElement);
       });
+      if (destroyed) return;
     }
     api = Chessground(boardElement, config);
     injectGridSVG(boardElement);
@@ -246,14 +251,16 @@
     boardResizeRo.observe(boardElement);
 
     if (HAS_PROMOTION) {
-      eventBus.on<{ from: Square; to: Square; color: "w" | "b" }>(
-        "promote",
-        (payload) => {
-          if (!payload) return;
-          promotingMove = { from: payload.from, to: payload.to };
-          promotingColor = payload.color;
-        },
-      );
+      promoteHandler = (payload) => {
+        if (!payload) return;
+        promotingMove = { from: payload.from, to: payload.to };
+        promotingColor = payload.color;
+      };
+      eventBus.on<{
+        from: Square;
+        to: Square;
+        color: "w" | "b";
+      }>("promote", promoteHandler);
     }
 
     layoutChangeHandler = () => {
@@ -269,6 +276,7 @@
   });
 
   onDestroy(() => {
+    destroyed = true;
     if (boardResizeRo) {
       boardResizeRo.disconnect();
       boardResizeRo = null;
@@ -276,6 +284,10 @@
     if (resizeTimer) {
       clearTimeout(resizeTimer);
       resizeTimer = null;
+    }
+    if (promoteHandler) {
+      eventBus.off("promote", promoteHandler);
+      promoteHandler = null;
     }
     if (layoutChangeHandler) {
       activeDocument.body.removeEventListener(
@@ -458,6 +470,8 @@
     position: absolute;
     inset: 0;
     background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -466,12 +480,12 @@
 
   .promotion-choices {
     display: flex;
-    gap: 4px;
-    padding: 6px;
-    border-radius: 6px;
+    gap: 6px;
+    padding: 8px;
+    border-radius: var(--radius-m, 10px);
     background: var(--background-primary);
     color: var(--text-normal);
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+    box-shadow: var(--shadow-l, 0 2px 12px rgba(0, 0, 0, 0.3));
   }
 
   .promotion-btn {

@@ -82,11 +82,12 @@
   let listUlRef: HTMLUListElement | null = $state(null);
 
   $effect(() => {
-    void listCurrentStep;
+    const step = listCurrentStep;
     void listMoves;
     (async () => {
       await tick();
-      const index = listCurrentStep <= 0 ? 0 : Math.ceil(listCurrentStep / 2);
+      if (destroyed) return;
+      const index = step <= 0 ? 0 : Math.ceil(step / 2);
       const targetEl = listItemRefs[index];
       if (targetEl) {
         scrollToBTN(targetEl, listUlRef);
@@ -103,6 +104,7 @@
     }
     (async () => {
       await tick();
+      if (destroyed) return;
       resetView();
     })();
   });
@@ -152,8 +154,12 @@
   let handleSliderTouchEnd: (() => void) | null = null;
   let intersectionObserver: IntersectionObserver | null = null;
   let needsInitialReset = $state(false);
+  let destroyed = false;
 
   onDestroy(() => {
+    destroyed = true;
+    unsubLang();
+    eventBus.off("updateUI", onUiVer);
     if (saveTimeout) {
       clearTimeout(saveTimeout);
       saveTimeout = undefined;
@@ -437,12 +443,12 @@
         v2 === Infinity ? edgeR : v2 === -Infinity ? edgeL : midX + v2 * scaleX;
       const color =
         v2 === Infinity || (Number.isFinite(v2) && v2 >= 0)
-          ? "#4CAF50"
-          : "#f44336";
+          ? "var(--chess-eval-plus)"
+          : "var(--chess-eval-minus)";
       const color1 =
         v1 === Infinity || (Number.isFinite(v1) && v1 >= 0)
-          ? "#4CAF50"
-          : "#f44336";
+          ? "var(--chess-eval-plus)"
+          : "var(--chess-eval-minus)";
       if (color1 !== color) {
         segments.push({
           x1,
@@ -475,17 +481,22 @@
   let listVisible = $state(settings?.showMovelist ?? true);
   function toggleListVisible() {
     listVisible = !listVisible;
-    tick().then(() => resetView());
+    void tick().then(() => {
+      if (destroyed) return undefined;
+      resetView();
+      return undefined;
+    });
   }
 
   let _lv = $state(0);
-  onLangChange(() => _lv++);
+  const unsubLang = onLangChange(() => _lv++);
 
   let _uiVer = $state(0);
+  const onUiVer = () => {
+    _uiVer++;
+  };
   onMount(() => {
-    eventBus.on("updateUI", () => {
-      _uiVer++;
-    });
+    eventBus.on("updateUI", onUiVer);
   });
 
   let showGameNav = $derived(games && games.length > 1 && !isBlockMode);
@@ -685,7 +696,7 @@
     tick()
       .then(() => new Promise(requestAnimationFrame))
       .then(() => {
-        if (!svgEl) return;
+        if (destroyed || !svgEl) return;
         if (svgEl.clientWidth === 0 || svgEl.clientHeight === 0) {
           needsInitialReset = true;
           intersectionObserver = new IntersectionObserver(
@@ -694,6 +705,7 @@
                 if (entry.isIntersecting && needsInitialReset) {
                   needsInitialReset = false;
                   requestAnimationFrame(() => {
+                    if (destroyed) return;
                     updateZoomExtent();
                     d3.select(svgEl!).call(zoomBehavior!);
                     resetView();
@@ -724,6 +736,7 @@
     const node = currentNode;
     commentsText = (node.comments ?? []).join("\n");
     tick().then(() => {
+      if (destroyed) return;
       if (textareaEl) adjustTextareaHeight();
       panToNodeIfNeeded(node);
       return undefined;
@@ -764,13 +777,15 @@
             class="toolbar-btn game-nav-arrow"
             aria-label={t("game.prev", _lv)}
             disabled={currentGameIndex <= 0}
-            onclick={prevGame}>◀</button
+            use:useSetIcon={"chevron-left"}
+            onclick={prevGame}></button
           >
           <button
             class="toolbar-btn game-nav-arrow"
             aria-label={t("game.next", _lv)}
             disabled={!games || currentGameIndex >= games.length - 1}
-            onclick={nextGame}>▶</button
+            use:useSetIcon={"chevron-right"}
+            onclick={nextGame}></button
           >
         </div>
       {/if}
@@ -792,10 +807,10 @@
         {@const isPositive =
           ce.score > 0 || (ce.scoreType === "mate" && ce.score >= 0)}
         {@const evalColor = isPositive
-          ? "rgba(76, 175, 80, 0.8)"
-          : "rgba(244, 67, 54, 0.8)"}
+          ? "var(--chess-eval-plus)"
+          : "var(--chess-eval-minus)"}
         {@const labelBg = isZero
-          ? "linear-gradient(to bottom, rgba(76, 175, 80, 0.8) 50%, rgba(244, 67, 54, 0.8) 50%)"
+          ? "linear-gradient(to bottom, var(--chess-eval-plus) 50%, var(--chess-eval-minus) 50%)"
           : evalColor}
         {@const fillPercent =
           ce.scoreType === "mate"
@@ -831,6 +846,9 @@
           {#each renderedNodes as node (node.id)}
             {#each node.children as child, idx (node.id + "-" + idx)}
               {#if !(foldedNodes.has(node.id) && idx > 0)}
+                {@const onPath =
+                  currentPath.includes(node.id) &&
+                  currentPath.includes(child.id)}
                 <path
                   d={`
               M ${node.x! * spacingX} ${node.y! * spacingY}
@@ -839,18 +857,8 @@
               `}
                   stroke="var(--chess-board-line)"
                   stroke-linejoin="round"
-                  stroke-width={currentPath.includes(node.id) &&
-                  currentPath.includes(child.id)
-                    ? 1.5
-                    : 1}
-                  opacity={currentPath.includes(node.id) &&
-                  currentPath.includes(child.id)
-                    ? 1.5
-                    : 0.7}
-                  filter={currentPath.includes(node.id) &&
-                  currentPath.includes(child.id)
-                    ? "brightness(1.5) saturate(1.4) drop-shadow(0 0 1px rgba(255, 255, 255, 0.6))"
-                    : "grayscale(50%) brightness(0.75)"}
+                  stroke-width={onPath ? 1.5 : 1}
+                  opacity={onPath ? 1 : 0.4}
                   fill="none"
                 />
               {/if}
@@ -861,6 +869,12 @@
             {#if node.children.length > 1}
               {@const isLeft = (node.y ?? 0) % 2 === 0}
               {@const nw = localGetNodeWidth(node)}
+              {@const offPathFold =
+                !(
+                  currentPath.includes(node.id) &&
+                  node.children[0] &&
+                  !currentPath.includes(node.children[0].id)
+                )}
               <!-- svelte-ignore a11y_click_events_have_key_events -->
               <!-- svelte-ignore a11y_no_static_element_interactions -->
               <g
@@ -887,16 +901,7 @@
                   stroke="var(--chess-board-line)"
                   stroke-width="1.5"
                   stroke-linejoin="round"
-                  opacity={currentPath.includes(node.id) &&
-                  node.children[0] &&
-                  !currentPath.includes(node.children[0].id)
-                    ? 1.5
-                    : 0.7}
-                  filter={currentPath.includes(node.id) &&
-                  node.children[0] &&
-                  !currentPath.includes(node.children[0].id)
-                    ? "brightness(1.5) saturate(1.4) drop-shadow(0 0 1px rgba(255, 255, 255, 0.6))"
-                    : "grayscale(50%) brightness(0.75)"}
+                  opacity={offPathFold ? 0.5 : 1}
                 />
               </g>
             {/if}
@@ -912,12 +917,10 @@
               class="node-group"
               transform="translate({node.x! * spacingX} {node.y! *
                 spacingY}){isCurrent ? ' scale(1.2)' : ''}"
-              opacity={currentPath.includes(node.id) ? 1 : 0.8}
-              filter={!currentPath.includes(node.id)
-                ? "grayscale(100%) brightness(0.75)"
-                : isCurrent
-                  ? "drop-shadow(0 0 4px var(--color-accent))"
-                  : undefined}
+              opacity={currentPath.includes(node.id) ? 1 : 0.55}
+              filter={isCurrent
+                ? "drop-shadow(0 0 4px var(--color-accent))"
+                : undefined}
               stroke-width={isCurrent ? 1 : 0.5}
               onclick={() => eventBus.emit("node-click", node.id)}
             >
@@ -991,11 +994,11 @@
                 {@const color =
                   node.eval.score > 0 ||
                   (node.eval.scoreType === "mate" && node.eval.score >= 0)
-                    ? `rgba(76, 175, 80, ${0.6 + intensity * 0.4})`
+                    ? `color-mix(in srgb, var(--chess-eval-plus) ${60 + intensity * 40}%, transparent)`
                     : node.eval.score < 0 ||
                         (node.eval.scoreType === "mate" && node.eval.score < 0)
-                      ? `rgba(244, 67, 54, ${0.6 + intensity * 0.4})`
-                      : `rgba(136, 136, 136, 0.6)`}
+                      ? `color-mix(in srgb, var(--chess-eval-minus) ${60 + intensity * 40}%, transparent)`
+                      : `color-mix(in srgb, var(--text-muted) 60%, transparent)`}
                 {@const barWidth = 2 + intensity * (nw - 4)}
                 <rect
                   x={-barWidth / 2}
@@ -1048,7 +1051,7 @@
                   style="pointer-events: none"
                 >
                   <!-- eslint-disable-next-line svelte/no-at-html-tags -->
-                  {@html iconSvg("message_square_text", 7, 1.5, "royalblue")}
+                  {@html iconSvg("message_square_text", 7, 1.5, "var(--color-blue)")}
                 </g>
               {/if}
             </g>
@@ -1056,7 +1059,7 @@
         </g>
       </svg>
 
-      <div class="toolbar">
+      <div class="toolbar toolbar-group">
         {#if canFold}
           <button
             class="toolbar-btn"
@@ -1247,6 +1250,8 @@
     --piece-red: var(--chess-piece-white, var(--color-red));
     --piece-black: var(--chess-piece-black, var(--color-blue));
     --text-color: var(--text-normal);
+    --chess-eval-plus: var(--color-green, #4caf50);
+    --chess-eval-minus: var(--color-red, #f44336);
   }
 
   .tools-row {
@@ -1303,12 +1308,14 @@
     display: inline-block;
     line-height: 1.1;
     text-align: center;
-    border-radius: 0.2em;
+    border-radius: var(--radius-s, 4px);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition:
+      background-color 0.15s ease,
+      color 0.15s ease;
     white-space: nowrap;
     flex-shrink: 0;
-    padding: 0.1em 0.35em;
+    padding: 0.12em 0.4em;
     margin: 0;
     color: var(--text-normal);
   }
@@ -1325,15 +1332,13 @@
 
   .move-list span.move:hover {
     background-color: var(--background-modifier-hover);
-    transform: scale(1.02);
   }
 
   .move-list span.move.active {
     background-color: var(--color-accent);
     color: var(--text-on-accent);
-    box-shadow: 0 0.125em 0.375em rgba(0, 0, 0, 0.15);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
     font-weight: 500;
-    transform: scale(1.02);
   }
 
   .svg-wrapper {
@@ -1407,18 +1412,22 @@
     position: absolute;
     bottom: 0.5rem;
     left: 0.5rem;
-    display: flex;
     flex-direction: column;
-    gap: 0;
+    gap: 2px;
     margin: 0;
-    padding: 0px;
+    background: color-mix(
+      in srgb,
+      var(--background-primary) 72%,
+      transparent
+    );
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    box-shadow: var(--shadow-s, 0 1px 2px rgba(0, 0, 0, 0.1));
+    pointer-events: none;
   }
 
   .toolbar .toolbar-btn {
-    width: 30px;
-    height: 30px;
-    padding: 0;
-    margin: 0;
+    pointer-events: auto;
   }
 
   .slider {
@@ -1562,10 +1571,13 @@
     color: var(--text-normal);
     background: var(--background-secondary);
     border: 1px solid var(--background-modifier-border);
-    border-radius: 3px;
-    padding: 0;
+    border-radius: var(--radius-s, 4px);
+    padding: 4px 8px;
     outline: none;
     overflow-y: auto;
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease;
   }
   textarea.auto-height {
     height: auto;
@@ -1575,7 +1587,7 @@
     display: flex;
     flex-direction: row;
     align-items: stretch;
-    gap: 0;
+    gap: 2px;
   }
   .toggle-list-btn {
     width: 28px;
@@ -1586,13 +1598,10 @@
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    border-radius: 0;
-    border-left: 1px solid var(--background-modifier-border);
-    background-color: var(--background-primary-alt);
   }
   textarea:focus {
     border-color: var(--interactive-accent);
-    box-shadow: 0 0 5px var(--interactive-accent);
+    box-shadow: 0 0 0 1px var(--interactive-accent);
   }
 
   .game-nav-bar {
@@ -1634,14 +1643,17 @@
   .game-nav-arrows {
     display: flex;
     flex-direction: row;
-    gap: 1px;
+    gap: 2px;
     flex-shrink: 0;
   }
   .game-nav-arrow {
     width: 24px;
     height: 24px;
     padding: 0;
-    font-size: 12px;
+  }
+  .game-nav-arrow :global(svg) {
+    width: 16px;
+    height: 16px;
   }
   .game-nav-menu-btn {
     width: 24px;

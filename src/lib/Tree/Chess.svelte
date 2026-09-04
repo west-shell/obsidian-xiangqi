@@ -25,7 +25,7 @@
     type Square,
   } from "../../chess";
   import type ChessPlugin from "../../main";
-  import { onMount, tick } from "svelte";
+  import { onDestroy, onMount, tick } from "svelte";
   import { annotationShapes } from "../../utils/glyphs";
   import { badgeBoardSvg } from "../../utils/icon";
 
@@ -150,18 +150,26 @@
       : null,
   ) as "white" | "black" | null;
 
+  let destroyed = false;
+  onDestroy(() => {
+    destroyed = true;
+  });
+
   onMount(async () => {
     await tick();
+    if (destroyed) return;
     eventBus.emit("ready");
   });
 
   $effect(() => {
-    eventBus.on<{
-      bestmove: string;
-      ponder?: string;
-      score?: number;
-      depth?: number;
-    } | null>("engine-result", (result) => {
+    const onEngineResult = (
+      result?: {
+        bestmove: string;
+        ponder?: string;
+        score?: number;
+        depth?: number;
+      } | null,
+    ) => {
       if (result) {
         const from = result.bestmove.slice(0, 2) as Square;
         const to = result.bestmove.slice(2, 4) as Square;
@@ -178,25 +186,39 @@
         engineBestMove = null;
         enginePonder = null;
       }
-    });
-    eventBus.on("clear-engine-bestmove", () => {
+    };
+    const onClearBestmove = () => {
       engineBestMove = null;
       enginePonder = null;
-    });
+    };
+    eventBus.on("engine-result", onEngineResult);
+    eventBus.on("clear-engine-bestmove", onClearBestmove);
+    return () => {
+      eventBus.off("engine-result", onEngineResult);
+      eventBus.off("clear-engine-bestmove", onClearBestmove);
+    };
   });
 
   $effect(() => {
-    eventBus.on<DrawShape[]>("user-shapes-changed", (shapes) => {
+    const onShapesChanged = (shapes?: DrawShape[]) => {
       saveShapes(currentNode, shapes ?? []);
       eventBus.emit("modified", null);
       eventBus.emit("updateUI", null);
-    });
+    };
+    eventBus.on("user-shapes-changed", onShapesChanged);
+    return () => {
+      eventBus.off("user-shapes-changed", onShapesChanged);
+    };
   });
 
   $effect(() => {
-    eventBus.on("rotate", () => {
+    const onRotate = () => {
       rotated = !rotated;
-    });
+    };
+    eventBus.on("rotate", onRotate);
+    return () => {
+      eventBus.off("rotate", onRotate);
+    };
   });
 </script>
 

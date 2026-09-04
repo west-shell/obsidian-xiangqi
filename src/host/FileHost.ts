@@ -20,6 +20,7 @@ export class FileHost extends TextFileView {
   static readonly VIEW_TYPE = "PGN_VIEW";
   settings: ISettings;
   eventBus!: EventBus;
+  generation = 0;
   constructor(
     leaf: WorkspaceLeaf,
     public plugin: ChessPlugin,

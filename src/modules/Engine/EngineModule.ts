@@ -21,6 +21,7 @@ function initEngine(host: object) {
   let pendingNodeId: string | null = null;
   let stopped = false;
   let lastNodeId: string | null = null;
+  let lastGen = h.generation;
   let lastResult: {
     bestmove: string;
     ponder?: string;
@@ -120,6 +121,18 @@ function initEngine(host: object) {
     }
   });
 
+  eventBus.on("request-engine-state", () => {
+    if (autoAnalyze) {
+      eventBus.emit("engine-auto-on");
+    }
+    if (analyzing) {
+      eventBus.emit("engine-busy");
+    }
+    if (batchAnalyzing) {
+      eventBus.emit("engine-batch-start");
+    }
+  });
+
   eventBus.on<Move>("runmove", (move) => {
     if (!move || !lastResult || lastResult.bestmove === "(none)") return;
     const moveUci = move.from + move.to;
@@ -158,6 +171,15 @@ function initEngine(host: object) {
   });
 
   eventBus.on("updateUI", () => {
+    if (h.generation !== lastGen) {
+      lastGen = h.generation;
+      lastNodeId = null;
+      lastResult = null;
+      batchCancelled = true;
+      if (analyzing) {
+        engine.stop();
+      }
+    }
     if (!autoAnalyze) return;
     const nodeId = h.currentNode.id;
     if (nodeId === lastNodeId) return;
@@ -199,11 +221,12 @@ function initEngine(host: object) {
     }
     analyzing = true;
     stopped = false;
+    const gen = h.generation;
     applyOptions();
     eventBus.emit("engine-busy");
     try {
       const result = await engine.analyze(node.fen, settings.engineDepth);
-      if (stopped) return;
+      if (stopped || gen !== h.generation) return;
       if (result && result.score != null) {
         const score = toWhiteView(result.score, result.scoreType, node.fen);
         const nodeEval: NodeEval = {

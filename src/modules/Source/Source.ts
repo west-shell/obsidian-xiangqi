@@ -49,6 +49,7 @@ const SourceModule = {
   init(host: IBlockHost) {
     const eventBus = host.eventBus;
     eventBus.on<string>("load", (renderChild) => {
+      host.generation++;
       switch (renderChild) {
         case "tree": {
           host.isFenMode = false;

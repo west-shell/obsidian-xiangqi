@@ -17,6 +17,7 @@ import type { ISettings } from "../types";
 export class BlockHost extends MarkdownRenderChild {
   settings: ISettings;
   eventBus!: EventBus;
+  generation = 0;
   constructor(
     public containerEl: HTMLElement,
     public ctx: MarkdownPostProcessorContext,

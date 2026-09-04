@@ -3,6 +3,7 @@
 @use "scss/media-queries" as *;
 @use "scss/uniboard" as *;
 @use "scss/layout-base" as *;
+@use "scss/buttons" as *;
 @use "scss/board" as *;
 @use "scss/coords" as *;
 @use "scss/variant" as *;
@@ -81,8 +82,15 @@ $local-block-gap: 2px;
       flex-direction: column;
       flex-wrap: wrap;
       max-height: var(---col2-uniboard-#{$col2-primary-dimension});
-      column-gap: 2px;
+      align-items: center;
+      column-gap: 4px;
       grid-row: 1;
+
+      .toolbar-sep {
+        width: auto;
+        height: 1px;
+        margin: 1px 3px;
+      }
     }
 
     &__tools {
@@ -99,7 +107,13 @@ $local-block-gap: 2px;
   flex-wrap: wrap;
   justify-content: flex-start;
   align-items: center;
-  gap: 2px;
+  gap: 4px;
+}
+
+// 主工具栏（board 下方的按钮排）：居中，与居中的棋盘对齐
+.chess-layout__toolbar.toolbar-container {
+  justify-content: center;
+  gap: 6px;
 }
 
 // ====== GenFEN 编辑器专用 ======
@@ -169,7 +183,8 @@ $local-block-gap: 2px;
     flex-shrink: 0;
     position: relative;
     z-index: 1;
-    height: 28px;
+    height: auto;
+    min-height: 32px;
   }
 
   &__tools {
@@ -193,7 +208,15 @@ $local-block-gap: 2px;
       flex-wrap: wrap;
       max-height: none;
       align-self: center;
+      align-items: center;
       height: auto;
+      min-height: 0;
+
+      .toolbar-sep {
+        width: auto;
+        height: 1px;
+        margin: 1px 3px;
+      }
     }
 
     .chess-layout--genfen &__toolbar {

@@ -19,7 +19,7 @@
 
   let flipped = $state(false);
 
-  function onBtnClick(action: { name: string; payload?: unknown } | null) {
+  function onBtnClick(action?: { name: string; payload?: unknown } | null) {
     if (!action) return;
     if (action.name === "flip") {
       flipped = !flipped;

@@ -14,6 +14,7 @@ import {
   isAnnotationKey,
   SHAPES_PREFIX,
 } from "../../utils/icon";
+import { GLYPH_DEFS } from "../../utils/winningChances";
 
 import { type Token, tokenize, type TokenType } from "./Tokenizer";
 
@@ -216,17 +217,6 @@ export class PGNParser {
       }
       this.currentNode.eval = { score, scoreType, depth: 0, bestmove, ponder };
       if (glyphSymbol) {
-        const GLYPH_DEFS: Record<
-          string,
-          { symbol: string; name: string; color: string }
-        > = {
-          "?!": { symbol: "?!", name: "Inaccuracy", color: "#56b4e9" },
-          "?": { symbol: "?", name: "Mistake", color: "#e69f00" },
-          "??": { symbol: "??", name: "Blunder", color: "#df5353" },
-          "!": { symbol: "!", name: "Good move", color: "#22ac38" },
-          "!!": { symbol: "!!", name: "Brilliant", color: "#168226" },
-          "!?": { symbol: "!?", name: "Interesting", color: "#ea45d8" },
-        };
         const glyphDef = GLYPH_DEFS[glyphSymbol];
         if (glyphDef) this.currentNode.glyph = glyphDef;
       }

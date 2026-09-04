@@ -138,6 +138,8 @@ export interface IHost {
   stringifyPGN: (root: ChessNode, includeEval?: boolean) => string;
   games: GameSlot[];
   currentGameIndex: number;
+  /** Bumped every time the underlying PGN data is replaced (file switch) */
+  generation: number;
 }
 
 export type IBlockHost = IHost &

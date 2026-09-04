@@ -1,0 +1,79 @@
+// ====== Shared flat icon buttons (.toolbar-btn) ======
+// Used by the main toolbar, tree overlay toolbar, game nav arrows and the
+// move-list toggle. Variant-agnostic: only generic Obsidian tokens here.
+
+button.toolbar-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  color: var(--text-muted);
+  cursor: var(--cursor);
+  border-radius: var(--radius-s, 4px);
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    opacity 0.15s ease,
+    filter 0.15s ease;
+}
+
+button.toolbar-btn svg {
+  width: 18px;
+  height: 18px;
+  pointer-events: none;
+}
+
+button.toolbar-btn:hover {
+  background-color: var(--background-modifier-hover);
+  color: var(--text-normal);
+}
+
+button.toolbar-btn:active {
+  background-color: var(--background-modifier-active-hover);
+}
+
+button.toolbar-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+button.toolbar-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--background-modifier-border-focus);
+}
+
+// ====== Grouped pill controls ======
+// Related buttons live inside one bordered pill; the pill direction follows
+// its parent toolbar (row in col1, column in col2) via flex-direction inherit.
+
+.toolbar-group {
+  display: flex;
+  flex-direction: inherit;
+  align-items: center;
+  gap: 0;
+  padding: 2px;
+  background: var(--background-secondary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-m, 8px);
+}
+
+.toolbar-group button.toolbar-btn {
+  width: 26px;
+  height: 26px;
+}
+
+.toolbar-group button.toolbar-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.toolbar-sep {
+  flex: none;
+  width: 1px;
+  align-self: stretch;
+  margin: 3px 1px;
+  background: var(--background-modifier-border);
+}
