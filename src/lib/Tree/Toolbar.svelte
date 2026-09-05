@@ -430,28 +430,23 @@
 </script>
 
 <div class="toolbar-container chess-layout__toolbar">
-  <div class="toolbar-group">
-    {#each navButtons as { title, icon, event }, i (event)}
-      {#if i === 1}<div class="toolbar-sep"></div>{/if}
-      <button
-        class="toolbar-btn"
-        aria-label={title}
-        use:useSetIcon={icon}
-        onclick={() => emitEvent(event)}
-      ></button>
-    {/each}
-  </div>
+  {#each navButtons as { title, icon, event } (event)}
+    <button
+      class="toolbar-btn toolbar-single"
+      aria-label={title}
+      use:useSetIcon={icon}
+      onclick={() => emitEvent(event)}
+    ></button>
+  {/each}
 
-  <div class="toolbar-group">
-    {#each menuButtons as { title, icon, event } (event)}
-      <button
-        class="toolbar-btn"
-        aria-label={title}
-        use:useSetIcon={icon}
-        onclick={(e) => handleMenuButton(event, e)}
-      ></button>
-    {/each}
-  </div>
+  {#each menuButtons as { title, icon, event } (event)}
+    <button
+      class="toolbar-btn toolbar-single"
+      aria-label={title}
+      use:useSetIcon={icon}
+      onclick={(e) => handleMenuButton(event, e)}
+    ></button>
+  {/each}
 
   <button
     class="toolbar-btn toolbar-single{analyzeBtnClass}"
@@ -493,13 +488,18 @@
   .toolbar-container {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
+    gap: 0;
     align-items: center;
   }
 
   .toolbar-single {
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
+  }
+
+  .toolbar-single :global(svg) {
+    width: 20px;
+    height: 20px;
   }
 
   .toolbar-btn.engine-active {

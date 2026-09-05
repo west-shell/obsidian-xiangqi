@@ -3,7 +3,7 @@
 @use "variant" as *;
 
 $uniboard-table-min: 240px;
-$uniboard-table: minmax(#{$uniboard-table-min}, 400px);
+$uniboard-table: minmax(#{$uniboard-table-min}, 1fr);
 $uniboard-controls: 3rem;
 $col-min-bottom-margin: 1rem;
 

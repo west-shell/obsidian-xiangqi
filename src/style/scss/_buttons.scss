@@ -7,11 +7,11 @@ button.toolbar-btn {
   align-items: center;
   justify-content: center;
   padding: 0;
-  background: transparent;
-  border: none;
-  box-shadow: none;
-  color: var(--text-muted);
-  cursor: var(--cursor);
+  // background: transparent;
+  // border: none;
+  // box-shadow: none;
+  // color: var(--text-muted);
+  // cursor: var(--cursor);
   border-radius: var(--radius-s, 4px);
   transition:
     background-color 0.15s ease,
@@ -61,13 +61,13 @@ button.toolbar-btn:focus-visible {
 }
 
 .toolbar-group button.toolbar-btn {
-  width: 26px;
-  height: 26px;
+  width: 22px;
+  height: 22px;
 }
 
 .toolbar-group button.toolbar-btn svg {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
 }
 
 .toolbar-sep {
