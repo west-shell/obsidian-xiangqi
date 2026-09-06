@@ -1,0 +1,265 @@
+// ============================================================================
+// FEN editor (.ct-layout--edit) — piece palette + editor tools.
+//
+// The editor re-shapes the shared .ct-layout grid:
+//   col1: board / palette / toolbar stacked
+//   col2: board | palette | toolbar in one row
+// ============================================================================
+
+@use "mixins" as *;
+@use "variant" as *;
+
+// ---- Edit-mode grid -----------------------------------------------------------
+
+.ct-layout--edit {
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto auto;
+  grid-template-areas:
+    "board"
+    "palette"
+    "toolbar";
+
+  @include col2 {
+    height: auto;
+    grid-template-columns: var(--ct-col2-width) min-content min-content;
+    grid-template-rows: auto;
+    grid-template-areas: "board palette toolbar";
+
+    .ct-layout__toolbar {
+      flex-direction: column;
+      flex-wrap: #{$genfen-toolbar-wrap};
+      align-items: center;
+
+      @if $genfen-toolbar-align {
+        align-content: #{$genfen-toolbar-align};
+      }
+    }
+  }
+}
+
+// ---- Piece palette (.ct-layout__palette) ----------------------------------------
+
+.ct-layout__palette {
+  display: grid;
+  grid-template-columns: repeat(#{$palette-cols}, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  width: 100%;
+  height: 56px;
+
+  .ct-palette__btn {
+    width: #{$palette-col-cqw};
+    height: 28px;
+  }
+
+  @include col2 {
+    container-type: size;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(#{$palette-cols}, 1fr);
+    width: 56px;
+    height: 100%;
+
+    .ct-palette__btn {
+      width: 28px;
+      height: #{$palette-col-cqh};
+    }
+  }
+}
+
+.ct-palette__btn {
+  padding: 0;
+  margin: 0;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid rgba(0, 0, 0, 0.35);
+  transition:
+    box-shadow 0.15s,
+    border-color 0.15s;
+  color: white;
+}
+
+.ct-palette__btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.ct-palette__btn--white {
+  background-color: var(--ct-piece-primary);
+  color: black;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.ct-palette__btn--black {
+  background-color: var(--ct-piece-secondary);
+  color: white;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.ct-palette__btn--active {
+  border-color: #ffd700;
+  box-shadow: 0 0 0 2px #ffd700;
+  filter: brightness(1.5) saturate(1.4)
+    drop-shadow(0 0 6px rgba(255, 255, 255, 0.6));
+}
+
+.ct-palette__btn--empty {
+  pointer-events: none;
+  opacity: 0.35;
+}
+
+// ---- Editor tools (.ct-genfen) ---------------------------------------------------
+
+.ct-genfen {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 8px;
+  max-height: 100%;
+}
+
+.ct-genfen__section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ct-genfen__section--row {
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+}
+
+.ct-genfen__label {
+  font-size: 0.8em;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.7;
+}
+
+// Side-to-move toggle.
+.ct-genfen__turn {
+  padding: 2px 12px;
+  border: 1.5px solid rgba(0, 0, 0, 0.35);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85em;
+  transition:
+    box-shadow 0.15s,
+    border-color 0.15s;
+  white-space: nowrap;
+}
+
+.ct-genfen__turn--white {
+  background-color: var(--ct-piece-primary);
+  color: black;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.ct-genfen__turn--black {
+  background-color: var(--ct-piece-secondary);
+  color: white;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.ct-genfen__turn:hover {
+  filter: brightness(1.1);
+}
+
+// En-passant / generic selects.
+.ct-genfen__select {
+  padding: 4px 8px;
+  border: 1px solid var(--background-modifier-border, #ccc);
+  border-radius: 4px;
+  background: var(--background-primary, #fff);
+  color: var(--text-normal, #000);
+  font-size: 0.9em;
+  max-width: 100%;
+}
+
+// Castling rights rows.
+.ct-genfen__rights {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 4px;
+  align-items: center;
+}
+
+.ct-genfen__rights + .ct-genfen__rights {
+  margin-top: 2px;
+}
+
+.ct-genfen__side {
+  font-weight: 600;
+  font-size: 0.85em;
+  white-space: nowrap;
+  min-width: 3em;
+}
+
+.ct-genfen__right {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  cursor: pointer;
+  font-size: 0.85em;
+  padding: 2px 4px;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+
+.ct-genfen__right--on {
+  border-color: var(--interactive-accent, #6a9fb5);
+  background: color-mix(
+    in srgb,
+    var(--interactive-accent, #6a9fb5) 15%,
+    transparent
+  );
+}
+
+.ct-genfen__right input {
+  margin: 0;
+}
+
+.ct-genfen__right--off {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+// Action buttons.
+.ct-genfen__actions {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-content: start;
+}
+
+.ct-genfen__action {
+  padding: 6px 12px;
+  border: 1px solid var(--background-modifier-border, #ccc);
+  border-radius: 4px;
+  cursor: pointer;
+  background: var(--background-secondary, #f0f0f0);
+  color: var(--text-normal, #000);
+  font-size: 0.85em;
+  transition: background 0.15s;
+}
+
+.ct-genfen__action:hover {
+  background: var(--background-modifier-hover, #e0e0e0);
+}
+
+.ct-genfen__action--save {
+  background: var(--interactive-accent, #6a9fb5);
+  color: var(--text-on-accent, #fff);
+  border-color: var(--interactive-accent, #6a9fb5);
+  font-weight: 600;
+}
+
+.ct-genfen__action--save:hover {
+  opacity: 0.9;
+}

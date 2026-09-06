@@ -6,7 +6,7 @@
   import Toolbar from "./Toolbar.svelte";
   import { onDestroy, onMount } from "svelte";
   import type { Piece } from "../../chess";
-  import { LAYOUT_CLASS, LAYOUT_CLASS_GENFEN } from "../../chess";
+  import { LAYOUT_CLASS, LAYOUT_CLASS_EDIT } from "../../chess";
 
   interface Props {
     settings: ISettings;
@@ -34,15 +34,8 @@
   });
 </script>
 
-<div class="{LAYOUT_CLASS} {LAYOUT_CLASS_GENFEN}">
+<div class="{LAYOUT_CLASS} {LAYOUT_CLASS_EDIT}">
   <Board {settings} {fen} {eventBus} rotated={flipped} freeMode={true} />
   <PieceBTNs {fen} {eventBus} {selectedPiece} />
   <Toolbar {eventBus} {fen} />
 </div>
-
-<style>
-  .chess-layout {
-    --red: #861818;
-    --black: #000080;
-  }
-</style>

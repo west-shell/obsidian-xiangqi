@@ -15,6 +15,7 @@
     type Move,
     PROMOTION_PIECES,
     RESIZE_EVENT,
+    RESIZING_CLASS,
     type Square,
     WRAP_CLASS,
     ZOOM_CHANGE_EVENT,
@@ -87,7 +88,6 @@
   }
 
   let promotingMove: { from: Square; to: Square } | null = $state(null);
-  let promotingColor: "w" | "b" = $state("w");
 
   function completePromotion(pieceType: "q" | "r" | "b" | "n") {
     if (!promotingMove) return;
@@ -114,7 +114,9 @@
   );
   let turnClass = $derived(
     settings.showTurnBorder
-      ? `turn-${fen.split(" ")[1] === "b" ? "black" : "white"}`
+      ? `ct-layout__board--turn-${
+          fen.split(" ")[1] === "b" ? "black" : "white"
+        }`
       : "",
   );
 
@@ -254,7 +256,6 @@
       promoteHandler = (payload) => {
         if (!payload) return;
         promotingMove = { from: payload.from, to: payload.to };
-        promotingColor = payload.color;
       };
       eventBus.on<{
         from: Square;
@@ -384,19 +385,19 @@
       zoom = Math.round(Math.min(100, Math.max(0, initialZoom + delta / 5)));
       const boardScale = (zoom / 100) * 0.75 + 0.25;
       activeDocument.body.style.setProperty(
-        "--chess-board-scale",
+        "--ct-board-scale",
         `${boardScale}`,
       );
       activeDocument.body.dispatchEvent(new Event(RESIZE_EVENT));
     };
 
-    activeDocument.body.classList.add("resizing");
+    activeDocument.body.classList.add(RESIZING_CLASS);
     activeDocument.addEventListener(moveEvent, resize);
     activeDocument.addEventListener(
       upEvent,
       () => {
         activeDocument.removeEventListener(moveEvent, resize);
-        activeDocument.body.classList.remove("resizing");
+        activeDocument.body.classList.remove(RESIZING_CLASS);
         activeDocument.body.dispatchEvent(
           new CustomEvent(ZOOM_CHANGE_EVENT, { detail: zoom }),
         );
@@ -406,27 +407,24 @@
   }
 </script>
 
-<div
-  class="board-wrapper chess-layout__board {turnClass}"
-  onwheel={handleWheel}
->
+<div class="ct-layout__board {turnClass}" onwheel={handleWheel}>
   <div
     bind:this={boardElement}
-    class="{WRAP_CLASS} {turnClass}"
-    style="--chess-board-ratio: {BOARD_ASPECT_RATIO}"
+    class={WRAP_CLASS}
+    style="--ct-board-ratio: {BOARD_ASPECT_RATIO}"
   ></div>
   {#if HAS_PROMOTION && promotingMove}
     <!-- svelte-ignore a11y_click_events_have_key_events -->
     <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <div class="promotion-overlay">
+    <div class="ct-promotion">
       <!-- svelte-ignore a11y_click_events_have_key_events -->
       <!-- svelte-ignore a11y_no_static_element_interactions -->
-      <div
-        class="promotion-choices {promotingColor}"
-        onclick={(e) => e.stopPropagation()}
-      >
+      <div class="ct-promotion__choices" onclick={(e) => e.stopPropagation()}>
         {#each PROMOTION_PIECES ?? [] as { type, icon } (type)}
-          <button class="promotion-btn" onclick={() => completePromotion(type)}>
+          <button
+            class="ct-promotion__btn"
+            onclick={() => completePromotion(type)}
+          >
             <!-- eslint-disable-next-line svelte/no-at-html-tags -->
             {@html iconSvg(icon, promoIconSize, 1.2)}
           </button>
@@ -436,109 +434,8 @@
   {/if}
   <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div
-    class="board-resize"
+    class="ct-board-resize"
     onmousedown={startResize}
     ontouchstart={startResize}
   ></div>
 </div>
-
-<style>
-  .board-wrapper {
-    --bw: var(
-      --chess-board-width,
-      min(
-        var(--chess-board-max-size, 100vh) * var(--chess-board-scale, 0.85),
-        100%
-      )
-    );
-    width: var(--bw);
-    position: relative;
-    border-radius: 2px;
-  }
-
-  .board-wrapper.turn-white {
-    background: rgba(255, 255, 255, 0.7);
-    box-shadow: 0 0 12px 3px rgba(255, 255, 255, 0.7);
-  }
-
-  .board-wrapper.turn-black {
-    background: rgba(0, 0, 0, 0.7);
-    box-shadow: 0 0 12px 3px rgba(0, 0, 0, 0.7);
-  }
-
-  .promotion-overlay {
-    position: absolute;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(2px);
-    -webkit-backdrop-filter: blur(2px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 10;
-  }
-
-  .promotion-choices {
-    display: flex;
-    gap: 6px;
-    padding: 8px;
-    border-radius: var(--radius-m, 10px);
-    background: var(--background-primary);
-    color: var(--text-normal);
-    box-shadow: var(--shadow-l, 0 2px 12px rgba(0, 0, 0, 0.3));
-  }
-
-  .promotion-btn {
-    all: unset;
-    cursor: pointer;
-    padding: 4px;
-    border-radius: 4px;
-    border: 1px solid transparent;
-    color: var(--text-normal);
-    transition: background 0.15s;
-  }
-
-  .promotion-btn:hover {
-    background: var(--background-modifier-hover);
-    border-color: var(--color-accent);
-  }
-
-  .board-resize {
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    width: 14px;
-    height: 14px;
-    cursor: nwse-resize;
-    z-index: 5;
-
-    &::before,
-    &::after {
-      background: var(--text-muted);
-      content: "";
-      position: absolute;
-      height: 1px;
-      left: 0;
-    }
-
-    &::before {
-      width: 5px;
-      transform: translate(7px, 8px) rotate(-45deg);
-    }
-
-    &::after {
-      width: 10px;
-      transform: translate(1px, 6px) rotate(-45deg);
-    }
-
-    &:hover {
-      border-radius: 50%;
-      background: var(--interactive-accent);
-    }
-  }
-
-  :global(body.resizing) {
-    user-select: none;
-    -webkit-user-select: none;
-  }
-</style>

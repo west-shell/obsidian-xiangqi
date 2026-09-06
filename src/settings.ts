@@ -1,5 +1,3 @@
-import "./style/settings.css";
-
 import {
   type App,
   Notice,
@@ -81,7 +79,7 @@ function addSliderWithValue(
   let currentValue = value;
   const setting = new Setting(containerEl).setName(name).setDesc(desc);
 
-  const valueDisplay = createSpan({ cls: "ws-slider-value" });
+  const valueDisplay = createSpan({ cls: "ct-setting-value" });
   valueDisplay.setText(`${currentValue}${unit}`);
   setting.controlEl.prepend(valueDisplay);
 
@@ -828,7 +826,7 @@ export class ChessSettingTab extends PluginSettingTab {
         }),
       );
 
-    containerEl.parentElement?.classList.add("ws-setting-tab");
+    containerEl.parentElement?.classList.add("ct-settings");
   }
 
   hide(): void {

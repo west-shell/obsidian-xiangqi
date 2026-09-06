@@ -1,0 +1,50 @@
+// ============================================================================
+// Base layer — custom-property defaults, host containers, drag state.
+// ============================================================================
+
+@use "tokens" as *;
+@use "mixins" as *;
+@use "variant" as *;
+
+body {
+  --ct-header-h: 0px;
+  --ct-gap: 4px;
+
+  // col2 rail size, computed by _tokens.scss from the viewport algebra.
+  // Width equals the primary dimension for width-driven boards, otherwise
+  // derives from the board aspect ratio (see _variant.scss).
+  --ct-col2-size: #{$col2-size};
+  @if $col2-size-dimension == "width" {
+    --ct-col2-width: #{$col2-size};
+  } @else {
+    --ct-col2-width: calc(#{$col2-size} * #{$board-ratio});
+  }
+}
+
+// The PGN file view sits under Obsidian's view header.
+.view-content.ct-file-view {
+  --ct-header-h: var(--size-header-height, 40px);
+}
+
+// Board-drag state: suppress text selection while resizing the board.
+body.ct-resizing {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+// ---------------------------------------------------------------------------
+// Host containers
+// ---------------------------------------------------------------------------
+
+// `chess`/`tree`/`fen` code blocks
+.ct-block .ct-layout {
+  margin: 1rem 0;
+}
+
+// PGN file view host
+.ct-file-view {
+  overflow: hidden !important;
+  margin: 0 !important;
+  padding-top: var(--ct-board-margin-top, 0px) !important;
+  padding-bottom: var(--ct-board-margin-bottom, 0px) !important;
+}

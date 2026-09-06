@@ -209,12 +209,12 @@
 
   function adjustTextareaHeight() {
     if (!textareaEl) return;
-    textareaEl.classList.add("auto-height");
+    textareaEl.classList.add("ct-comment__input--auto");
     textareaEl.style.setProperty(
-      "--textarea-height",
+      "--ct-textarea-h",
       `${textareaEl.scrollHeight}px`,
     );
-    textareaEl.classList.remove("auto-height");
+    textareaEl.classList.remove("ct-comment__input--auto");
   }
 
   function updateTreeLayout() {
@@ -443,12 +443,12 @@
         v2 === Infinity ? edgeR : v2 === -Infinity ? edgeL : midX + v2 * scaleX;
       const color =
         v2 === Infinity || (Number.isFinite(v2) && v2 >= 0)
-          ? "var(--chess-eval-plus)"
-          : "var(--chess-eval-minus)";
+          ? "var(--ct-eval-plus)"
+          : "var(--ct-eval-minus)";
       const color1 =
         v1 === Infinity || (Number.isFinite(v1) && v1 >= 0)
-          ? "var(--chess-eval-plus)"
-          : "var(--chess-eval-minus)";
+          ? "var(--ct-eval-plus)"
+          : "var(--ct-eval-minus)";
       if (color1 !== color) {
         segments.push({
           x1,
@@ -750,12 +750,12 @@
   });
 </script>
 
-<div class="tree-container chess-layout__tools">
+<div class="ct-layout__panel">
   {#if showGameInfo}
-    <div class="game-nav-bar">
+    <div class="ct-gamenav">
       <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
       <div
-        class="game-nav-info"
+        class="ct-gamenav__info"
         role={isBlockMode ? undefined : "button"}
         tabindex={isBlockMode ? undefined : 0}
         onclick={isBlockMode ? undefined : handleGameMenu}
@@ -766,22 +766,22 @@
                 handleGameMenu(e as unknown as MouseEvent);
             }}
       >
-        <span class="game-nav-title">{gameTitle}</span>
+        <span class="ct-gamenav__title">{gameTitle}</span>
         {#if showGameNav}
-          <span class="game-nav-index">{gameLabel}</span>
+          <span class="ct-gamenav__index">{gameLabel}</span>
         {/if}
       </div>
       {#if showGameNav}
-        <div class="game-nav-arrows">
+        <div class="ct-gamenav__arrows">
           <button
-            class="toolbar-btn game-nav-arrow"
+            class="ct-btn ct-gamenav__arrow"
             aria-label={t("game.prev", _lv)}
             disabled={currentGameIndex <= 0}
             use:useSetIcon={"chevron-left"}
             onclick={prevGame}
           ></button>
           <button
-            class="toolbar-btn game-nav-arrow"
+            class="ct-btn ct-gamenav__arrow"
             aria-label={t("game.next", _lv)}
             disabled={!games || currentGameIndex >= games.length - 1}
             use:useSetIcon={"chevron-right"}
@@ -791,7 +791,7 @@
       {/if}
       {#if !isBlockMode}
         <button
-          class="toolbar-btn game-nav-arrow game-nav-menu-btn"
+          class="ct-btn ct-gamenav__arrow ct-gamenav__menu"
           aria-label={t("game.select", _lv)}
           use:useSetIcon={"list"}
           onclick={handleGameMenu}
@@ -799,18 +799,18 @@
       {/if}
     </div>
   {/if}
-  <div class="tools-row">
-    <div class="svg-wrapper">
+  <div class="ct-panel__row">
+    <div class="ct-panel__canvas">
       {#if nodeMap.get(currentNode?.id ?? "")?.eval}
         {@const ce = nodeMap.get(currentNode!.id)!.eval!}
         {@const isZero = ce.scoreType !== "mate" && ce.score === 0}
         {@const isPositive =
           ce.score > 0 || (ce.scoreType === "mate" && ce.score >= 0)}
         {@const evalColor = isPositive
-          ? "var(--chess-eval-plus)"
-          : "var(--chess-eval-minus)"}
+          ? "var(--ct-eval-plus)"
+          : "var(--ct-eval-minus)"}
         {@const labelBg = isZero
-          ? "linear-gradient(to bottom, var(--chess-eval-plus) 50%, var(--chess-eval-minus) 50%)"
+          ? "linear-gradient(to bottom, var(--ct-eval-plus) 50%, var(--ct-eval-minus) 50%)"
           : evalColor}
         {@const fillPercent =
           ce.scoreType === "mate"
@@ -820,28 +820,28 @@
           ce.scoreType === "mate"
             ? (ce.score >= 0 ? "+" : "-") + "M"
             : (ce.score > 0 ? "+" : "") + (ce.score / 100).toFixed(1)}
-        <div class="eval-sidebar">
-          <div class="eval-bar">
+        <div class="ct-eval">
+          <div class="ct-eval__bar">
             {#if isPositive}
               <div
-                class="eval-fill"
+                class="ct-eval__fill"
                 style="height: {fillPercent}%; top: {50 -
                   fillPercent}%; background: {evalColor}"
               ></div>
             {:else}
               <div
-                class="eval-fill"
+                class="ct-eval__fill"
                 style="height: {fillPercent}%; top: 50%; background: {evalColor}"
               ></div>
             {/if}
-            <div class="eval-center-line"></div>
-            <span class="eval-label" style="background: {labelBg}"
+            <div class="ct-eval__center"></div>
+            <span class="ct-eval__label" style="background: {labelBg}"
               >{evalText}</span
             >
           </div>
         </div>
       {/if}
-      <svg bind:this={svgEl} width="100%" height="100%" class="tree-svg">
+      <svg bind:this={svgEl} width="100%" height="100%" class="ct-panel__svg">
         <g transform={TRANSFORM_SAFE}>
           {#each renderedNodes as node (node.id)}
             {#each node.children as child, idx (node.id + "-" + idx)}
@@ -855,7 +855,7 @@
               L ${(child.x! - 0.3 * Math.sign(child.x! - node.x!)) * spacingX} ${node.y! * spacingY}
               L ${child.x! * spacingX} ${child.y! * spacingY}
               `}
-                  stroke="var(--chess-board-line)"
+                  stroke="var(--ct-tree-line)"
                   stroke-linejoin="round"
                   stroke-width={onPath ? 1.5 : 1}
                   opacity={onPath ? 1 : 0.4}
@@ -896,8 +896,8 @@
                     : isLeft
                       ? "0,-4 0,4 -5,0"
                       : "0,-4 0,4 5,0"}
-                  fill="var(--chess-board-line)"
-                  stroke="var(--chess-board-line)"
+                  fill="var(--ct-tree-line)"
+                  stroke="var(--ct-tree-line)"
                   stroke-width="1.5"
                   stroke-linejoin="round"
                   opacity={offPathFold ? 0.5 : 1}
@@ -913,7 +913,7 @@
             <!-- svelte-ignore a11y_click_events_have_key_events -->
             <!-- svelte-ignore a11y_no_static_element_interactions -->
             <g
-              class="node-group"
+              class="ct-panel__node"
               transform="translate({node.x! * spacingX} {node.y! *
                 spacingY}){isCurrent ? ' scale(1.2)' : ''}"
               opacity={currentPath.includes(node.id) ? 1 : 0.55}
@@ -935,7 +935,7 @@
                   : getNodeFill(node.color)}
                 stroke={isCurrent
                   ? getNodeFill(node.color)
-                  : "var(--chess-board-line)"}
+                  : "var(--ct-tree-line)"}
               />
               {#if nodeMode === 0 && !node.move}
                 <g
@@ -993,10 +993,10 @@
                 {@const color =
                   node.eval.score > 0 ||
                   (node.eval.scoreType === "mate" && node.eval.score >= 0)
-                    ? `color-mix(in srgb, var(--chess-eval-plus) ${60 + intensity * 40}%, transparent)`
+                    ? `color-mix(in srgb, var(--ct-eval-plus) ${60 + intensity * 40}%, transparent)`
                     : node.eval.score < 0 ||
                         (node.eval.scoreType === "mate" && node.eval.score < 0)
-                      ? `color-mix(in srgb, var(--chess-eval-minus) ${60 + intensity * 40}%, transparent)`
+                      ? `color-mix(in srgb, var(--ct-eval-minus) ${60 + intensity * 40}%, transparent)`
                       : `color-mix(in srgb, var(--text-muted) 60%, transparent)`}
                 {@const barWidth = 2 + intensity * (nw - 4)}
                 <rect
@@ -1063,10 +1063,10 @@
         </g>
       </svg>
 
-      <div class="toolbar toolbar-group">
+      <div class="ct-panel__toolbar ct-btn-group">
         {#if canFold}
           <button
-            class="toolbar-btn"
+            class="ct-btn"
             aria-label={t("tree.fold", _lv)}
             use:useSetIcon={"chevrons-right-left"}
             onclick={toggleCurrentFold}
@@ -1074,14 +1074,14 @@
         {/if}
         {#each zoomBTN as { title, icon, event } (event)}
           <button
-            class="toolbar-btn"
+            class="ct-btn"
             aria-label={title}
             use:useSetIcon={icon}
             onclick={event}
           ></button>
         {/each}
         <button
-          class="toolbar-btn"
+          class="ct-btn"
           aria-label={nodeModeTitle}
           use:useSetIcon={modeIcon}
           onclick={cycleNodeMode}
@@ -1089,19 +1089,19 @@
       </div>
 
       <div
-        class="slider"
-        class:active={sliderDragging}
-        class:has-eval={!!evalChartSegments}
+        class="ct-slider"
+        class:ct-slider--dragging={sliderDragging}
+        class:ct-slider--eval={!!evalChartSegments}
       >
         <button
-          class="slider-btn slider-to-start"
+          class="ct-slider__btn ct-slider__btn--start"
           aria-label="To start"
           use:useSetIcon={"minus"}
           onclick={() =>
             eventBus.emit("btn-click", { name: "toStart", payload: null })}
         ></button>
         <button
-          class="slider-btn slider-prev"
+          class="ct-slider__btn ct-slider__btn--prev"
           aria-label="Previous"
           use:useSetIcon={"arrow-up"}
           onclick={() =>
@@ -1114,7 +1114,7 @@
           aria-valuemin={0}
           aria-valuemax={100}
           bind:this={sliderInnerEl}
-          class="slider-inner"
+          class="ct-slider__track"
           onmousedown={handleSliderAreaMouseDown}
         >
           {#if evalChartSegments}
@@ -1123,7 +1123,7 @@
               height="100%"
               viewBox="0 0 {evalChartSegments.w} {evalChartSegments.h}"
               preserveAspectRatio="none"
-              class="eval-chart-bg"
+              class="ct-slider__chart"
             >
               <line
                 x1={evalChartSegments.midX}
@@ -1147,11 +1147,11 @@
               {/each}
             </svg>
           {/if}
-          <span class="slider-thumb" style="top: {sliderPercent}%"></span>
+          <span class="ct-slider__thumb" style="top: {sliderPercent}%"></span>
           {#if sliderText}
             <!-- svelte-ignore a11y_no_static_element_interactions -->
             <span
-              class="slider-label"
+              class="ct-slider__label"
               style="top: {sliderPercent}%"
               onmousedown={handleSliderAreaMouseDown}
               ontouchstart={handleSliderLabelTouchStart}>{sliderText}</span
@@ -1159,14 +1159,14 @@
           {/if}
         </div>
         <button
-          class="slider-btn slider-next"
+          class="ct-slider__btn ct-slider__btn--next"
           aria-label="Next"
           use:useSetIcon={"arrow-down"}
           onclick={() =>
             eventBus.emit("btn-click", { name: "next", payload: null })}
         ></button>
         <button
-          class="slider-btn slider-to-end"
+          class="ct-slider__btn ct-slider__btn--end"
           aria-label="To end"
           use:useSetIcon={"minus"}
           onclick={() =>
@@ -1175,14 +1175,17 @@
       </div>
     </div>
     {#if listVisible}
-      <ul class="move-list" bind:this={listUlRef}>
-        <li class="start" bind:this={listItemRefs[0]}>
-          <span class="roundnum">0</span>
+      <ul class="ct-moves" bind:this={listUlRef}>
+        <li
+          class="ct-moves__row ct-moves__row--start"
+          bind:this={listItemRefs[0]}
+        >
+          <span class="ct-moves__num">0</span>
           <!-- svelte-ignore a11y_click_events_have_key_events -->
           <!-- svelte-ignore a11y_no_static_element_interactions -->
           <span
-            class="move start"
-            class:active={listCurrentStep === 0}
+            class="ct-moves__move ct-moves__move--start"
+            class:ct-moves__move--active={listCurrentStep === 0}
             onclick={() => onClickStep(0)}
           >
             {getStartLabel()}
@@ -1190,13 +1193,13 @@
         </li>
         {#each listMoves as move, i (i)}
           {#if i % 2 === 0}
-            <li class="round" bind:this={listItemRefs[i / 2 + 1]}>
-              <span class="roundnum">{i / 2 + 1}</span>
+            <li class="ct-moves__row" bind:this={listItemRefs[i / 2 + 1]}>
+              <span class="ct-moves__num">{i / 2 + 1}</span>
               <!-- svelte-ignore a11y_click_events_have_key_events -->
               <!-- svelte-ignore a11y_no_static_element_interactions -->
               <span
-                class="move {getMoveListSideClass(move.color)}"
-                class:active={listCurrentStep === i + 1}
+                class="ct-moves__move {getMoveListSideClass(move.color)}"
+                class:ct-moves__move--active={listCurrentStep === i + 1}
                 onclick={() => onClickStep(i + 1)}
               >
                 {move.move ? getMoveNotation(move.move) : "..."}
@@ -1205,8 +1208,10 @@
                 <!-- svelte-ignore a11y_click_events_have_key_events -->
                 <!-- svelte-ignore a11y_no_static_element_interactions -->
                 <span
-                  class="move {getMoveListSideClass(listMoves[i + 1].color)}"
-                  class:active={listCurrentStep === i + 2}
+                  class="ct-moves__move {getMoveListSideClass(
+                    listMoves[i + 1].color,
+                  )}"
+                  class:ct-moves__move--active={listCurrentStep === i + 2}
                   onclick={() => onClickStep(i + 2)}
                 >
                   {(() => {
@@ -1222,17 +1227,17 @@
     {/if}
   </div>
 
-  <div class="comment-row">
+  <div class="ct-panel__comment">
     <textarea
       bind:value={commentsText}
-      class="auto-height"
+      class="ct-comment__input ct-comment__input--auto"
       placeholder={t("tree.placeholder")}
       bind:this={textareaEl}
       oninput={handleCommentsInput}
       onblur={handleCommentsBlur}
       rows="1"></textarea>
     <button
-      class="toolbar-btn toggle-list-btn"
+      class="ct-btn ct-comment__toggle"
       title={listVisible ? t("tree.hideList", _lv) : t("tree.showList", _lv)}
       aria-label={listVisible
         ? t("tree.hideList", _lv)
@@ -1242,422 +1247,3 @@
     ></button>
   </div>
 </div>
-
-<style>
-  .tree-container {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    overflow: hidden;
-    --chess-board-background: transparent;
-    --chess-board-line: var(--text-normal);
-    --piece-red: var(--chess-piece-white, var(--color-red));
-    --piece-black: var(--chess-piece-black, var(--color-blue));
-    --text-color: var(--text-normal);
-    --chess-eval-plus: var(--color-green, #4caf50);
-    --chess-eval-minus: var(--color-red, #f44336);
-  }
-
-  .tools-row {
-    display: flex;
-    flex-direction: row;
-    flex: 1 1 auto;
-    overflow: hidden;
-  }
-
-  .move-list {
-    width: auto;
-    min-width: 0;
-    max-width: 200px;
-    display: flex;
-    flex-direction: column;
-    font-size: var(--chess-font-size, 12px);
-    overflow-y: auto;
-    overflow-x: hidden;
-    padding: 0;
-    margin: 0;
-    color: var(--text-normal);
-    background-color: var(--background-primary-alt);
-    border-left: 1px solid var(--background-modifier-border);
-    flex-shrink: 0;
-    list-style: none;
-  }
-
-  .move-list li {
-    display: flex;
-    flex-wrap: nowrap;
-    flex-shrink: 0;
-    flex-grow: 0;
-    align-items: center;
-    gap: 0.25em;
-    padding: 0 0.25em;
-    margin: 0;
-    border-bottom: none;
-    white-space: nowrap;
-    width: 100%;
-  }
-
-  .move-list .roundnum {
-    display: inline-block;
-    min-width: 1.2em;
-    max-width: 2em;
-    text-align: right;
-    margin-right: 0.2em;
-    color: var(--text-muted);
-    flex-shrink: 0;
-    white-space: nowrap;
-  }
-
-  .move-list span.move {
-    display: inline-block;
-    line-height: 1.1;
-    text-align: center;
-    border-radius: var(--radius-s, 4px);
-    cursor: pointer;
-    transition:
-      background-color 0.15s ease,
-      color 0.15s ease;
-    white-space: nowrap;
-    flex-shrink: 0;
-    padding: 0.12em 0.4em;
-    margin: 0;
-    color: var(--text-normal);
-  }
-
-  .move-list span.move.white {
-    min-width: 2.5em;
-    text-align: left;
-  }
-
-  .move-list span.move.black {
-    min-width: 2.5em;
-    text-align: right;
-  }
-
-  .move-list span.move:hover {
-    background-color: var(--background-modifier-hover);
-  }
-
-  .move-list span.move.active {
-    background-color: var(--color-accent);
-    color: var(--text-on-accent);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
-    font-weight: 500;
-  }
-
-  .svg-wrapper {
-    flex: 1 1 auto;
-    overflow: hidden;
-    background-color: var(--chess-board-background);
-    position: relative;
-    width: 100%;
-    height: 100%;
-  }
-
-  .eval-sidebar {
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    width: 8px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 0;
-    z-index: 2;
-    pointer-events: none;
-  }
-
-  .eval-bar {
-    position: relative;
-    flex: 1 1 auto;
-    width: 4px;
-    background: var(--background-modifier-border);
-    border-radius: 2px;
-  }
-
-  .eval-fill {
-    position: absolute;
-    left: 0;
-    right: 0;
-    border-radius: 2px;
-    transition:
-      height 0.3s ease,
-      top 0.3s ease,
-      background 0.3s ease;
-  }
-
-  .eval-center-line {
-    position: absolute;
-    top: 50%;
-    left: 0;
-    right: 0;
-    height: 0;
-  }
-
-  .eval-label {
-    position: absolute;
-    top: 50%;
-    left: calc(100% + 4px);
-    height: 18px;
-    margin-top: -9px;
-    background: var(--interactive-accent);
-    color: var(--text-on-accent);
-    font-size: 0.6em;
-    line-height: 18px;
-    text-align: center;
-    padding: 0 4px;
-    border-radius: 3px;
-    white-space: nowrap;
-    pointer-events: none;
-  }
-
-  .toolbar {
-    position: absolute;
-    bottom: 0.5rem;
-    left: 0.5rem;
-    flex-direction: column;
-    gap: 2px;
-    margin: 0;
-    background: color-mix(in srgb, var(--background-primary) 72%, transparent);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-    box-shadow: var(--shadow-s, 0 1px 2px rgba(0, 0, 0, 0.1));
-    pointer-events: none;
-  }
-
-  .toolbar .toolbar-btn {
-    pointer-events: auto;
-  }
-
-  .slider {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    width: 20px;
-    background: var(--background-primary-alt);
-    border: 1px solid var(--background-modifier-border);
-    z-index: 2;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    border-radius: 3px 0 0 3px;
-    margin: 0 0 0 6px;
-  }
-
-  .slider:not(.has-eval) {
-    background: transparent;
-    border-color: transparent;
-  }
-
-  .slider:not(.has-eval) .slider-inner {
-    width: 4px;
-    background: var(--background-modifier-border);
-    border-radius: 2px;
-    align-self: center;
-  }
-
-  .eval-chart-bg {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-  }
-
-  .slider-btn {
-    width: 16px;
-    height: 16px;
-    background: var(--background-secondary);
-    border: 1px solid var(--background-modifier-border);
-    border-radius: 3px;
-    color: var(--text-muted);
-    font-size: 0.55em;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-    margin: 0;
-    transition:
-      color 0.2s,
-      background 0.2s;
-  }
-  .slider-btn + .slider-btn {
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
-    margin-top: -1px;
-  }
-  .slider-btn:hover {
-    color: var(--text-normal);
-    background: var(--background-modifier-hover);
-  }
-  .slider-btn:active {
-    color: var(--text-on-accent);
-    background: var(--interactive-accent);
-  }
-
-  .slider-inner {
-    flex: 1 1 auto;
-    width: 100%;
-    position: relative;
-    cursor: pointer;
-  }
-
-  .slider-thumb {
-    position: absolute;
-    left: -2px;
-    right: -2px;
-    height: 6px;
-    margin-top: -3px;
-    background: var(--interactive-accent);
-    border-radius: 3px;
-    transition: top 0.2s;
-  }
-  .slider.active .slider-thumb {
-    transition: none;
-  }
-
-  .slider-label {
-    position: absolute;
-    right: calc(100% + 8px);
-    height: 18px;
-    margin-top: -9px;
-    background: var(--interactive-accent);
-    color: var(--text-on-accent);
-    font-size: 0.6em;
-    line-height: 18px;
-    text-align: center;
-    padding: 0 4px;
-    border-radius: 3px;
-    white-space: nowrap;
-    cursor: pointer;
-    touch-action: none;
-    transition: top 0.2s;
-  }
-  .slider.active .slider-label {
-    transition: none;
-  }
-  .slider-label::after {
-    content: "";
-    position: absolute;
-    top: 50%;
-    right: -4px;
-    transform: translateY(-50%);
-    border: 4px solid transparent;
-    border-left-color: var(--interactive-accent);
-    border-right: none;
-  }
-
-  .tree-svg {
-    user-select: none;
-    touch-action: none;
-    display: block;
-  }
-
-  .node-group {
-    cursor: pointer;
-  }
-
-  textarea {
-    width: 100%;
-    height: var(--textarea-height, 20px);
-    max-height: 80px;
-    resize: none;
-    font-family: var(--font-family);
-    font-size: var(--font-size-normal);
-    color: var(--text-normal);
-    background: var(--background-secondary);
-    border: 1px solid var(--background-modifier-border);
-    border-radius: var(--radius-s, 4px);
-    padding: 4px 8px;
-    outline: none;
-    overflow-y: auto;
-    transition:
-      border-color 0.15s ease,
-      box-shadow 0.15s ease;
-  }
-  textarea.auto-height {
-    height: auto;
-    flex: 1 1 auto;
-  }
-  .comment-row {
-    display: flex;
-    flex-direction: row;
-    align-items: stretch;
-    gap: 2px;
-  }
-  .toggle-list-btn {
-    width: 28px;
-    height: auto;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
-  textarea:focus {
-    border-color: var(--interactive-accent);
-    box-shadow: 0 0 0 1px var(--interactive-accent);
-  }
-
-  .game-nav-bar {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 4px;
-    padding: 2px 4px;
-    flex-shrink: 0;
-    border-bottom: 1px solid var(--background-modifier-border);
-    background: var(--background-secondary);
-  }
-  .game-nav-info {
-    flex: 1 1 auto;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0;
-    padding: 2px 6px;
-    min-width: 0;
-  }
-  .game-nav-info:hover {
-    background: var(--background-modifier-hover);
-    border-radius: 4px;
-  }
-  .game-nav-title {
-    font-size: 11px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 100%;
-    line-height: 1.3;
-  }
-  .game-nav-index {
-    font-size: 9px;
-    color: var(--text-muted);
-    line-height: 1.2;
-  }
-  .game-nav-arrows {
-    display: flex;
-    flex-direction: row;
-    gap: 2px;
-    flex-shrink: 0;
-  }
-  .game-nav-arrow {
-    width: 24px;
-    height: 24px;
-    padding: 0;
-  }
-  .game-nav-arrow :global(svg) {
-    width: 16px;
-    height: 16px;
-  }
-  .game-nav-menu-btn {
-    width: 24px;
-    height: 24px;
-    padding: 0;
-  }
-</style>

@@ -1,244 +1,28 @@
-@use "scss/functions" as *;
-@use "scss/variables" as *;
-@use "scss/media-queries" as *;
-@use "scss/uniboard" as *;
-@use "scss/layout-base" as *;
-@use "scss/buttons" as *;
-@use "scss/board" as *;
-@use "scss/coords" as *;
-@use "scss/variant" as *;
+// ============================================================================
+// Chess Tree — style entry
+//
+// Architecture (see README.md next to this file):
+//   variant  → variant-tunable values (the ONLY file xiangqi replaces)
+//   tokens   → breakpoints / spacing / size algebra
+//   mixins   → col1/col2 media queries + helpers
+//   base     → custom-property defaults + host containers
+//   layout   → .ct-layout grid (col1/col2) + host contexts
+//   board    → board area + chessground overrides (only place for cg-* / xq-*)
+//   buttons  → .ct-btn system
+//   toolbar  → main toolbar rail
+//   panel    → tree panel (game nav / canvas / eval / slider / move list)
+//   genfen   → FEN editor (--edit layout, piece palette, editor tools)
+//   settings → plugin settings tab + modal controls
+// ============================================================================
 
-$local-block-gap: 2px;
-
-// ====== 主网格容器 ======
-
-.chess-layout {
-  display: grid;
-  gap: $local-block-gap;
-  background: var(--background-primary-alt);
-
-  &__board {
-    grid-area: board;
-    align-self: start;
-  }
-
-  &__toolbar {
-    grid-area: toolbar;
-    align-self: start;
-  }
-
-  &__tools {
-    grid-area: tools;
-  }
-
-  &__piecebtns {
-    grid-area: piecebtns;
-  }
-
-  // ====== col1：单栏（默认，竖屏） ======
-  grid-template-columns: 1fr;
-  grid-template-rows: auto auto auto;
-  grid-template-areas:
-    "board"
-    "toolbar"
-    "tools";
-
-  &__board {
-    @if $col1-board-scale {
-      --chess-board-scale: #{$col1-board-scale};
-    }
-    @if $col1-board-max-width {
-      max-width: #{$col1-board-max-width};
-    }
-    justify-self: center;
-
-    .board-resize {
-      display: none;
-    }
-  }
-
-  &__tools {
-    min-height: 45vh;
-  }
-
-  // ====== col2：双栏（宽屏或横屏） ======
-  @include mq-is-col2 {
-    @if $col2-primary-dimension != "width" {
-      --chess-board-width: var(---col2-uniboard-width);
-    }
-    height: var(---col2-uniboard-#{$col2-primary-dimension});
-    grid-template-columns: var(---col2-uniboard-width) auto $uniboard-table;
-    grid-template-rows: var(---col2-uniboard-#{$col2-primary-dimension}) 1fr;
-    grid-template-areas:
-      "board toolbar tools"
-      "board toolbar tools";
-
-    &__board {
-      .board-resize {
-        display: block;
-      }
-    }
-
-    .chess-layout__toolbar.toolbar-container {
-      flex-direction: column;
-      flex-wrap: wrap;
-      max-height: var(---col2-uniboard-#{$col2-primary-dimension});
-      align-items: center;
-      column-gap: 0;
-      grid-row: 1;
-
-      .toolbar-sep {
-        width: auto;
-        height: 1px;
-        margin: 1px 3px;
-      }
-    }
-
-    &__tools {
-      max-height: var(---col2-uniboard-#{$col2-primary-dimension});
-      min-width: 160px;
-      min-height: 0;
-    }
-  }
-}
-
-// ====== 工具栏方向自适应 ======
-.chess-layout__toolbar {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  align-items: center;
-  gap: 4px;
-}
-
-// 主工具栏（board 下方的按钮排）：居中，与居中的棋盘对齐
-.chess-layout__toolbar.toolbar-container {
-  justify-content: center;
-  gap: 0;
-}
-
-// ====== GenFEN 编辑器专用 ======
-.chess-layout--genfen {
-  grid-template-columns: 1fr;
-  grid-template-rows: auto auto auto;
-  grid-template-areas:
-    "board"
-    "piecebtns"
-    "toolbar";
-
-  @include mq-is-col2 {
-    height: auto;
-    grid-template-columns: var(---col2-uniboard-width) min-content min-content;
-    grid-template-rows: auto;
-    grid-template-areas: "board piecebtns toolbar";
-
-    .chess-layout__toolbar {
-      flex-direction: column;
-      flex-wrap: #{$genfen-toolbar-flex-wrap};
-      align-items: center;
-      @if $genfen-toolbar-align-content {
-        align-content: #{$genfen-toolbar-align-content};
-      }
-    }
-  }
-
-  .chess-layout__piecebtns.piece-btn-container {
-    container-type: size;
-    grid-template-columns: repeat(#{$piecebtns-cols}, 1fr);
-    grid-template-rows: repeat(2, 1fr);
-    width: 100%;
-    height: 56px;
-    .piece-btn {
-      width: #{$piecebtns-col-cqw};
-      height: 28px;
-    }
-    @include mq-is-col2 {
-      grid-template-columns: repeat(2, 1fr);
-      grid-template-rows: repeat(#{$piecebtns-cols}, 1fr);
-      width: 56px;
-      height: 100%;
-      .piece-btn {
-        width: 28px;
-        height: #{$piecebtns-col-cqh};
-      }
-    }
-  }
-}
-
-// ====== PGN 文件视图专用 ======
-.pgn-view .chess-layout {
-  container-type: size;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-
-  &__board {
-    --chess-board-width: min(100cqw, #{$pgn-col1-board-cqh});
-    align-self: center;
-    .board-resize {
-      display: none;
-    }
-  }
-
-  &__toolbar {
-    flex-shrink: 0;
-    position: relative;
-    z-index: 1;
-    height: auto;
-    min-height: 32px;
-  }
-
-  &__tools {
-    flex: 1 1 0;
-    min-height: 0;
-    max-height: none;
-  }
-
-  @include mq-is-col2 {
-    flex-direction: row;
-    @if $pgn-col2-override-uniboard-width {
-      ---col2-uniboard-width: 100cqh;
-    }
-    &__board {
-      --chess-board-width: min(60cqw, #{$pgn-col2-board-cqh});
-      align-self: center;
-    }
-
-    &__toolbar {
-      flex-direction: column;
-      flex-wrap: wrap;
-      max-height: none;
-      align-self: center;
-      align-items: center;
-      height: auto;
-      min-height: 0;
-
-      .toolbar-sep {
-        width: auto;
-        height: 1px;
-        margin: 1px 3px;
-      }
-    }
-
-    .chess-layout--genfen &__toolbar {
-      align-self: stretch;
-    }
-
-    &__tools {
-      height: 100%;
-    }
-  }
-}
-
-.pgn-view {
-  overflow: hidden !important;
-  margin: 0 !important;
-  padding-top: var(--chess-board-margin-top, 0px) !important;
-  padding-bottom: var(--chess-board-margin-bottom, 0px) !important;
-}
-
-// ====== tree codeblock 专用 ======
-.tree-codeblock .chess-layout {
-  margin: 1rem 0;
-}
+@use "scss/variant";
+@use "scss/tokens";
+@use "scss/mixins";
+@use "scss/base";
+@use "scss/layout";
+@use "scss/board";
+@use "scss/buttons";
+@use "scss/toolbar";
+@use "scss/panel";
+@use "scss/genfen";
+@use "scss/settings";

@@ -1,0 +1,203 @@
+// ============================================================================
+// .ct-layout — the master grid shared by every UI surface.
+//
+//   col1 (default, narrow portrait): board / toolbar / panel stacked
+//   col2 (wide or landscape):        board | toolbar | panel in one row
+//
+// Host contexts re-shape the grid:
+//   .ct-file-view  → PGN file view (flex column/row, container queries)
+//   .ct-layout--edit → FEN editor (see _genfen.scss)
+// ============================================================================
+
+@use "tokens" as *;
+@use "mixins" as *;
+@use "variant" as *;
+
+.ct-layout {
+  display: grid;
+  gap: $ct-layout-gap;
+  background: var(--background-primary-alt);
+
+  // ---- Grid areas ----------------------------------------------------------
+  &__board {
+    grid-area: board;
+    align-self: start;
+  }
+
+  &__toolbar {
+    grid-area: toolbar;
+    align-self: start;
+  }
+
+  &__panel {
+    grid-area: panel;
+  }
+
+  &__palette {
+    grid-area: palette;
+  }
+
+  // ---- col1: stacked (default) ---------------------------------------------
+  @if $col1-board-scale {
+    --ct-board-scale: #{$col1-board-scale};
+  }
+
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto auto;
+  grid-template-areas:
+    "board"
+    "toolbar"
+    "panel";
+
+  &__board {
+    @if $col1-board-max-width {
+      max-width: #{$col1-board-max-width};
+    }
+    justify-self: center;
+
+    .ct-board-resize {
+      display: none;
+    }
+  }
+
+  // Main toolbar matches the centered board width, single adaptive row.
+  .ct-layout__toolbar.ct-toolbar {
+    width: min(var(--ct-board-max, 100vh) * var(--ct-board-scale, 0.85), 100%);
+    justify-self: center;
+    flex-wrap: nowrap;
+
+    .ct-btn {
+      min-width: 0;
+      height: auto;
+      aspect-ratio: 1;
+    }
+  }
+
+  &__panel {
+    min-height: 45vh;
+  }
+
+  // ---- col2: side-by-side ---------------------------------------------------
+  @include col2 {
+    height: var(--ct-col2-size);
+    grid-template-columns: var(--ct-col2-width) auto $uniboard-table;
+    grid-template-rows: var(--ct-col2-size) 1fr;
+    grid-template-areas:
+      "board toolbar panel"
+      "board toolbar panel";
+
+    &__board {
+      .ct-board-resize {
+        display: block;
+      }
+    }
+
+    .ct-layout__toolbar.ct-toolbar {
+      flex-direction: column;
+      flex-wrap: wrap;
+      max-height: var(--ct-col2-size);
+      align-items: center;
+      column-gap: 0;
+      grid-row: 1;
+      justify-content: flex-start;
+      width: auto;
+
+      .ct-btn-sep {
+        width: auto;
+        height: 1px;
+        margin: 1px 3px;
+      }
+    }
+
+    &__panel {
+      max-height: var(--ct-col2-size);
+      min-width: 160px;
+      min-height: 0;
+    }
+  }
+}
+
+// ============================================================================
+// PGN file view context — fills the leaf, container queries for the board.
+// ============================================================================
+
+.ct-file-view .ct-layout {
+  container-type: size;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  &__board {
+    --ct-board-width: min(100cqw, #{$pgn-col1-board-height});
+    align-self: center;
+
+    .ct-board-resize {
+      display: none;
+    }
+  }
+
+  &__toolbar {
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+    height: auto;
+    min-height: 32px;
+  }
+
+  // Main toolbar matches the board width, centered.
+  .ct-toolbar {
+    width: min(100cqw, #{$pgn-col1-board-height});
+    align-self: center;
+  }
+
+  &__panel {
+    flex: 1 1 0;
+    min-height: 0;
+    max-height: none;
+  }
+
+  @include col2 {
+    flex-direction: row;
+
+    @if $pgn-col2-override-width {
+      --ct-col2-width: 100cqh;
+    }
+
+    &__board {
+      --ct-board-width: min(60cqw, #{$pgn-col2-board-height});
+      align-self: center;
+    }
+
+    &__toolbar {
+      flex-direction: column;
+      flex-wrap: wrap;
+      max-height: none;
+      align-self: center;
+      align-items: center;
+      height: auto;
+      min-height: 0;
+
+      .ct-btn-sep {
+        width: auto;
+        height: 1px;
+        margin: 1px 3px;
+      }
+    }
+
+    // FEN editor toolbar stretches to the rail height.
+    .ct-layout--edit &__toolbar {
+      align-self: stretch;
+    }
+
+    // Restore the plain wrapped toolbar in the file view.
+    .ct-toolbar {
+      width: auto;
+      align-self: flex-start;
+      flex-wrap: wrap;
+    }
+
+    &__panel {
+      height: 100%;
+    }
+  }
+}

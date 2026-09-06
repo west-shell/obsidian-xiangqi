@@ -3,6 +3,7 @@ import {
   buildDefaultEditFen,
   DEFAULT_FEN,
   EMPTY_FEN,
+  FILE_VIEW_CLASS,
   getSaveNotation,
   isMoveCheckmate,
   matchMove,
@@ -90,7 +91,7 @@ const ActionsModule = {
       let container: HTMLElement;
       if (isFileHost(host)) {
         container = host.contentEl;
-        container.classList.add("pgn-view");
+        container.classList.add(FILE_VIEW_CLASS);
       } else {
         container = (host as IBlockHost).containerEl.createDiv();
       }
@@ -634,7 +635,7 @@ const ActionsModule = {
         depthSlider.value = String(depthValue);
         const depthLabel = contentEl.createDiv({
           text: String(depthValue),
-          cls: "depth-slider-label",
+          cls: "ct-range-value",
         });
         depthSlider.addEventListener("input", () => {
           depthValue = Number.parseInt(depthSlider.value) || 18;
@@ -649,14 +650,14 @@ const ActionsModule = {
         skillSlider.value = String(skillValue);
         const skillLabel = contentEl.createDiv({
           text: String(skillValue),
-          cls: "depth-slider-label",
+          cls: "ct-range-value",
         });
         skillSlider.addEventListener("input", () => {
           skillValue = Number.parseInt(skillSlider.value) || 20;
           skillLabel.textContent = String(skillValue);
         });
 
-        const bmContainer = contentEl.createDiv("engine-setting-toggle");
+        const bmContainer = contentEl.createDiv("ct-engine-toggle");
         const bmToggle = bmContainer.createEl("input", { type: "checkbox" });
         bmToggle.checked = showBestMove;
         bmContainer.createEl("label", { text: t("engine.showBestMove") });
@@ -664,7 +665,7 @@ const ActionsModule = {
           showBestMove = bmToggle.checked;
         });
 
-        const ponderContainer = contentEl.createDiv("engine-setting-toggle");
+        const ponderContainer = contentEl.createDiv("ct-engine-toggle");
         const ponderToggle = ponderContainer.createEl("input", {
           type: "checkbox",
         });
@@ -674,7 +675,7 @@ const ActionsModule = {
           showPonder = ponderToggle.checked;
         });
 
-        const engineAnnContainer = contentEl.createDiv("engine-setting-toggle");
+        const engineAnnContainer = contentEl.createDiv("ct-engine-toggle");
         const engineAnnToggle = engineAnnContainer.createEl("input", {
           type: "checkbox",
         });
@@ -686,7 +687,7 @@ const ActionsModule = {
           showEngineAnn = engineAnnToggle.checked;
         });
 
-        const boardAnnContainer = contentEl.createDiv("engine-setting-toggle");
+        const boardAnnContainer = contentEl.createDiv("ct-engine-toggle");
         const boardAnnToggle = boardAnnContainer.createEl("input", {
           type: "checkbox",
         });

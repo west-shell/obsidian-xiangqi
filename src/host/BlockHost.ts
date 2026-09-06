@@ -11,6 +11,7 @@ import {
 
 import type { EventBus } from "../core/event-bus";
 import { createBlockModuleRegistry } from "../core/module-system";
+import { BLOCK_CLASS } from "../chess";
 import type ChessPlugin from "../main";
 import type { ISettings } from "../types";
 
@@ -26,7 +27,7 @@ export class BlockHost extends MarkdownRenderChild {
   ) {
     super(containerEl);
     this.settings = this.plugin.settings;
-    containerEl.classList.add("tree-codeblock");
+    containerEl.classList.add(BLOCK_CLASS);
     createBlockModuleRegistry(this);
   }
 

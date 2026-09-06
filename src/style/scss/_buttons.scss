@@ -1,17 +1,14 @@
-// ====== Shared flat icon buttons (.toolbar-btn) ======
-// Used by the main toolbar, tree overlay toolbar, game nav arrows and the
-// move-list toggle. Variant-agnostic: only generic Obsidian tokens here.
+// ============================================================================
+// .ct-btn — shared flat icon buttons and grouped pill controls.
+// Used by the main toolbar, the tree overlay toolbar, game nav arrows and
+// the move list toggle. Variant-agnostic: only generic Obsidian tokens.
+// ============================================================================
 
-button.toolbar-btn {
+button.ct-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   padding: 0;
-  // background: transparent;
-  // border: none;
-  // box-shadow: none;
-  // color: var(--text-muted);
-  // cursor: var(--cursor);
   border-radius: var(--radius-s, 4px);
   transition:
     background-color 0.15s ease,
@@ -20,36 +17,36 @@ button.toolbar-btn {
     filter 0.15s ease;
 }
 
-button.toolbar-btn svg {
+button.ct-btn svg {
   width: 18px;
   height: 18px;
   pointer-events: none;
 }
 
-button.toolbar-btn:hover {
+button.ct-btn:hover {
   background-color: var(--background-modifier-hover);
   color: var(--text-normal);
 }
 
-button.toolbar-btn:active {
+button.ct-btn:active {
   background-color: var(--background-modifier-active-hover);
 }
 
-button.toolbar-btn:disabled {
+button.ct-btn:disabled {
   opacity: 0.4;
   cursor: default;
 }
 
-button.toolbar-btn:focus-visible {
+button.ct-btn:focus-visible {
   outline: none;
   box-shadow: 0 0 0 2px var(--background-modifier-border-focus);
 }
 
-// ====== Grouped pill controls ======
+// ---- Grouped pill -------------------------------------------------------------
 // Related buttons live inside one bordered pill; the pill direction follows
 // its parent toolbar (row in col1, column in col2) via flex-direction inherit.
 
-.toolbar-group {
+.ct-btn-group {
   display: flex;
   flex-direction: inherit;
   align-items: center;
@@ -60,20 +57,70 @@ button.toolbar-btn:focus-visible {
   border-radius: var(--radius-m, 8px);
 }
 
-.toolbar-group button.toolbar-btn {
+.ct-btn-group button.ct-btn {
   width: 22px;
   height: 22px;
 }
 
-.toolbar-group button.toolbar-btn svg {
+.ct-btn-group button.ct-btn svg {
   width: 14px;
   height: 14px;
 }
 
-.toolbar-sep {
+// ---- Separator ----------------------------------------------------------------
+
+.ct-btn-sep {
   flex: none;
   width: 1px;
   align-self: stretch;
   margin: 3px 1px;
   background: var(--background-modifier-border);
+}
+
+// ---- State modifiers -----------------------------------------------------------
+
+// Save button: saved / unsaved-to-file states.
+button.ct-btn--saved {
+  background-color: var(--color-green, hsl(122, 39%, 49%));
+  color: var(--text-on-accent);
+}
+
+button.ct-btn--saved:hover {
+  background-color: var(--color-green, hsl(122, 39%, 49%));
+  filter: brightness(1.1);
+}
+
+button.ct-btn--unsaved {
+  background-color: var(--color-orange, hsl(35, 100%, 50%));
+  color: var(--text-on-accent);
+}
+
+button.ct-btn--unsaved:hover {
+  background-color: var(--color-orange, hsl(35, 100%, 50%));
+  filter: brightness(1.1);
+}
+
+// Engine button: analysis active / busy states.
+button.ct-btn--engine {
+  background-color: var(--interactive-accent);
+  color: var(--text-on-accent);
+}
+
+button.ct-btn--engine:hover {
+  background-color: var(--interactive-accent);
+  filter: brightness(1.15);
+}
+
+button.ct-btn--busy {
+  animation: ct-engine-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes ct-engine-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
 }

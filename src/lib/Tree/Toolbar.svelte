@@ -105,18 +105,18 @@
 
   let analyzeBtnClass = $derived(
     autoAnalyze && engineBusy
-      ? " engine-active engine-busy"
+      ? " ct-btn--engine ct-btn--busy"
       : autoAnalyze
-        ? " engine-active"
+        ? " ct-btn--engine"
         : engineBusy
-          ? " engine-busy"
+          ? " ct-btn--busy"
           : batchAnalyzing
-            ? " engine-active engine-busy"
+            ? " ct-btn--engine ct-btn--busy"
             : "",
   );
 
   let isprotected = $derived(options?.protected || false);
-  let saveBtnClass = $derived(modified ? "unsaved" : "saved");
+  let saveBtnClass = $derived(modified ? "ct-btn--unsaved" : "ct-btn--saved");
 
   const buildNavButtons = (v: number) => [
     { title: t("toolbar.reset", v), icon: "rotate-ccw", event: "reset" },
@@ -429,10 +429,10 @@
   }
 </script>
 
-<div class="toolbar-container chess-layout__toolbar">
+<div class="ct-toolbar ct-layout__toolbar">
   {#each navButtons as { title, icon, event } (event)}
     <button
-      class="toolbar-btn toolbar-single"
+      class="ct-btn"
       aria-label={title}
       use:useSetIcon={icon}
       onclick={() => emitEvent(event)}
@@ -441,7 +441,7 @@
 
   {#each menuButtons as { title, icon, event } (event)}
     <button
-      class="toolbar-btn toolbar-single"
+      class="ct-btn"
       aria-label={title}
       use:useSetIcon={icon}
       onclick={(e) => handleMenuButton(event, e)}
@@ -449,80 +449,17 @@
   {/each}
 
   <button
-    class="toolbar-btn toolbar-single{analyzeBtnClass}"
+    class="ct-btn{analyzeBtnClass}"
     aria-label={t("toolbar.analyzeMenu", _lv)}
     use:useSetIcon={"brain"}
     onclick={(e) => handleAnalyzeMenu(e)}
   ></button>
 
   <button
-    class="toolbar-btn toolbar-single {saveBtnClass}"
+    class="ct-btn {saveBtnClass}"
     aria-label={t("toolbar.save", _lv)}
     use:useSetSaveIcon
     disabled={isprotected}
     onclick={() => emitEvent("save")}
   ></button>
 </div>
-
-<style>
-  .toolbar-btn.saved {
-    background-color: var(--color-green, hsl(122, 39%, 49%));
-    color: var(--text-on-accent);
-  }
-
-  .toolbar-btn.saved:hover {
-    background-color: var(--color-green, hsl(122, 39%, 49%));
-    filter: brightness(1.1);
-  }
-
-  .toolbar-btn.unsaved {
-    background-color: var(--color-orange, hsl(35, 100%, 50%));
-    color: var(--text-on-accent);
-  }
-
-  .toolbar-btn.unsaved:hover {
-    background-color: var(--color-orange, hsl(35, 100%, 50%));
-    filter: brightness(1.1);
-  }
-
-  .toolbar-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0;
-    align-items: center;
-  }
-
-  .toolbar-single {
-    width: 32px;
-    height: 32px;
-  }
-
-  .toolbar-single :global(svg) {
-    width: 20px;
-    height: 20px;
-  }
-
-  .toolbar-btn.engine-active {
-    background-color: var(--interactive-accent);
-    color: var(--text-on-accent);
-  }
-
-  .toolbar-btn.engine-active:hover {
-    background-color: var(--interactive-accent);
-    filter: brightness(1.15);
-  }
-
-  .engine-busy {
-    animation: engine-pulse 1.2s ease-in-out infinite;
-  }
-
-  @keyframes engine-pulse {
-    0%,
-    100% {
-      opacity: 1;
-    }
-    50% {
-      opacity: 0.4;
-    }
-  }
-</style>

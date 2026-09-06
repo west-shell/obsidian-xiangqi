@@ -1,0 +1,23 @@
+// ============================================================================
+// .ct-toolbar — the main button rail (below the board in col1, beside it in
+// col2). Placement and responsive reshaping live in _layout.scss; this file
+// only owns the component's own flex behaviour and button sizing.
+// ============================================================================
+
+.ct-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0;
+
+  .ct-btn {
+    width: 32px;
+    height: 32px;
+  }
+
+  .ct-btn svg {
+    width: 20px;
+    height: 20px;
+  }
+}

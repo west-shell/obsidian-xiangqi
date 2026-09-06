@@ -1,0 +1,28 @@
+// ============================================================================
+// Shared mixins & functions.
+// ============================================================================
+
+@use "tokens" as *;
+
+// Subtract a hair so min-/max-width media queries never overlap.
+@function at-least($width) {
+  @return $width - 0.7px;
+}
+
+@function at-most($width) {
+  @return $width - 0.71px;
+}
+
+// Stacked layout: narrow portrait viewports.
+@mixin col1 {
+  @media (max-width: at-most($breakpoint)) and (orientation: portrait) {
+    @content;
+  }
+}
+
+// Side-by-side layout: wide or landscape viewports.
+@mixin col2 {
+  @media (min-width: at-least($breakpoint)), (orientation: landscape) {
+    @content;
+  }
+}

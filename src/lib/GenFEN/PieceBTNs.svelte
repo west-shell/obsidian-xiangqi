@@ -60,66 +60,17 @@
   }
 </script>
 
-<div class="piece-btn-container chess-layout__piecebtns">
+<div class="ct-layout__palette">
   {#each PIECE_KEYS as key (key)}
     <button
-      class="piece-btn {key === key.toUpperCase() ? 'white' : 'black'}"
-      class:empty={getCount(key) <= 0}
-      class:active={isSelected(key)}
+      class="ct-palette__btn ct-palette__btn--{key === key.toUpperCase()
+        ? 'white'
+        : 'black'}"
+      class:ct-palette__btn--active={isSelected(key)}
+      class:ct-palette__btn--empty={getCount(key) <= 0}
       onclick={() => handleClick(PIECE_CHARS![key])}
     >
       {PIECE_CHARS![key]}
     </button>
   {/each}
 </div>
-
-<style>
-  .piece-btn-container {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(7, 1fr);
-    height: 100%;
-    width: auto;
-    justify-content: left;
-  }
-
-  .piece-btn {
-    padding: 0;
-    margin: 0;
-    border-radius: 4px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1.5px solid rgba(0, 0, 0, 0.35);
-    transition:
-      box-shadow 0.15s,
-      border-color 0.15s;
-    font-size: 1.1em;
-    font-weight: bold;
-  }
-
-  .piece-btn.white {
-    background-color: var(--chess-piece-red, var(--color-red));
-    color: white;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-  }
-
-  .piece-btn.black {
-    background-color: var(--chess-piece-black, var(--color-blue));
-    color: white;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-  }
-
-  .active {
-    border-color: #ffd700;
-    box-shadow: 0 0 0 2px #ffd700;
-    filter: brightness(1.5) saturate(1.4)
-      drop-shadow(0 0 6px rgba(255, 255, 255, 0.6));
-  }
-
-  .empty {
-    pointer-events: none;
-    opacity: 0.35;
-  }
-</style>

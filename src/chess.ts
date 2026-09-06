@@ -25,8 +25,11 @@ import type {
 export const DEFAULT_FEN =
   "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w";
 export const EMPTY_FEN = "4k4/9/9/9/9/9/9/9/9/4K4 w - - 0 1";
-export const LAYOUT_CLASS = "chess-layout";
-export const LAYOUT_CLASS_GENFEN = "chess-layout--genfen";
+export const LAYOUT_CLASS = "ct-layout";
+export const LAYOUT_CLASS_EDIT = "ct-layout--edit";
+export const BLOCK_CLASS = "ct-block";
+export const FILE_VIEW_CLASS = "ct-file-view";
+export const RESIZING_CLASS = "ct-resizing";
 export const WRAP_CLASS = "xq-wrap";
 export const BOARD_ELEMENT = "xq-board";
 export const BOARD_ASPECT_RATIO = 0.9;
@@ -54,7 +57,7 @@ export const PIECE_CHARS: Record<string, string> | null = {
   p: "卒",
 };
 export const GRID_SVG: string | null =
-  `<svg class="xq-grid" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 450 500" width="100%" height="100%" style="position:absolute;top:0;left:0;pointer-events:none"><rect x="20" y="20" width="410" height="460" fill="none" stroke="var(--chess-grid-color,#555)" stroke-width="3"/><rect x="25" y="25" width="400" height="450" fill="none" stroke="var(--chess-grid-color,#555)" stroke-width="1"/><line x1="25" y1="25" x2="425" y2="25" stroke="var(--chess-grid-color,#555)" stroke-width="1"/><line x1="25" y1="75" x2="425" y2="75" stroke="var(--chess-grid-color,#555)" stroke-width="1"/><line x1="25" y1="125" x2="425" y2="125" stroke="var(--chess-grid-color,#555)" stroke-width="1"/><line x1="25" y1="175" x2="425" y2="175" stroke="var(--chess-grid-color,#555)" stroke-width="1"/><line x1="25" y1="225" x2="425" y2="225" stroke="var(--chess-grid-color,#555)" stroke-width="1"/><line x1="25" y1="275" x2="425" y2="275" stroke="var(--chess-grid-color,#555)" stroke-width="1"/><line x1="25" y1="325" x2="425" y2="325" stroke="var(--chess-grid-color,#555)" stroke-width="1"/><line x1="25" y1="375" x2="425" y2="375" stroke="var(--chess-grid-color,#555)" stroke-width="1"/><line x1="25" y1="425" x2="425" y2="425" stroke="var(--chess-grid-color,#555)" stroke-width="1"/><line x1="25" y1="475" x2="425" y2="475" stroke="var(--chess-grid-color,#555)" stroke-width="1"/><line x1="25" y1="25" x2="25" y2="225" stroke="var(--chess-grid-color,#555)" stroke-width="1"/><line x1="75" y1="25" x2="75" y2="225" stroke="var(--chess-grid-color,#555)" stroke-width="1"/><line x1="125" y1="25" x2="125" y2="225" stroke="var(--chess-grid-color,#555)" stroke-width="1"/><line x1="175" y1="25" x2="175" y2="225" stroke="var(--chess-grid-color,#555)" stroke-width="1"/><line x1="225" y1="25" x2="225" y2="225" stroke="var(--chess-grid-color,#555)" stroke-width="1"/><line x1="275" y1="25" x2="275" y2="225" stroke="var(--chess-grid-color,#555)" stroke-width="1"/><line x1="325" y1="25" x2="325" y2="225" stroke="var(--chess-grid-color,#555)" stroke-width="1"/><line x1="375" y1="25" x2="375" y2="225" stroke="var(--chess-grid-color,#555)" stroke-width="1"/><line x1="425" y1="25" x2="425" y2="225" stroke="var(--chess-grid-color,#555)" stroke-width="1"/><line x1="25" y1="275" x2="25" y2="475" stroke="var(--chess-grid-color,#555)" stroke-width="1"/><line x1="75" y1="275" x2="75" y2="475" stroke="var(--chess-grid-color,#555)" stroke-width="1"/><line x1="125" y1="275" x2="125" y2="475" stroke="var(--chess-grid-color,#555)" stroke-width="1"/><line x1="175" y1="275" x2="175" y2="475" stroke="var(--chess-grid-color,#555)" stroke-width="1"/><line x1="225" y1="275" x2="225" y2="475" stroke="var(--chess-grid-color,#555)" stroke-width="1"/><line x1="275" y1="275" x2="275" y2="475" stroke="var(--chess-grid-color,#555)" stroke-width="1"/><line x1="325" y1="275" x2="325" y2="475" stroke="var(--chess-grid-color,#555)" stroke-width="1"/><line x1="375" y1="275" x2="375" y2="475" stroke="var(--chess-grid-color,#555)" stroke-width="1"/><line x1="425" y1="275" x2="425" y2="475" stroke="var(--chess-grid-color,#555)" stroke-width="1"/><line x1="175" y1="25" x2="275" y2="125" stroke="var(--chess-grid-color,#555)" stroke-width="1"/><line x1="275" y1="25" x2="175" y2="125" stroke="var(--chess-grid-color,#555)" stroke-width="1"/><line x1="175" y1="375" x2="275" y2="475" stroke="var(--chess-grid-color,#555)" stroke-width="1"/><line x1="275" y1="375" x2="175" y2="475" stroke="var(--chess-grid-color,#555)" stroke-width="1"/><text x="100" y="250" font-size="30" fill="var(--chess-grid-color,#555)" text-anchor="middle" dominant-baseline="middle" font-family="serif" dy="0.1em">楚 河</text><text x="350" y="250" font-size="30" fill="var(--chess-grid-color,#555)" text-anchor="middle" dominant-baseline="middle" font-family="serif" dy="0.1em">漢 界</text><path d="M 71,113.5 v 7.5 h -7.5 M 79,113.5 v 7.5 h 7.5 M 79,136.5 v -7.5 h 7.5 M 71,136.5 v -7.5 h -7.5" stroke="var(--chess-grid-color,#555)" stroke-width="1" fill="none"/><path d="M 371,113.5 v 7.5 h -7.5 M 379,113.5 v 7.5 h 7.5 M 379,136.5 v -7.5 h 7.5 M 371,136.5 v -7.5 h -7.5" stroke="var(--chess-grid-color,#555)" stroke-width="1" fill="none"/><path d="M 71,363.5 v 7.5 h -7.5 M 79,363.5 v 7.5 h 7.5 M 79,386.5 v -7.5 h 7.5 M 71,386.5 v -7.5 h -7.5" stroke="var(--chess-grid-color,#555)" stroke-width="1" fill="none"/><path d="M 371,363.5 v 7.5 h -7.5 M 379,363.5 v 7.5 h 7.5 M 379,386.5 v -7.5 h 7.5 M 371,386.5 v -7.5 h -7.5" stroke="var(--chess-grid-color,#555)" stroke-width="1" fill="none"/><path d="M 121,163.5 v 7.5 h -7.5 M 129,163.5 v 7.5 h 7.5 M 129,186.5 v -7.5 h 7.5 M 121,186.5 v -7.5 h -7.5" stroke="var(--chess-grid-color,#555)" stroke-width="1" fill="none"/><path d="M 221,163.5 v 7.5 h -7.5 M 229,163.5 v 7.5 h 7.5 M 229,186.5 v -7.5 h 7.5 M 221,186.5 v -7.5 h -7.5" stroke="var(--chess-grid-color,#555)" stroke-width="1" fill="none"/><path d="M 321,163.5 v 7.5 h -7.5 M 329,163.5 v 7.5 h 7.5 M 329,186.5 v -7.5 h 7.5 M 321,186.5 v -7.5 h -7.5" stroke="var(--chess-grid-color,#555)" stroke-width="1" fill="none"/><path d="M 121,313.5 v 7.5 h -7.5 M 129,313.5 v 7.5 h 7.5 M 129,336.5 v -7.5 h 7.5 M 121,336.5 v -7.5 h -7.5" stroke="var(--chess-grid-color,#555)" stroke-width="1" fill="none"/><path d="M 221,313.5 v 7.5 h -7.5 M 229,313.5 v 7.5 h 7.5 M 229,336.5 v -7.5 h 7.5 M 221,336.5 v -7.5 h -7.5" stroke="var(--chess-grid-color,#555)" stroke-width="1" fill="none"/><path d="M 321,313.5 v 7.5 h -7.5 M 329,313.5 v 7.5 h 7.5 M 329,336.5 v -7.5 h 7.5 M 321,336.5 v -7.5 h -7.5" stroke="var(--chess-grid-color,#555)" stroke-width="1" fill="none"/><path d="M 29,163.5 v 7.5 h 7.5 M 29,186.5 v -7.5 h 7.5" stroke="var(--chess-grid-color,#555)" stroke-width="1" fill="none"/><path d="M 29,313.5 v 7.5 h 7.5 M 29,336.5 v -7.5 h 7.5" stroke="var(--chess-grid-color,#555)" stroke-width="1" fill="none"/><path d="M 421,163.5 v 7.5 h -7.5 M 421,186.5 v -7.5 h -7.5" stroke="var(--chess-grid-color,#555)" stroke-width="1" fill="none"/><path d="M 421,313.5 v 7.5 h -7.5 M 421,336.5 v -7.5 h -7.5" stroke="var(--chess-grid-color,#555)" stroke-width="1" fill="none"/></svg>`;
+  `<svg class="xq-grid" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 450 500" width="100%" height="100%" style="position:absolute;top:0;left:0;pointer-events:none"><rect x="20" y="20" width="410" height="460" fill="none" stroke="var(--ct-grid-color,#555)" stroke-width="3"/><rect x="25" y="25" width="400" height="450" fill="none" stroke="var(--ct-grid-color,#555)" stroke-width="1"/><line x1="25" y1="25" x2="425" y2="25" stroke="var(--ct-grid-color,#555)" stroke-width="1"/><line x1="25" y1="75" x2="425" y2="75" stroke="var(--ct-grid-color,#555)" stroke-width="1"/><line x1="25" y1="125" x2="425" y2="125" stroke="var(--ct-grid-color,#555)" stroke-width="1"/><line x1="25" y1="175" x2="425" y2="175" stroke="var(--ct-grid-color,#555)" stroke-width="1"/><line x1="25" y1="225" x2="425" y2="225" stroke="var(--ct-grid-color,#555)" stroke-width="1"/><line x1="25" y1="275" x2="425" y2="275" stroke="var(--ct-grid-color,#555)" stroke-width="1"/><line x1="25" y1="325" x2="425" y2="325" stroke="var(--ct-grid-color,#555)" stroke-width="1"/><line x1="25" y1="375" x2="425" y2="375" stroke="var(--ct-grid-color,#555)" stroke-width="1"/><line x1="25" y1="425" x2="425" y2="425" stroke="var(--ct-grid-color,#555)" stroke-width="1"/><line x1="25" y1="475" x2="425" y2="475" stroke="var(--ct-grid-color,#555)" stroke-width="1"/><line x1="25" y1="25" x2="25" y2="225" stroke="var(--ct-grid-color,#555)" stroke-width="1"/><line x1="75" y1="25" x2="75" y2="225" stroke="var(--ct-grid-color,#555)" stroke-width="1"/><line x1="125" y1="25" x2="125" y2="225" stroke="var(--ct-grid-color,#555)" stroke-width="1"/><line x1="175" y1="25" x2="175" y2="225" stroke="var(--ct-grid-color,#555)" stroke-width="1"/><line x1="225" y1="25" x2="225" y2="225" stroke="var(--ct-grid-color,#555)" stroke-width="1"/><line x1="275" y1="25" x2="275" y2="225" stroke="var(--ct-grid-color,#555)" stroke-width="1"/><line x1="325" y1="25" x2="325" y2="225" stroke="var(--ct-grid-color,#555)" stroke-width="1"/><line x1="375" y1="25" x2="375" y2="225" stroke="var(--ct-grid-color,#555)" stroke-width="1"/><line x1="425" y1="25" x2="425" y2="225" stroke="var(--ct-grid-color,#555)" stroke-width="1"/><line x1="25" y1="275" x2="25" y2="475" stroke="var(--ct-grid-color,#555)" stroke-width="1"/><line x1="75" y1="275" x2="75" y2="475" stroke="var(--ct-grid-color,#555)" stroke-width="1"/><line x1="125" y1="275" x2="125" y2="475" stroke="var(--ct-grid-color,#555)" stroke-width="1"/><line x1="175" y1="275" x2="175" y2="475" stroke="var(--ct-grid-color,#555)" stroke-width="1"/><line x1="225" y1="275" x2="225" y2="475" stroke="var(--ct-grid-color,#555)" stroke-width="1"/><line x1="275" y1="275" x2="275" y2="475" stroke="var(--ct-grid-color,#555)" stroke-width="1"/><line x1="325" y1="275" x2="325" y2="475" stroke="var(--ct-grid-color,#555)" stroke-width="1"/><line x1="375" y1="275" x2="375" y2="475" stroke="var(--ct-grid-color,#555)" stroke-width="1"/><line x1="425" y1="275" x2="425" y2="475" stroke="var(--ct-grid-color,#555)" stroke-width="1"/><line x1="175" y1="25" x2="275" y2="125" stroke="var(--ct-grid-color,#555)" stroke-width="1"/><line x1="275" y1="25" x2="175" y2="125" stroke="var(--ct-grid-color,#555)" stroke-width="1"/><line x1="175" y1="375" x2="275" y2="475" stroke="var(--ct-grid-color,#555)" stroke-width="1"/><line x1="275" y1="375" x2="175" y2="475" stroke="var(--ct-grid-color,#555)" stroke-width="1"/><text x="100" y="250" font-size="30" fill="var(--ct-grid-color,#555)" text-anchor="middle" dominant-baseline="middle" font-family="serif" dy="0.1em">楚 河</text><text x="350" y="250" font-size="30" fill="var(--ct-grid-color,#555)" text-anchor="middle" dominant-baseline="middle" font-family="serif" dy="0.1em">漢 界</text><path d="M 71,113.5 v 7.5 h -7.5 M 79,113.5 v 7.5 h 7.5 M 79,136.5 v -7.5 h 7.5 M 71,136.5 v -7.5 h -7.5" stroke="var(--ct-grid-color,#555)" stroke-width="1" fill="none"/><path d="M 371,113.5 v 7.5 h -7.5 M 379,113.5 v 7.5 h 7.5 M 379,136.5 v -7.5 h 7.5 M 371,136.5 v -7.5 h -7.5" stroke="var(--ct-grid-color,#555)" stroke-width="1" fill="none"/><path d="M 71,363.5 v 7.5 h -7.5 M 79,363.5 v 7.5 h 7.5 M 79,386.5 v -7.5 h 7.5 M 71,386.5 v -7.5 h -7.5" stroke="var(--ct-grid-color,#555)" stroke-width="1" fill="none"/><path d="M 371,363.5 v 7.5 h -7.5 M 379,363.5 v 7.5 h 7.5 M 379,386.5 v -7.5 h 7.5 M 371,386.5 v -7.5 h -7.5" stroke="var(--ct-grid-color,#555)" stroke-width="1" fill="none"/><path d="M 121,163.5 v 7.5 h -7.5 M 129,163.5 v 7.5 h 7.5 M 129,186.5 v -7.5 h 7.5 M 121,186.5 v -7.5 h -7.5" stroke="var(--ct-grid-color,#555)" stroke-width="1" fill="none"/><path d="M 221,163.5 v 7.5 h -7.5 M 229,163.5 v 7.5 h 7.5 M 229,186.5 v -7.5 h 7.5 M 221,186.5 v -7.5 h -7.5" stroke="var(--ct-grid-color,#555)" stroke-width="1" fill="none"/><path d="M 321,163.5 v 7.5 h -7.5 M 329,163.5 v 7.5 h 7.5 M 329,186.5 v -7.5 h 7.5 M 321,186.5 v -7.5 h -7.5" stroke="var(--ct-grid-color,#555)" stroke-width="1" fill="none"/><path d="M 121,313.5 v 7.5 h -7.5 M 129,313.5 v 7.5 h 7.5 M 129,336.5 v -7.5 h 7.5 M 121,336.5 v -7.5 h -7.5" stroke="var(--ct-grid-color,#555)" stroke-width="1" fill="none"/><path d="M 221,313.5 v 7.5 h -7.5 M 229,313.5 v 7.5 h 7.5 M 229,336.5 v -7.5 h 7.5 M 221,336.5 v -7.5 h -7.5" stroke="var(--ct-grid-color,#555)" stroke-width="1" fill="none"/><path d="M 321,313.5 v 7.5 h -7.5 M 329,313.5 v 7.5 h 7.5 M 329,336.5 v -7.5 h 7.5 M 321,336.5 v -7.5 h -7.5" stroke="var(--ct-grid-color,#555)" stroke-width="1" fill="none"/><path d="M 29,163.5 v 7.5 h 7.5 M 29,186.5 v -7.5 h 7.5" stroke="var(--ct-grid-color,#555)" stroke-width="1" fill="none"/><path d="M 29,313.5 v 7.5 h 7.5 M 29,336.5 v -7.5 h 7.5" stroke="var(--ct-grid-color,#555)" stroke-width="1" fill="none"/><path d="M 421,163.5 v 7.5 h -7.5 M 421,186.5 v -7.5 h -7.5" stroke="var(--ct-grid-color,#555)" stroke-width="1" fill="none"/><path d="M 421,313.5 v 7.5 h -7.5 M 421,336.5 v -7.5 h -7.5" stroke="var(--ct-grid-color,#555)" stroke-width="1" fill="none"/></svg>`;
 export const TREE_LAYOUT_SPACING = 0.4;
 export const TREE_SPACING_X = 22;
 export const NODE_CHAR_DY = 0;
@@ -131,8 +134,8 @@ export function getNodeWidth(
 }
 
 export function getNodeFill(side: string | null): string {
-  if (side === "white") return "var(--chess-piece-red, var(--color-red))";
-  if (side === "black") return "var(--chess-piece-black, var(--color-blue))";
+  if (side === "white") return "var(--ct-piece-primary, var(--color-red))";
+  if (side === "black") return "var(--ct-piece-secondary, var(--color-blue))";
   return "green";
 }
 
@@ -141,8 +144,10 @@ export function getNodeTextColor(side: string | null): string {
 }
 
 export function getMoveListSideClass(side: string | null): string {
-  if (side === "white" || side === "red") return "red";
-  return "black";
+  if (side === "white" || side === "red") {
+    return "ct-moves__move--white";
+  }
+  return "ct-moves__move--black";
 }
 
 export function getStartLabel(): string {
@@ -223,29 +228,29 @@ export function applyThemeCSSVars(
 ): void {
   const boardScale = (settings.zoom / 100) * 0.75 + 0.25;
   const body = activeDocument.body.style;
-  body.setProperty("--chess-board-scale", `${boardScale}`);
-  body.setProperty("--chess-font-size", `${settings.fontSize}px`);
+  body.setProperty("--ct-board-scale", `${boardScale}`);
+  body.setProperty("--ct-font-size", `${settings.fontSize}px`);
 
   let bg = themeData.bg;
   if (app && /\.(png|jpe?g|gif|webp|svg|bmp)$/i.test(bg)) {
     const url = app.vault.adapter.getResourcePath(
       app.vault.configDir + "/" + bg,
     );
-    body.setProperty("--chess-board-bg-image", `url('${url}')`);
-    body.setProperty("--chess-board-bg-color", "#333");
+    body.setProperty("--ct-board-bg-image", `url('${url}')`);
+    body.setProperty("--ct-board-bg", "#333");
   } else {
-    body.setProperty("--chess-board-bg-color", bg);
-    body.removeProperty("--chess-board-bg-image");
+    body.setProperty("--ct-board-bg", bg);
+    body.removeProperty("--ct-board-bg-image");
   }
 
   if (themeData.texture) {
-    body.setProperty("--chess-board-texture", themeData.texture);
+    body.setProperty("--ct-board-texture", themeData.texture);
   } else {
-    body.removeProperty("--chess-board-texture");
+    body.removeProperty("--ct-board-texture");
   }
   if (themeData.grid) {
     body.setProperty(
-      "--chess-grid-color",
+      "--ct-grid-color",
       themeData.grid === "dark"
         ? "#555"
         : themeData.grid === "light"
@@ -253,15 +258,15 @@ export function applyThemeCSSVars(
           : "transparent",
     );
   } else {
-    body.removeProperty("--chess-grid-color");
+    body.removeProperty("--ct-grid-color");
   }
-  body.setProperty("--chess-board-margin-top", `${settings.boardMarginTop}px`);
+  body.setProperty("--ct-board-margin-top", `${settings.boardMarginTop}px`);
   body.setProperty(
-    "--chess-board-margin-bottom",
+    "--ct-board-margin-bottom",
     `${settings.boardMarginBottom}px`,
   );
   body.setProperty(
-    "--chess-coords-display",
+    "--ct-coords-display",
     settings.showCoordinateLabels ? "flex" : "none",
   );
 }

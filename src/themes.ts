@@ -135,6 +135,6 @@ export function applyThemes(settings: ISettings, app?: App) {
   const t = themes[settings.theme] ?? themes.light;
   applyThemeCSSVars(settings, t, app);
   const body = activeDocument.body.style;
-  body.setProperty("--chess-piece-red", t.red);
-  body.setProperty("--chess-piece-black", t.black);
+  body.setProperty("--ct-piece-primary", t.red);
+  body.setProperty("--ct-piece-secondary", t.black);
 }

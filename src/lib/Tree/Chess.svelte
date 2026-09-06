@@ -19,7 +19,7 @@
     getMoveDest,
     isMoveCheck,
     LAYOUT_CLASS,
-    LAYOUT_CLASS_GENFEN,
+    LAYOUT_CLASS_EDIT,
     type Move,
     type Piece,
     type Square,
@@ -223,7 +223,7 @@
 </script>
 
 {#if editing}
-  <div class="{LAYOUT_CLASS} {LAYOUT_CLASS_GENFEN}">
+  <div class="{LAYOUT_CLASS} {LAYOUT_CLASS_EDIT}">
     <Board
       {settings}
       {fen}
