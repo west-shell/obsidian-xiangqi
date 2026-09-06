@@ -63,50 +63,53 @@
       height: #{$palette-col-cqh};
     }
   }
-}
 
-.ct-palette__btn {
-  padding: 0;
-  margin: 0;
-  border-radius: 4px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1.5px solid rgba(0, 0, 0, 0.35);
-  transition:
-    box-shadow 0.15s,
-    border-color 0.15s;
-  color: white;
-}
+  // Container-scoped + `button.`-qualified so the palette always outranks
+  // host button styling (the pre-refactor scoped-Svelte selectors were
+  // 3 classes deep; a bare class rule loses that fight).
+  button.ct-palette__btn {
+    padding: 0;
+    margin: 0;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1.5px solid rgba(0, 0, 0, 0.35);
+    transition:
+      box-shadow 0.15s,
+      border-color 0.15s;
+    color: white;
 
-.ct-palette__btn svg {
-  width: 18px;
-  height: 18px;
-}
+    svg {
+      width: 18px;
+      height: 18px;
+    }
+  }
 
-.ct-palette__btn--white {
-  background-color: var(--ct-piece-primary);
-  color: black;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-}
+  button.ct-palette__btn--white {
+    background-color: var(--ct-piece-primary);
+    color: black;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  }
 
-.ct-palette__btn--black {
-  background-color: var(--ct-piece-secondary);
-  color: white;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-}
+  button.ct-palette__btn--black {
+    background-color: var(--ct-piece-secondary);
+    color: white;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  }
 
-.ct-palette__btn--active {
-  border-color: #ffd700;
-  box-shadow: 0 0 0 2px #ffd700;
-  filter: brightness(1.5) saturate(1.4)
-    drop-shadow(0 0 6px rgba(255, 255, 255, 0.6));
-}
+  button.ct-palette__btn--active {
+    border-color: #ffd700;
+    box-shadow: 0 0 0 2px #ffd700;
+    filter: brightness(1.5) saturate(1.4)
+      drop-shadow(0 0 6px rgba(255, 255, 255, 0.6));
+  }
 
-.ct-palette__btn--empty {
-  pointer-events: none;
-  opacity: 0.35;
+  button.ct-palette__btn--empty {
+    pointer-events: none;
+    opacity: 0.35;
+  }
 }
 
 // ---- Editor tools (.ct-genfen) ---------------------------------------------------
@@ -139,8 +142,8 @@
   opacity: 0.7;
 }
 
-// Side-to-move toggle.
-.ct-genfen__turn {
+// Side-to-move toggle (container-scoped + `button.`-qualified, see palette).
+.ct-genfen button.ct-genfen__turn {
   padding: 2px 12px;
   border: 1.5px solid rgba(0, 0, 0, 0.35);
   border-radius: 4px;
@@ -152,19 +155,19 @@
   white-space: nowrap;
 }
 
-.ct-genfen__turn--white {
+.ct-genfen button.ct-genfen__turn--white {
   background-color: var(--ct-piece-primary);
   color: black;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
-.ct-genfen__turn--black {
+.ct-genfen button.ct-genfen__turn--black {
   background-color: var(--ct-piece-secondary);
   color: white;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
-.ct-genfen__turn:hover {
+.ct-genfen button.ct-genfen__turn:hover {
   filter: brightness(1.1);
 }
 
@@ -238,7 +241,7 @@
   align-content: start;
 }
 
-.ct-genfen__action {
+.ct-genfen button.ct-genfen__action {
   padding: 6px 12px;
   border: 1px solid var(--background-modifier-border, #ccc);
   border-radius: 4px;
@@ -249,17 +252,17 @@
   transition: background 0.15s;
 }
 
-.ct-genfen__action:hover {
+.ct-genfen button.ct-genfen__action:hover {
   background: var(--background-modifier-hover, #e0e0e0);
 }
 
-.ct-genfen__action--save {
+.ct-genfen button.ct-genfen__action--save {
   background: var(--interactive-accent, #6a9fb5);
   color: var(--text-on-accent, #fff);
   border-color: var(--interactive-accent, #6a9fb5);
   font-weight: 600;
 }
 
-.ct-genfen__action--save:hover {
+.ct-genfen button.ct-genfen__action--save:hover {
   opacity: 0.9;
 }
