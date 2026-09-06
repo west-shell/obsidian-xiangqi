@@ -144,10 +144,19 @@
     min-height: 32px;
   }
 
-  // Main toolbar matches the board width, centered.
-  .ct-toolbar {
+  // Main toolbar matches the board width, centered. Re-qualified as
+  // `.ct-layout__toolbar.ct-toolbar` to outrank the block-host rule above,
+  // which ties the width to the global board scale.
+  .ct-layout__toolbar.ct-toolbar {
     width: min(100cqw, #{$pgn-col1-board-height});
     align-self: center;
+    flex-wrap: wrap;
+
+    .ct-btn {
+      min-width: auto;
+      height: 32px;
+      aspect-ratio: auto;
+    }
   }
 
   &__panel {
@@ -189,11 +198,13 @@
       align-self: stretch;
     }
 
-    // Restore the plain wrapped toolbar in the file view.
-    .ct-toolbar {
+    // Restore the plain wrapped toolbar in the file view — re-qualified to
+    // outrank the block-host col2 rule capping it at --ct-col2-size.
+    .ct-layout__toolbar.ct-toolbar {
       width: auto;
       align-self: flex-start;
       flex-wrap: wrap;
+      max-height: none;
     }
 
     &__panel {
