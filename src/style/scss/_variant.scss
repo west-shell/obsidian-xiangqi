@@ -55,20 +55,6 @@
   @include bracket-frame(var(--ct-selected-color, #14551e));
 }
 
-// Auto-theme highlight colors, switched by Obsidian appearance. Values mirror
-// the *_light / *_dark presets in themes.ts (auto references --ct-auto-*).
-body.theme-light {
-  --ct-auto-selected: #14551e;
-  --ct-auto-lastmove: #0d47a1;
-  --ct-auto-nextmove: #14551e;
-}
-
-body.theme-dark {
-  --ct-auto-selected: #66bb6a;
-  --ct-auto-lastmove: #7986cb;
-  --ct-auto-nextmove: #66bb6a;
-}
-
 // ---- Variant-tunable values ---------------------------------------------------
 
 // Board aspect ratio (width / height): chess = 1, xiangqi = 0.9

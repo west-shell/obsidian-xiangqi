@@ -28,18 +28,20 @@ interface ThemeDef extends ThemeData {
 const tree_red = "#861818";
 const tree_black = "#0A1C3A";
 const themes: Record<string, ThemeDef> = {
-  // Auto follows Obsidian's appearance: the --ct-auto-* vars are defined per
-  // body.theme-light / body.theme-dark in scss/_variant.scss.
+  // Auto follows Obsidian's appearance: applyThemes() swaps in the light/dark
+  // theme's colors and grid at apply time (re-applied on "css-change"); only
+  // bg (Obsidian-native) comes from here. The color fields are
+  // type-required placeholders.
   auto: {
     name: "Auto",
     nameZh: "自动",
     bg: "var(--background-primary-alt)",
     grid: "dark",
-    red: "var(--xq-auto-red)",
-    black: "var(--xq-auto-black)",
-    selected: "var(--ct-auto-selected)",
-    lastMove: "var(--ct-auto-lastmove)",
-    nextMove: "var(--ct-auto-nextmove)",
+    red: tree_red,
+    black: tree_black,
+    selected: selected_light,
+    lastMove: lastMove_light,
+    nextMove: nextMove_light,
   },
   light: {
     name: "Light",
@@ -169,7 +171,13 @@ export async function ensureBoardAssets(app: App): Promise<void> {
 }
 
 export function applyThemes(settings: ISettings, app?: App) {
-  const t = themes[settings.theme] ?? themes.light;
+  let t = themes[settings.theme] ?? themes.light;
+  if (settings.theme === "auto") {
+    const base = activeDocument.body.classList.contains("theme-dark")
+      ? themes.dark
+      : themes.light;
+    t = { ...base, bg: themes.auto.bg };
+  }
   applyThemeCSSVars(settings, t, app);
   const body = activeDocument.body.style;
   body.setProperty("--ct-piece-primary", t.red);
@@ -178,8 +186,7 @@ export function applyThemes(settings: ISettings, app?: App) {
   body.setProperty("--ct-lastmove-color", t.lastMove);
   body.setProperty("--ct-nextmove-color", t.nextMove);
   // xiangqiground consumes RGB-triplet vars for its built-in markers
-  // (last-move block/bracket, move-dest dots). Non-hex values (e.g. the
-  // auto theme's var() indirection) pass through unchanged.
+  // (last-move block/bracket, move-dest dots).
   body.setProperty("--xq-last-move-orig-color", hexToRgbTriplet(t.lastMove));
   body.setProperty("--xq-move-dest-color", hexToRgbTriplet(t.nextMove));
 }
