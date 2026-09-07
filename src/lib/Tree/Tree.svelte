@@ -153,7 +153,7 @@
   let handleSliderMouseUp: (() => void) | null = null;
   let handleSliderTouchMove: ((evt: TouchEvent) => void) | null = null;
   let handleSliderTouchEnd: (() => void) | null = null;
-  let intersectionObserver: IntersectionObserver | null = null;
+  let resizeObserver: ResizeObserver | null = null;
   let needsInitialReset = $state(false);
   let destroyed = false;
 
@@ -180,9 +180,9 @@
       activeDocument.removeEventListener("touchmove", handleSliderTouchMove);
     if (handleSliderTouchEnd)
       activeDocument.removeEventListener("touchend", handleSliderTouchEnd);
-    if (intersectionObserver) {
-      intersectionObserver.disconnect();
-      intersectionObserver = null;
+    if (resizeObserver) {
+      resizeObserver.disconnect();
+      resizeObserver = null;
     }
   });
 
@@ -680,9 +680,9 @@
       if (!svgEl || svgEl.clientWidth === 0 || svgEl.clientHeight === 0) return;
       if (needsInitialReset) {
         needsInitialReset = false;
-        if (intersectionObserver) {
-          intersectionObserver.disconnect();
-          intersectionObserver = null;
+        if (resizeObserver) {
+          resizeObserver.disconnect();
+          resizeObserver = null;
         }
         updateZoomExtent();
         d3.select(svgEl).call(zoomBehavior);
@@ -700,26 +700,24 @@
         if (destroyed || !svgEl) return;
         if (svgEl.clientWidth === 0 || svgEl.clientHeight === 0) {
           needsInitialReset = true;
-          intersectionObserver = new IntersectionObserver(
-            (entries) => {
-              for (const entry of entries) {
-                if (entry.isIntersecting && needsInitialReset) {
-                  needsInitialReset = false;
-                  requestAnimationFrame(() => {
-                    if (destroyed) return;
-                    updateZoomExtent();
-                    d3.select(svgEl!).call(zoomBehavior!);
-                    resetView();
-                    if (textareaEl) adjustTextareaHeight();
-                  });
-                  intersectionObserver!.disconnect();
-                  intersectionObserver = null;
-                }
+          resizeObserver = new ResizeObserver(() => {
+            if (destroyed || !needsInitialReset || !svgEl) return;
+            if (svgEl.clientWidth === 0 || svgEl.clientHeight === 0) return;
+            requestAnimationFrame(() => {
+              if (destroyed || !svgEl) return;
+              if (svgEl.clientWidth === 0 || svgEl.clientHeight === 0) return;
+              needsInitialReset = false;
+              if (resizeObserver) {
+                resizeObserver.disconnect();
+                resizeObserver = null;
               }
-            },
-            { threshold: 0.1 },
-          );
-          intersectionObserver.observe(svgEl);
+              updateZoomExtent();
+              d3.select(svgEl).call(zoomBehavior!);
+              resetView();
+              if (textareaEl) adjustTextareaHeight();
+            });
+          });
+          resizeObserver.observe(svgEl);
           return;
         }
         updateZoomExtent();
