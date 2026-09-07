@@ -54,10 +54,7 @@
         class="ct-genfen__turn ct-genfen__turn--{_turn === 'b'
           ? 'black'
           : 'white'}"
-        onclick={toggleTurn}
-        >{_turn === "b"
-          ? t("genfen.black_turn", _lv)
-          : t("genfen.white_turn", _lv)}</button
+        onclick={toggleTurn}>{t("genfen.side_to_move", _lv)}</button
       >
     </div>
   </div>

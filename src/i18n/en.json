@@ -84,8 +84,6 @@
   "genfen.start": "Start position",
   "genfen.flip": "Flip board",
   "genfen.side_to_move": "Side to move",
-  "genfen.white_turn": "White to move",
-  "genfen.black_turn": "Black to move",
   "annotation.w+": "Advantage",
   "annotation.b+": "Disadvantage",
   "annotation.eq": "Equal",
