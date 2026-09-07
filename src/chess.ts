@@ -147,7 +147,7 @@ export function getMoveListSideClass(side: string | null): string {
 }
 
 export function getStartLabel(): string {
-  return "= 开局 =";
+  return "==开局==";
 }
 
 // ========== FEN Build Functions ==========
