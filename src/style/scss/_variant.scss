@@ -12,19 +12,18 @@
 // Corner-bracket frame (four L-shaped marks) — same visual language as
 // xiangqiground's last-move destination square. Reusable for the selected
 // square or custom highlights; the color is passed in separately.
-//   $rgb:   RGB triplet — literal "R, G, B" or var() holding one
-//   $alpha: 0–1 opacity of the marks
-// Emitted via interpolation so Sass does not evaluate rgba().
-@mixin bracket-frame($rgb, $alpha: 1) {
+//   $color: full color — hex literal or var() reference
+// Emitted via interpolation so Sass does not evaluate the value.
+@mixin bracket-frame($color) {
   background:
-    linear-gradient(rgba(#{$rgb}, #{$alpha}) 0 0) no-repeat 0 0 / 20% 4px,
-    linear-gradient(rgba(#{$rgb}, #{$alpha}) 0 0) no-repeat 0 0 / 4px 20%,
-    linear-gradient(rgba(#{$rgb}, #{$alpha}) 0 0) no-repeat 100% 0 / 20% 4px,
-    linear-gradient(rgba(#{$rgb}, #{$alpha}) 0 0) no-repeat 100% 0 / 4px 20%,
-    linear-gradient(rgba(#{$rgb}, #{$alpha}) 0 0) no-repeat 0 100% / 20% 4px,
-    linear-gradient(rgba(#{$rgb}, #{$alpha}) 0 0) no-repeat 0 100% / 4px 20%,
-    linear-gradient(rgba(#{$rgb}, #{$alpha}) 0 0) no-repeat 100% 100% / 20% 4px,
-    linear-gradient(rgba(#{$rgb}, #{$alpha}) 0 0) no-repeat 100% 100% / 4px 20%;
+    linear-gradient(#{$color} 0 0) no-repeat 0 0 / 20% 4px,
+    linear-gradient(#{$color} 0 0) no-repeat 0 0 / 4px 20%,
+    linear-gradient(#{$color} 0 0) no-repeat 100% 0 / 20% 4px,
+    linear-gradient(#{$color} 0 0) no-repeat 100% 0 / 4px 20%,
+    linear-gradient(#{$color} 0 0) no-repeat 0 100% / 20% 4px,
+    linear-gradient(#{$color} 0 0) no-repeat 0 100% / 4px 20%,
+    linear-gradient(#{$color} 0 0) no-repeat 100% 100% / 20% 4px,
+    linear-gradient(#{$color} 0 0) no-repeat 100% 100% / 4px 20%;
   z-index: 1;
 }
 
@@ -50,10 +49,24 @@
 }
 
 // Selected square: corner-bracket frame (mixin above) in the theme-provided
-// color (themes.ts writes --ct-selected-color as an RGB triplet; the
-// fallback keeps the library default green). Fully opaque.
+// color (themes.ts writes --ct-selected-color as a full color; the fallback
+// mirrors the selected_light preset in themes.ts). Fully opaque.
 .xq-wrap xq-board square.selected {
-  @include bracket-frame(var(--ct-selected-color, 20, 85, 30), 1);
+  @include bracket-frame(var(--ct-selected-color, #14551e));
+}
+
+// Auto-theme highlight colors, switched by Obsidian appearance. Values mirror
+// the *_light / *_dark presets in themes.ts (auto references --ct-auto-*).
+body.theme-light {
+  --ct-auto-selected: #14551e;
+  --ct-auto-lastmove: #0d47a1;
+  --ct-auto-nextmove: #14551e;
+}
+
+body.theme-dark {
+  --ct-auto-selected: #66bb6a;
+  --ct-auto-lastmove: #7986cb;
+  --ct-auto-nextmove: #66bb6a;
 }
 
 // ---- Variant-tunable values ---------------------------------------------------

@@ -5,18 +5,31 @@ import woodB64 from "../assets/wood.jpg?base64";
 
 import type { ISettings } from "./types";
 import { applyThemeCSSVars, type ThemeData } from "./chess";
+import { hexToRgbTriplet } from "./utils/utils";
+
+// Highlight color presets — the suffix names the board it suits:
+// *_light for light boards (dark marks), *_dark for dark boards (light marks).
+const selected_light = "#14551e";
+const selected_dark = "#66bb6a";
+const lastMove_light = "#0d47a1";
+const lastMove_dark = "#7986cb";
+const nextMove_light = "#14551e";
+const nextMove_dark = "#66bb6a";
 
 interface ThemeDef extends ThemeData {
   red: string;
   black: string;
-  /** Selected-square highlight color, RGB triplet "R, G, B" */
+  /** Highlight colors: a preset constant or a custom value. */
   selected: string;
+  lastMove: string;
+  nextMove: string;
 }
 
 const tree_red = "#861818";
 const tree_black = "#0A1C3A";
-const sel_green = "20, 85, 30";
 const themes: Record<string, ThemeDef> = {
+  // Auto follows Obsidian's appearance: the --ct-auto-* vars are defined per
+  // body.theme-light / body.theme-dark in scss/_variant.scss.
   auto: {
     name: "Auto",
     nameZh: "自动",
@@ -24,7 +37,9 @@ const themes: Record<string, ThemeDef> = {
     grid: "dark",
     red: "var(--xq-auto-red)",
     black: "var(--xq-auto-black)",
-    selected: "255, 152, 0",
+    selected: "var(--ct-auto-selected)",
+    lastMove: "var(--ct-auto-lastmove)",
+    nextMove: "var(--ct-auto-nextmove)",
   },
   light: {
     name: "Light",
@@ -33,7 +48,9 @@ const themes: Record<string, ThemeDef> = {
     grid: "dark",
     red: tree_red,
     black: tree_black,
-    selected: sel_green,
+    selected: selected_light,
+    lastMove: lastMove_light,
+    nextMove: nextMove_light,
   },
   dark: {
     name: "Dark",
@@ -42,7 +59,9 @@ const themes: Record<string, ThemeDef> = {
     grid: "light",
     red: tree_red,
     black: tree_black,
-    selected: "102, 187, 106",
+    selected: selected_dark,
+    lastMove: lastMove_dark,
+    nextMove: nextMove_dark,
   },
   parchment: {
     name: "Parchment",
@@ -53,7 +72,9 @@ const themes: Record<string, ThemeDef> = {
     grid: "dark",
     red: tree_red,
     black: tree_black,
-    selected: sel_green,
+    selected: selected_light,
+    lastMove: lastMove_light,
+    nextMove: nextMove_light,
   },
   green: {
     name: "Green",
@@ -64,7 +85,9 @@ const themes: Record<string, ThemeDef> = {
     grid: "light",
     red: tree_red,
     black: tree_black,
-    selected: "255, 213, 79",
+    selected: "#ffd54f",
+    lastMove: lastMove_dark,
+    nextMove: "#ffd54f",
   },
   wood: {
     name: "Wood",
@@ -74,7 +97,9 @@ const themes: Record<string, ThemeDef> = {
     grid: "light",
     red: tree_red,
     black: tree_black,
-    selected: sel_green,
+    selected: selected_light,
+    lastMove: lastMove_light,
+    nextMove: nextMove_light,
   },
   bamboo: {
     name: "Bamboo",
@@ -84,7 +109,9 @@ const themes: Record<string, ThemeDef> = {
     grid: "none",
     red: tree_red,
     black: tree_black,
-    selected: "255, 213, 79",
+    selected: "#ffd54f",
+    lastMove: lastMove_light,
+    nextMove: "#ffd54f",
   },
 };
 
@@ -148,4 +175,11 @@ export function applyThemes(settings: ISettings, app?: App) {
   body.setProperty("--ct-piece-primary", t.red);
   body.setProperty("--ct-piece-secondary", t.black);
   body.setProperty("--ct-selected-color", t.selected);
+  body.setProperty("--ct-lastmove-color", t.lastMove);
+  body.setProperty("--ct-nextmove-color", t.nextMove);
+  // xiangqiground consumes RGB-triplet vars for its built-in markers
+  // (last-move block/bracket, move-dest dots). Non-hex values (e.g. the
+  // auto theme's var() indirection) pass through unchanged.
+  body.setProperty("--xq-last-move-orig-color", hexToRgbTriplet(t.lastMove));
+  body.setProperty("--xq-move-dest-color", hexToRgbTriplet(t.nextMove));
 }
