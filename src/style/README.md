@@ -92,18 +92,21 @@ src/style/
 
 ## 4. CSS 自定义属性
 
-主题层写入 `<body>`（`themes.ts` / `chess.ts#applyThemeCSSVars`）：
+主题层写入 `<body>`（`themes.ts` / `chess.ts#applyThemeCSSVars`）。
 
-| 变量                                                 | 说明                      |
-| ---------------------------------------------------- | ------------------------- |
-| `--ct-board-scale`                                   | 棋盘缩放系数（zoom 换算） |
-| `--ct-font-size`                                     | 走法列表字号              |
-| `--ct-board-bg`                                      | 棋盘底色                  |
-| `--ct-board-bg-image` / `--ct-board-texture`         | 自定义背景图 / 纹理       |
-| `--ct-grid-color`                                    | 网格线颜色                |
-| `--ct-board-margin-top` / `--ct-board-margin-bottom` | 棋盘上下边距              |
-| `--ct-coords-display`                                | 坐标显隐（flex/none）     |
-| `--ct-piece-primary` / `--ct-piece-secondary`        | 双方棋子代表色            |
+主题色变量（棋盘底色/纹理/网格/棋子/高亮）各变体独立命名：chess 用
+`--ct-*`，xiangqi 用 `--xq-*`（消费规则的 scss 也在各自 `_variant.scss`）。
+下表为共享变量 + chess 侧命名：
+
+| 变量                                                                  | 说明                             |
+| --------------------------------------------------------------------- | -------------------------------- |
+| `--ct-board-scale`                                                    | 棋盘缩放系数（zoom 换算）        |
+| `--ct-font-size`                                                      | 走法列表字号                     |
+| `--ct-board-bg` / `--ct-board-bg-image` / `--ct-board-texture`        | 棋盘底色 / 背景图 / 纹理         |
+| `--ct-selected-color` / `--ct-lastmove-color` / `--ct-nextmove-color` | 选中 / 最后一着 / 可走目标高亮色 |
+| `--ct-board-margin-top` / `--ct-board-margin-bottom`                  | 棋盘上下边距                     |
+| `--ct-coords-display`                                                 | 坐标显隐（flex/none）            |
+| `--ct-piece-primary` / `--ct-piece-secondary`                         | 双方棋子代表色                   |
 
 组件/布局内部：
 
@@ -153,9 +156,10 @@ src/style/
 `scripts/sync-to-xiangqi.mjs` 单向复制 `src/`。本目录中除
 `scss/_variant.scss` 外全部共享，必须保持变体无关：
 
-- 变体专属选择器（cg-board/xq-board 内部、坐标布局等）与变体数值
-  （宽高比、主维度、palette 列数…）只写在 `_variant.scss`；
-- 棋子双色用中性变量 `--ct-piece-primary/secondary`，由各自 `themes.ts`
-  提供具体颜色；
+- 变体专属选择器（cg-board/xq-board 内部、坐标布局、主题色变量消费规则）
+  与变体数值（宽高比、主维度、palette 列数…）只写在 `_variant.scss`；
+- 主题色变量名各变体独立：chess 用 `--ct-*`，xiangqi 用 `--xq-*`
+  （注意避开 xiangqiground 库已占用的 `--xq-selected-color` 等），
+  由各自 `themes.ts` 写入；
 - 同步后 xiangqi 侧需手工更新其 `chess.ts` 中的类名常量与
   `applyThemeCSSVars` 变量名。

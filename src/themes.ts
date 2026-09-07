@@ -180,11 +180,10 @@ export function applyThemes(settings: ISettings, app?: App) {
   }
   applyThemeCSSVars(settings, t, app);
   const body = activeDocument.body.style;
-  body.setProperty("--ct-piece-primary", t.red);
-  body.setProperty("--ct-piece-secondary", t.black);
-  body.setProperty("--ct-selected-color", t.selected);
-  body.setProperty("--ct-lastmove-color", t.lastMove);
-  body.setProperty("--ct-nextmove-color", t.nextMove);
+  body.setProperty("--xq-piece-red", t.red);
+  body.setProperty("--xq-piece-black", t.black);
+  // Selected square: corner-bracket frame color (scss/_variant.scss).
+  body.setProperty("--xq-bracket-color", t.selected);
   // xiangqiground consumes RGB-triplet vars for its built-in markers
   // (last-move block/bracket, move-dest dots).
   body.setProperty("--xq-last-move-orig-color", hexToRgbTriplet(t.lastMove));

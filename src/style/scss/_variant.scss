@@ -5,7 +5,12 @@
 // scripts/sync-to-xiangqi.mjs (this one is excluded from the sync):
 // shared rules stay variant-agnostic; selectors that only make sense for
 // one variant (cg-board / xq-board internals, coords layout) live here.
+// Theme-color consumers also live here, so each variant owns its color
+// variable names (xiangqi: --xq-*, avoiding xiangqiground's own
+// --xq-selected-color etc.).
 // ============================================================================
+
+@use "mixins" as *;
 
 // ---- Reusable board visuals ---------------------------------------------------
 
@@ -32,15 +37,15 @@
 // Board background (image + texture + fallback color).
 .xq-wrap xq-board {
   background:
-    var(--ct-board-bg-image, none) center / cover no-repeat,
-    var(--ct-board-texture, none) center / cover no-repeat,
-    var(--ct-board-bg, #d0b899);
+    var(--xq-board-bg-image, none) center / cover no-repeat,
+    var(--xq-board-texture, none) center / cover no-repeat,
+    var(--xq-board-bg, #d0b899);
 }
 
 // Piece colors: red = primary side, black = secondary side.
 .xq-wrap {
-  --piece-red: var(--ct-piece-primary, var(--color-red));
-  --piece-black: var(--ct-piece-secondary, var(--color-blue));
+  --piece-red: var(--xq-piece-red, var(--color-red));
+  --piece-black: var(--xq-piece-black, var(--color-blue));
 }
 
 // Coordinate labels (simple on/off via shared custom property).
@@ -49,10 +54,40 @@
 }
 
 // Selected square: corner-bracket frame (mixin above) in the theme-provided
-// color (themes.ts writes --ct-selected-color as a full color; the fallback
+// color (themes.ts writes --xq-bracket-color as a full color; the fallback
 // mirrors the selected_light preset in themes.ts). Fully opaque.
 .xq-wrap xq-board square.selected {
-  @include bracket-frame(var(--ct-selected-color, #14551e));
+  @include bracket-frame(var(--xq-bracket-color, #14551e));
+}
+
+// ---- FEN editor piece colors (theme-driven) -----------------------------------
+// Palette + side-to-move button colors. `.ct-layout--edit`-scoped so they
+// outrank the shared base button rule in _genfen.scss (which loads later
+// and resets `color: white`). The active state in _genfen.scss re-outranks
+// these at the same specificity.
+
+.ct-layout--edit .ct-layout__palette button.ct-palette__btn--white {
+  background-color: var(--xq-piece-red);
+  @include contrast-text(var(--xq-piece-red), black);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.ct-layout--edit .ct-layout__palette button.ct-palette__btn--black {
+  background-color: var(--xq-piece-black);
+  @include contrast-text(var(--xq-piece-black), white);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.ct-layout--edit .ct-genfen button.ct-genfen__turn--white {
+  background-color: var(--xq-piece-red);
+  @include contrast-text(var(--xq-piece-red), black);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.ct-layout--edit .ct-genfen button.ct-genfen__turn--black {
+  background-color: var(--xq-piece-black);
+  @include contrast-text(var(--xq-piece-black), white);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 // ---- Variant-tunable values ---------------------------------------------------

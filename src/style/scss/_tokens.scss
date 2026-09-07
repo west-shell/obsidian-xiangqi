@@ -1,9 +1,6 @@
 // ============================================================================
 // Design tokens — breakpoints, spacing and the layout size algebra.
-// Only consumes _variant.scss; everything downstream uses these names.
 // ============================================================================
-
-@use "variant" as *;
 
 // Breakpoint between the stacked (col1) and side-by-side (col2) layouts.
 $breakpoint: 800px;

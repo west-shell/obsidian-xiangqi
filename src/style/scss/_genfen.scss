@@ -107,29 +107,20 @@
     }
   }
 
-  button.ct-palette__btn--white {
-    background-color: var(--ct-piece-primary);
-    @include contrast-text(var(--ct-piece-primary), black);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-  }
-
-  button.ct-palette__btn--black {
-    background-color: var(--ct-piece-secondary);
-    @include contrast-text(var(--ct-piece-secondary), white);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-  }
-
-  button.ct-palette__btn--active {
-    border-color: #ffd700;
-    box-shadow: 0 0 0 2px #ffd700;
-    filter: brightness(1.5) saturate(1.4)
-      drop-shadow(0 0 6px rgba(255, 255, 255, 0.6));
-  }
-
   button.ct-palette__btn--empty {
     pointer-events: none;
     opacity: 0.35;
   }
+}
+
+// Active palette button. Hoisted + `.ct-layout--edit`-scoped so it outranks
+// the per-variant piece-color rules in _variant.scss (same specificity,
+// this file loads later).
+.ct-layout--edit .ct-layout__palette button.ct-palette__btn--active {
+  border-color: #ffd700;
+  box-shadow: 0 0 0 2px #ffd700;
+  filter: brightness(1.5) saturate(1.4)
+    drop-shadow(0 0 6px rgba(255, 255, 255, 0.6));
 }
 
 // ---- Editor tools (.ct-genfen) ---------------------------------------------------
@@ -175,18 +166,6 @@
     box-shadow 0.15s,
     border-color 0.15s;
   white-space: nowrap;
-}
-
-.ct-genfen button.ct-genfen__turn--white {
-  background-color: var(--ct-piece-primary);
-  @include contrast-text(var(--ct-piece-primary), black);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-}
-
-.ct-genfen button.ct-genfen__turn--black {
-  background-color: var(--ct-piece-secondary);
-  @include contrast-text(var(--ct-piece-secondary), white);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .ct-genfen button.ct-genfen__turn:hover {
