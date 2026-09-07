@@ -343,6 +343,15 @@ button.#{$cls-prefix}-gamenav__arrow svg {
   width: 100%;
 }
 
+// Obsidian's markdown list rules (e.g. ".markdown-rendered ul > li") out-rank
+// single-class selectors and inject margins into the list; restore the
+// specificity the old scoped component styles used to have.
+.#{$cls-prefix}-moves.#{$cls-prefix}-moves,
+.#{$cls-prefix}-moves > li.#{$cls-prefix}-moves__row {
+  margin: 0;
+  list-style: none;
+}
+
 .#{$cls-prefix}-moves__num {
   display: inline-block;
   min-width: 1.2em;
