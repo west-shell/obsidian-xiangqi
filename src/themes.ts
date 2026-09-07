@@ -9,10 +9,13 @@ import { applyThemeCSSVars, type ThemeData } from "./chess";
 interface ThemeDef extends ThemeData {
   red: string;
   black: string;
+  /** Selected-square highlight color, RGB triplet "R, G, B" */
+  selected: string;
 }
 
 const tree_red = "#861818";
 const tree_black = "#0A1C3A";
+const sel_green = "20, 85, 30";
 const themes: Record<string, ThemeDef> = {
   auto: {
     name: "Auto",
@@ -21,6 +24,7 @@ const themes: Record<string, ThemeDef> = {
     grid: "dark",
     red: "var(--xq-auto-red)",
     black: "var(--xq-auto-black)",
+    selected: "255, 152, 0",
   },
   light: {
     name: "Light",
@@ -29,6 +33,7 @@ const themes: Record<string, ThemeDef> = {
     grid: "dark",
     red: tree_red,
     black: tree_black,
+    selected: sel_green,
   },
   dark: {
     name: "Dark",
@@ -37,6 +42,7 @@ const themes: Record<string, ThemeDef> = {
     grid: "light",
     red: tree_red,
     black: tree_black,
+    selected: "102, 187, 106",
   },
   parchment: {
     name: "Parchment",
@@ -47,6 +53,7 @@ const themes: Record<string, ThemeDef> = {
     grid: "dark",
     red: tree_red,
     black: tree_black,
+    selected: sel_green,
   },
   green: {
     name: "Green",
@@ -57,6 +64,7 @@ const themes: Record<string, ThemeDef> = {
     grid: "light",
     red: tree_red,
     black: tree_black,
+    selected: "255, 213, 79",
   },
   wood: {
     name: "Wood",
@@ -66,6 +74,7 @@ const themes: Record<string, ThemeDef> = {
     grid: "light",
     red: tree_red,
     black: tree_black,
+    selected: sel_green,
   },
   bamboo: {
     name: "Bamboo",
@@ -75,6 +84,7 @@ const themes: Record<string, ThemeDef> = {
     grid: "none",
     red: tree_red,
     black: tree_black,
+    selected: sel_green,
   },
 };
 
@@ -137,4 +147,5 @@ export function applyThemes(settings: ISettings, app?: App) {
   const body = activeDocument.body.style;
   body.setProperty("--ct-piece-primary", t.red);
   body.setProperty("--ct-piece-secondary", t.black);
+  body.setProperty("--ct-selected-color", t.selected);
 }

@@ -7,6 +7,27 @@
 // one variant (cg-board / xq-board internals, coords layout) live here.
 // ============================================================================
 
+// ---- Reusable board visuals ---------------------------------------------------
+
+// Corner-bracket frame (four L-shaped marks) — same visual language as
+// xiangqiground's last-move destination square. Reusable for the selected
+// square or custom highlights; the color is passed in separately.
+//   $rgb:   RGB triplet — literal "R, G, B" or var() holding one
+//   $alpha: 0–1 opacity of the marks
+// Emitted via interpolation so Sass does not evaluate rgba().
+@mixin bracket-frame($rgb, $alpha: 1) {
+  background:
+    linear-gradient(rgba(#{$rgb}, #{$alpha}) 0 0) no-repeat 0 0 / 20% 4px,
+    linear-gradient(rgba(#{$rgb}, #{$alpha}) 0 0) no-repeat 0 0 / 4px 20%,
+    linear-gradient(rgba(#{$rgb}, #{$alpha}) 0 0) no-repeat 100% 0 / 20% 4px,
+    linear-gradient(rgba(#{$rgb}, #{$alpha}) 0 0) no-repeat 100% 0 / 4px 20%,
+    linear-gradient(rgba(#{$rgb}, #{$alpha}) 0 0) no-repeat 0 100% / 20% 4px,
+    linear-gradient(rgba(#{$rgb}, #{$alpha}) 0 0) no-repeat 0 100% / 4px 20%,
+    linear-gradient(rgba(#{$rgb}, #{$alpha}) 0 0) no-repeat 100% 100% / 20% 4px,
+    linear-gradient(rgba(#{$rgb}, #{$alpha}) 0 0) no-repeat 100% 100% / 4px 20%;
+  z-index: 1;
+}
+
 // ---- Variant-only selectors --------------------------------------------------
 
 // Board background (image + texture + fallback color).
@@ -28,27 +49,11 @@
   display: var(--ct-coords-display, flex);
 }
 
-// Selected square: corner-bracket frame like last-move dest, but fully
-// opaque in the selected color (replaces the default translucent fill).
+// Selected square: corner-bracket frame (mixin above) in the theme-provided
+// color (themes.ts writes --ct-selected-color as an RGB triplet; the
+// fallback keeps the library default green). Fully opaque.
 .xq-wrap xq-board square.selected {
-  background:
-    linear-gradient(rgba(var(--xq-selected-color), 1) 0 0) no-repeat 0 0 / 20%
-      4px,
-    linear-gradient(rgba(var(--xq-selected-color), 1) 0 0) no-repeat 0 0 / 4px
-      20%,
-    linear-gradient(rgba(var(--xq-selected-color), 1) 0 0) no-repeat 100% 0 /
-      20% 4px,
-    linear-gradient(rgba(var(--xq-selected-color), 1) 0 0) no-repeat 100% 0 /
-      4px 20%,
-    linear-gradient(rgba(var(--xq-selected-color), 1) 0 0) no-repeat 0 100% /
-      20% 4px,
-    linear-gradient(rgba(var(--xq-selected-color), 1) 0 0) no-repeat 0 100% /
-      4px 20%,
-    linear-gradient(rgba(var(--xq-selected-color), 1) 0 0) no-repeat 100% 100% /
-      20% 4px,
-    linear-gradient(rgba(var(--xq-selected-color), 1) 0 0) no-repeat 100% 100% /
-      4px 20%;
-  z-index: 1;
+  @include bracket-frame(var(--ct-selected-color, 20, 85, 30), 1);
 }
 
 // ---- Variant-tunable values ---------------------------------------------------
