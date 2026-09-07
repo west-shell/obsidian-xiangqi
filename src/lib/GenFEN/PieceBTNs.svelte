@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { CLS_PREFIX, type Piece } from "../../chess";
-  import { createPieceFromChar, PIECE_CHARS } from "../../chess";
+  import { CLS_PREFIX, type Piece, PIECE_CHARS } from "../../chess";
   import type { EventBus } from "../../core/event-bus";
 
   interface Props {
@@ -10,11 +9,19 @@
   }
   let { fen, eventBus, selectedPiece }: Props = $props();
 
-  const PIECE_KEYS = PIECE_CHARS ? Object.keys(PIECE_CHARS) : [];
+  const keys = PIECE_CHARS ? Object.keys(PIECE_CHARS) : [];
+  const PIECE_KEYS = [
+    ...keys.filter((k) => k === k.toLowerCase()),
+    ...keys.filter((k) => k !== k.toLowerCase()),
+  ];
 
-  function handleClick(char: string) {
-    const piece = createPieceFromChar(char);
-    if (piece) eventBus.emit("clickPieceBTN", piece);
+  function handleClick(key: string) {
+    const isUpper = key === key.toUpperCase();
+    const piece: Piece = {
+      type: key.toLowerCase() as Piece["type"],
+      color: isUpper ? "w" : "b",
+    };
+    eventBus.emit("clickPieceBTN", piece);
   }
 
   let pieceCount = $derived(
@@ -64,7 +71,7 @@
   {#each PIECE_KEYS as key (key)}
     <button
       class={`${CLS_PREFIX}-palette__btn ${CLS_PREFIX}-palette__btn--${key === key.toUpperCase() ? "white" : "black"} ${isSelected(key) ? `${CLS_PREFIX}-palette__btn--active` : ""} ${getCount(key) <= 0 ? `${CLS_PREFIX}-palette__btn--empty` : ""}`}
-      onclick={() => handleClick(PIECE_CHARS![key])}
+      onclick={() => handleClick(key)}
     >
       {PIECE_CHARS![key]}
     </button>
