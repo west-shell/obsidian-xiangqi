@@ -84,7 +84,7 @@ const themes: Record<string, ThemeDef> = {
     grid: "none",
     red: tree_red,
     black: tree_black,
-    selected: sel_green,
+    selected: "255, 213, 79",
   },
 };
 
