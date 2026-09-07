@@ -2,12 +2,12 @@
 // Chess Tree — style entry
 //
 // Architecture (see README.md next to this file):
-//   variant  → variant-tunable values (the ONLY file xiangqi replaces)
+//   variant  → variant-only selectors + tunable values (the ONLY file xiangqi replaces)
 //   tokens   → breakpoints / spacing / size algebra
 //   mixins   → col1/col2 media queries + helpers
 //   base     → custom-property defaults + host containers
 //   layout   → .ct-layout grid (col1/col2) + host contexts
-//   board    → board area + chessground overrides (only place for cg-* / xq-*)
+//   board    → board area + shared board-lib overrides (cg-*/xq-* per variant → _variant)
 //   buttons  → .ct-btn system
 //   toolbar  → main toolbar rail
 //   panel    → tree panel (game nav / canvas / eval / slider / move list)

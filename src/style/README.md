@@ -77,12 +77,12 @@ FileHost   contentEl  ─── .view-content.ct-file-view
 src/style/
   layout.scss          入口，@use 以下全部模块
   scss/
-    _variant.scss      变体差异（chess 专属数值；sync 排除，xiangqi 有自己的版本）
+    _variant.scss      变体差异（变体专属选择器 + 数值；sync 排除，xiangqi 有自己的版本）
     _tokens.scss       断点 / 间距 / col2 尺寸代数
     _mixins.scss       col1/col2 媒体查询 mixin、宽度函数
     _base.scss         body 自定义属性默认值、宿主容器、拖拽状态
     _layout.scss       .ct-layout 主网格（col1/col2）+ .ct-file-view 上下文
-    _board.scss        棋盘区 + chessground 覆盖（唯一允许 cg-*/xq-* 的文件）
+    _board.scss        棋盘区 + 双变体共享的 chessground 覆盖（wrap/piece）
     _buttons.scss      .ct-btn 按钮体系（含 pill 组、状态修饰符）
     _toolbar.scss      .ct-toolbar 主工具栏组件
     _panel.scss        棋树面板（gamenav/canvas/eval/slider/moves/comment）
@@ -153,8 +153,8 @@ src/style/
 `scripts/sync-to-xiangqi.mjs` 单向复制 `src/`。本目录中除
 `scss/_variant.scss` 外全部共享，必须保持变体无关：
 
-- 变体数值（宽高比、主维度、palette 列数、坐标样式开关…）只写在
-  `_variant.scss`；
+- 变体专属选择器（cg-board/xq-board 内部、坐标布局等）与变体数值
+  （宽高比、主维度、palette 列数…）只写在 `_variant.scss`；
 - 棋子双色用中性变量 `--ct-piece-primary/secondary`，由各自 `themes.ts`
   提供具体颜色；
 - 同步后 xiangqi 侧需手工更新其 `chess.ts` 中的类名常量与

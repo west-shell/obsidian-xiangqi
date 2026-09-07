@@ -1,9 +1,57 @@
 // ============================================================================
-// Variant-specific values — XIANQI
+// Variant-specific rules + values — XIANQI
 // This is the ONLY style file that differs between chess-tree and
 // obsidian-xiangqi. All other files are shared verbatim by
-// scripts/sync-to-xiangqi.mjs (this one is excluded from the sync).
+// scripts/sync-to-xiangqi.mjs (this one is excluded from the sync):
+// shared rules stay variant-agnostic; selectors that only make sense for
+// one variant (cg-board / xq-board internals, coords layout) live here.
 // ============================================================================
+
+// ---- Variant-only selectors --------------------------------------------------
+
+// Board background (image + texture + fallback color).
+.xq-wrap xq-board {
+  background:
+    var(--ct-board-bg-image, none) center / cover no-repeat,
+    var(--ct-board-texture, none) center / cover no-repeat,
+    var(--ct-board-bg, #d0b899);
+}
+
+// Piece colors: red = primary side, black = secondary side.
+.xq-wrap {
+  --piece-red: var(--ct-piece-primary, var(--color-red));
+  --piece-black: var(--ct-piece-secondary, var(--color-blue));
+}
+
+// Coordinate labels (simple on/off via shared custom property).
+.xq-wrap coords {
+  display: var(--ct-coords-display, flex);
+}
+
+// Selected square: corner-bracket frame like last-move dest, but fully
+// opaque in the selected color (replaces the default translucent fill).
+.xq-wrap xq-board square.selected {
+  background:
+    linear-gradient(rgba(var(--xq-selected-color), 1) 0 0) no-repeat 0 0 / 20%
+      4px,
+    linear-gradient(rgba(var(--xq-selected-color), 1) 0 0) no-repeat 0 0 / 4px
+      20%,
+    linear-gradient(rgba(var(--xq-selected-color), 1) 0 0) no-repeat 100% 0 /
+      20% 4px,
+    linear-gradient(rgba(var(--xq-selected-color), 1) 0 0) no-repeat 100% 0 /
+      4px 20%,
+    linear-gradient(rgba(var(--xq-selected-color), 1) 0 0) no-repeat 0 100% /
+      20% 4px,
+    linear-gradient(rgba(var(--xq-selected-color), 1) 0 0) no-repeat 0 100% /
+      4px 20%,
+    linear-gradient(rgba(var(--xq-selected-color), 1) 0 0) no-repeat 100% 100% /
+      20% 4px,
+    linear-gradient(rgba(var(--xq-selected-color), 1) 0 0) no-repeat 100% 100% /
+      4px 20%;
+  z-index: 1;
+}
+
+// ---- Variant-tunable values ---------------------------------------------------
 
 // Board aspect ratio (width / height): chess = 1, xiangqi = 0.9
 $board-ratio: 0.9;
@@ -22,9 +70,6 @@ $pgn-col2-board-height: 90cqh;
 
 // PGN file view col2: chess-style col2 width override (false for xiangqi)
 $pgn-col2-override-width: false;
-
-// Coordinate labels: rich files/ranks layout (true for square boards)
-$coords-rich: false;
 
 // FEN editor piece palette: 14 buttons laid out in N columns
 $palette-cols: 7;
