@@ -39,7 +39,7 @@
 
   // ---- col1: stacked (default) ---------------------------------------------
   @if $col1-board-scale {
-    --ct-board-scale: #{$col1-board-scale};
+    --#{$cls-prefix}-board-scale: #{$col1-board-scale};
   }
 
   grid-template-columns: 1fr;
@@ -62,7 +62,10 @@
 
   // Main toolbar matches the centered board width, single adaptive row.
   .#{$cls-prefix}-toolbar {
-    width: min(var(--board-max, 100vh) * var(--ct-board-scale, 0.85), 100%);
+    width: min(
+      var(--board-max, 100vh) * var(--#{$cls-prefix}-board-scale, 0.85),
+      100%
+    );
     justify-self: center;
     flex-wrap: nowrap;
 
@@ -79,9 +82,9 @@
 
   // ---- col2: side-by-side ---------------------------------------------------
   @include col2 {
-    height: var(--ct-col2-size);
-    grid-template-columns: var(--ct-col2-width) auto $uniboard-table;
-    grid-template-rows: var(--ct-col2-size) 1fr;
+    height: var(--#{$cls-prefix}-col2-size);
+    grid-template-columns: var(--#{$cls-prefix}-col2-width) auto $uniboard-table;
+    grid-template-rows: var(--#{$cls-prefix}-col2-size) 1fr;
     grid-template-areas:
       "board toolbar panel"
       "board toolbar panel";
@@ -95,7 +98,7 @@
     .#{$cls-prefix}-toolbar {
       flex-direction: column;
       flex-wrap: wrap;
-      max-height: var(--ct-col2-size);
+      max-height: var(--#{$cls-prefix}-col2-size);
       align-items: center;
       column-gap: 0;
       grid-row: 1;
@@ -110,7 +113,7 @@
     }
 
     &__panel {
-      max-height: var(--ct-col2-size);
+      max-height: var(--#{$cls-prefix}-col2-size);
       min-width: 160px;
       min-height: 0;
     }
@@ -172,7 +175,7 @@
     flex-direction: row;
 
     @if $pgn-col2-override-width {
-      --ct-col2-width: 100cqh;
+      --#{$cls-prefix}-col2-width: 100cqh;
     }
 
     &__board {
@@ -202,7 +205,7 @@
     }
 
     // Restore the plain wrapped toolbar in the file view (overrides the
-    // block-host col2 rule capping it at --ct-col2-size).
+    // block-host col2 rule capping it at --#{$cls-prefix}-col2-size).
     .#{$cls-prefix}-toolbar {
       width: auto;
       align-self: flex-start;

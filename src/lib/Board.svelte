@@ -385,7 +385,7 @@
       zoom = Math.round(Math.min(100, Math.max(0, initialZoom + delta / 5)));
       const boardScale = (zoom / 100) * 0.75 + 0.25;
       activeDocument.body.style.setProperty(
-        "--ct-board-scale",
+        `--${CLS_PREFIX}-board-scale`,
         `${boardScale}`,
       );
       activeDocument.body.dispatchEvent(new Event(RESIZE_EVENT));

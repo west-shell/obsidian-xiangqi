@@ -16,7 +16,7 @@
 .#{$cls-prefix}-layout__board {
   width: var(
     --board-width,
-    min(var(--board-max, 100vh) * var(--ct-board-scale, 0.85), 100%)
+    min(var(--board-max, 100vh) * var(--#{$cls-prefix}-board-scale, 0.85), 100%)
   );
   position: relative;
   border-radius: 2px;

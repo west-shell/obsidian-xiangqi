@@ -55,7 +55,7 @@ $cls-prefix: "xq";
 
 // Coordinate labels (simple on/off via shared custom property).
 .xq-wrap coords {
-  display: var(--ct-coords-display, flex);
+  display: var(--#{$cls-prefix}-coords-display, flex);
 }
 
 // Selected square: corner-bracket frame (mixin above) in the theme-provided

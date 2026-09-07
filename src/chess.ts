@@ -224,8 +224,8 @@ export function applyThemeCSSVars(
 ): void {
   const boardScale = (settings.zoom / 100) * 0.75 + 0.25;
   const body = activeDocument.body.style;
-  body.setProperty("--ct-board-scale", `${boardScale}`);
-  body.setProperty("--ct-font-size", `${settings.fontSize}px`);
+  body.setProperty(`--${CLS_PREFIX}-board-scale`, `${boardScale}`);
+  body.setProperty(`--${CLS_PREFIX}-font-size`, `${settings.fontSize}px`);
 
   let bg = themeData.bg;
   if (app && /\.(png|jpe?g|gif|webp|svg|bmp)$/i.test(bg)) {
@@ -256,13 +256,13 @@ export function applyThemeCSSVars(
   } else {
     body.removeProperty("--xq-grid-color");
   }
-  body.setProperty("--ct-board-margin-top", `${settings.boardMarginTop}px`);
+  body.setProperty(`--${CLS_PREFIX}-board-margin-top`, `${settings.boardMarginTop}px`);
   body.setProperty(
-    "--ct-board-margin-bottom",
+    `--${CLS_PREFIX}-board-margin-bottom`,
     `${settings.boardMarginBottom}px`,
   );
   body.setProperty(
-    "--ct-coords-display",
+    `--${CLS_PREFIX}-coords-display`,
     settings.showCoordinateLabels ? "flex" : "none",
   );
 }

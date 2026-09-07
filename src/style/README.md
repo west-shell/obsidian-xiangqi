@@ -96,13 +96,12 @@ src/style/
 
 ## 4. CSS 自定义属性
 
-主题层写入 `<body>`（`themes.ts` / `chess.ts#applyThemeCSSVars`）。
+**全局变量**（写入 `<body>`，或由共享 scss 定义在 `body` / 视图根上）一律带
+变体前缀，名字由前缀派生：chess 为 `--ct-*`，xiangqi 为 `--xq-*`。
+写入方：`themes.ts` / `chess.ts#applyThemeCSSVars`（各变体自有）与
+`_base.scss`；共享 scss 一律以 `var(--#{$cls-prefix}-…)` 消费。
 
-主题色变量（棋盘底色/纹理/网格/棋子/高亮）各变体独立命名：chess 用
-`--ct-*`，xiangqi 用 `--xq-*`（消费规则的 scss 也在各自 `_variant.scss`）。
-下表为共享变量 + chess 侧命名：
-
-| 变量                                                                  | 说明                             |
+| 变量（chess 侧命名）                                                  | 说明                             |
 | --------------------------------------------------------------------- | -------------------------------- |
 | `--ct-board-scale`                                                    | 棋盘缩放系数（zoom 换算）        |
 | `--ct-font-size`                                                      | 走法列表字号                     |
@@ -111,20 +110,23 @@ src/style/
 | `--ct-board-margin-top` / `--ct-board-margin-bottom`                  | 棋盘上下边距                     |
 | `--ct-coords-display`                                                 | 坐标显隐（flex/none）            |
 | `--ct-piece-primary` / `--ct-piece-secondary`                         | 双方棋子代表色                   |
+| `--ct-header-h`                                                       | 视图头部高度（col2 高度代数用）  |
+| `--ct-gap`                                                            | 全局间距                         |
+| `--ct-col2-size` / `--ct-col2-width`                                  | col2 轨道主尺寸 / 宽度           |
 
-组件/布局内部（父容器作用域内，不带前缀）：
+主题色变量（棋盘底色/纹理/网格/棋子/高亮）的消费规则在各自 `_variant.scss`；
+xiangqi 注意避开 xiangqiground 库已占用的 `--xq-*` 名。
 
-| 变量                                 | 作用域                 | 说明                                       |
-| ------------------------------------ | ---------------------- | ------------------------------------------ |
-| `--ct-header-h`                      | body / `.ct-file-view` | 视图头部高度（col2 高度代数用）            |
-| `--ct-gap`                           | body                   | 全局间距                                   |
-| `--ct-col2-size` / `--ct-col2-width` | body                   | col2 轨道主尺寸 / 宽度                     |
-| `--board-width`                      | `.ct-layout__board`    | 棋盘宽度覆盖点（PGN 视图用）               |
-| `--board-max`                        | 布局回退               | 棋盘最大尺寸回退值（默认 100vh）           |
-| `--board-ratio`                      | `.cg-wrap`             | 棋盘宽高比（由 `BOARD_ASPECT_RATIO` 内联） |
-| `--tree-bg` / `--tree-line`          | `.ct-layout__panel`    | 画布底色 / 树线颜色                        |
-| `--eval-plus` / `--eval-minus`       | `.ct-layout__panel`    | 局势评估双色                               |
-| `--textarea-h`                       | `.ct-comment__input`   | 评论框测量高度                             |
+**组件/布局内部变量**（父容器作用域内，不带前缀）：
+
+| 变量                           | 作用域               | 说明                                       |
+| ------------------------------ | -------------------- | ------------------------------------------ |
+| `--board-width`                | `.ct-layout__board`  | 棋盘宽度覆盖点（PGN 视图用）               |
+| `--board-max`                  | 布局回退             | 棋盘最大尺寸回退值（默认 100vh）           |
+| `--board-ratio`                | `.cg-wrap`           | 棋盘宽高比（由 `BOARD_ASPECT_RATIO` 内联） |
+| `--tree-bg` / `--tree-line`    | `.ct-layout__panel`  | 画布底色 / 树线颜色                        |
+| `--eval-plus` / `--eval-minus` | `.ct-layout__panel`  | 局势评估双色                               |
+| `--textarea-h`                 | `.ct-comment__input` | 评论框测量高度                             |
 
 ## 5. 重命名对照表
 

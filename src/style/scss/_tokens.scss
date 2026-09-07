@@ -1,5 +1,8 @@
 // ============================================================================
 // Design tokens — breakpoints, spacing and the layout size algebra.
+// Leaf module: must not depend on variant (which needs mixins -> tokens),
+// so computations that read the variant-prefixed global custom properties
+// (--{prefix}-gap / -header-h / -board-scale) live in _base.scss instead.
 // ============================================================================
 
 // Breakpoint between the stacked (col1) and side-by-side (col2) layouts.
@@ -9,27 +12,12 @@ $breakpoint: 800px;
 $scrollbar-width: 20px;
 $bottom-margin: 1rem;
 
-// Page chrome height: 0 for code blocks, Obsidian's view header height
-// inside the PGN file view (overridden on the {prefix}-file-view root).
-$ct-header-h: var(--ct-header-h, 0px);
-
-// Global grid gap, set on <body> so themes can tweak it.
-$ct-gap: var(--ct-gap, 4px);
-
 // Gap between the layout and its host (code blocks only).
 $ct-layout-gap: 2px;
 
 // ---------------------------------------------------------------------------
-// col2 "uniboard" algebra — the board + toolbar rail sized to the viewport.
+// col2 "uniboard" rail — grid track + viewport allowance primitives.
 // ---------------------------------------------------------------------------
+
 $uniboard-table-min: 240px;
 $uniboard-table: minmax(#{$uniboard-table-min}, 1fr);
-
-$col2-max-width: calc(
-  100vw - #{$ct-gap} - #{$uniboard-table-min} - #{$scrollbar-width}
-);
-$col2-max-height: calc(100vh - #{$ct-header-h} - #{$bottom-margin});
-$col2-max-size: min(#{$col2-max-width}, #{$col2-max-height});
-
-// The rail's primary dimension, scaled by the zoom factor.
-$col2-size: calc(#{$col2-max-size} * var(--ct-board-scale, 0.85));

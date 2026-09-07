@@ -44,10 +44,10 @@
 // wraps into a second column instead of stretching the block taller.
 .#{$cls-prefix}-block .#{$cls-prefix}-layout--edit {
   @include col2 {
-    height: calc(var(--ct-col2-width) / #{$board-ratio});
+    height: calc(var(--#{$cls-prefix}-col2-width) / #{$board-ratio});
 
     .#{$cls-prefix}-layout__board {
-      --board-width: var(--ct-col2-width);
+      --board-width: var(--#{$cls-prefix}-col2-width);
       flex: none;
     }
 

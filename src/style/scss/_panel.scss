@@ -317,7 +317,7 @@ button.#{$cls-prefix}-gamenav__arrow svg {
   max-width: 200px;
   display: flex;
   flex-direction: column;
-  font-size: var(--ct-font-size, 12px);
+  font-size: var(--#{$cls-prefix}-font-size, 12px);
   overflow-y: auto;
   overflow-x: hidden;
   padding: 0;
