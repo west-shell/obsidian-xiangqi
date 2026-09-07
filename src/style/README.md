@@ -27,7 +27,7 @@ FileHost   contentEl  ─── .view-content.ct-file-view
           │    ├─ .cg-wrap  (chessground: cg-container > cg-board)
           │    ├─ .ct-promotion > .ct-promotion__choices > .ct-promotion__btn
           │    └─ .ct-board-resize
-          ├─ Toolbar.svelte ─── .ct-toolbar.ct-layout__toolbar
+          ├─ Toolbar.svelte ─── .ct-toolbar
           │    └─ button.ct-btn [--saved/--unsaved/--engine/--busy]
           ├─ Tree.svelte ─── .ct-layout__panel
           │    ├─ .ct-gamenav
@@ -52,7 +52,7 @@ FileHost   contentEl  ─── .view-content.ct-file-view
           └─ FEN 编辑模式 (.ct-layout--edit)
                ├─ .ct-layout__palette
                │    └─ button.ct-palette__btn [--white/--black/--active/--empty]
-               └─ GenFEN/Toolbar.svelte ─── .ct-genfen.ct-layout__toolbar
+               └─ GenFEN/Toolbar.svelte ─── .ct-genfen
                     ├─ .ct-genfen__group
                     │    ├─ .ct-genfen__section[--row]
                     │    │    ├─ button.ct-genfen__turn [--white/--black]
@@ -126,7 +126,7 @@ src/style/
 | `chess-layout`                                                                               | `ct-layout`                                                                                                                                                        |
 | `chess-layout--genfen`                                                                       | `ct-layout--edit`（常量 `LAYOUT_CLASS_EDIT`）                                                                                                                      |
 | `board-wrapper` + `chess-layout__board`                                                      | `ct-layout__board`（合并双类名）                                                                                                                                   |
-| `toolbar-container` + `chess-layout__toolbar`                                                | `ct-toolbar ct-layout__toolbar`                                                                                                                                    |
+| `toolbar-container` + `chess-layout__toolbar`                                                | `ct-toolbar`                                                                                                                                                       |
 | `tree-container` + `chess-layout__tools`                                                     | `ct-layout__panel`                                                                                                                                                 |
 | `piece-btn-container` + `chess-layout__piecebtns`                                            | `ct-layout__palette`                                                                                                                                               |
 | `toolbar-btn` / `toolbar-single`                                                             | `ct-btn`（尺寸由上下文决定）                                                                                                                                       |

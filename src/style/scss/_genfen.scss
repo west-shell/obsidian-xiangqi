@@ -1,31 +1,34 @@
 // ============================================================================
 // FEN editor (.ct-layout--edit) — piece palette + editor tools.
 //
-// The editor re-shapes the shared .ct-layout grid:
-//   col1: board / palette / toolbar stacked
-//   col2: board | palette | toolbar in one row
+// The editor does NOT reuse the play-mode grid template: it is a plain flex
+// container of its own.
+//   col1: flex column — board / palette / toolbar, toolbar laid out
+//         horizontally (wrapping when narrow)
+//   col2: flex row — board | palette | toolbar, height set by the board;
+//         the toolbar rail wraps into columns when its content is taller
 // ============================================================================
 
+@use "tokens" as *;
 @use "mixins" as *;
 @use "variant" as *;
 
-// ---- Edit-mode grid -----------------------------------------------------------
+// ---- Edit-mode layout -----------------------------------------------------------
 
 .ct-layout--edit {
-  grid-template-columns: 1fr;
-  grid-template-rows: auto auto auto;
-  grid-template-areas:
-    "board"
-    "palette"
-    "toolbar";
+  display: flex;
+  flex-direction: column;
+  gap: $ct-layout-gap;
+
+  .ct-layout__board {
+    align-self: center;
+  }
 
   @include col2 {
-    height: auto;
-    grid-template-columns: var(--ct-col2-width) min-content min-content;
-    grid-template-rows: auto;
-    grid-template-areas: "board palette toolbar";
+    flex-direction: row;
+    align-items: flex-start;
 
-    .ct-layout__toolbar {
+    .ct-genfen {
       flex-direction: column;
       flex-wrap: #{$genfen-toolbar-wrap};
       align-items: center;
@@ -33,6 +36,23 @@
       @if $genfen-toolbar-align {
         align-content: #{$genfen-toolbar-align};
       }
+    }
+  }
+}
+
+// Code-block host: the row height equals the board height, so the toolbar
+// wraps into a second column instead of stretching the block taller.
+.ct-block .ct-layout--edit {
+  @include col2 {
+    height: calc(var(--ct-col2-width) / #{$board-ratio});
+
+    .ct-layout__board {
+      --ct-board-width: var(--ct-col2-width);
+      flex: none;
+    }
+
+    .ct-genfen {
+      max-height: 100%;
     }
   }
 }
@@ -116,7 +136,9 @@
 
 .ct-genfen {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-start;
   gap: 10px;
   padding: 8px;
   max-height: 100%;

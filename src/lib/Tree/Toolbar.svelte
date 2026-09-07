@@ -429,7 +429,7 @@
   }
 </script>
 
-<div class="ct-toolbar ct-layout__toolbar">
+<div class="ct-toolbar">
   {#each navButtons as { title, icon, event } (event)}
     <button
       class="ct-btn"

@@ -47,7 +47,7 @@
   });
 </script>
 
-<div class="ct-genfen ct-layout__toolbar">
+<div class="ct-genfen">
   <div class="ct-genfen__group">
     <div class="ct-genfen__section ct-genfen__section--row">
       <button

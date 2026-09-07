@@ -24,7 +24,7 @@
     align-self: start;
   }
 
-  &__toolbar {
+  .ct-toolbar {
     grid-area: toolbar;
     align-self: start;
   }
@@ -61,7 +61,7 @@
   }
 
   // Main toolbar matches the centered board width, single adaptive row.
-  .ct-layout__toolbar.ct-toolbar {
+  .ct-toolbar {
     width: min(var(--ct-board-max, 100vh) * var(--ct-board-scale, 0.85), 100%);
     justify-self: center;
     flex-wrap: nowrap;
@@ -92,7 +92,7 @@
       }
     }
 
-    .ct-layout__toolbar.ct-toolbar {
+    .ct-toolbar {
       flex-direction: column;
       flex-wrap: wrap;
       max-height: var(--ct-col2-size);
@@ -136,18 +136,21 @@
     }
   }
 
-  &__toolbar {
+  .ct-toolbar,
+  .ct-genfen {
     flex-shrink: 0;
     position: relative;
     z-index: 1;
+  }
+
+  .ct-toolbar {
     height: auto;
     min-height: 32px;
   }
 
-  // Main toolbar matches the board width, centered. Re-qualified as
-  // `.ct-layout__toolbar.ct-toolbar` to outrank the block-host rule above,
-  // which ties the width to the global board scale.
-  .ct-layout__toolbar.ct-toolbar {
+  // Main toolbar matches the board width, centered (overrides the
+  // block-host rule above, which ties the width to the global board scale).
+  .ct-toolbar {
     width: min(100cqw, #{$pgn-col1-board-height});
     align-self: center;
     flex-wrap: wrap;
@@ -177,7 +180,7 @@
       align-self: center;
     }
 
-    &__toolbar {
+    .ct-toolbar {
       flex-direction: column;
       flex-wrap: wrap;
       max-height: none;
@@ -193,14 +196,14 @@
       }
     }
 
-    // FEN editor toolbar stretches to the rail height.
-    .ct-layout--edit &__toolbar {
+    // FEN editor toolbar fills the view height.
+    .ct-layout--edit .ct-genfen {
       align-self: stretch;
     }
 
-    // Restore the plain wrapped toolbar in the file view — re-qualified to
-    // outrank the block-host col2 rule capping it at --ct-col2-size.
-    .ct-layout__toolbar.ct-toolbar {
+    // Restore the plain wrapped toolbar in the file view (overrides the
+    // block-host col2 rule capping it at --ct-col2-size).
+    .ct-toolbar {
       width: auto;
       align-self: flex-start;
       flex-wrap: wrap;
