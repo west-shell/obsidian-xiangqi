@@ -31,6 +31,7 @@ $palette-cols: 7;
 $palette-col-cqw: 14.2857cqw;
 $palette-col-cqh: 14.2857cqh;
 
-// FEN editor toolbar in col2: wrap behaviour
-$genfen-toolbar-wrap: wrap;
-$genfen-toolbar-align: start;
+// FEN editor toolbar: few buttons — col2 stays a single vertical column
+// (no wrapping); col1 is horizontal via the shared base rule.
+$genfen-toolbar-wrap: nowrap;
+$genfen-toolbar-align: null;
