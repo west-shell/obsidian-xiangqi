@@ -3,6 +3,8 @@
 // eval bar + overlay toolbar + slider), move list and the comment row.
 // ============================================================================
 
+@use "mixins" as *;
+
 // ---- Panel root -------------------------------------------------------------
 
 .ct-layout__panel {
@@ -380,7 +382,10 @@ span.ct-moves__move:hover {
 
 span.ct-moves__move--active {
   background-color: var(--color-accent);
-  color: var(--text-on-accent);
+  // The accent comes from the Obsidian theme and can be any colour — pick
+  // black/white by its luminance (see mixins#contrast-text); fall back to
+  // Obsidian's own token on engines without relative-colour syntax.
+  @include contrast-text(var(--color-accent), var(--text-on-accent));
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
   font-weight: 500;
 }

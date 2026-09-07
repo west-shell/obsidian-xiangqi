@@ -5,7 +5,6 @@ import woodB64 from "../assets/wood.jpg?base64";
 
 import type { ISettings } from "./types";
 import { applyThemeCSSVars, type ThemeData } from "./chess";
-import { contrastColor } from "./utils/color";
 
 interface ThemeDef extends ThemeData {
   red: string;
@@ -138,6 +137,4 @@ export function applyThemes(settings: ISettings, app?: App) {
   const body = activeDocument.body.style;
   body.setProperty("--ct-piece-primary", t.red);
   body.setProperty("--ct-piece-secondary", t.black);
-  body.setProperty("--ct-piece-primary-contrast", contrastColor(t.red));
-  body.setProperty("--ct-piece-secondary-contrast", contrastColor(t.black));
 }
