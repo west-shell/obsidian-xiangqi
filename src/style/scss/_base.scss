@@ -22,12 +22,12 @@ body {
 }
 
 // The PGN file view sits under Obsidian's view header.
-.view-content.ct-file-view {
+.view-content.#{$cls-prefix}-file-view {
   --ct-header-h: var(--size-header-height, 40px);
 }
 
 // Board-drag state: suppress text selection while resizing the board.
-body.ct-resizing {
+body.#{$cls-prefix}-resizing {
   user-select: none;
   -webkit-user-select: none;
 }
@@ -37,12 +37,12 @@ body.ct-resizing {
 // ---------------------------------------------------------------------------
 
 // `chess`/`tree`/`fen` code blocks
-.ct-block .ct-layout {
+.#{$cls-prefix}-block .#{$cls-prefix}-layout {
   margin: 1rem 0;
 }
 
 // PGN file view host
-.ct-file-view {
+.#{$cls-prefix}-file-view {
   overflow: hidden !important;
   margin: 0 !important;
   padding-top: var(--ct-board-margin-top, 0px) !important;

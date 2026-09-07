@@ -15,11 +15,10 @@
   import type { EventBus } from "../../core/event-bus";
   import {
     type cg,
+    CLS_PREFIX,
     type DrawShape,
     getMoveDest,
     isMoveCheck,
-    LAYOUT_CLASS,
-    LAYOUT_CLASS_EDIT,
     type Move,
     type Piece,
     type Square,
@@ -223,7 +222,7 @@
 </script>
 
 {#if editing}
-  <div class="{LAYOUT_CLASS} {LAYOUT_CLASS_EDIT}">
+  <div class="{CLS_PREFIX}-layout {CLS_PREFIX}-layout--edit">
     <Board
       {settings}
       {fen}
@@ -237,7 +236,7 @@
     <GenFENToolbar {eventBus} {fen} {isFenMode} />
   </div>
 {:else}
-  <div class={LAYOUT_CLASS}>
+  <div class="{CLS_PREFIX}-layout">
     <Board
       {settings}
       {fen}

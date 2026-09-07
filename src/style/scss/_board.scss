@@ -9,24 +9,26 @@
 // (cg-board / xq-board internals, coords layout) live in _variant.scss.
 // ============================================================================
 
+@use "variant" as *;
+
 // ---- Board area (the grid cell hosting the chessground wrap) ---------------
 
-.ct-layout__board {
+.#{$cls-prefix}-layout__board {
   width: var(
-    --ct-board-width,
-    min(var(--ct-board-max, 100vh) * var(--ct-board-scale, 0.85), 100%)
+    --board-width,
+    min(var(--board-max, 100vh) * var(--ct-board-scale, 0.85), 100%)
   );
   position: relative;
   border-radius: 2px;
 }
 
 // Turn indicator glow (rendered on the area, not on chessground itself).
-.ct-layout__board--turn-white {
+.#{$cls-prefix}-layout__board--turn-white {
   background: rgba(255, 255, 255, 0.7);
   box-shadow: 0 0 12px 3px rgba(255, 255, 255, 0.7);
 }
 
-.ct-layout__board--turn-black {
+.#{$cls-prefix}-layout__board--turn-black {
   background: rgba(0, 0, 0, 0.7);
   box-shadow: 0 0 12px 3px rgba(0, 0, 0, 0.7);
 }
@@ -37,7 +39,7 @@
 .xq-wrap {
   container-type: inline-size;
   flex-shrink: 0;
-  aspect-ratio: var(--ct-board-ratio, 1);
+  aspect-ratio: var(--board-ratio, 1);
   border-radius: 2px;
 }
 
@@ -55,7 +57,7 @@ cg-container {
 
 // ---- Promotion overlay -------------------------------------------------------
 
-.ct-promotion {
+.#{$cls-prefix}-promotion {
   position: absolute;
   inset: 0;
   background: rgba(0, 0, 0, 0.4);
@@ -67,7 +69,7 @@ cg-container {
   z-index: 10;
 }
 
-.ct-promotion__choices {
+.#{$cls-prefix}-promotion__choices {
   display: flex;
   gap: 6px;
   padding: 8px;
@@ -77,7 +79,7 @@ cg-container {
   box-shadow: var(--shadow-l, 0 2px 12px rgba(0, 0, 0, 0.3));
 }
 
-.ct-promotion__btn {
+.#{$cls-prefix}-promotion__btn {
   all: unset;
   cursor: pointer;
   padding: 4px;
@@ -87,14 +89,14 @@ cg-container {
   transition: background 0.15s;
 }
 
-.ct-promotion__btn:hover {
+.#{$cls-prefix}-promotion__btn:hover {
   background: var(--background-modifier-hover);
   border-color: var(--color-accent);
 }
 
 // ---- Resize handle (col2 only, shown via _layout.scss) -----------------------
 
-.ct-board-resize {
+.#{$cls-prefix}-board-resize {
   position: absolute;
   right: 0;
   bottom: 0;

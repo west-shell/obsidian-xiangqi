@@ -5,15 +5,19 @@
 
 ## 1. 命名规范
 
-- **BEM**：`块__元素--修饰符`，全局前缀 `ct-`（chess-tree）。
-- **类名单一来源**：TS/Svelte 一律通过 `src/chess.ts` 的常量引用类名
-  （`LAYOUT_CLASS`、`BLOCK_CLASS`、`FILE_VIEW_CLASS`…），不手写字符串。
+- **BEM**：`块__元素--修饰符`，全局前缀由变体唯一决定：chess 为 `ct-`，
+  xiangqi 为 `xq-`。
+- **类名单一来源**：前缀只定义一次——TS/Svelte 用 `src/chess.ts` 的
+  `CLS_PREFIX` 模板串派生（`` `${CLS_PREFIX}-layout` ``），scss 用
+  `_variant.scss` 的 `$cls-prefix` 派生（`.#{$cls-prefix}-layout`），
+  不手写含前缀的字符串。
 - **chessground 库类不可改名**：`cg-wrap` / `cg-container` / `cg-board` /
   `coords` / `coord` / `piece` / `square` 属于 `@lichess-org/chessground`，
   覆盖样式只允许出现在 `scss/_board.scss`。
 - **组件不写 `<style>`**：全部样式收口在 `src/style/`，Svelte 组件只挂类名。
-- **CSS 自定义属性统一 `--ct-*`**：主题层（`themes.ts` /
-  `applyThemeCSSVars`）写入 `<body>`，布局私有变量不再使用 `---` 三横线。
+- **CSS 自定义属性分两层**：写入 `<body>` 的全局变量带变体前缀
+  （chess `--ct-*`，xiangqi `--xq-*`，见第 4 节）；有父容器作用域罩着的
+  组件内部变量不带前缀（`--tree-line`、`--board-ratio`…）。
 
 ## 2. DOM 树
 
@@ -108,26 +112,26 @@ src/style/
 | `--ct-coords-display`                                                 | 坐标显隐（flex/none）            |
 | `--ct-piece-primary` / `--ct-piece-secondary`                         | 双方棋子代表色                   |
 
-组件/布局内部：
+组件/布局内部（父容器作用域内，不带前缀）：
 
 | 变量                                 | 作用域                 | 说明                                       |
 | ------------------------------------ | ---------------------- | ------------------------------------------ |
 | `--ct-header-h`                      | body / `.ct-file-view` | 视图头部高度（col2 高度代数用）            |
 | `--ct-gap`                           | body                   | 全局间距                                   |
 | `--ct-col2-size` / `--ct-col2-width` | body                   | col2 轨道主尺寸 / 宽度                     |
-| `--ct-board-width`                   | `.ct-layout__board`    | 棋盘宽度覆盖点（PGN 视图用）               |
-| `--ct-board-max`                     | 布局回退               | 棋盘最大尺寸回退值（默认 100vh）           |
-| `--ct-board-ratio`                   | `.cg-wrap`             | 棋盘宽高比（由 `BOARD_ASPECT_RATIO` 内联） |
-| `--ct-tree-bg` / `--ct-tree-line`    | `.ct-layout__panel`    | 画布底色 / 树线颜色                        |
-| `--ct-eval-plus` / `--ct-eval-minus` | `.ct-layout__panel`    | 局势评估双色                               |
-| `--ct-textarea-h`                    | `.ct-comment__input`   | 评论框测量高度                             |
+| `--board-width`                      | `.ct-layout__board`    | 棋盘宽度覆盖点（PGN 视图用）               |
+| `--board-max`                        | 布局回退               | 棋盘最大尺寸回退值（默认 100vh）           |
+| `--board-ratio`                      | `.cg-wrap`             | 棋盘宽高比（由 `BOARD_ASPECT_RATIO` 内联） |
+| `--tree-bg` / `--tree-line`          | `.ct-layout__panel`    | 画布底色 / 树线颜色                        |
+| `--eval-plus` / `--eval-minus`       | `.ct-layout__panel`    | 局势评估双色                               |
+| `--textarea-h`                       | `.ct-comment__input`   | 评论框测量高度                             |
 
 ## 5. 重命名对照表
 
 | 旧                                                                                           | 新                                                                                                                                                                 |
 | -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `chess-layout`                                                                               | `ct-layout`                                                                                                                                                        |
-| `chess-layout--genfen`                                                                       | `ct-layout--edit`（常量 `LAYOUT_CLASS_EDIT`）                                                                                                                      |
+| `chess-layout--genfen`                                                                       | `ct-layout--edit`（`${CLS_PREFIX}-layout--edit`）                                                                                                                  |
 | `board-wrapper` + `chess-layout__board`                                                      | `ct-layout__board`（合并双类名）                                                                                                                                   |
 | `toolbar-container` + `chess-layout__toolbar`                                                | `ct-toolbar`                                                                                                                                                       |
 | `tree-container` + `chess-layout__tools`                                                     | `ct-layout__panel`                                                                                                                                                 |
@@ -161,5 +165,5 @@ src/style/
 - 主题色变量名各变体独立：chess 用 `--ct-*`，xiangqi 用 `--xq-*`
   （注意避开 xiangqiground 库已占用的 `--xq-selected-color` 等），
   由各自 `themes.ts` 写入；
-- 同步后 xiangqi 侧需手工更新其 `chess.ts` 中的类名常量与
+- 同步后 xiangqi 侧需手工更新其 `chess.ts`（`CLS_PREFIX = "xq"`）与
   `applyThemeCSSVars` 变量名。

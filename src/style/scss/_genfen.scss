@@ -1,5 +1,5 @@
 // ============================================================================
-// FEN editor (.ct-layout--edit) — piece palette + editor tools.
+// FEN editor ({prefix}-layout--edit) — piece palette + editor tools.
 //
 // The editor does NOT reuse the play-mode grid template: it is a plain flex
 // container of its own.
@@ -15,12 +15,12 @@
 
 // ---- Edit-mode layout -----------------------------------------------------------
 
-.ct-layout--edit {
+.#{$cls-prefix}-layout--edit {
   display: flex;
   flex-direction: column;
   gap: $ct-layout-gap;
 
-  .ct-layout__board {
+  .#{$cls-prefix}-layout__board {
     align-self: center;
   }
 
@@ -28,7 +28,7 @@
     flex-direction: row;
     align-items: flex-start;
 
-    .ct-genfen {
+    .#{$cls-prefix}-genfen {
       flex-direction: column;
       flex-wrap: #{$genfen-toolbar-wrap};
       align-items: center;
@@ -42,31 +42,31 @@
 
 // Code-block host: the row height equals the board height, so the toolbar
 // wraps into a second column instead of stretching the block taller.
-.ct-block .ct-layout--edit {
+.#{$cls-prefix}-block .#{$cls-prefix}-layout--edit {
   @include col2 {
     height: calc(var(--ct-col2-width) / #{$board-ratio});
 
-    .ct-layout__board {
-      --ct-board-width: var(--ct-col2-width);
+    .#{$cls-prefix}-layout__board {
+      --board-width: var(--ct-col2-width);
       flex: none;
     }
 
-    .ct-genfen {
+    .#{$cls-prefix}-genfen {
       max-height: 100%;
     }
   }
 }
 
-// ---- Piece palette (.ct-layout__palette) ----------------------------------------
+// ---- Piece palette ({prefix}-layout__palette) ----------------------------------------
 
-.ct-layout__palette {
+.#{$cls-prefix}-layout__palette {
   display: grid;
   grid-template-columns: repeat(#{$palette-cols}, 1fr);
   grid-template-rows: repeat(2, 1fr);
   width: 100%;
   height: 56px;
 
-  .ct-palette__btn {
+  .#{$cls-prefix}-palette__btn {
     width: #{$palette-col-cqw};
     height: 28px;
   }
@@ -78,7 +78,7 @@
     width: 56px;
     height: 100%;
 
-    .ct-palette__btn {
+    .#{$cls-prefix}-palette__btn {
       width: 28px;
       height: #{$palette-col-cqh};
     }
@@ -87,7 +87,7 @@
   // Container-scoped + `button.`-qualified so the palette always outranks
   // host button styling (the pre-refactor scoped-Svelte selectors were
   // 3 classes deep; a bare class rule loses that fight).
-  button.ct-palette__btn {
+  button.#{$cls-prefix}-palette__btn {
     padding: 0;
     margin: 0;
     border-radius: 4px;
@@ -107,25 +107,27 @@
     }
   }
 
-  button.ct-palette__btn--empty {
+  button.#{$cls-prefix}-palette__btn--empty {
     pointer-events: none;
     opacity: 0.35;
   }
 }
 
-// Active palette button. Hoisted + `.ct-layout--edit`-scoped so it outranks
+// Active palette button. Hoisted + `{prefix}-layout--edit`-scoped so it outranks
 // the per-variant piece-color rules in _variant.scss (same specificity,
 // this file loads later).
-.ct-layout--edit .ct-layout__palette button.ct-palette__btn--active {
+.#{$cls-prefix}-layout--edit
+  .#{$cls-prefix}-layout__palette
+  button.#{$cls-prefix}-palette__btn--active {
   border-color: #ffd700;
   box-shadow: 0 0 0 2px #ffd700;
   filter: brightness(1.5) saturate(1.4)
     drop-shadow(0 0 6px rgba(255, 255, 255, 0.6));
 }
 
-// ---- Editor tools (.ct-genfen) ---------------------------------------------------
+// ---- Editor tools ({prefix}-genfen) ---------------------------------------------------
 
-.ct-genfen {
+.#{$cls-prefix}-genfen {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
@@ -135,19 +137,19 @@
   max-height: 100%;
 }
 
-.ct-genfen__section {
+.#{$cls-prefix}-genfen__section {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-.ct-genfen__section--row {
+.#{$cls-prefix}-genfen__section--row {
   flex-direction: row;
   align-items: center;
   gap: 4px;
 }
 
-.ct-genfen__label {
+.#{$cls-prefix}-genfen__label {
   font-size: 0.8em;
   font-weight: 600;
   text-transform: uppercase;
@@ -156,7 +158,7 @@
 }
 
 // Side-to-move toggle (container-scoped + `button.`-qualified, see palette).
-.ct-genfen button.ct-genfen__turn {
+.#{$cls-prefix}-genfen button.#{$cls-prefix}-genfen__turn {
   padding: 2px 12px;
   border: 1.5px solid rgba(0, 0, 0, 0.35);
   border-radius: 4px;
@@ -168,12 +170,12 @@
   white-space: nowrap;
 }
 
-.ct-genfen button.ct-genfen__turn:hover {
+.#{$cls-prefix}-genfen button.#{$cls-prefix}-genfen__turn:hover {
   filter: brightness(1.1);
 }
 
 // En-passant / generic selects.
-.ct-genfen__select {
+.#{$cls-prefix}-genfen__select {
   padding: 4px 8px;
   border: 1px solid var(--background-modifier-border, #ccc);
   border-radius: 4px;
@@ -184,25 +186,25 @@
 }
 
 // Castling rights rows.
-.ct-genfen__rights {
+.#{$cls-prefix}-genfen__rights {
   display: flex;
   flex-wrap: nowrap;
   gap: 4px;
   align-items: center;
 }
 
-.ct-genfen__rights + .ct-genfen__rights {
+.#{$cls-prefix}-genfen__rights + .#{$cls-prefix}-genfen__rights {
   margin-top: 2px;
 }
 
-.ct-genfen__side {
+.#{$cls-prefix}-genfen__side {
   font-weight: 600;
   font-size: 0.85em;
   white-space: nowrap;
   min-width: 3em;
 }
 
-.ct-genfen__right {
+.#{$cls-prefix}-genfen__right {
   display: flex;
   align-items: center;
   gap: 2px;
@@ -215,7 +217,7 @@
   transition: all 0.15s;
 }
 
-.ct-genfen__right--on {
+.#{$cls-prefix}-genfen__right--on {
   border-color: var(--interactive-accent, #6a9fb5);
   background: color-mix(
     in srgb,
@@ -224,17 +226,17 @@
   );
 }
 
-.ct-genfen__right input {
+.#{$cls-prefix}-genfen__right input {
   margin: 0;
 }
 
-.ct-genfen__right--off {
+.#{$cls-prefix}-genfen__right--off {
   opacity: 0.3;
   pointer-events: none;
 }
 
 // Action buttons.
-.ct-genfen__actions {
+.#{$cls-prefix}-genfen__actions {
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;
@@ -242,7 +244,7 @@
   align-content: start;
 }
 
-.ct-genfen button.ct-genfen__action {
+.#{$cls-prefix}-genfen button.#{$cls-prefix}-genfen__action {
   padding: 6px 12px;
   border: 1px solid var(--background-modifier-border, #ccc);
   border-radius: 4px;
@@ -253,17 +255,17 @@
   transition: background 0.15s;
 }
 
-.ct-genfen button.ct-genfen__action:hover {
+.#{$cls-prefix}-genfen button.#{$cls-prefix}-genfen__action:hover {
   background: var(--background-modifier-hover, #e0e0e0);
 }
 
-.ct-genfen button.ct-genfen__action--save {
+.#{$cls-prefix}-genfen button.#{$cls-prefix}-genfen__action--save {
   background: var(--interactive-accent, #6a9fb5);
   color: var(--text-on-accent, #fff);
   border-color: var(--interactive-accent, #6a9fb5);
   font-weight: 600;
 }
 
-.ct-genfen button.ct-genfen__action--save:hover {
+.#{$cls-prefix}-genfen button.#{$cls-prefix}-genfen__action--save:hover {
   opacity: 0.9;
 }

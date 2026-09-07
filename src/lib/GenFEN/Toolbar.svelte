@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { CLS_PREFIX } from "../../chess";
   import type { EventBus } from "../../core/event-bus";
   import { onLangChange, t } from "../../i18n";
   import { onMount } from "svelte";
@@ -47,11 +48,12 @@
   });
 </script>
 
-<div class="ct-genfen">
-  <div class="ct-genfen__group">
-    <div class="ct-genfen__section ct-genfen__section--row">
+<div class="{CLS_PREFIX}-genfen">
+  <div class="{CLS_PREFIX}-genfen__group">
+    <div class="{CLS_PREFIX}-genfen__section {CLS_PREFIX}-genfen__section--row">
       <button
-        class="ct-genfen__turn ct-genfen__turn--{_turn === 'b'
+        class="{CLS_PREFIX}-genfen__turn {CLS_PREFIX}-genfen__turn--{_turn ===
+        'b'
           ? 'black'
           : 'white'}"
         onclick={toggleTurn}
@@ -62,25 +64,34 @@
     </div>
   </div>
 
-  <div class="ct-genfen__actions">
-    <button class="ct-genfen__action" onclick={() => buttonClick("start")}>
+  <div class="{CLS_PREFIX}-genfen__actions">
+    <button
+      class="{CLS_PREFIX}-genfen__action"
+      onclick={() => buttonClick("start")}
+    >
       {t("genfen.start", _lv)}
     </button>
-    <button class="ct-genfen__action" onclick={() => buttonClick("empty")}>
+    <button
+      class="{CLS_PREFIX}-genfen__action"
+      onclick={() => buttonClick("empty")}
+    >
       {t("genfen.empty", _lv)}
     </button>
-    <button class="ct-genfen__action" onclick={() => buttonClick("flip")}>
+    <button
+      class="{CLS_PREFIX}-genfen__action"
+      onclick={() => buttonClick("flip")}
+    >
       {t("genfen.flip", _lv)}
     </button>
     <button
-      class="ct-genfen__action ct-genfen__action--save"
+      class="{CLS_PREFIX}-genfen__action {CLS_PREFIX}-genfen__action--save"
       onclick={() => buttonClick("save")}
     >
       {t("genfen.save", _lv)}
     </button>
     {#if !isFenMode}
       <button
-        class="ct-genfen__action ct-genfen__action--back"
+        class="{CLS_PREFIX}-genfen__action {CLS_PREFIX}-genfen__action--back"
         onclick={() => eventBus.emit("exit-edit")}
       >
         {t("genfen.back", _lv)}

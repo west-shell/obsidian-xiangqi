@@ -7,7 +7,11 @@ import {
   // type SettingGroupItem,
 } from "obsidian";
 
-import { DEFAULT_FEN_BLOCK_NAMES, DEFAULT_TREE_BLOCK_NAMES } from "./chess";
+import {
+  CLS_PREFIX,
+  DEFAULT_FEN_BLOCK_NAMES,
+  DEFAULT_TREE_BLOCK_NAMES,
+} from "./chess";
 import { getLang, initI18n, t } from "./i18n";
 import type ChessPlugin from "./main";
 import { getThemeDisplayName, THEME_KEYS } from "./themes";
@@ -79,7 +83,7 @@ function addSliderWithValue(
   let currentValue = value;
   const setting = new Setting(containerEl).setName(name).setDesc(desc);
 
-  const valueDisplay = createSpan({ cls: "ct-setting-value" });
+  const valueDisplay = createSpan({ cls: `${CLS_PREFIX}-setting-value` });
   valueDisplay.setText(`${currentValue}${unit}`);
   setting.controlEl.prepend(valueDisplay);
 
@@ -826,7 +830,7 @@ export class ChessSettingTab extends PluginSettingTab {
         }),
       );
 
-    containerEl.parentElement?.classList.add("ct-settings");
+    containerEl.parentElement?.classList.add(`${CLS_PREFIX}-settings`);
   }
 
   hide(): void {

@@ -10,7 +10,7 @@ $scrollbar-width: 20px;
 $bottom-margin: 1rem;
 
 // Page chrome height: 0 for code blocks, Obsidian's view header height
-// inside the PGN file view (overridden on .view-content.ct-file-view).
+// inside the PGN file view (overridden on the {prefix}-file-view root).
 $ct-header-h: var(--ct-header-h, 0px);
 
 // Global grid gap, set on <body> so themes can tweak it.

@@ -7,6 +7,7 @@
     type cg,
     Chess,
     Chessground,
+    CLS_PREFIX,
     type Config,
     type DrawShape,
     GRID_SVG,
@@ -15,7 +16,6 @@
     type Move,
     PROMOTION_PIECES,
     RESIZE_EVENT,
-    RESIZING_CLASS,
     type Square,
     WRAP_CLASS,
     ZOOM_CHANGE_EVENT,
@@ -114,7 +114,7 @@
   );
   let turnClass = $derived(
     settings.showTurnBorder
-      ? `ct-layout__board--turn-${
+      ? `${CLS_PREFIX}-layout__board--turn-${
           fen.split(" ")[1] === "b" ? "black" : "white"
         }`
       : "",
@@ -391,13 +391,13 @@
       activeDocument.body.dispatchEvent(new Event(RESIZE_EVENT));
     };
 
-    activeDocument.body.classList.add(RESIZING_CLASS);
+    activeDocument.body.classList.add(`${CLS_PREFIX}-resizing`);
     activeDocument.addEventListener(moveEvent, resize);
     activeDocument.addEventListener(
       upEvent,
       () => {
         activeDocument.removeEventListener(moveEvent, resize);
-        activeDocument.body.classList.remove(RESIZING_CLASS);
+        activeDocument.body.classList.remove(`${CLS_PREFIX}-resizing`);
         activeDocument.body.dispatchEvent(
           new CustomEvent(ZOOM_CHANGE_EVENT, { detail: zoom }),
         );
@@ -407,22 +407,25 @@
   }
 </script>
 
-<div class="ct-layout__board {turnClass}" onwheel={handleWheel}>
+<div class="{CLS_PREFIX}-layout__board {turnClass}" onwheel={handleWheel}>
   <div
     bind:this={boardElement}
     class={WRAP_CLASS}
-    style="--ct-board-ratio: {BOARD_ASPECT_RATIO}"
+    style="--board-ratio: {BOARD_ASPECT_RATIO}"
   ></div>
   {#if HAS_PROMOTION && promotingMove}
     <!-- svelte-ignore a11y_click_events_have_key_events -->
     <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <div class="ct-promotion">
+    <div class="{CLS_PREFIX}-promotion">
       <!-- svelte-ignore a11y_click_events_have_key_events -->
       <!-- svelte-ignore a11y_no_static_element_interactions -->
-      <div class="ct-promotion__choices" onclick={(e) => e.stopPropagation()}>
+      <div
+        class="{CLS_PREFIX}-promotion__choices"
+        onclick={(e) => e.stopPropagation()}
+      >
         {#each PROMOTION_PIECES ?? [] as { type, icon } (type)}
           <button
-            class="ct-promotion__btn"
+            class="{CLS_PREFIX}-promotion__btn"
             onclick={() => completePromotion(type)}
           >
             <!-- eslint-disable-next-line svelte/no-at-html-tags -->
@@ -434,7 +437,7 @@
   {/if}
   <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div
-    class="ct-board-resize"
+    class="{CLS_PREFIX}-board-resize"
     onmousedown={startResize}
     ontouchstart={startResize}
   ></div>

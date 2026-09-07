@@ -2,10 +2,12 @@
 // Plugin settings tab + modal controls (engine dialog, import/export).
 // ============================================================================
 
+@use "variant" as *;
+
 // ---- Settings tab -------------------------------------------------------------
 
 // Slider value bubble rendered before each slider control.
-.ct-setting-value {
+.#{$cls-prefix}-setting-value {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -21,26 +23,26 @@
 }
 
 // Applied to the settings tab container: tighter setting items.
-.ct-settings .setting-item {
+.#{$cls-prefix}-settings .setting-item {
   border-top: none;
 }
 
 // ---- Engine modal ----------------------------------------------------------------
 
-.ct-engine-toggle {
+.#{$cls-prefix}-engine-toggle {
   display: flex;
   align-items: center;
   gap: 8px;
   margin: 8px 0;
 }
 
-.ct-engine-toggle label {
+.#{$cls-prefix}-engine-toggle label {
   cursor: pointer;
 }
 
 // ---- Import / export modal ---------------------------------------------------------
 
-.ct-modal-textarea {
+.#{$cls-prefix}-modal-textarea {
   width: 100%;
   min-height: 40px;
   padding: 8px;
@@ -54,17 +56,17 @@
   box-sizing: border-box;
 }
 
-.ct-modal-textarea--fixed {
+.#{$cls-prefix}-modal-textarea--fixed {
   resize: none;
 }
 
-.ct-modal-warning {
+.#{$cls-prefix}-modal-warning {
   color: var(--text-error);
   font-size: 13px;
   margin: 4px 0 8px;
 }
 
-.ct-modal-separator {
+.#{$cls-prefix}-modal-separator {
   border-top: 1px solid var(--background-modifier-border);
   margin: 16px 0;
 }

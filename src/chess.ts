@@ -25,11 +25,7 @@ import type {
 export const DEFAULT_FEN =
   "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w";
 export const EMPTY_FEN = "4k4/9/9/9/9/9/9/9/9/4K4 w - - 0 1";
-export const LAYOUT_CLASS = "ct-layout";
-export const LAYOUT_CLASS_EDIT = "ct-layout--edit";
-export const BLOCK_CLASS = "ct-block";
-export const FILE_VIEW_CLASS = "ct-file-view";
-export const RESIZING_CLASS = "ct-resizing";
+export const CLS_PREFIX = "xq";
 export const WRAP_CLASS = "xq-wrap";
 export const BOARD_ELEMENT = "xq-board";
 export const BOARD_ASPECT_RATIO = 0.9;
@@ -145,9 +141,9 @@ export function getNodeTextColor(side: string | null): string {
 
 export function getMoveListSideClass(side: string | null): string {
   if (side === "white" || side === "red") {
-    return "ct-moves__move--white";
+    return `${CLS_PREFIX}-moves__move--white`;
   }
-  return "ct-moves__move--black";
+  return `${CLS_PREFIX}-moves__move--black`;
 }
 
 export function getStartLabel(): string {

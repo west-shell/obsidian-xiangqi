@@ -9,6 +9,7 @@
     type NodeMap,
   } from "../../types";
   import {
+    CLS_PREFIX,
     getMoveListSideClass,
     getMoveNotation,
     getNodeDisplay,
@@ -209,12 +210,12 @@
 
   function adjustTextareaHeight() {
     if (!textareaEl) return;
-    textareaEl.classList.add("ct-comment__input--auto");
+    textareaEl.classList.add(`${CLS_PREFIX}-comment__input--auto`);
     textareaEl.style.setProperty(
-      "--ct-textarea-h",
+      "--textarea-h",
       `${textareaEl.scrollHeight}px`,
     );
-    textareaEl.classList.remove("ct-comment__input--auto");
+    textareaEl.classList.remove(`${CLS_PREFIX}-comment__input--auto`);
   }
 
   function updateTreeLayout() {
@@ -443,12 +444,12 @@
         v2 === Infinity ? edgeR : v2 === -Infinity ? edgeL : midX + v2 * scaleX;
       const color =
         v2 === Infinity || (Number.isFinite(v2) && v2 >= 0)
-          ? "var(--ct-eval-plus)"
-          : "var(--ct-eval-minus)";
+          ? "var(--eval-plus)"
+          : "var(--eval-minus)";
       const color1 =
         v1 === Infinity || (Number.isFinite(v1) && v1 >= 0)
-          ? "var(--ct-eval-plus)"
-          : "var(--ct-eval-minus)";
+          ? "var(--eval-plus)"
+          : "var(--eval-minus)";
       if (color1 !== color) {
         segments.push({
           x1,
@@ -750,12 +751,12 @@
   });
 </script>
 
-<div class="ct-layout__panel">
+<div class="{CLS_PREFIX}-layout__panel">
   {#if showGameInfo}
-    <div class="ct-gamenav">
+    <div class="{CLS_PREFIX}-gamenav">
       <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
       <div
-        class="ct-gamenav__info"
+        class="{CLS_PREFIX}-gamenav__info"
         role={isBlockMode ? undefined : "button"}
         tabindex={isBlockMode ? undefined : 0}
         onclick={isBlockMode ? undefined : handleGameMenu}
@@ -766,22 +767,22 @@
                 handleGameMenu(e as unknown as MouseEvent);
             }}
       >
-        <span class="ct-gamenav__title">{gameTitle}</span>
+        <span class="{CLS_PREFIX}-gamenav__title">{gameTitle}</span>
         {#if showGameNav}
-          <span class="ct-gamenav__index">{gameLabel}</span>
+          <span class="{CLS_PREFIX}-gamenav__index">{gameLabel}</span>
         {/if}
       </div>
       {#if showGameNav}
-        <div class="ct-gamenav__arrows">
+        <div class="{CLS_PREFIX}-gamenav__arrows">
           <button
-            class="ct-btn ct-gamenav__arrow"
+            class="{CLS_PREFIX}-btn {CLS_PREFIX}-gamenav__arrow"
             aria-label={t("game.prev", _lv)}
             disabled={currentGameIndex <= 0}
             use:useSetIcon={"chevron-left"}
             onclick={prevGame}
           ></button>
           <button
-            class="ct-btn ct-gamenav__arrow"
+            class="{CLS_PREFIX}-btn {CLS_PREFIX}-gamenav__arrow"
             aria-label={t("game.next", _lv)}
             disabled={!games || currentGameIndex >= games.length - 1}
             use:useSetIcon={"chevron-right"}
@@ -791,7 +792,7 @@
       {/if}
       {#if !isBlockMode}
         <button
-          class="ct-btn ct-gamenav__arrow ct-gamenav__menu"
+          class="{CLS_PREFIX}-btn {CLS_PREFIX}-gamenav__arrow {CLS_PREFIX}-gamenav__menu"
           aria-label={t("game.select", _lv)}
           use:useSetIcon={"list"}
           onclick={handleGameMenu}
@@ -799,18 +800,18 @@
       {/if}
     </div>
   {/if}
-  <div class="ct-panel__row">
-    <div class="ct-panel__canvas">
+  <div class="{CLS_PREFIX}-panel__row">
+    <div class="{CLS_PREFIX}-panel__canvas">
       {#if nodeMap.get(currentNode?.id ?? "")?.eval}
         {@const ce = nodeMap.get(currentNode!.id)!.eval!}
         {@const isZero = ce.scoreType !== "mate" && ce.score === 0}
         {@const isPositive =
           ce.score > 0 || (ce.scoreType === "mate" && ce.score >= 0)}
         {@const evalColor = isPositive
-          ? "var(--ct-eval-plus)"
-          : "var(--ct-eval-minus)"}
+          ? "var(--eval-plus)"
+          : "var(--eval-minus)"}
         {@const labelBg = isZero
-          ? "linear-gradient(to bottom, var(--ct-eval-plus) 50%, var(--ct-eval-minus) 50%)"
+          ? "linear-gradient(to bottom, var(--eval-plus) 50%, var(--eval-minus) 50%)"
           : evalColor}
         {@const fillPercent =
           ce.scoreType === "mate"
@@ -820,28 +821,33 @@
           ce.scoreType === "mate"
             ? (ce.score >= 0 ? "+" : "-") + "M"
             : (ce.score > 0 ? "+" : "") + (ce.score / 100).toFixed(1)}
-        <div class="ct-eval">
-          <div class="ct-eval__bar">
+        <div class="{CLS_PREFIX}-eval">
+          <div class="{CLS_PREFIX}-eval__bar">
             {#if isPositive}
               <div
-                class="ct-eval__fill"
+                class="{CLS_PREFIX}-eval__fill"
                 style="height: {fillPercent}%; top: {50 -
                   fillPercent}%; background: {evalColor}"
               ></div>
             {:else}
               <div
-                class="ct-eval__fill"
+                class="{CLS_PREFIX}-eval__fill"
                 style="height: {fillPercent}%; top: 50%; background: {evalColor}"
               ></div>
             {/if}
-            <div class="ct-eval__center"></div>
-            <span class="ct-eval__label" style="background: {labelBg}"
+            <div class="{CLS_PREFIX}-eval__center"></div>
+            <span class="{CLS_PREFIX}-eval__label" style="background: {labelBg}"
               >{evalText}</span
             >
           </div>
         </div>
       {/if}
-      <svg bind:this={svgEl} width="100%" height="100%" class="ct-panel__svg">
+      <svg
+        bind:this={svgEl}
+        width="100%"
+        height="100%"
+        class="{CLS_PREFIX}-panel__svg"
+      >
         <g transform={TRANSFORM_SAFE}>
           {#each renderedNodes as node (node.id)}
             {#each node.children as child, idx (node.id + "-" + idx)}
@@ -855,7 +861,7 @@
               L ${(child.x! - 0.3 * Math.sign(child.x! - node.x!)) * spacingX} ${node.y! * spacingY}
               L ${child.x! * spacingX} ${child.y! * spacingY}
               `}
-                  stroke="var(--ct-tree-line)"
+                  stroke="var(--tree-line)"
                   stroke-linejoin="round"
                   stroke-width={onPath ? 1.5 : 1}
                   opacity={onPath ? 1 : 0.4}
@@ -896,8 +902,8 @@
                     : isLeft
                       ? "0,-4 0,4 -5,0"
                       : "0,-4 0,4 5,0"}
-                  fill="var(--ct-tree-line)"
-                  stroke="var(--ct-tree-line)"
+                  fill="var(--tree-line)"
+                  stroke="var(--tree-line)"
                   stroke-width="1.5"
                   stroke-linejoin="round"
                   opacity={offPathFold ? 0.5 : 1}
@@ -913,7 +919,7 @@
             <!-- svelte-ignore a11y_click_events_have_key_events -->
             <!-- svelte-ignore a11y_no_static_element_interactions -->
             <g
-              class="ct-panel__node"
+              class="{CLS_PREFIX}-panel__node"
               transform="translate({node.x! * spacingX} {node.y! *
                 spacingY}){isCurrent ? ' scale(1.2)' : ''}"
               opacity={currentPath.includes(node.id) ? 1 : 0.55}
@@ -935,7 +941,7 @@
                   : getNodeFill(node.color)}
                 stroke={isCurrent
                   ? getNodeFill(node.color)
-                  : "var(--ct-tree-line)"}
+                  : "var(--tree-line)"}
               />
               {#if nodeMode === 0 && !node.move}
                 <g
@@ -993,10 +999,10 @@
                 {@const color =
                   node.eval.score > 0 ||
                   (node.eval.scoreType === "mate" && node.eval.score >= 0)
-                    ? `color-mix(in srgb, var(--ct-eval-plus) ${60 + intensity * 40}%, transparent)`
+                    ? `color-mix(in srgb, var(--eval-plus) ${60 + intensity * 40}%, transparent)`
                     : node.eval.score < 0 ||
                         (node.eval.scoreType === "mate" && node.eval.score < 0)
-                      ? `color-mix(in srgb, var(--ct-eval-minus) ${60 + intensity * 40}%, transparent)`
+                      ? `color-mix(in srgb, var(--eval-minus) ${60 + intensity * 40}%, transparent)`
                       : `color-mix(in srgb, var(--text-muted) 60%, transparent)`}
                 {@const barWidth = 2 + intensity * (nw - 4)}
                 <rect
@@ -1063,10 +1069,10 @@
         </g>
       </svg>
 
-      <div class="ct-panel__toolbar ct-btn-group">
+      <div class="{CLS_PREFIX}-panel__toolbar {CLS_PREFIX}-btn-group">
         {#if canFold}
           <button
-            class="ct-btn"
+            class="{CLS_PREFIX}-btn"
             aria-label={t("tree.fold", _lv)}
             use:useSetIcon={"chevrons-right-left"}
             onclick={toggleCurrentFold}
@@ -1074,14 +1080,14 @@
         {/if}
         {#each zoomBTN as { title, icon, event } (event)}
           <button
-            class="ct-btn"
+            class="{CLS_PREFIX}-btn"
             aria-label={title}
             use:useSetIcon={icon}
             onclick={event}
           ></button>
         {/each}
         <button
-          class="ct-btn"
+          class="{CLS_PREFIX}-btn"
           aria-label={nodeModeTitle}
           use:useSetIcon={modeIcon}
           onclick={cycleNodeMode}
@@ -1089,19 +1095,17 @@
       </div>
 
       <div
-        class="ct-slider"
-        class:ct-slider--dragging={sliderDragging}
-        class:ct-slider--eval={!!evalChartSegments}
+        class={`${CLS_PREFIX}-slider ${sliderDragging ? `${CLS_PREFIX}-slider--dragging` : ""} ${evalChartSegments ? `${CLS_PREFIX}-slider--eval` : ""}`}
       >
         <button
-          class="ct-slider__btn ct-slider__btn--start"
+          class="{CLS_PREFIX}-slider__btn {CLS_PREFIX}-slider__btn--start"
           aria-label="To start"
           use:useSetIcon={"minus"}
           onclick={() =>
             eventBus.emit("btn-click", { name: "toStart", payload: null })}
         ></button>
         <button
-          class="ct-slider__btn ct-slider__btn--prev"
+          class="{CLS_PREFIX}-slider__btn {CLS_PREFIX}-slider__btn--prev"
           aria-label="Previous"
           use:useSetIcon={"arrow-up"}
           onclick={() =>
@@ -1114,7 +1118,7 @@
           aria-valuemin={0}
           aria-valuemax={100}
           bind:this={sliderInnerEl}
-          class="ct-slider__track"
+          class="{CLS_PREFIX}-slider__track"
           onmousedown={handleSliderAreaMouseDown}
         >
           {#if evalChartSegments}
@@ -1123,7 +1127,7 @@
               height="100%"
               viewBox="0 0 {evalChartSegments.w} {evalChartSegments.h}"
               preserveAspectRatio="none"
-              class="ct-slider__chart"
+              class="{CLS_PREFIX}-slider__chart"
             >
               <line
                 x1={evalChartSegments.midX}
@@ -1147,11 +1151,12 @@
               {/each}
             </svg>
           {/if}
-          <span class="ct-slider__thumb" style="top: {sliderPercent}%"></span>
+          <span class="{CLS_PREFIX}-slider__thumb" style="top: {sliderPercent}%"
+          ></span>
           {#if sliderText}
             <!-- svelte-ignore a11y_no_static_element_interactions -->
             <span
-              class="ct-slider__label"
+              class="{CLS_PREFIX}-slider__label"
               style="top: {sliderPercent}%"
               onmousedown={handleSliderAreaMouseDown}
               ontouchstart={handleSliderLabelTouchStart}>{sliderText}</span
@@ -1159,14 +1164,14 @@
           {/if}
         </div>
         <button
-          class="ct-slider__btn ct-slider__btn--next"
+          class="{CLS_PREFIX}-slider__btn {CLS_PREFIX}-slider__btn--next"
           aria-label="Next"
           use:useSetIcon={"arrow-down"}
           onclick={() =>
             eventBus.emit("btn-click", { name: "next", payload: null })}
         ></button>
         <button
-          class="ct-slider__btn ct-slider__btn--end"
+          class="{CLS_PREFIX}-slider__btn {CLS_PREFIX}-slider__btn--end"
           aria-label="To end"
           use:useSetIcon={"minus"}
           onclick={() =>
@@ -1175,17 +1180,16 @@
       </div>
     </div>
     {#if listVisible}
-      <ul class="ct-moves" bind:this={listUlRef}>
+      <ul class="{CLS_PREFIX}-moves" bind:this={listUlRef}>
         <li
-          class="ct-moves__row ct-moves__row--start"
+          class="{CLS_PREFIX}-moves__row {CLS_PREFIX}-moves__row--start"
           bind:this={listItemRefs[0]}
         >
-          <span class="ct-moves__num">0</span>
+          <span class="{CLS_PREFIX}-moves__num">0</span>
           <!-- svelte-ignore a11y_click_events_have_key_events -->
           <!-- svelte-ignore a11y_no_static_element_interactions -->
           <span
-            class="ct-moves__move ct-moves__move--start"
-            class:ct-moves__move--active={listCurrentStep === 0}
+            class={`${CLS_PREFIX}-moves__move ${CLS_PREFIX}-moves__move--start ${listCurrentStep === 0 ? `${CLS_PREFIX}-moves__move--active` : ""}`}
             onclick={() => onClickStep(0)}
           >
             {getStartLabel()}
@@ -1193,13 +1197,15 @@
         </li>
         {#each listMoves as move, i (i)}
           {#if i % 2 === 0}
-            <li class="ct-moves__row" bind:this={listItemRefs[i / 2 + 1]}>
-              <span class="ct-moves__num">{i / 2 + 1}</span>
+            <li
+              class="{CLS_PREFIX}-moves__row"
+              bind:this={listItemRefs[i / 2 + 1]}
+            >
+              <span class="{CLS_PREFIX}-moves__num">{i / 2 + 1}</span>
               <!-- svelte-ignore a11y_click_events_have_key_events -->
               <!-- svelte-ignore a11y_no_static_element_interactions -->
               <span
-                class="ct-moves__move {getMoveListSideClass(move.color)}"
-                class:ct-moves__move--active={listCurrentStep === i + 1}
+                class={`${CLS_PREFIX}-moves__move ${getMoveListSideClass(move.color)} ${listCurrentStep === i + 1 ? `${CLS_PREFIX}-moves__move--active` : ""}`}
                 onclick={() => onClickStep(i + 1)}
               >
                 {move.move ? getMoveNotation(move.move) : "..."}
@@ -1208,10 +1214,9 @@
                 <!-- svelte-ignore a11y_click_events_have_key_events -->
                 <!-- svelte-ignore a11y_no_static_element_interactions -->
                 <span
-                  class="ct-moves__move {getMoveListSideClass(
+                  class={`${CLS_PREFIX}-moves__move ${getMoveListSideClass(
                     listMoves[i + 1].color,
-                  )}"
-                  class:ct-moves__move--active={listCurrentStep === i + 2}
+                  )} ${listCurrentStep === i + 2 ? `${CLS_PREFIX}-moves__move--active` : ""}`}
                   onclick={() => onClickStep(i + 2)}
                 >
                   {(() => {
@@ -1227,17 +1232,17 @@
     {/if}
   </div>
 
-  <div class="ct-panel__comment">
+  <div class="{CLS_PREFIX}-panel__comment">
     <textarea
       bind:value={commentsText}
-      class="ct-comment__input ct-comment__input--auto"
+      class="{CLS_PREFIX}-comment__input {CLS_PREFIX}-comment__input--auto"
       placeholder={t("tree.placeholder")}
       bind:this={textareaEl}
       oninput={handleCommentsInput}
       onblur={handleCommentsBlur}
       rows="1"></textarea>
     <button
-      class="ct-btn ct-comment__toggle"
+      class="{CLS_PREFIX}-btn {CLS_PREFIX}-comment__toggle"
       title={listVisible ? t("tree.hideList", _lv) : t("tree.showList", _lv)}
       aria-label={listVisible
         ? t("tree.hideList", _lv)

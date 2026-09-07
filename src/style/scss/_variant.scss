@@ -12,6 +12,11 @@
 
 @use "mixins" as *;
 
+// Class-name prefix (chess = "ct", xiangqi = "xq"). Shared scss derives
+// every class selector from it: `.#{$cls-prefix}-layout` etc. Comments in
+// shared files abbreviate it as {prefix}.
+$cls-prefix: "xq";
+
 // ---- Reusable board visuals ---------------------------------------------------
 
 // Corner-bracket frame (four L-shaped marks) — same visual language as
@@ -61,30 +66,38 @@
 }
 
 // ---- FEN editor piece colors (theme-driven) -----------------------------------
-// Palette + side-to-move button colors. `.ct-layout--edit`-scoped so they
-// outrank the shared base button rule in _genfen.scss (which loads later
-// and resets `color: white`). The active state in _genfen.scss re-outranks
-// these at the same specificity.
+// Palette + side-to-move button colors. `.#{$cls-prefix}-layout--edit`-scoped
+// so they outrank the shared base button rule in _genfen.scss (which loads
+// later and resets `color: white`). The active state in _genfen.scss
+// re-outranks these at the same specificity.
 
-.ct-layout--edit .ct-layout__palette button.ct-palette__btn--white {
+.#{$cls-prefix}-layout--edit
+  .#{$cls-prefix}-layout__palette
+  button.#{$cls-prefix}-palette__btn--white {
   background-color: var(--xq-piece-red);
   @include contrast-text(var(--xq-piece-red), black);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
-.ct-layout--edit .ct-layout__palette button.ct-palette__btn--black {
+.#{$cls-prefix}-layout--edit
+  .#{$cls-prefix}-layout__palette
+  button.#{$cls-prefix}-palette__btn--black {
   background-color: var(--xq-piece-black);
   @include contrast-text(var(--xq-piece-black), white);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
-.ct-layout--edit .ct-genfen button.ct-genfen__turn--white {
+.#{$cls-prefix}-layout--edit
+  .#{$cls-prefix}-genfen
+  button.#{$cls-prefix}-genfen__turn--white {
   background-color: var(--xq-piece-red);
   @include contrast-text(var(--xq-piece-red), black);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
-.ct-layout--edit .ct-genfen button.ct-genfen__turn--black {
+.#{$cls-prefix}-layout--edit
+  .#{$cls-prefix}-genfen
+  button.#{$cls-prefix}-genfen__turn--black {
   background-color: var(--xq-piece-black);
   @include contrast-text(var(--xq-piece-black), white);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);

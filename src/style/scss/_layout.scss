@@ -1,19 +1,19 @@
 // ============================================================================
-// .ct-layout — the master grid shared by every UI surface.
+// {prefix}-layout — the master grid shared by every UI surface.
 //
 //   col1 (default, narrow portrait): board / toolbar / panel stacked
 //   col2 (wide or landscape):        board | toolbar | panel in one row
 //
 // Host contexts re-shape the grid:
-//   .ct-file-view  → PGN file view (flex column/row, container queries)
-//   .ct-layout--edit → FEN editor (see _genfen.scss)
+//   {prefix}-file-view  → PGN file view (flex column/row, container queries)
+//   {prefix}-layout--edit → FEN editor (see _genfen.scss)
 // ============================================================================
 
 @use "tokens" as *;
 @use "mixins" as *;
 @use "variant" as *;
 
-.ct-layout {
+.#{$cls-prefix}-layout {
   display: grid;
   gap: $ct-layout-gap;
   background: var(--background-primary-alt);
@@ -24,7 +24,7 @@
     align-self: start;
   }
 
-  .ct-toolbar {
+  .#{$cls-prefix}-toolbar {
     grid-area: toolbar;
     align-self: start;
   }
@@ -55,18 +55,18 @@
     }
     justify-self: center;
 
-    .ct-board-resize {
+    .#{$cls-prefix}-board-resize {
       display: none;
     }
   }
 
   // Main toolbar matches the centered board width, single adaptive row.
-  .ct-toolbar {
-    width: min(var(--ct-board-max, 100vh) * var(--ct-board-scale, 0.85), 100%);
+  .#{$cls-prefix}-toolbar {
+    width: min(var(--board-max, 100vh) * var(--ct-board-scale, 0.85), 100%);
     justify-self: center;
     flex-wrap: nowrap;
 
-    .ct-btn {
+    .#{$cls-prefix}-btn {
       min-width: 0;
       height: auto;
       aspect-ratio: 1;
@@ -87,12 +87,12 @@
       "board toolbar panel";
 
     &__board {
-      .ct-board-resize {
+      .#{$cls-prefix}-board-resize {
         display: block;
       }
     }
 
-    .ct-toolbar {
+    .#{$cls-prefix}-toolbar {
       flex-direction: column;
       flex-wrap: wrap;
       max-height: var(--ct-col2-size);
@@ -102,7 +102,7 @@
       justify-content: flex-start;
       width: auto;
 
-      .ct-btn-sep {
+      .#{$cls-prefix}-btn-sep {
         width: auto;
         height: 1px;
         margin: 1px 3px;
@@ -121,41 +121,41 @@
 // PGN file view context — fills the leaf, container queries for the board.
 // ============================================================================
 
-.ct-file-view .ct-layout {
+.#{$cls-prefix}-file-view .#{$cls-prefix}-layout {
   container-type: size;
   display: flex;
   flex-direction: column;
   height: 100%;
 
   &__board {
-    --ct-board-width: min(100cqw, #{$pgn-col1-board-height});
+    --board-width: min(100cqw, #{$pgn-col1-board-height});
     align-self: center;
 
-    .ct-board-resize {
+    .#{$cls-prefix}-board-resize {
       display: none;
     }
   }
 
-  .ct-toolbar,
-  .ct-genfen {
+  .#{$cls-prefix}-toolbar,
+  .#{$cls-prefix}-genfen {
     flex-shrink: 0;
     position: relative;
     z-index: 1;
   }
 
-  .ct-toolbar {
+  .#{$cls-prefix}-toolbar {
     height: auto;
     min-height: 32px;
   }
 
   // Main toolbar matches the board width, centered (overrides the
   // block-host rule above, which ties the width to the global board scale).
-  .ct-toolbar {
+  .#{$cls-prefix}-toolbar {
     width: min(100cqw, #{$pgn-col1-board-height});
     align-self: center;
     flex-wrap: wrap;
 
-    .ct-btn {
+    .#{$cls-prefix}-btn {
       min-width: auto;
       height: 32px;
       aspect-ratio: auto;
@@ -176,11 +176,11 @@
     }
 
     &__board {
-      --ct-board-width: min(60cqw, #{$pgn-col2-board-height});
+      --board-width: min(60cqw, #{$pgn-col2-board-height});
       align-self: center;
     }
 
-    .ct-toolbar {
+    .#{$cls-prefix}-toolbar {
       flex-direction: column;
       flex-wrap: wrap;
       max-height: none;
@@ -189,7 +189,7 @@
       height: auto;
       min-height: 0;
 
-      .ct-btn-sep {
+      .#{$cls-prefix}-btn-sep {
         width: auto;
         height: 1px;
         margin: 1px 3px;
@@ -197,13 +197,13 @@
     }
 
     // FEN editor toolbar fills the view height.
-    .ct-layout--edit .ct-genfen {
+    .#{$cls-prefix}-layout--edit .#{$cls-prefix}-genfen {
       align-self: stretch;
     }
 
     // Restore the plain wrapped toolbar in the file view (overrides the
     // block-host col2 rule capping it at --ct-col2-size).
-    .ct-toolbar {
+    .#{$cls-prefix}-toolbar {
       width: auto;
       align-self: flex-start;
       flex-wrap: wrap;

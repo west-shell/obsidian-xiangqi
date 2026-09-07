@@ -6,7 +6,7 @@
   import Toolbar from "./Toolbar.svelte";
   import { onDestroy, onMount } from "svelte";
   import type { Piece } from "../../chess";
-  import { LAYOUT_CLASS, LAYOUT_CLASS_EDIT } from "../../chess";
+  import { CLS_PREFIX } from "../../chess";
 
   interface Props {
     settings: ISettings;
@@ -34,7 +34,7 @@
   });
 </script>
 
-<div class="{LAYOUT_CLASS} {LAYOUT_CLASS_EDIT}">
+<div class="{CLS_PREFIX}-layout {CLS_PREFIX}-layout--edit">
   <Board {settings} {fen} {eventBus} rotated={flipped} freeMode={true} />
   <PieceBTNs {fen} {eventBus} {selectedPiece} />
   <Toolbar {eventBus} {fen} />

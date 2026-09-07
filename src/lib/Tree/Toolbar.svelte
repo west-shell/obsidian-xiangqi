@@ -1,6 +1,7 @@
 <script lang="ts">
   import { Menu, setIcon } from "obsidian";
   import { onDestroy } from "svelte";
+  import { CLS_PREFIX } from "../../chess";
   import type { EventBus } from "../../core/event-bus";
   import type { IOptions, ISettings } from "../../types";
   import type ChessPlugin from "../../main";
@@ -105,18 +106,20 @@
 
   let analyzeBtnClass = $derived(
     autoAnalyze && engineBusy
-      ? " ct-btn--engine ct-btn--busy"
+      ? ` ${CLS_PREFIX}-btn--engine ${CLS_PREFIX}-btn--busy`
       : autoAnalyze
-        ? " ct-btn--engine"
+        ? ` ${CLS_PREFIX}-btn--engine`
         : engineBusy
-          ? " ct-btn--busy"
+          ? ` ${CLS_PREFIX}-btn--busy`
           : batchAnalyzing
-            ? " ct-btn--engine ct-btn--busy"
+            ? ` ${CLS_PREFIX}-btn--engine ${CLS_PREFIX}-btn--busy`
             : "",
   );
 
   let isprotected = $derived(options?.protected || false);
-  let saveBtnClass = $derived(modified ? "ct-btn--unsaved" : "ct-btn--saved");
+  let saveBtnClass = $derived(
+    modified ? `${CLS_PREFIX}-btn--unsaved` : `${CLS_PREFIX}-btn--saved`,
+  );
 
   const buildNavButtons = (v: number) => [
     { title: t("toolbar.reset", v), icon: "rotate-ccw", event: "reset" },
@@ -429,10 +432,10 @@
   }
 </script>
 
-<div class="ct-toolbar">
+<div class="{CLS_PREFIX}-toolbar">
   {#each navButtons as { title, icon, event } (event)}
     <button
-      class="ct-btn"
+      class="{CLS_PREFIX}-btn"
       aria-label={title}
       use:useSetIcon={icon}
       onclick={() => emitEvent(event)}
@@ -441,7 +444,7 @@
 
   {#each menuButtons as { title, icon, event } (event)}
     <button
-      class="ct-btn"
+      class="{CLS_PREFIX}-btn"
       aria-label={title}
       use:useSetIcon={icon}
       onclick={(e) => handleMenuButton(event, e)}
@@ -449,14 +452,14 @@
   {/each}
 
   <button
-    class="ct-btn{analyzeBtnClass}"
+    class="{CLS_PREFIX}-btn{analyzeBtnClass}"
     aria-label={t("toolbar.analyzeMenu", _lv)}
     use:useSetIcon={"brain"}
     onclick={(e) => handleAnalyzeMenu(e)}
   ></button>
 
   <button
-    class="ct-btn {saveBtnClass}"
+    class="{CLS_PREFIX}-btn {saveBtnClass}"
     aria-label={t("toolbar.save", _lv)}
     use:useSetSaveIcon
     disabled={isprotected}

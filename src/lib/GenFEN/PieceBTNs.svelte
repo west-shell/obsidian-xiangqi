@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Piece } from "../../chess";
+  import { CLS_PREFIX, type Piece } from "../../chess";
   import { createPieceFromChar, PIECE_CHARS } from "../../chess";
   import type { EventBus } from "../../core/event-bus";
 
@@ -60,14 +60,10 @@
   }
 </script>
 
-<div class="ct-layout__palette">
+<div class="{CLS_PREFIX}-layout__palette">
   {#each PIECE_KEYS as key (key)}
     <button
-      class="ct-palette__btn ct-palette__btn--{key === key.toUpperCase()
-        ? 'white'
-        : 'black'}"
-      class:ct-palette__btn--active={isSelected(key)}
-      class:ct-palette__btn--empty={getCount(key) <= 0}
+      class={`${CLS_PREFIX}-palette__btn ${CLS_PREFIX}-palette__btn--${key === key.toUpperCase() ? "white" : "black"} ${isSelected(key) ? `${CLS_PREFIX}-palette__btn--active` : ""} ${getCount(key) <= 0 ? `${CLS_PREFIX}-palette__btn--empty` : ""}`}
       onclick={() => handleClick(PIECE_CHARS![key])}
     >
       {PIECE_CHARS![key]}

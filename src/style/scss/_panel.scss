@@ -1,28 +1,29 @@
 // ============================================================================
-// .ct-layout__panel — the tree panel: game navigation, canvas (SVG tree +
+// {prefix}-layout__panel — the tree panel: game navigation, canvas (SVG tree +
 // eval bar + overlay toolbar + slider), move list and the comment row.
 // ============================================================================
 
 @use "mixins" as *;
+@use "variant" as *;
 
 // ---- Panel root -------------------------------------------------------------
 
-.ct-layout__panel {
+.#{$cls-prefix}-layout__panel {
   display: flex;
   flex-direction: column;
   height: 100%;
   overflow: hidden;
 
   // Canvas + SVG tree custom properties.
-  --ct-tree-bg: transparent;
-  --ct-tree-line: var(--text-normal);
-  --ct-eval-plus: var(--color-green, #4caf50);
-  --ct-eval-minus: var(--color-red, #f44336);
+  --tree-bg: transparent;
+  --tree-line: var(--text-normal);
+  --eval-plus: var(--color-green, #4caf50);
+  --eval-minus: var(--color-red, #f44336);
 }
 
 // ---- Game navigation bar ------------------------------------------------------
 
-.ct-gamenav {
+.#{$cls-prefix}-gamenav {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -33,7 +34,7 @@
   background: var(--background-secondary);
 }
 
-.ct-gamenav__info {
+.#{$cls-prefix}-gamenav__info {
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;
@@ -43,12 +44,12 @@
   min-width: 0;
 }
 
-.ct-gamenav__info:hover {
+.#{$cls-prefix}-gamenav__info:hover {
   background: var(--background-modifier-hover);
   border-radius: 4px;
 }
 
-.ct-gamenav__title {
+.#{$cls-prefix}-gamenav__title {
   font-size: 11px;
   white-space: nowrap;
   overflow: hidden;
@@ -57,61 +58,61 @@
   line-height: 1.3;
 }
 
-.ct-gamenav__index {
+.#{$cls-prefix}-gamenav__index {
   font-size: 9px;
   color: var(--text-muted);
   line-height: 1.2;
 }
 
-.ct-gamenav__arrows {
+.#{$cls-prefix}-gamenav__arrows {
   display: flex;
   flex-direction: row;
   gap: 2px;
   flex-shrink: 0;
 }
 
-button.ct-gamenav__arrow {
+button.#{$cls-prefix}-gamenav__arrow {
   width: 24px;
   height: 24px;
   padding: 0;
 }
 
-button.ct-gamenav__arrow svg {
+button.#{$cls-prefix}-gamenav__arrow svg {
   width: 16px;
   height: 16px;
 }
 
 // ---- Body row: canvas + move list ----------------------------------------------
 
-.ct-panel__row {
+.#{$cls-prefix}-panel__row {
   display: flex;
   flex-direction: row;
   flex: 1 1 auto;
   overflow: hidden;
 }
 
-.ct-panel__canvas {
+.#{$cls-prefix}-panel__canvas {
   flex: 1 1 auto;
   overflow: hidden;
-  background-color: var(--ct-tree-bg);
+  background-color: var(--tree-bg);
   position: relative;
   width: 100%;
   height: 100%;
 }
 
-.ct-panel__svg {
+.#{$cls-prefix}-panel__svg {
   user-select: none;
   touch-action: none;
   display: block;
 }
 
-.ct-panel__node {
+.#{$cls-prefix}-panel__node {
   cursor: pointer;
 }
 
 // ---- Eval bar --------------------------------------------------------------------
 
-.ct-eval {
+.#{$cls-prefix}-eval {
   position: absolute;
   top: 0;
   left: 0;
@@ -125,7 +126,7 @@ button.ct-gamenav__arrow svg {
   pointer-events: none;
 }
 
-.ct-eval__bar {
+.#{$cls-prefix}-eval__bar {
   position: relative;
   flex: 1 1 auto;
   width: 4px;
@@ -133,7 +134,7 @@ button.ct-gamenav__arrow svg {
   border-radius: 2px;
 }
 
-.ct-eval__fill {
+.#{$cls-prefix}-eval__fill {
   position: absolute;
   left: 0;
   right: 0;
@@ -144,7 +145,7 @@ button.ct-gamenav__arrow svg {
     background 0.3s ease;
 }
 
-.ct-eval__center {
+.#{$cls-prefix}-eval__center {
   position: absolute;
   top: 50%;
   left: 0;
@@ -152,7 +153,7 @@ button.ct-gamenav__arrow svg {
   height: 0;
 }
 
-.ct-eval__label {
+.#{$cls-prefix}-eval__label {
   position: absolute;
   top: 50%;
   left: calc(100% + 4px);
@@ -171,7 +172,7 @@ button.ct-gamenav__arrow svg {
 
 // ---- Overlay toolbar (bottom-left of the canvas) ---------------------------------
 
-.ct-panel__toolbar {
+.#{$cls-prefix}-panel__toolbar {
   position: absolute;
   bottom: 0.5rem;
   left: 0.5rem;
@@ -185,13 +186,13 @@ button.ct-gamenav__arrow svg {
   pointer-events: none;
 }
 
-.ct-panel__toolbar .ct-btn {
+.#{$cls-prefix}-panel__toolbar .#{$cls-prefix}-btn {
   pointer-events: auto;
 }
 
 // ---- Vertical slider (move navigation + eval chart) --------------------------------
 
-.ct-slider {
+.#{$cls-prefix}-slider {
   position: absolute;
   top: 0;
   right: 0;
@@ -207,19 +208,20 @@ button.ct-gamenav__arrow svg {
   margin: 0 0 0 6px;
 }
 
-.ct-slider:not(.ct-slider--eval) {
+.#{$cls-prefix}-slider:not(.#{$cls-prefix}-slider--eval) {
   background: transparent;
   border-color: transparent;
 }
 
-.ct-slider:not(.ct-slider--eval) .ct-slider__track {
+.#{$cls-prefix}-slider:not(.#{$cls-prefix}-slider--eval)
+  .#{$cls-prefix}-slider__track {
   width: 4px;
   background: var(--background-modifier-border);
   border-radius: 2px;
   align-self: center;
 }
 
-.ct-slider__chart {
+.#{$cls-prefix}-slider__chart {
   position: absolute;
   top: 0;
   left: 0;
@@ -228,7 +230,7 @@ button.ct-gamenav__arrow svg {
   pointer-events: none;
 }
 
-.ct-slider__btn {
+.#{$cls-prefix}-slider__btn {
   width: 16px;
   height: 16px;
   background: var(--background-secondary);
@@ -247,30 +249,30 @@ button.ct-gamenav__arrow svg {
     background 0.2s;
 }
 
-.ct-slider__btn + .ct-slider__btn {
+.#{$cls-prefix}-slider__btn + .#{$cls-prefix}-slider__btn {
   border-top-left-radius: 0;
   border-top-right-radius: 0;
   margin-top: -1px;
 }
 
-.ct-slider__btn:hover {
+.#{$cls-prefix}-slider__btn:hover {
   color: var(--text-normal);
   background: var(--background-modifier-hover);
 }
 
-.ct-slider__btn:active {
+.#{$cls-prefix}-slider__btn:active {
   color: var(--text-on-accent);
   background: var(--interactive-accent);
 }
 
-.ct-slider__track {
+.#{$cls-prefix}-slider__track {
   flex: 1 1 auto;
   width: 100%;
   position: relative;
   cursor: pointer;
 }
 
-.ct-slider__thumb {
+.#{$cls-prefix}-slider__thumb {
   position: absolute;
   left: -2px;
   right: -2px;
@@ -281,7 +283,7 @@ button.ct-gamenav__arrow svg {
   transition: top 0.2s;
 }
 
-.ct-slider__label {
+.#{$cls-prefix}-slider__label {
   position: absolute;
   right: calc(100% + 8px);
   height: 18px;
@@ -300,14 +302,16 @@ button.ct-gamenav__arrow svg {
 }
 
 // While dragging, freeze the thumb/label transitions.
-.ct-slider.ct-slider--dragging .ct-slider__thumb,
-.ct-slider.ct-slider--dragging .ct-slider__label {
+.#{$cls-prefix}-slider.#{$cls-prefix}-slider--dragging
+  .#{$cls-prefix}-slider__thumb,
+.#{$cls-prefix}-slider.#{$cls-prefix}-slider--dragging
+  .#{$cls-prefix}-slider__label {
   transition: none;
 }
 
 // ---- Move list -----------------------------------------------------------------------
 
-.ct-moves {
+.#{$cls-prefix}-moves {
   width: auto;
   min-width: 0;
   max-width: 200px;
@@ -325,7 +329,7 @@ button.ct-gamenav__arrow svg {
   list-style: none;
 }
 
-.ct-moves__row {
+.#{$cls-prefix}-moves__row {
   display: flex;
   flex-wrap: nowrap;
   flex-shrink: 0;
@@ -339,7 +343,7 @@ button.ct-gamenav__arrow svg {
   width: 100%;
 }
 
-.ct-moves__num {
+.#{$cls-prefix}-moves__num {
   display: inline-block;
   min-width: 1.2em;
   max-width: 2em;
@@ -350,7 +354,7 @@ button.ct-gamenav__arrow svg {
   white-space: nowrap;
 }
 
-span.ct-moves__move {
+span.#{$cls-prefix}-moves__move {
   display: inline-block;
   line-height: 1.1;
   text-align: center;
@@ -366,21 +370,21 @@ span.ct-moves__move {
   color: var(--text-normal);
 }
 
-span.ct-moves__move--white {
+span.#{$cls-prefix}-moves__move--white {
   min-width: 2.5em;
   text-align: left;
 }
 
-span.ct-moves__move--black {
+span.#{$cls-prefix}-moves__move--black {
   min-width: 2.5em;
   text-align: right;
 }
 
-span.ct-moves__move:hover {
+span.#{$cls-prefix}-moves__move:hover {
   background-color: var(--background-modifier-hover);
 }
 
-span.ct-moves__move--active {
+span.#{$cls-prefix}-moves__move--active {
   background-color: var(--color-accent);
   // The accent comes from the Obsidian theme and can be any colour — pick
   // black/white by its luminance (see mixins#contrast-text); fall back to
@@ -392,16 +396,16 @@ span.ct-moves__move--active {
 
 // ---- Comment row -----------------------------------------------------------------------
 
-.ct-panel__comment {
+.#{$cls-prefix}-panel__comment {
   display: flex;
   flex-direction: row;
   align-items: stretch;
   gap: 2px;
 }
 
-.ct-comment__input {
+.#{$cls-prefix}-comment__input {
   width: 100%;
-  height: var(--ct-textarea-h, 20px);
+  height: var(--textarea-h, 20px);
   max-height: 80px;
   resize: none;
   font-family: var(--font-family);
@@ -418,17 +422,17 @@ span.ct-moves__move--active {
     box-shadow 0.15s ease;
 }
 
-.ct-comment__input--auto {
+.#{$cls-prefix}-comment__input--auto {
   height: auto;
   flex: 1 1 auto;
 }
 
-.ct-comment__input:focus {
+.#{$cls-prefix}-comment__input:focus {
   border-color: var(--interactive-accent);
   box-shadow: 0 0 0 1px var(--interactive-accent);
 }
 
-button.ct-comment__toggle {
+button.#{$cls-prefix}-comment__toggle {
   width: 28px;
   height: auto;
   padding: 0;
