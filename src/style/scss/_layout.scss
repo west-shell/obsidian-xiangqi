@@ -15,7 +15,7 @@
 
 .#{$cls-prefix}-layout {
   display: grid;
-  gap: $ct-layout-gap;
+  gap: $layout-gap;
   background: var(--background-primary-alt);
 
   // ---- Grid areas ----------------------------------------------------------

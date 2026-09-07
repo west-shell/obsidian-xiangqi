@@ -114,10 +114,10 @@ button.#{$cls-prefix}-btn--engine:hover {
 }
 
 button.#{$cls-prefix}-btn--busy {
-  animation: ct-engine-pulse 1.2s ease-in-out infinite;
+  animation: engine-pulse 1.2s ease-in-out infinite;
 }
 
-@keyframes ct-engine-pulse {
+@keyframes engine-pulse {
   0%,
   100% {
     opacity: 1;

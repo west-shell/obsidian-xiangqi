@@ -6,9 +6,9 @@
 //   tokens   → breakpoints / spacing / size algebra
 //   mixins   → col1/col2 media queries + helpers
 //   base     → custom-property defaults + host containers
-//   layout   → .ct-layout grid (col1/col2) + host contexts
+//   layout   → {prefix}-layout grid (col1/col2) + host contexts
 //   board    → board area + shared board-lib overrides (cg-*/xq-* per variant → _variant)
-//   buttons  → .ct-btn system
+//   buttons  → {prefix}-btn system
 //   toolbar  → main toolbar rail
 //   panel    → tree panel (game nav / canvas / eval / slider / move list)
 //   genfen   → FEN editor (--edit layout, piece palette, editor tools)
