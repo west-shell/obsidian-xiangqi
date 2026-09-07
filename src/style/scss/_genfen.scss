@@ -109,13 +109,13 @@
 
   button.ct-palette__btn--white {
     background-color: var(--ct-piece-primary);
-    color: black;
+    color: var(--ct-piece-primary-contrast, black);
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
   }
 
   button.ct-palette__btn--black {
     background-color: var(--ct-piece-secondary);
-    color: white;
+    color: var(--ct-piece-secondary-contrast, white);
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
   }
 
@@ -179,13 +179,13 @@
 
 .ct-genfen button.ct-genfen__turn--white {
   background-color: var(--ct-piece-primary);
-  color: black;
+  color: var(--ct-piece-primary-contrast, black);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .ct-genfen button.ct-genfen__turn--black {
   background-color: var(--ct-piece-secondary);
-  color: white;
+  color: var(--ct-piece-secondary-contrast, white);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
