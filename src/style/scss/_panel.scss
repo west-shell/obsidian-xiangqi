@@ -15,7 +15,7 @@
   overflow: hidden;
 
   // Canvas + SVG tree custom properties.
-  --tree-bg: transparent;
+  --tree-bg: var(--background-secondary);
   --tree-line: var(--text-normal);
   --eval-plus: var(--color-green, #4caf50);
   --eval-minus: var(--color-red, #f44336);

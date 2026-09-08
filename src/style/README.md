@@ -119,14 +119,14 @@ xiangqi 注意避开 xiangqiground 库已占用的 `--xq-*` 名。
 
 **组件/布局内部变量**（父容器作用域内，不带前缀）：
 
-| 变量                           | 作用域               | 说明                                       |
-| ------------------------------ | -------------------- | ------------------------------------------ |
-| `--board-width`                | `.ct-layout__board`  | 棋盘宽度覆盖点（PGN 视图用）               |
-| `--board-max`                  | 布局回退             | 棋盘最大尺寸回退值（默认 100vh）           |
-| `--board-ratio`                | `.cg-wrap`           | 棋盘宽高比（由 `BOARD_ASPECT_RATIO` 内联） |
-| `--tree-bg` / `--tree-line`    | `.ct-layout__panel`  | 画布底色 / 树线颜色                        |
-| `--eval-plus` / `--eval-minus` | `.ct-layout__panel`  | 局势评估双色                               |
-| `--textarea-h`                 | `.ct-comment__input` | 评论框测量高度                             |
+| 变量                           | 作用域               | 说明                                                |
+| ------------------------------ | -------------------- | --------------------------------------------------- |
+| `--board-width`                | `.ct-layout__board`  | 棋盘宽度覆盖点（PGN 视图用）                        |
+| `--board-max`                  | 布局回退             | 棋盘最大尺寸回退值（默认 100vh）                    |
+| `--board-ratio`                | `.cg-wrap`           | 棋盘宽高比（由 `BOARD_ASPECT_RATIO` 内联）          |
+| `--tree-bg` / `--tree-line`    | `.ct-layout__panel`  | 画布底色（默认 `--background-secondary`）/ 树线颜色 |
+| `--eval-plus` / `--eval-minus` | `.ct-layout__panel`  | 局势评估双色                                        |
+| `--textarea-h`                 | `.ct-comment__input` | 评论框测量高度                                      |
 
 ## 5. 重命名对照表
 
