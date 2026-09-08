@@ -62,7 +62,7 @@ $cls-prefix: "xq";
 // color (themes.ts writes --xq-bracket-color as a full color; the fallback
 // mirrors the selected_light preset in themes.ts). Fully opaque.
 .xq-wrap xq-board square.selected {
-  @include bracket-frame(var(--xq-bracket-color, #14551e));
+  @include bracket-frame(var(--xq-bracket-color, #0f766e));
 }
 
 // ---- Board highlight markers (theme-driven, fully opaque) --------------------
@@ -77,22 +77,22 @@ $cls-prefix: "xq";
 
 .xq-wrap xq-board square.last-move-orig {
   background: linear-gradient(
-      #{"rgb(from var(--xq-lastmove-color, #0d47a1) r g b)"},
-      #{"rgb(from var(--xq-lastmove-color, #0d47a1) r g b)"}
+      #{"rgb(from var(--xq-lastmove-color, #1a5fb0) r g b)"},
+      #{"rgb(from var(--xq-lastmove-color, #1a5fb0) r g b)"}
     )
     center / 30% 30% no-repeat;
 }
 
 .xq-wrap xq-board square.last-move-dest {
   @include bracket-frame(
-    #{"rgb(from var(--xq-lastmove-color, #0d47a1) r g b)"}
+    #{"rgb(from var(--xq-lastmove-color, #1a5fb0) r g b)"}
   );
 }
 
 .xq-wrap xq-board square.move-dest {
   background: radial-gradient(
-    #{"rgb(from var(--xq-dest-color, #14551e) r g b)"} 22%,
-    #{"rgb(from var(--xq-dest-color, #14551e) r g b)"} 0,
+    #{"rgb(from var(--xq-dest-color, #0f766e) r g b)"} 22%,
+    #{"rgb(from var(--xq-dest-color, #0f766e) r g b)"} 0,
     rgba(0, 0, 0, 0.3) 0,
     rgba(0, 0, 0, 0) 0
   );
@@ -102,13 +102,15 @@ $cls-prefix: "xq";
   background: radial-gradient(
     transparent 0%,
     transparent 80%,
-    #{"rgb(from var(--xq-dest-color, #14551e) r g b)"} 80%
+    #{"rgb(from var(--xq-dest-color, #0f766e) r g b)"} 80%
   );
 }
 
+// Hover state fills the square with a translucent block — enough to show a
+// move is legal, but the board texture still reads through underneath.
 .xq-wrap xq-board square.move-dest:hover,
 .xq-wrap xq-board square.move-dest.hover {
-  background: #{"rgb(from var(--xq-dest-color, #14551e) r g b)"};
+  background: #{"rgb(from var(--xq-dest-color, #0f766e) r g b / 0.5)"};
 }
 
 // Next-move preview arrow: Board.svelte draws it with the library's "blue"
@@ -117,37 +119,46 @@ $cls-prefix: "xq";
 // CSS rule wins over, so the arrow can be themed without touching shared
 // Board.svelte.
 .xq-wrap svg [stroke="#003088"] {
-  stroke: var(--xq-nextmove-color, #003088);
+  stroke: var(--xq-nextmove-color, #e8590c);
 }
 
 .xq-wrap svg [fill="#003088"] {
-  fill: var(--xq-nextmove-color, #003088);
+  fill: var(--xq-nextmove-color, #e8590c);
+}
+
+// Library dims the whole arrow layer to 60% (xiangqiground.base.css
+// `.xq-wrap .xq-shapes`); brighten it so the engine best-move/ponder
+// arrows, the next-move preview and user-drawn arrows read clearly.
+// The per-shaft modifiers (0.9 in-progress / 0.6 hover-to-delete)
+// compound on top of this layer opacity.
+.xq-wrap .xq-shapes {
+  opacity: 0.85;
 }
 
 // Engine/user shape brushes (best move = green, ponder = yellow, user red
 // via modifier keys) — same presentation-attribute override as above.
 .xq-wrap svg [stroke="#15781B"] {
-  stroke: var(--xq-brush-green, #15781b);
+  stroke: var(--xq-brush-green, #2e8b3a);
 }
 
 .xq-wrap svg [fill="#15781B"] {
-  fill: var(--xq-brush-green, #15781b);
+  fill: var(--xq-brush-green, #2e8b3a);
 }
 
 .xq-wrap svg [stroke="#882020"] {
-  stroke: var(--xq-brush-red, #882020);
+  stroke: var(--xq-brush-red, #d64541);
 }
 
 .xq-wrap svg [fill="#882020"] {
-  fill: var(--xq-brush-red, #882020);
+  fill: var(--xq-brush-red, #d64541);
 }
 
 .xq-wrap svg [stroke="#e68f00"] {
-  stroke: var(--xq-brush-yellow, #e68f00);
+  stroke: var(--xq-brush-yellow, #f57c00);
 }
 
 .xq-wrap svg [fill="#e68f00"] {
-  fill: var(--xq-brush-yellow, #e68f00);
+  fill: var(--xq-brush-yellow, #f57c00);
 }
 
 // ---- FEN editor piece colors (theme-driven) -----------------------------------
