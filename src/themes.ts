@@ -19,7 +19,7 @@ import { applyThemeCSSVars, type ThemeData } from "./chess";
 //   nextMove = orange-red (preview arrow — a warm accent clearly apart
 //              from the two cool highlights)
 const selected_light = "#0f766e"; // 青绿
-const selected_dark = "#2dd4bf"; // 亮青绿
+const selected_dark = "#1517c0"; // 亮青绿
 const lastMove_light = "#1a5fb0"; // 钴蓝
 const lastMove_dark = "#6aa7ff"; // 天蓝
 const nextMove_light = "#e8590c"; // 橙红
@@ -62,12 +62,12 @@ const themes: Record<string, ThemeDef> = {
     grid: "dark",
     red: tree_red,
     black: tree_black,
-    selected: selected_light,
-    lastMove: lastMove_light,
-    nextMove: nextMove_light,
-    brushGreen: brushGreen_light,
-    brushRed: brushRed_light,
-    brushYellow: brushYellow,
+    selected: "var(--color-blue)",
+    lastMove: "var(--color-cyan)",
+    nextMove: "var(--color-purple)",
+    brushGreen: "var(--color-green)",
+    brushRed: "var(--color-red)",
+    brushYellow: "var(--color-yellow)",
   },
   light: {
     name: "Light",
