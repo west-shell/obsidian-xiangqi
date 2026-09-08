@@ -197,4 +197,19 @@ export function activateGame(host: IHost, index: number): void {
   }
 
   host.eventBus.emit("updateUI");
+
+  // Surface the stored eval of the newly active node — best-move/ponder
+  // arrows otherwise only refresh on navigation events (node-click etc.).
+  const ev = host.currentNode.eval;
+  if (ev?.bestmove) {
+    host.eventBus.emit("engine-result", {
+      bestmove: ev.bestmove,
+      ponder: ev.ponder,
+      score: ev.score,
+      depth: ev.depth,
+      scoreType: ev.scoreType,
+    });
+  } else {
+    host.eventBus.emit("clear-engine-bestmove");
+  }
 }

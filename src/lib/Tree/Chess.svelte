@@ -155,6 +155,22 @@
   });
 
   onMount(async () => {
+    // activateGame() emits engine-result while this component is not yet
+    // mounted (no listener yet), so seed the arrows from the initial node's
+    // stored eval here.
+    const ev = currentNode.eval;
+    if (ev?.bestmove) {
+      engineBestMove = {
+        from: ev.bestmove.slice(0, 2) as Square,
+        to: ev.bestmove.slice(2, 4) as Square,
+      };
+      enginePonder = ev.ponder
+        ? {
+            from: ev.ponder.slice(0, 2) as Square,
+            to: ev.ponder.slice(2, 4) as Square,
+          }
+        : null;
+    }
     await tick();
     if (destroyed) return;
     eventBus.emit("ready");

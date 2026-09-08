@@ -457,7 +457,6 @@ export class ImportModal extends Modal {
       eventBus.emit("updateMainPath");
       eventBus.emit("updateUI");
       eventBus.emit("modified", null);
-      eventBus.emit("clear-engine-bestmove");
       this.close();
       new Notice(t("notice.pgnImportedAsGame"));
       return;

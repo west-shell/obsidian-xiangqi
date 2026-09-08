@@ -228,7 +228,6 @@ const ActionsModule = {
         prevSlot.parsed.nodeMap = host.nodeMap;
       }
       activateGame(host, index);
-      host.eventBus.emit("clear-engine-bestmove");
     });
 
     eventBus.on("create-game", () => {
@@ -241,7 +240,6 @@ const ActionsModule = {
       host.games.push(newSlot);
       host.eventBus.emit("modified", null);
       activateGame(host, host.games.length - 1);
-      host.eventBus.emit("clear-engine-bestmove");
     });
 
     eventBus.on("delete-game", async () => {
@@ -261,7 +259,6 @@ const ActionsModule = {
       const newIdx = Math.min(idx, host.games.length - 1);
       host.eventBus.emit("modified", null);
       activateGame(host, newIdx);
-      host.eventBus.emit("clear-engine-bestmove");
     });
 
     eventBus.on<number>("move-game", (direction) => {
@@ -275,7 +272,6 @@ const ActionsModule = {
       host.games[targetIdx] = temp;
       host.eventBus.emit("modified", null);
       activateGame(host, targetIdx);
-      host.eventBus.emit("clear-engine-bestmove");
     });
 
     eventBus.on<{ name: string; payload: unknown }>(
