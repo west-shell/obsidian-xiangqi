@@ -158,13 +158,17 @@
       : []),
   ]);
   let shapes = $derived([
-    ...(settings.showNextMove
-      ? computeVariationShapes(mainVariation ?? [])
+    ...(!freeMode
+      ? [
+          ...(settings.showNextMove
+            ? computeVariationShapes(mainVariation ?? [])
+            : []),
+          ...(settings.showOtherVariations && settings.showNextMove
+            ? computeVariationShapes(otherVariations ?? [])
+            : []),
+          ...engineShapes,
+        ]
       : []),
-    ...(settings.showOtherVariations && settings.showNextMove
-      ? computeVariationShapes(otherVariations ?? [])
-      : []),
-    ...engineShapes,
     ...glyphShapes,
   ]);
   let dests = $derived(computeDests(fen));
