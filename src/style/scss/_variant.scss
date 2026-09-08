@@ -65,32 +65,33 @@ $cls-prefix: "xq";
   @include bracket-frame(var(--xq-bracket-color, #14551e));
 }
 
-// ---- Board highlight markers (theme-driven) ----------------------------------
+// ---- Board highlight markers (theme-driven, fully opaque) --------------------
 // xiangqiground declares its RGB-triplet marker vars on `.xq-wrap`
 // (xiangqiground.base.css); a custom property on `.xq-wrap` always shadows
 // the value inherited from <body>, so themes set on body never reach the
 // board. Re-declare the marker rules here against plugin-owned hex vars
 // (themes.ts); fallbacks mirror the library defaults. Selection marks
 // (dest dots / capture rings) share the selected color; the last-move and
-// next-move marks keep their own colors.
+// next-move marks keep their own colors. All markers render at full
+// opacity, unlike the library's faded defaults.
 
 .xq-wrap xq-board square.last-move-orig {
   background: linear-gradient(
-      #{"rgb(from var(--xq-lastmove-color, #0d47a1) r g b / 0.41)"},
-      #{"rgb(from var(--xq-lastmove-color, #0d47a1) r g b / 0.8)"}
+      #{"rgb(from var(--xq-lastmove-color, #0d47a1) r g b)"},
+      #{"rgb(from var(--xq-lastmove-color, #0d47a1) r g b)"}
     )
     center / 30% 30% no-repeat;
 }
 
 .xq-wrap xq-board square.last-move-dest {
   @include bracket-frame(
-    #{"rgb(from var(--xq-lastmove-color, #0d47a1) r g b / 0.8)"}
+    #{"rgb(from var(--xq-lastmove-color, #0d47a1) r g b)"}
   );
 }
 
 .xq-wrap xq-board square.move-dest {
   background: radial-gradient(
-    #{"rgb(from var(--xq-dest-color, #14551e) r g b / 0.5)"} 22%,
+    #{"rgb(from var(--xq-dest-color, #14551e) r g b)"} 22%,
     #{"rgb(from var(--xq-dest-color, #14551e) r g b)"} 0,
     rgba(0, 0, 0, 0.3) 0,
     rgba(0, 0, 0, 0) 0
@@ -101,13 +102,13 @@ $cls-prefix: "xq";
   background: radial-gradient(
     transparent 0%,
     transparent 80%,
-    #{"rgb(from var(--xq-dest-color, #14551e) r g b / 0.3)"} 80%
+    #{"rgb(from var(--xq-dest-color, #14551e) r g b)"} 80%
   );
 }
 
 .xq-wrap xq-board square.move-dest:hover,
 .xq-wrap xq-board square.move-dest.hover {
-  background: #{"rgb(from var(--xq-dest-color, #14551e) r g b / 0.3)"};
+  background: #{"rgb(from var(--xq-dest-color, #14551e) r g b)"};
 }
 
 // Next-move preview arrow: Board.svelte draws it with the library's "blue"
