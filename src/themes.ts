@@ -6,24 +6,21 @@ import woodB64 from "../assets/wood.jpg?base64";
 import type { ISettings } from "./types";
 import { applyThemeCSSVars, type ThemeData } from "./chess";
 
-// Highlight color presets — the suffix names the board it suits:
-// *_light for light boards (dark marks), *_dark for dark boards (light marks).
+// Two default highlight sets — dark marks for light boards, bright marks
+// for dark boards. Themes pick from these per field; textured boards
+// (wood ~#8c5531, bamboo ~#366d64) override individual fields with custom
+// values, since dark marks sink into their grain.
 const selected_light = "#14551e";
 const selected_dark = "#66bb6a";
 const lastMove_light = "#0d47a1";
-const lastMove_dark = "#7986cb";
+const lastMove_dark = "#9fa8da";
 const nextMove_light = "#ef6c00";
 const nextMove_dark = "#ffb74d";
-// Mid-luminance textured boards (wood ~#8c5531, bamboo ~#366d64): dark marks
-// sink into the grain, so highlights must be bright instead.
-const selected_warm = "#ffd54f";
-const lastMove_wood = "#90caf9";
-const nextMove_wood = "#80deea";
 
 interface ThemeDef extends ThemeData {
   red: string;
   black: string;
-  /** Highlight colors: a preset constant or a custom value. */
+  /** Highlight colors: selection marks / last move / next-move arrow. */
   selected: string;
   lastMove: string;
   nextMove: string;
@@ -91,9 +88,11 @@ const themes: Record<string, ThemeDef> = {
     grid: "light",
     red: tree_red,
     black: tree_black,
-    selected: selected_warm,
+    // Bright marks for the dark green board; cyan arrow separates from the
+    // yellow selection dots.
+    selected: "#ffd54f",
     lastMove: lastMove_dark,
-    nextMove: nextMove_dark,
+    nextMove: "#80deea",
   },
   wood: {
     name: "Wood",
@@ -103,9 +102,9 @@ const themes: Record<string, ThemeDef> = {
     grid: "light",
     red: tree_red,
     black: tree_black,
-    selected: selected_warm,
-    lastMove: lastMove_wood,
-    nextMove: nextMove_wood,
+    selected: "#ffd54f",
+    lastMove: "#90caf9",
+    nextMove: "#80deea",
   },
   bamboo: {
     name: "Bamboo",
@@ -115,9 +114,10 @@ const themes: Record<string, ThemeDef> = {
     grid: "none",
     red: tree_red,
     black: tree_black,
-    selected: selected_warm,
+    // Coral arrow: cyan would blend into the teal bamboo board.
+    selected: "#ffd54f",
     lastMove: lastMove_dark,
-    nextMove: nextMove_dark,
+    nextMove: "#ff8a65",
   },
 };
 
