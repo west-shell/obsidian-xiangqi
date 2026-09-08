@@ -1,7 +1,12 @@
 // ============================================================================
-// {prefix}-toolbar — the main button rail (below the board in col1, beside it in
-// col2). Placement and responsive reshaping live in _layout.scss; this file
+// {prefix}-toolbar — the main button rail (below the board in col1, beside it
+// in col2). Placement and responsive reshaping live in _layout.scss; this file
 // only owns the component's own flex behaviour and button sizing.
+//
+// Adaptive sizing: each layout context sets --{prefix}-rail to the rail's
+// main-axis length (width in col1, height in col2). Buttons divide it evenly
+// between themselves, clamped to [btn-min, btn-max]; once every button sits
+// at the minimum the leftover items wrap onto a second line (flex-wrap).
 // ============================================================================
 
 @use "variant" as *;
@@ -13,13 +18,24 @@
   align-items: center;
   gap: 0;
 
+  --#{$cls-prefix}-btn-min: 20px;
+  --#{$cls-prefix}-btn-max: 32px;
+
   .#{$cls-prefix}-btn {
-    width: 32px;
-    height: 32px;
+    flex: none;
+    width: clamp(
+      var(--#{$cls-prefix}-btn-min),
+      calc(
+        var(--#{$cls-prefix}-rail, 320px) / var(--#{$cls-prefix}-btn-count, 10)
+      ),
+      var(--#{$cls-prefix}-btn-max)
+    );
+    height: auto;
+    aspect-ratio: 1;
   }
 
   .#{$cls-prefix}-btn svg {
-    width: 20px;
-    height: 20px;
+    width: 62.5%;
+    height: 62.5%;
   }
 }

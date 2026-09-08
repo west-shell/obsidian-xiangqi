@@ -60,20 +60,15 @@
     }
   }
 
-  // Main toolbar matches the centered board width, single adaptive row.
+  // Main toolbar matches the centered board width. Buttons shrink to fill
+  // the single row and wrap onto a second one only at the minimum size.
   .#{$cls-prefix}-toolbar {
-    width: min(
+    --#{$cls-prefix}-rail: min(
       var(--board-max, 100vh) * var(--#{$cls-prefix}-board-scale, 0.85),
       100%
     );
+    width: var(--#{$cls-prefix}-rail);
     justify-self: center;
-    flex-wrap: nowrap;
-
-    .#{$cls-prefix}-btn {
-      min-width: 0;
-      height: auto;
-      aspect-ratio: 1;
-    }
   }
 
   &__panel {
@@ -98,8 +93,10 @@
     .#{$cls-prefix}-toolbar {
       flex-direction: column;
       flex-wrap: wrap;
-      max-height: var(--#{$cls-prefix}-col2-size);
+      --#{$cls-prefix}-rail: var(--#{$cls-prefix}-col2-size);
+      height: var(--#{$cls-prefix}-col2-size);
       align-items: center;
+      align-content: flex-start;
       column-gap: 0;
       grid-row: 1;
       justify-content: flex-start;
@@ -148,21 +145,15 @@
 
   .#{$cls-prefix}-toolbar {
     height: auto;
-    min-height: 32px;
+    min-height: var(--#{$cls-prefix}-btn-min);
   }
 
   // Main toolbar matches the board width, centered (overrides the
   // block-host rule above, which ties the width to the global board scale).
   .#{$cls-prefix}-toolbar {
-    width: min(100cqw, #{$pgn-col1-board-height});
+    --#{$cls-prefix}-rail: min(100cqw, #{$pgn-col1-board-height});
+    width: var(--#{$cls-prefix}-rail);
     align-self: center;
-    flex-wrap: wrap;
-
-    .#{$cls-prefix}-btn {
-      min-width: auto;
-      height: 32px;
-      aspect-ratio: auto;
-    }
   }
 
   &__panel {
@@ -183,14 +174,20 @@
       align-self: center;
     }
 
+    // Toolbar rail spans the view height; buttons shrink to pack one column
+    // and wrap into a second one at the minimum size (overrides the
+    // block-host col2 rule, which sizes the rail at --{prefix}-col2-size).
     .#{$cls-prefix}-toolbar {
       flex-direction: column;
       flex-wrap: wrap;
-      max-height: none;
-      align-self: center;
-      align-items: center;
+      --#{$cls-prefix}-rail: 100cqh;
+      width: auto;
       height: auto;
       min-height: 0;
+      align-self: stretch;
+      align-items: center;
+      align-content: flex-start;
+      justify-content: flex-start;
 
       .#{$cls-prefix}-btn-sep {
         width: auto;
@@ -202,15 +199,6 @@
     // FEN editor toolbar fills the view height.
     .#{$cls-prefix}-layout--edit .#{$cls-prefix}-genfen {
       align-self: stretch;
-    }
-
-    // Restore the plain wrapped toolbar in the file view (overrides the
-    // block-host col2 rule capping it at --#{$cls-prefix}-col2-size).
-    .#{$cls-prefix}-toolbar {
-      width: auto;
-      align-self: flex-start;
-      flex-wrap: wrap;
-      max-height: none;
     }
 
     &__panel {

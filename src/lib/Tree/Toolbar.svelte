@@ -153,6 +153,8 @@
   ];
   let menuButtons = $derived(buildMenuButtons(_lv));
 
+  let btnCount = $derived(navButtons.length + menuButtons.length + 2);
+
   const buildAnnotations = (v: number) => [
     {
       title: t("annotation.w+", v),
@@ -432,7 +434,7 @@
   }
 </script>
 
-<div class="{CLS_PREFIX}-toolbar">
+<div class="{CLS_PREFIX}-toolbar" style="--{CLS_PREFIX}-btn-count: {btnCount}">
   {#each navButtons as { title, icon, event } (event)}
     <button
       class="{CLS_PREFIX}-btn"
