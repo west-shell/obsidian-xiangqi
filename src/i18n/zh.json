@@ -189,6 +189,7 @@
   "codeblock.invalidName": "名称 \"{name}\" 不合法已忽略，仅允许小写字母、数字和连字符",
   "settings.restartRequired.title": "以下设置重启后生效",
   "settings.restartRequired.desc": "以下设置需要重启插件或软件才能生效",
+  "settings.defaultSuffix": "(默认: {names})",
   "pgn.title": "PGN 文件视图",
   "pgn.enable": "启用 PGN 文件视图",
   "pgn.enable.desc": "注册 PGN 文件视图以打开 .pgn 文件",

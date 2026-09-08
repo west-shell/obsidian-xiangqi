@@ -22,7 +22,13 @@ const BlockHostModule = {
           host.plugin.app.workspace.getActiveViewOfType(MarkdownView);
         if (!view?.file) return;
         const fen = host.fen;
-        const saveBlockName = host.settings.fenSaveBlockName;
+        // Guard against a stale setting (block renamed since): fall back to
+        // the first registered tree block name.
+        const saveBlockName = host.settings.treeBlockNames.includes(
+          host.settings.fenSaveBlockName,
+        )
+          ? host.settings.fenSaveBlockName
+          : host.settings.treeBlockNames[0];
         const newContent = `[FEN "${fen}"]`;
 
         void host.plugin.app.vault.process(view.file, (fileContent) => {

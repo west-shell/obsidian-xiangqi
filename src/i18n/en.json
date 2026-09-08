@@ -188,6 +188,7 @@
   "codeblock.invalidName": "Invalid name \"{name}\" ignored. Only lowercase letters, digits, and hyphens are allowed.",
   "settings.restartRequired.title": "The following settings require restart",
   "settings.restartRequired.desc": "The following settings require restarting the plugin or Obsidian to take effect.",
+  "settings.defaultSuffix": "(default: {names})",
   "pgn.title": "PGN File View",
   "pgn.enable": "Enable PGN file view",
   "pgn.enable.desc": "Register PGN file view for opening .pgn files",

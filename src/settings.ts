@@ -748,7 +748,14 @@ export class ChessSettingTab extends PluginSettingTab {
 
     const treeSetting = new Setting(containerEl)
       .setName(t("codeblock.treeAliases"))
-      .setDesc(t("codeblock.treeAliases.desc") + " (默认: chess, tree)")
+      .setDesc(
+        t("codeblock.treeAliases.desc") +
+          " " +
+          t("settings.defaultSuffix").replace(
+            "{names}",
+            DEFAULT_TREE_BLOCK_NAMES.join(", "),
+          ),
+      )
       .addText((text) =>
         text.setValue(settings.treeBlockNames.join(", ")).onChange((value) => {
           const { valid, invalid } = parseAndValidateNames(value);
@@ -763,12 +770,18 @@ export class ChessSettingTab extends PluginSettingTab {
           }
           if (!valid.length) return;
           settings.treeBlockNames = valid;
+          if (!valid.includes(settings.fenSaveBlockName)) {
+            settings.fenSaveBlockName = valid[0];
+          }
           void this.plugin.saveSettings();
         }),
       )
       .addButton((button) =>
         button.setIcon("rotate-ccw").onClick(() => {
           settings.treeBlockNames = [...DEFAULT_TREE_BLOCK_NAMES];
+          if (!settings.treeBlockNames.includes(settings.fenSaveBlockName)) {
+            settings.fenSaveBlockName = settings.treeBlockNames[0];
+          }
           treeSetting.controlEl.querySelector("input")!.value =
             DEFAULT_TREE_BLOCK_NAMES.join(", ");
           void this.plugin.saveSettings();
@@ -782,7 +795,11 @@ export class ChessSettingTab extends PluginSettingTab {
         for (const name of settings.treeBlockNames) {
           dropdown.addOption(name, name);
         }
-        dropdown.setValue(settings.fenSaveBlockName);
+        dropdown.setValue(
+          settings.treeBlockNames.includes(settings.fenSaveBlockName)
+            ? settings.fenSaveBlockName
+            : settings.treeBlockNames[0],
+        );
         dropdown.onChange((value) => {
           settings.fenSaveBlockName = value;
           void this.plugin.saveSettings();
@@ -804,7 +821,11 @@ export class ChessSettingTab extends PluginSettingTab {
 
     const pgnExtSetting = new Setting(containerEl)
       .setName(t("pgn.extensions"))
-      .setDesc(t("pgn.extensions.desc") + " (默认: pgn)")
+      .setDesc(
+        t("pgn.extensions.desc") +
+          " " +
+          t("settings.defaultSuffix").replace("{names}", "pgn"),
+      )
       .addText((text) =>
         text
           .setValue(settings.pgnFileExtensions.join(", "))
