@@ -62,7 +62,7 @@ $cls-prefix: "xq";
 // color (themes.ts writes --xq-bracket-color as a full color; the fallback
 // mirrors the selected_light preset in themes.ts). Fully opaque.
 .xq-wrap xq-board square.selected {
-  @include bracket-frame(var(--xq-bracket-color, #0f766e));
+  @include bracket-frame(var(--xq-bracket-color, #15803d));
 }
 
 // ---- Board highlight markers (theme-driven, fully opaque) --------------------
@@ -77,22 +77,22 @@ $cls-prefix: "xq";
 
 .xq-wrap xq-board square.last-move-orig {
   background: linear-gradient(
-      #{"rgb(from var(--xq-lastmove-color, #1a5fb0) r g b)"},
-      #{"rgb(from var(--xq-lastmove-color, #1a5fb0) r g b)"}
+      #{"rgb(from var(--xq-lastmove-color, #0e7490) r g b)"},
+      #{"rgb(from var(--xq-lastmove-color, #0e7490) r g b)"}
     )
     center / 30% 30% no-repeat;
 }
 
 .xq-wrap xq-board square.last-move-dest {
   @include bracket-frame(
-    #{"rgb(from var(--xq-lastmove-color, #1a5fb0) r g b)"}
+    #{"rgb(from var(--xq-lastmove-color, #0e7490) r g b)"}
   );
 }
 
 .xq-wrap xq-board square.move-dest {
   background: radial-gradient(
-    #{"rgb(from var(--xq-dest-color, #0f766e) r g b)"} 22%,
-    #{"rgb(from var(--xq-dest-color, #0f766e) r g b)"} 0,
+    #{"rgb(from var(--xq-dest-color, #15803d) r g b)"} 22%,
+    #{"rgb(from var(--xq-dest-color, #15803d) r g b)"} 0,
     rgba(0, 0, 0, 0.3) 0,
     rgba(0, 0, 0, 0) 0
   );
@@ -102,7 +102,7 @@ $cls-prefix: "xq";
   background: radial-gradient(
     transparent 0%,
     transparent 80%,
-    #{"rgb(from var(--xq-dest-color, #0f766e) r g b)"} 80%
+    #{"rgb(from var(--xq-dest-color, #15803d) r g b)"} 80%
   );
 }
 
@@ -110,7 +110,7 @@ $cls-prefix: "xq";
 // move is legal, but the board texture still reads through underneath.
 .xq-wrap xq-board square.move-dest:hover,
 .xq-wrap xq-board square.move-dest.hover {
-  background: #{"rgb(from var(--xq-dest-color, #0f766e) r g b / 0.5)"};
+  background: #{"rgb(from var(--xq-dest-color, #15803d) r g b / 0.5)"};
 }
 
 // Next-move preview arrow: Board.svelte draws it with the library's "blue"
@@ -119,11 +119,11 @@ $cls-prefix: "xq";
 // CSS rule wins over, so the arrow can be themed without touching shared
 // Board.svelte.
 .xq-wrap svg [stroke="#003088"] {
-  stroke: var(--xq-nextmove-color, #e8590c);
+  stroke: var(--xq-nextmove-color, #1a5fb0);
 }
 
 .xq-wrap svg [fill="#003088"] {
-  fill: var(--xq-nextmove-color, #e8590c);
+  fill: var(--xq-nextmove-color, #1a5fb0);
 }
 
 // Library dims the whole arrow layer to 60% (xiangqiground.base.css

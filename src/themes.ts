@@ -14,16 +14,16 @@ import { applyThemeCSSVars, type ThemeData } from "./chess";
 // Every set runs on the same triad, so the three roles are always
 // distinguishable from each other AND from the red/black pieces no matter
 // which board they sit on:
-//   selected = teal (cool "active" frame + destination dots)
-//   lastMove = cobalt/sky blue (cool trace of the previous move)
-//   nextMove = orange-red (preview arrow — a warm accent clearly apart
-//              from the two cool highlights)
-const selected_light = "#0f766e"; // 青绿
-const selected_dark = "#1517c0"; // 亮青绿
-const lastMove_light = "#1a5fb0"; // 钴蓝
-const lastMove_dark = "#6aa7ff"; // 天蓝
-const nextMove_light = "#e8590c"; // 橙红
-const nextMove_dark = "#ff8a3d"; // 亮橙
+//   selected = green (active frame + destination dots)
+//   lastMove = cyan (cool trace of the previous move)
+//   nextMove = blue (preview arrow — one hue step past lastMove and a
+//              cool counterpoint to the warm yellow/orange ponder arrows)
+const selected_light = "#15803d"; // 绿
+const selected_dark = "#4ade80"; // 亮绿
+const lastMove_light = "#0e7490"; // 青
+const lastMove_dark = "#22d3ee"; // 亮青
+const nextMove_light = "#1a5fb0"; // 钴蓝
+const nextMove_dark = "#6aa7ff"; // 天蓝
 // Shape brush colors: engine best-move arrow = green, ponder = yellow;
 // user-drawn arrows/circles reuse the same brushes (red/blue via modifier
 // keys; blue is already themed as nextMove).
@@ -31,8 +31,8 @@ const brushGreen_light = "#2e8b3a";
 const brushGreen_dark = "#58d07a";
 const brushRed_light = "#d64541";
 const brushRed_dark = "#ff5b5b";
-// Orange — same warning family as the nextMove accent, so a ponder arrow
-// stays warm but never reads as a teal selection mark.
+// Orange — the only warm accent left now that nextMove is blue, so a
+// ponder arrow never reads as the green selection frame or cyan trace.
 const brushYellow = "#f57c00";
 
 interface ThemeDef extends ThemeData {
@@ -62,9 +62,9 @@ const themes: Record<string, ThemeDef> = {
     grid: "dark",
     red: tree_red,
     black: tree_black,
-    selected: "var(--color-blue)",
+    selected: "var(--color-green)",
     lastMove: "var(--color-cyan)",
-    nextMove: "var(--color-purple)",
+    nextMove: "var(--color-blue)",
     brushGreen: "var(--color-green)",
     brushRed: "var(--color-red)",
     brushYellow: "var(--color-yellow)",
@@ -106,12 +106,11 @@ const themes: Record<string, ThemeDef> = {
     grid: "dark",
     red: tree_red,
     black: tree_black,
-    // Milky-brown board: deep teal pairs with the warm background as its
-    // complement; the navy lastMove and burnt-orange nextMove keep the
-    // triad sharply distinguishable.
-    selected: "#0e7490",
-    lastMove: "#1658a8",
-    nextMove: "#d9480b",
+    // Milky-brown board: deep green/cyan/blue marks tuned for the warm
+    // background, one hue step apart so the triad stays sharp.
+    selected: "#2f7d32",
+    lastMove: "#0e7490",
+    nextMove: "#1658a8",
     brushGreen: "#2f7d32",
     brushRed: "#c0392b",
     brushYellow: brushYellow,
@@ -125,8 +124,8 @@ const themes: Record<string, ThemeDef> = {
     grid: "light",
     red: tree_red,
     black: tree_black,
-    // Bright marks for the dark green board; orange nextMove separates
-    // from the sky-blue lastMove and stays clear of the red/black pieces.
+    // Bright marks for the dark green board; the green/cyan/blue trio
+    // stays legible over the saturated background and the red/black pieces.
     selected: selected_dark,
     lastMove: lastMove_dark,
     nextMove: nextMove_dark,
@@ -142,8 +141,8 @@ const themes: Record<string, ThemeDef> = {
     grid: "light",
     red: tree_red,
     black: tree_black,
-    // Teal + sky-blue + orange stay readable over the wood texture via
-    // luminance; the cool teal complements the warm grain.
+    // Green + cyan + blue stay readable over the wood texture via
+    // luminance; the cool marks complement the warm grain.
     selected: selected_dark,
     lastMove: lastMove_dark,
     nextMove: nextMove_dark,
@@ -159,8 +158,8 @@ const themes: Record<string, ThemeDef> = {
     grid: "none",
     red: tree_red,
     black: tree_black,
-    // Teal + sky-blue + orange stay readable over the teal board via
-    // luminance; the amber-toned wood grain frames the cool highlights.
+    // Green + cyan + blue stay readable over the bamboo board via
+    // luminance; the amber-toned grain frames the cool highlights.
     selected: selected_dark,
     lastMove: lastMove_dark,
     nextMove: nextMove_dark,
