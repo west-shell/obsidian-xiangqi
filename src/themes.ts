@@ -14,8 +14,18 @@ const selected_light = "#14551e";
 const selected_dark = "#66bb6a";
 const lastMove_light = "#0d47a1";
 const lastMove_dark = "#9fa8da";
-const nextMove_light = "#ef6c00";
-const nextMove_dark = "#ffb74d";
+const nextMove_light = "#003088";
+const nextMove_dark = "#80deea";
+// Shape brush colors: engine best-move arrow = green, ponder = yellow;
+// user-drawn arrows/circles reuse the same brushes (red/blue via modifier
+// keys; blue is already themed as nextMove).
+const brushGreen_light = "#15781b";
+const brushGreen_dark = "#4caf50";
+const brushRed_light = "#882020";
+const brushRed_dark = "#ef5350";
+// Amber reads on every board and stays darker than the yellow selection
+// marks of the textured themes.
+const brushYellow = "#e68f00";
 
 interface ThemeDef extends ThemeData {
   red: string;
@@ -24,6 +34,10 @@ interface ThemeDef extends ThemeData {
   selected: string;
   lastMove: string;
   nextMove: string;
+  /** Shape brushes: engine best move / user red / engine ponder. */
+  brushGreen: string;
+  brushRed: string;
+  brushYellow: string;
 }
 
 const tree_red = "#861818";
@@ -43,6 +57,9 @@ const themes: Record<string, ThemeDef> = {
     selected: selected_light,
     lastMove: lastMove_light,
     nextMove: nextMove_light,
+    brushGreen: brushGreen_light,
+    brushRed: brushRed_light,
+    brushYellow: brushYellow,
   },
   light: {
     name: "Light",
@@ -54,6 +71,9 @@ const themes: Record<string, ThemeDef> = {
     selected: selected_light,
     lastMove: lastMove_light,
     nextMove: nextMove_light,
+    brushGreen: brushGreen_light,
+    brushRed: brushRed_light,
+    brushYellow: brushYellow,
   },
   dark: {
     name: "Dark",
@@ -65,6 +85,9 @@ const themes: Record<string, ThemeDef> = {
     selected: selected_dark,
     lastMove: lastMove_dark,
     nextMove: nextMove_dark,
+    brushGreen: brushGreen_dark,
+    brushRed: brushRed_dark,
+    brushYellow: brushYellow,
   },
   parchment: {
     name: "Parchment",
@@ -78,6 +101,9 @@ const themes: Record<string, ThemeDef> = {
     selected: selected_light,
     lastMove: lastMove_light,
     nextMove: nextMove_light,
+    brushGreen: brushGreen_light,
+    brushRed: brushRed_light,
+    brushYellow: brushYellow,
   },
   green: {
     name: "Green",
@@ -92,7 +118,10 @@ const themes: Record<string, ThemeDef> = {
     // yellow selection dots.
     selected: "#ffd54f",
     lastMove: lastMove_dark,
-    nextMove: "#80deea",
+    nextMove: nextMove_dark,
+    brushGreen: "#8bc34a",
+    brushRed: brushRed_dark,
+    brushYellow: brushYellow,
   },
   wood: {
     name: "Wood",
@@ -104,7 +133,10 @@ const themes: Record<string, ThemeDef> = {
     black: tree_black,
     selected: "#ffd54f",
     lastMove: "#90caf9",
-    nextMove: "#80deea",
+    nextMove: nextMove_dark,
+    brushGreen: "#81c784",
+    brushRed: "#f28b82",
+    brushYellow: brushYellow,
   },
   bamboo: {
     name: "Bamboo",
@@ -114,10 +146,14 @@ const themes: Record<string, ThemeDef> = {
     grid: "none",
     red: tree_red,
     black: tree_black,
-    // Coral arrow: cyan would blend into the teal bamboo board.
+    // Cyan stays readable over the teal board via luminance and separates
+    // from the yellow selection marks and periwinkle lastMove.
     selected: "#ffd54f",
     lastMove: lastMove_dark,
-    nextMove: "#ff8a65",
+    nextMove: nextMove_dark,
+    brushGreen: "#81c784",
+    brushRed: "#f28b82",
+    brushYellow: brushYellow,
   },
 };
 
@@ -196,4 +232,8 @@ export function applyThemes(settings: ISettings, app?: App) {
   body.setProperty("--xq-lastmove-color", t.lastMove);
   body.setProperty("--xq-dest-color", t.selected);
   body.setProperty("--xq-nextmove-color", t.nextMove);
+  // Shape brush colors (engine arrows + user-drawn shapes).
+  body.setProperty("--xq-brush-green", t.brushGreen);
+  body.setProperty("--xq-brush-red", t.brushRed);
+  body.setProperty("--xq-brush-yellow", t.brushYellow);
 }

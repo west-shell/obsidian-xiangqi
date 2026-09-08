@@ -124,6 +124,32 @@ $cls-prefix: "xq";
   fill: var(--xq-nextmove-color, #003088);
 }
 
+// Engine/user shape brushes (best move = green, ponder = yellow, user red
+// via modifier keys) — same presentation-attribute override as above.
+.xq-wrap svg [stroke="#15781B"] {
+  stroke: var(--xq-brush-green, #15781b);
+}
+
+.xq-wrap svg [fill="#15781B"] {
+  fill: var(--xq-brush-green, #15781b);
+}
+
+.xq-wrap svg [stroke="#882020"] {
+  stroke: var(--xq-brush-red, #882020);
+}
+
+.xq-wrap svg [fill="#882020"] {
+  fill: var(--xq-brush-red, #882020);
+}
+
+.xq-wrap svg [stroke="#e68f00"] {
+  stroke: var(--xq-brush-yellow, #e68f00);
+}
+
+.xq-wrap svg [fill="#e68f00"] {
+  fill: var(--xq-brush-yellow, #e68f00);
+}
+
 // ---- FEN editor piece colors (theme-driven) -----------------------------------
 // Palette + side-to-move button colors. `.#{$cls-prefix}-layout--edit`-scoped
 // so they outrank the shared base button rule in _genfen.scss (which loads
