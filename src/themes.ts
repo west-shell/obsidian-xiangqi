@@ -5,7 +5,6 @@ import woodB64 from "../assets/wood.jpg?base64";
 
 import type { ISettings } from "./types";
 import { applyThemeCSSVars, type ThemeData } from "./chess";
-import { hexToRgbTriplet } from "./utils/utils";
 
 // Highlight color presets — the suffix names the board it suits:
 // *_light for light boards (dark marks), *_dark for dark boards (light marks).
@@ -13,8 +12,13 @@ const selected_light = "#14551e";
 const selected_dark = "#66bb6a";
 const lastMove_light = "#0d47a1";
 const lastMove_dark = "#7986cb";
-const nextMove_light = "#14551e";
-const nextMove_dark = "#66bb6a";
+const nextMove_light = "#ef6c00";
+const nextMove_dark = "#ffb74d";
+// Mid-luminance textured boards (wood ~#8c5531, bamboo ~#366d64): dark marks
+// sink into the grain, so highlights must be bright instead.
+const selected_warm = "#ffd54f";
+const lastMove_wood = "#90caf9";
+const nextMove_wood = "#80deea";
 
 interface ThemeDef extends ThemeData {
   red: string;
@@ -87,9 +91,9 @@ const themes: Record<string, ThemeDef> = {
     grid: "light",
     red: tree_red,
     black: tree_black,
-    selected: "#ffd54f",
+    selected: selected_warm,
     lastMove: lastMove_dark,
-    nextMove: "#ffd54f",
+    nextMove: nextMove_dark,
   },
   wood: {
     name: "Wood",
@@ -99,9 +103,9 @@ const themes: Record<string, ThemeDef> = {
     grid: "light",
     red: tree_red,
     black: tree_black,
-    selected: selected_light,
-    lastMove: lastMove_light,
-    nextMove: nextMove_light,
+    selected: selected_warm,
+    lastMove: lastMove_wood,
+    nextMove: nextMove_wood,
   },
   bamboo: {
     name: "Bamboo",
@@ -111,9 +115,9 @@ const themes: Record<string, ThemeDef> = {
     grid: "none",
     red: tree_red,
     black: tree_black,
-    selected: "#ffd54f",
-    lastMove: lastMove_light,
-    nextMove: "#ffd54f",
+    selected: selected_warm,
+    lastMove: lastMove_dark,
+    nextMove: nextMove_dark,
   },
 };
 
@@ -184,8 +188,12 @@ export function applyThemes(settings: ISettings, app?: App) {
   body.setProperty("--xq-piece-black", t.black);
   // Selected square: corner-bracket frame color (scss/_variant.scss).
   body.setProperty("--xq-bracket-color", t.selected);
-  // xiangqiground consumes RGB-triplet vars for its built-in markers
-  // (last-move block/bracket, move-dest dots).
-  body.setProperty("--xq-last-move-orig-color", hexToRgbTriplet(t.lastMove));
-  body.setProperty("--xq-move-dest-color", hexToRgbTriplet(t.nextMove));
+  // xiangqiground declares its RGB-triplet marker vars on `.xq-wrap`, which
+  // shadows any value inherited from <body>; set plugin-owned hex vars here
+  // and override the marker rules in scss/_variant.scss instead.
+  // Selection marks (dest dots / capture rings) share the selected color;
+  // the next-move preview arrow is a distinct mark with its own color.
+  body.setProperty("--xq-lastmove-color", t.lastMove);
+  body.setProperty("--xq-dest-color", t.selected);
+  body.setProperty("--xq-nextmove-color", t.nextMove);
 }
