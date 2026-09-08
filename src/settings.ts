@@ -788,6 +788,42 @@ export class ChessSettingTab extends PluginSettingTab {
         }),
       );
 
+    const fenSetting = new Setting(containerEl)
+      .setName(t("codeblock.fenAliases"))
+      .setDesc(
+        t("codeblock.fenAliases.desc") +
+          " " +
+          t("settings.defaultSuffix").replace(
+            "{names}",
+            DEFAULT_FEN_BLOCK_NAMES.join(", "),
+          ),
+      )
+      .addText((text) =>
+        text.setValue(settings.fenBlockNames.join(", ")).onChange((value) => {
+          const { valid, invalid } = parseAndValidateNames(value);
+          if (invalid.length) {
+            new Notice(
+              t("codeblock.invalidName").replace("{name}", invalid[0]),
+            );
+            const input = fenSetting.controlEl.querySelector("input")!;
+            input.value = valid.length
+              ? valid.join(", ")
+              : DEFAULT_FEN_BLOCK_NAMES[0];
+          }
+          if (!valid.length) return;
+          settings.fenBlockNames = valid;
+          void this.plugin.saveSettings();
+        }),
+      )
+      .addButton((button) =>
+        button.setIcon("rotate-ccw").onClick(() => {
+          settings.fenBlockNames = [...DEFAULT_FEN_BLOCK_NAMES];
+          fenSetting.controlEl.querySelector("input")!.value =
+            DEFAULT_FEN_BLOCK_NAMES.join(", ");
+          void this.plugin.saveSettings();
+        }),
+      );
+
     new Setting(containerEl)
       .setName(t("codeblock.fenSaveBlockName"))
       .setDesc(t("codeblock.fenSaveBlockName.desc"))
