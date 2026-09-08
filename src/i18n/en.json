@@ -146,6 +146,7 @@
   "tag.Date": "Date",
   "tag.Round": "Round",
   "tag.White": "White",
+  "tag.Red": "Red",
   "tag.Black": "Black",
   "tag.Result": "Result",
   "tree.placeholder": "Add a comment",
