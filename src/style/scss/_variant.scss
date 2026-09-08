@@ -73,26 +73,25 @@ $cls-prefix: "xq";
 // (themes.ts); fallbacks mirror the library defaults. Selection marks
 // (dest dots / capture rings) share the selected color; the last-move and
 // next-move marks keep their own colors. All markers render at full
-// opacity, unlike the library's faded defaults.
+// opacity, unlike the library's faded defaults. The vars are consumed
+// as-is — no relative-color syntax, which mobile WebViews don't support.
 
 .xq-wrap xq-board square.last-move-orig {
   background: linear-gradient(
-      #{"rgb(from var(--xq-lastmove-color, #0e7490) r g b)"},
-      #{"rgb(from var(--xq-lastmove-color, #0e7490) r g b)"}
+      var(--xq-lastmove-color, #0e7490),
+      var(--xq-lastmove-color, #0e7490)
     )
     center / 30% 30% no-repeat;
 }
 
 .xq-wrap xq-board square.last-move-dest {
-  @include bracket-frame(
-    #{"rgb(from var(--xq-lastmove-color, #0e7490) r g b)"}
-  );
+  @include bracket-frame(var(--xq-lastmove-color, #0e7490));
 }
 
 .xq-wrap xq-board square.move-dest {
   background: radial-gradient(
-    #{"rgb(from var(--xq-dest-color, #15803d) r g b)"} 22%,
-    #{"rgb(from var(--xq-dest-color, #15803d) r g b)"} 0,
+    var(--xq-dest-color, #15803d) 22%,
+    var(--xq-dest-color, #15803d) 0,
     rgba(0, 0, 0, 0.3) 0,
     rgba(0, 0, 0, 0) 0
   );
@@ -102,15 +101,20 @@ $cls-prefix: "xq";
   background: radial-gradient(
     transparent 0%,
     transparent 80%,
-    #{"rgb(from var(--xq-dest-color, #15803d) r g b)"} 80%
+    var(--xq-dest-color, #15803d) 80%
   );
 }
 
-// Hover state fills the square with a translucent block — enough to show a
-// move is legal, but the board texture still reads through underneath.
+// Hover state: same marker style as the dest dot, but a slightly larger
+// circle (28% vs 22%) — no square fill, no transparency needed.
 .xq-wrap xq-board square.move-dest:hover,
 .xq-wrap xq-board square.move-dest.hover {
-  background: #{"rgb(from var(--xq-dest-color, #15803d) r g b / 0.5)"};
+  background: radial-gradient(
+    var(--xq-dest-color, #15803d) 28%,
+    var(--xq-dest-color, #15803d) 0,
+    rgba(0, 0, 0, 0.3) 0,
+    rgba(0, 0, 0, 0) 0
+  );
 }
 
 // Next-move preview arrow: Board.svelte draws it with the library's "blue"
