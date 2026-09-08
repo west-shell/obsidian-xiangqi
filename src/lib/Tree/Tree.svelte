@@ -938,7 +938,7 @@
                   ? "var(--color-accent)"
                   : getNodeFill(node.color)}
                 stroke={isCurrent
-                  ? getNodeFill(node.color)
+                  ? "var(--background-modifier-border-focus)"
                   : "var(--tree-line)"}
               />
               {#if nodeMode === 0 && !node.move}
