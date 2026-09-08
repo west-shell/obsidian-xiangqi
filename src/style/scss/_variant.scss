@@ -135,6 +135,14 @@ $cls-prefix: "xq";
   opacity: 0.85;
 }
 
+// Slim the arrow shafts: the library computes stroke-width from the brush
+// (lineWidth / 64, e.g. 10/64 ≈ 0.156 board units). Override to ~70% so
+// the arrows read lighter against the pieces and board texture.
+.xq-wrap .xq-shapes line,
+.xq-wrap .xq-shapes-below line {
+  stroke-width: 0.11;
+}
+
 // Engine/user shape brushes (best move = green, ponder = yellow, user red
 // via modifier keys) — same presentation-attribute override as above.
 .xq-wrap svg [stroke="#15781B"] {
