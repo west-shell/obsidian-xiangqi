@@ -24,16 +24,19 @@ $cls-prefix: "xq";
 // square or custom highlights; the color is passed in separately.
 //   $color: full color — hex literal or var() reference
 // Emitted via interpolation so Sass does not evaluate the value.
+// Arm thickness is a percentage (6%) so brackets scale with the square
+// size — a fixed px value reads thick on small (mobile) boards and thin
+// on large (desktop) boards.
 @mixin bracket-frame($color) {
   background:
-    linear-gradient(#{$color} 0 0) no-repeat 0 0 / 20% 4px,
-    linear-gradient(#{$color} 0 0) no-repeat 0 0 / 4px 20%,
-    linear-gradient(#{$color} 0 0) no-repeat 100% 0 / 20% 4px,
-    linear-gradient(#{$color} 0 0) no-repeat 100% 0 / 4px 20%,
-    linear-gradient(#{$color} 0 0) no-repeat 0 100% / 20% 4px,
-    linear-gradient(#{$color} 0 0) no-repeat 0 100% / 4px 20%,
-    linear-gradient(#{$color} 0 0) no-repeat 100% 100% / 20% 4px,
-    linear-gradient(#{$color} 0 0) no-repeat 100% 100% / 4px 20%;
+    linear-gradient(#{$color} 0 0) no-repeat 0 0 / 20% 6%,
+    linear-gradient(#{$color} 0 0) no-repeat 0 0 / 6% 20%,
+    linear-gradient(#{$color} 0 0) no-repeat 100% 0 / 20% 6%,
+    linear-gradient(#{$color} 0 0) no-repeat 100% 0 / 6% 20%,
+    linear-gradient(#{$color} 0 0) no-repeat 0 100% / 20% 6%,
+    linear-gradient(#{$color} 0 0) no-repeat 0 100% / 6% 20%,
+    linear-gradient(#{$color} 0 0) no-repeat 100% 100% / 20% 6%,
+    linear-gradient(#{$color} 0 0) no-repeat 100% 100% / 6% 20%;
   z-index: 1;
 }
 
