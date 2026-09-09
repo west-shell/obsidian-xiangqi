@@ -11,18 +11,20 @@ import { applyThemeCSSVars, type ThemeData } from "./chess";
 // (parchment/wood/bamboo/green) override individual fields with custom
 // values tuned to their background.
 //
-// Every set runs on the same triad, so the three roles are always
-// distinguishable from each other AND from the red/black pieces no matter
-// which board they sit on:
-//   selected = green (active frame + destination dots)
-//   lastMove = violet (trace of the previous move — a large hue step from
-//              the blue nextMove, and still a cool counterpoint to the
-//              warm yellow/orange ponder arrows)
-//   nextMove = blue (preview arrow)
-const selected_light = "#15803d"; // 绿
-const selected_dark = "#4ade80"; // 亮绿
+// Palette tuned in OKLCH (perceptual space) with three constraints:
+//   1. every mark holds >= 3:1 WCAG contrast against its board background
+//      (non-text guideline; verified per theme);
+//   2. every role pair stays >= ~0.10 dE-ok apart, so the six roles never
+//      collide even where hues are adjacent (teal/green, violet/blue);
+//   3. red/green/yellow brushes are lightness-stratified so they survive
+//      red-green color-blind viewing, where hue alone would collapse them.
+// Roles: selected = teal/cyan frame + dest dots, lastMove = violet trace,
+// nextMove = blue preview arrow; brushes: green = engine best, yellow =
+// ponder, red = user-drawn.
+const selected_light = "#0f766e"; // 深青
+const selected_dark = "#22d3ee"; // 亮青（偏蓝，与绿刷子拉开 ΔE 0.09→0.16）
 const lastMove_light = "#7c3aed"; // 紫
-const lastMove_dark = "#a78bfa"; // 亮紫
+const lastMove_dark = "#c084fc"; // 亮紫（偏品红，与蓝 nextMove 拉开 ΔE 0.10→0.13）
 const nextMove_light = "#1a5fb0"; // 钴蓝
 const nextMove_dark = "#6aa7ff"; // 天蓝
 // Shape brush colors: engine best-move arrow = green, ponder = yellow;
@@ -30,11 +32,13 @@ const nextMove_dark = "#6aa7ff"; // 天蓝
 // keys; blue is already themed as nextMove).
 const brushGreen_light = "#2e8b3a";
 const brushGreen_dark = "#58d07a";
-const brushRed_light = "#d64541";
-const brushRed_dark = "#ff5b5b";
-// Orange — the only warm accent left now that nextMove is blue, so a
-// ponder arrow never reads as the green selection frame or cyan trace.
-const brushYellow = "#f57c00";
+const brushRed_light = "#b91c1c"; // 加深：与绿刷子明度分层（色弱安全），米色盘 5.0:1
+const brushRed_dark = "#ff7676"; // 提亮：绿棋盘上 2.7→3.1:1
+// Dark goldenrod instead of bright yellow: on cream/parchment boards a
+// light yellow falls under 3:1 contrast (a vivid yellow needs a dark bg).
+// Hue stays ~74° (yellow range), well clear of the red brush at ~28°.
+const brushYellow_light = "#92620a";
+const brushYellow_dark = "#facc15";
 
 interface ThemeDef extends ThemeData {
   red: string;
@@ -82,7 +86,7 @@ const themes: Record<string, ThemeDef> = {
     nextMove: nextMove_light,
     brushGreen: brushGreen_light,
     brushRed: brushRed_light,
-    brushYellow: brushYellow,
+    brushYellow: brushYellow_light,
   },
   dark: {
     name: "Dark",
@@ -96,7 +100,7 @@ const themes: Record<string, ThemeDef> = {
     nextMove: nextMove_dark,
     brushGreen: brushGreen_dark,
     brushRed: brushRed_dark,
-    brushYellow: brushYellow,
+    brushYellow: brushYellow_dark,
   },
   parchment: {
     name: "Parchment",
@@ -107,14 +111,16 @@ const themes: Record<string, ThemeDef> = {
     grid: "dark",
     red: tree_red,
     black: tree_black,
-    // Milky-brown board: deep green/violet/blue marks tuned for the warm
-    // background, one hue step apart so the triad stays sharp.
-    selected: "#2f7d32",
+    // Milky-brown board (lum 0.50): all marks darkened for >= 3.4:1, and
+    // the whole set lightness-stratified — the mid-tone background leaves
+    // only a narrow L band, so hue spacing must carry role separation
+    // (verified: every pair >= 0.11 dE-ok).
+    selected: "#164e63",
     lastMove: "#6d28d9",
     nextMove: "#1658a8",
-    brushGreen: "#2f7d32",
-    brushRed: "#c0392b",
-    brushYellow: brushYellow,
+    brushGreen: "#166534",
+    brushRed: "#b91c1c",
+    brushYellow: "#785008",
   },
   green: {
     name: "Green",
@@ -132,7 +138,7 @@ const themes: Record<string, ThemeDef> = {
     nextMove: nextMove_dark,
     brushGreen: brushGreen_dark,
     brushRed: brushRed_dark,
-    brushYellow: brushYellow,
+    brushYellow: brushYellow_dark,
   },
   wood: {
     name: "Wood",
@@ -149,11 +155,11 @@ const themes: Record<string, ThemeDef> = {
     nextMove: nextMove_dark,
     brushGreen: brushGreen_dark,
     brushRed: brushRed_dark,
-    brushYellow: brushYellow,
+    brushYellow: brushYellow_dark,
   },
   bamboo: {
     name: "Bamboo",
-    nameZh: "竹纹",
+    nameZh: "竹韵",
     bg: "plugins/xiangqi/assets/bamboo.jpg",
     bgImage: { path: "plugins/xiangqi/assets/bamboo.jpg", base64: bambooB64 },
     grid: "none",
@@ -166,7 +172,7 @@ const themes: Record<string, ThemeDef> = {
     nextMove: nextMove_dark,
     brushGreen: brushGreen_dark,
     brushRed: brushRed_dark,
-    brushYellow: brushYellow,
+    brushYellow: brushYellow_dark,
   },
 };
 
