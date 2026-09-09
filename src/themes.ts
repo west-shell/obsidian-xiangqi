@@ -15,13 +15,14 @@ import { applyThemeCSSVars, type ThemeData } from "./chess";
 // distinguishable from each other AND from the red/black pieces no matter
 // which board they sit on:
 //   selected = green (active frame + destination dots)
-//   lastMove = cyan (cool trace of the previous move)
-//   nextMove = blue (preview arrow — one hue step past lastMove and a
-//              cool counterpoint to the warm yellow/orange ponder arrows)
+//   lastMove = violet (trace of the previous move — a large hue step from
+//              the blue nextMove, and still a cool counterpoint to the
+//              warm yellow/orange ponder arrows)
+//   nextMove = blue (preview arrow)
 const selected_light = "#15803d"; // 绿
 const selected_dark = "#4ade80"; // 亮绿
-const lastMove_light = "#0e7490"; // 青
-const lastMove_dark = "#22d3ee"; // 亮青
+const lastMove_light = "#7c3aed"; // 紫
+const lastMove_dark = "#a78bfa"; // 亮紫
 const nextMove_light = "#1a5fb0"; // 钴蓝
 const nextMove_dark = "#6aa7ff"; // 天蓝
 // Shape brush colors: engine best-move arrow = green, ponder = yellow;
@@ -63,7 +64,7 @@ const themes: Record<string, ThemeDef> = {
     red: tree_red,
     black: tree_black,
     selected: "var(--color-green)",
-    lastMove: "var(--color-cyan)",
+    lastMove: "var(--color-purple)",
     nextMove: "var(--color-blue)",
     brushGreen: "var(--color-green)",
     brushRed: "var(--color-red)",
@@ -106,10 +107,10 @@ const themes: Record<string, ThemeDef> = {
     grid: "dark",
     red: tree_red,
     black: tree_black,
-    // Milky-brown board: deep green/cyan/blue marks tuned for the warm
+    // Milky-brown board: deep green/violet/blue marks tuned for the warm
     // background, one hue step apart so the triad stays sharp.
     selected: "#2f7d32",
-    lastMove: "#0e7490",
+    lastMove: "#6d28d9",
     nextMove: "#1658a8",
     brushGreen: "#2f7d32",
     brushRed: "#c0392b",
@@ -124,7 +125,7 @@ const themes: Record<string, ThemeDef> = {
     grid: "light",
     red: tree_red,
     black: tree_black,
-    // Bright marks for the dark green board; the green/cyan/blue trio
+    // Bright marks for the dark green board; the green/violet/blue trio
     // stays legible over the saturated background and the red/black pieces.
     selected: selected_dark,
     lastMove: lastMove_dark,
@@ -141,7 +142,7 @@ const themes: Record<string, ThemeDef> = {
     grid: "light",
     red: tree_red,
     black: tree_black,
-    // Green + cyan + blue stay readable over the wood texture via
+    // Green + violet + blue stay readable over the wood texture via
     // luminance; the cool marks complement the warm grain.
     selected: selected_dark,
     lastMove: lastMove_dark,
@@ -158,7 +159,7 @@ const themes: Record<string, ThemeDef> = {
     grid: "none",
     red: tree_red,
     black: tree_black,
-    // Green + cyan + blue stay readable over the bamboo board via
+    // Green + violet + blue stay readable over the bamboo board via
     // luminance; the amber-toned grain frames the cool highlights.
     selected: selected_dark,
     lastMove: lastMove_dark,

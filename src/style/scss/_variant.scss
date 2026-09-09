@@ -81,14 +81,14 @@ $cls-prefix: "xq";
 
 .xq-wrap xq-board square.last-move-orig {
   background: linear-gradient(
-      var(--xq-lastmove-color, #0e7490),
-      var(--xq-lastmove-color, #0e7490)
+      var(--xq-lastmove-color, #7c3aed),
+      var(--xq-lastmove-color, #7c3aed)
     )
     center / 30% 30% no-repeat;
 }
 
 .xq-wrap xq-board square.last-move-dest {
-  @include bracket-frame(var(--xq-lastmove-color, #0e7490));
+  @include bracket-frame(var(--xq-lastmove-color, #7c3aed));
 }
 
 .xq-wrap xq-board square.move-dest {
