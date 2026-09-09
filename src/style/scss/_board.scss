@@ -22,15 +22,14 @@
   border-radius: 2px;
 }
 
-// Turn indicator glow (rendered on the area, not on chessground itself).
+// Turn indicator (rendered on the area, not on chessground itself): the
+// side-to-move ring picks up the piece-button colors set by themes.ts.
 .#{$cls-prefix}-layout__board--turn-white {
-  background: rgba(255, 255, 255, 0.7);
-  box-shadow: 0 0 12px 3px rgba(255, 255, 255, 0.7);
+  background: var(--#{$cls-prefix}-piece-primary);
 }
 
 .#{$cls-prefix}-layout__board--turn-black {
-  background: rgba(0, 0, 0, 0.7);
-  box-shadow: 0 0 12px 3px rgba(0, 0, 0, 0.7);
+  background: var(--#{$cls-prefix}-piece-secondary);
 }
 
 // ---- chessground overrides (shared wrap/piece rules only) -------------------
