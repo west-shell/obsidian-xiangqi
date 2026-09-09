@@ -120,6 +120,19 @@ $cls-prefix: "xq";
   );
 }
 
+// Hover state on a capture square: shrink the transparent inner circle
+// (70% vs 80%) so the ring grows inward and reads clearly over the piece
+// being captured. Needs the extra .oc class to outrank the generic
+// move-dest hover rule above.
+.xq-wrap xq-board square.oc.move-dest:hover,
+.xq-wrap xq-board square.oc.move-dest.hover {
+  background: radial-gradient(
+    transparent 0%,
+    transparent 74%,
+    var(--xq-dest-color, #15803d) 74%
+  );
+}
+
 // Next-move preview arrow: Board.svelte draws it with the library's "blue"
 // brush — the shaft is a <line stroke="#003088">, the arrowhead a marker
 // <path fill="#003088">. Both are SVG presentation attributes, which any
