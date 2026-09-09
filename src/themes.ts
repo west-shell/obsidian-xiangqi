@@ -63,7 +63,7 @@ const themes: Record<string, ThemeDef> = {
   auto: {
     name: "Auto",
     nameZh: "自动",
-    bg: "var(--background-primary-alt)",
+    bg: "var(--background-secondary)",
     grid: "dark",
     red: tree_red,
     black: tree_black,
