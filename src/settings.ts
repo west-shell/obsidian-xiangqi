@@ -18,25 +18,116 @@ import { getThemeDisplayName, THEME_KEYS } from "./themes";
 import type { ISettings } from "./types";
 
 const VALID_NAME_RE = /^[a-z0-9-]+$/;
+// Characters the tag input accepts as they are typed (committed to
+// lowercase); anything else is rejected with a notice, never auto-removed.
+const TYPABLE_NAME_RE = /[a-zA-Z0-9-]/;
 
-function parseAndValidateNames(value: string): {
-  valid: string[];
-  invalid: string[];
-} {
-  const parsed = value
-    .split(",")
-    .map((s) => s.trim().toLowerCase())
-    .filter(Boolean);
-  const valid: string[] = [];
-  const invalid: string[] = [];
-  for (const name of parsed) {
-    if (VALID_NAME_RE.test(name)) {
-      valid.push(name);
-    } else {
-      invalid.push(name);
+interface TagInput {
+  refresh: () => void;
+}
+
+// GitHub-style tag input: committed names render as removable chips, the
+// inline input commits on Enter / comma / blur. Invalid characters are
+// rejected the moment they are typed (with a notice naming the character)
+// — the input value is never rewritten from under the user.
+function addTagInput(
+  setting: Setting,
+  getNames: () => string[],
+  setNames: (names: string[]) => void,
+): TagInput {
+  const wrap = setting.controlEl.createDiv({
+    cls: `${CLS_PREFIX}-tags`,
+  });
+
+  const removeChip = (chip: HTMLElement, name: string): void => {
+    const names = getNames();
+    if (names.length <= 1) {
+      new Notice(t("codeblock.lastName"));
+      return;
     }
-  }
-  return { valid, invalid };
+    chip.detach();
+    setNames(names.filter((n) => n !== name));
+  };
+
+  const buildChip = (name: string): HTMLElement => {
+    const chip = createSpan({ cls: `${CLS_PREFIX}-tags__chip` });
+    chip.dataset.name = name;
+    chip.createSpan({ text: name });
+    const x = chip.createEl("button", {
+      cls: `${CLS_PREFIX}-tags__x`,
+      attr: {
+        type: "button",
+        "aria-label": t("codeblock.removeName").replace("{name}", name),
+      },
+      text: "×",
+    });
+    x.addEventListener("click", () => removeChip(chip, name));
+    return chip;
+  };
+
+  const input = wrap.createEl("input", {
+    cls: `${CLS_PREFIX}-tags__input`,
+    attr: { type: "text", placeholder: t("codeblock.tagPlaceholder") },
+  });
+
+  const commit = (): void => {
+    const name = input.value.trim().toLowerCase();
+    input.value = "";
+    if (!name) return;
+    if (!VALID_NAME_RE.test(name)) {
+      new Notice(t("codeblock.invalidName").replace("{name}", name));
+      return;
+    }
+    const names = getNames();
+    if (names.includes(name)) {
+      new Notice(t("codeblock.duplicateName").replace("{name}", name));
+      return;
+    }
+    wrap.insertBefore(buildChip(name), input);
+    setNames([...names, name]);
+  };
+
+  input.addEventListener("keydown", (e: KeyboardEvent) => {
+    if (e.key === "Enter" || e.key === ",") {
+      e.preventDefault();
+      commit();
+    } else if (e.key === "Backspace" && !input.value) {
+      const last = input.previousElementSibling;
+      if (last instanceof HTMLElement) {
+        e.preventDefault();
+        removeChip(last, last.dataset.name ?? "");
+      }
+    } else if (e.key.length === 1 && !TYPABLE_NAME_RE.test(e.key)) {
+      e.preventDefault();
+      new Notice(t("codeblock.invalidChar").replace("{char}", e.key));
+    }
+  });
+
+  // Pasted text is filtered to what the filter above would allow, so the
+  // box never holds characters that would fail at commit time.
+  input.addEventListener("paste", (e: ClipboardEvent) => {
+    e.preventDefault();
+    const raw = e.clipboardData?.getData("text") ?? "";
+    const dropped = raw.replace(/[a-zA-Z0-9-]/g, "");
+    if (dropped) {
+      new Notice(t("codeblock.invalidChar").replace("{char}", dropped[0]));
+    }
+    input.value += raw.toLowerCase().replace(/[^a-z0-9-]/g, "");
+  });
+
+  input.addEventListener("blur", commit);
+
+  const refresh = (): void => {
+    wrap
+      .querySelectorAll(`.${CLS_PREFIX}-tags__chip`)
+      .forEach((el) => el.detach());
+    for (const name of getNames()) {
+      wrap.insertBefore(buildChip(name), input);
+    }
+  };
+  refresh();
+
+  return { refresh };
 }
 
 export const DEFAULT_SETTINGS: ISettings = {
@@ -746,6 +837,21 @@ export class ChessSettingTab extends PluginSettingTab {
     // ---- 代码块名称 ----
     new Setting(containerEl).setName(t("codeblock.title")).setHeading();
 
+    // FEN-save dropdown options follow the tree aliases; rebuilt whenever
+    // the tree tag list changes.
+    let fenSaveSelect: HTMLSelectElement | null = null;
+    const renderFenSaveOptions = (): void => {
+      if (!fenSaveSelect) return;
+      fenSaveSelect.innerHTML = "";
+      for (const name of settings.treeBlockNames) {
+        fenSaveSelect.add(new Option(name, name));
+      }
+      if (!settings.treeBlockNames.includes(settings.fenSaveBlockName)) {
+        settings.fenSaveBlockName = settings.treeBlockNames[0];
+      }
+      fenSaveSelect.value = settings.fenSaveBlockName;
+    };
+
     const treeSetting = new Setting(containerEl)
       .setName(t("codeblock.treeAliases"))
       .setDesc(
@@ -755,38 +861,30 @@ export class ChessSettingTab extends PluginSettingTab {
             "{names}",
             DEFAULT_TREE_BLOCK_NAMES.join(", "),
           ),
-      )
-      .addText((text) =>
-        text.setValue(settings.treeBlockNames.join(", ")).onChange((value) => {
-          const { valid, invalid } = parseAndValidateNames(value);
-          if (invalid.length) {
-            new Notice(
-              t("codeblock.invalidName").replace("{name}", invalid[0]),
-            );
-            const input = treeSetting.controlEl.querySelector("input")!;
-            input.value = valid.length
-              ? valid.join(", ")
-              : DEFAULT_TREE_BLOCK_NAMES[0];
-          }
-          if (!valid.length) return;
-          settings.treeBlockNames = valid;
-          if (!valid.includes(settings.fenSaveBlockName)) {
-            settings.fenSaveBlockName = valid[0];
-          }
-          void this.plugin.saveSettings();
-        }),
-      )
-      .addButton((button) =>
-        button.setIcon("rotate-ccw").onClick(() => {
-          settings.treeBlockNames = [...DEFAULT_TREE_BLOCK_NAMES];
-          if (!settings.treeBlockNames.includes(settings.fenSaveBlockName)) {
-            settings.fenSaveBlockName = settings.treeBlockNames[0];
-          }
-          treeSetting.controlEl.querySelector("input")!.value =
-            DEFAULT_TREE_BLOCK_NAMES.join(", ");
-          void this.plugin.saveSettings();
-        }),
       );
+    const treeTags = addTagInput(
+      treeSetting,
+      () => settings.treeBlockNames,
+      (names) => {
+        settings.treeBlockNames = names;
+        if (!names.includes(settings.fenSaveBlockName)) {
+          settings.fenSaveBlockName = names[0];
+        }
+        renderFenSaveOptions();
+        void this.plugin.saveSettings();
+      },
+    );
+    treeSetting.addButton((button) =>
+      button.setIcon("rotate-ccw").onClick(() => {
+        settings.treeBlockNames = [...DEFAULT_TREE_BLOCK_NAMES];
+        if (!settings.treeBlockNames.includes(settings.fenSaveBlockName)) {
+          settings.fenSaveBlockName = settings.treeBlockNames[0];
+        }
+        renderFenSaveOptions();
+        treeTags.refresh();
+        void this.plugin.saveSettings();
+      }),
+    );
 
     const fenSetting = new Setting(containerEl)
       .setName(t("codeblock.fenAliases"))
@@ -797,45 +895,29 @@ export class ChessSettingTab extends PluginSettingTab {
             "{names}",
             DEFAULT_FEN_BLOCK_NAMES.join(", "),
           ),
-      )
-      .addText((text) =>
-        text.setValue(settings.fenBlockNames.join(", ")).onChange((value) => {
-          const { valid, invalid } = parseAndValidateNames(value);
-          if (invalid.length) {
-            new Notice(
-              t("codeblock.invalidName").replace("{name}", invalid[0]),
-            );
-            const input = fenSetting.controlEl.querySelector("input")!;
-            input.value = valid.length
-              ? valid.join(", ")
-              : DEFAULT_FEN_BLOCK_NAMES[0];
-          }
-          if (!valid.length) return;
-          settings.fenBlockNames = valid;
-          void this.plugin.saveSettings();
-        }),
-      )
-      .addButton((button) =>
-        button.setIcon("rotate-ccw").onClick(() => {
-          settings.fenBlockNames = [...DEFAULT_FEN_BLOCK_NAMES];
-          fenSetting.controlEl.querySelector("input")!.value =
-            DEFAULT_FEN_BLOCK_NAMES.join(", ");
-          void this.plugin.saveSettings();
-        }),
       );
+    const fenTags = addTagInput(
+      fenSetting,
+      () => settings.fenBlockNames,
+      (names) => {
+        settings.fenBlockNames = names;
+        void this.plugin.saveSettings();
+      },
+    );
+    fenSetting.addButton((button) =>
+      button.setIcon("rotate-ccw").onClick(() => {
+        settings.fenBlockNames = [...DEFAULT_FEN_BLOCK_NAMES];
+        fenTags.refresh();
+        void this.plugin.saveSettings();
+      }),
+    );
 
     new Setting(containerEl)
       .setName(t("codeblock.fenSaveBlockName"))
       .setDesc(t("codeblock.fenSaveBlockName.desc"))
       .addDropdown((dropdown) => {
-        for (const name of settings.treeBlockNames) {
-          dropdown.addOption(name, name);
-        }
-        dropdown.setValue(
-          settings.treeBlockNames.includes(settings.fenSaveBlockName)
-            ? settings.fenSaveBlockName
-            : settings.treeBlockNames[0],
-        );
+        fenSaveSelect = dropdown.selectEl;
+        renderFenSaveOptions();
         dropdown.onChange((value) => {
           settings.fenSaveBlockName = value;
           void this.plugin.saveSettings();
@@ -861,31 +943,22 @@ export class ChessSettingTab extends PluginSettingTab {
         t("pgn.extensions.desc") +
           " " +
           t("settings.defaultSuffix").replace("{names}", "pgn"),
-      )
-      .addText((text) =>
-        text
-          .setValue(settings.pgnFileExtensions.join(", "))
-          .onChange((value) => {
-            const { valid, invalid } = parseAndValidateNames(value);
-            if (invalid.length) {
-              new Notice(
-                t("codeblock.invalidName").replace("{name}", invalid[0]),
-              );
-              const input = pgnExtSetting.controlEl.querySelector("input")!;
-              input.value = valid.length ? valid.join(", ") : "pgn";
-            }
-            if (!valid.length) return;
-            settings.pgnFileExtensions = valid;
-            void this.plugin.saveSettings();
-          }),
-      )
-      .addButton((button) =>
-        button.setIcon("rotate-ccw").onClick(() => {
-          settings.pgnFileExtensions = ["pgn"];
-          pgnExtSetting.controlEl.querySelector("input")!.value = "pgn";
-          void this.plugin.saveSettings();
-        }),
       );
+    const pgnExtTags = addTagInput(
+      pgnExtSetting,
+      () => settings.pgnFileExtensions,
+      (names) => {
+        settings.pgnFileExtensions = names;
+        void this.plugin.saveSettings();
+      },
+    );
+    pgnExtSetting.addButton((button) =>
+      button.setIcon("rotate-ccw").onClick(() => {
+        settings.pgnFileExtensions = ["pgn"];
+        pgnExtTags.refresh();
+        void this.plugin.saveSettings();
+      }),
+    );
 
     containerEl.parentElement?.classList.add(`${CLS_PREFIX}-settings`);
   }
