@@ -56,9 +56,21 @@ $cls-prefix: "xq";
   --piece-black: var(--xq-piece-black, var(--color-blue));
 }
 
-// Coordinate labels (simple on/off via shared custom property).
+// Coordinate labels (simple on/off via shared custom property). Fully
+// opaque — the library dims the container to 0.8 (xiangqiground.base.css);
+// this rule loads after it and wins by source order.
 .xq-wrap coords {
   display: var(--#{$cls-prefix}-coords-display, flex);
+  opacity: 1;
+}
+
+// Coordinate label color: follow the grid line color instead of the
+// library's alternating dark/light scheme. The :nth-child(n) selector is
+// needed to outrank xiangqiground.base.css's `.orientation-* .files
+// :nth-child(even|odd)` rules in both orientations.
+.xq-wrap coords coord,
+.xq-wrap .files coord:nth-child(n) {
+  color: var(--xq-grid-color, #555);
 }
 
 // Selected square: corner-bracket frame (mixin above) in the theme-provided
