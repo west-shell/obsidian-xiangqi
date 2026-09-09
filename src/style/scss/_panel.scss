@@ -389,8 +389,17 @@ span.#{$cls-prefix}-moves__move--black {
   text-align: right;
 }
 
-span.#{$cls-prefix}-moves__move:hover {
-  background-color: var(--background-modifier-hover);
+// Only real-pointer devices get hover feedback; touch devices leave a sticky
+// emulated :hover behind after a tap, which greys out the tapped move and the
+// previously-current move after slider navigation. The active move is excluded
+// so hovering it keeps the accent background (hover would otherwise win on
+// specificity).
+@media (hover: hover) {
+  span.#{$cls-prefix}-moves__move:not(
+      .#{$cls-prefix}-moves__move--active
+    ):hover {
+    background-color: var(--background-modifier-hover);
+  }
 }
 
 span.#{$cls-prefix}-moves__move--active {
