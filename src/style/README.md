@@ -109,7 +109,7 @@ src/style/
 | `--ct-selected-color` / `--ct-lastmove-color` / `--ct-nextmove-color` | 选中 / 最后一着 / 可走目标高亮色 |
 | `--ct-board-margin-top` / `--ct-board-margin-bottom`                  | 棋盘上下边距                     |
 | `--ct-coords-display`                                                 | 坐标显隐（flex/none）            |
-| `--ct-piece-primary` / `--ct-piece-secondary`                         | 双方棋子代表色                   |
+| `--ct-piece-white` / `--ct-piece-black`                               | 双方棋子代表色                   |
 | `--ct-header-h`                                                       | 视图头部高度（col2 高度代数用）  |
 | `--ct-gap`                                                            | 全局间距                         |
 | `--ct-col2-size` / `--ct-col2-width`                                  | col2 轨道主尺寸 / 宽度           |

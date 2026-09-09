@@ -22,15 +22,10 @@
   border-radius: 2px;
 }
 
-// Turn indicator (rendered on the area, not on chessground itself): the
-// side-to-move ring picks up the piece-button colors set by themes.ts.
-.#{$cls-prefix}-layout__board--turn-white {
-  background: var(--#{$cls-prefix}-piece-primary);
-}
-
-.#{$cls-prefix}-layout__board--turn-black {
-  background: var(--#{$cls-prefix}-piece-secondary);
-}
+// Turn indicator frame: a crisp ring around the board wrap (no blur → no
+// glow) in the side-to-move piece color. Lives in _variant.scss (not here)
+// because each variant owns its piece-color variable names
+// (chess: --{prefix}-piece-white/-black, xiangqi: --xq-piece-red/-black).
 
 // ---- chessground overrides (shared wrap/piece rules only) -------------------
 

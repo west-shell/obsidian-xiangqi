@@ -201,6 +201,21 @@ $cls-prefix: "xq";
   fill: var(--xq-brush-yellow, #92620a);
 }
 
+// Turn indicator frame: a crisp ring around the board (no blur → no glow)
+// in the side-to-move piece color. Drawn on xq-board — not the grid cell —
+// because the board fills the cell flush, so a cell background only leaks
+// through as a sub-pixel sliver whose width changes with the board scale.
+// Thickness scales with the board (cqw resolves against the wrap, the
+// inline-size container declared in _board.scss): ~2px at 500px, clamped
+// to 1–3px.
+.#{$cls-prefix}-layout__board--turn-white xq-board {
+  box-shadow: 0 0 0 clamp(1px, 0.4cqw, 3px) var(--xq-piece-red);
+}
+
+.#{$cls-prefix}-layout__board--turn-black xq-board {
+  box-shadow: 0 0 0 clamp(1px, 0.4cqw, 3px) var(--xq-piece-black);
+}
+
 // ---- FEN editor piece colors (theme-driven) -----------------------------------
 // Palette + side-to-move button colors. `.#{$cls-prefix}-layout--edit`-scoped
 // so they outrank the shared base button rule in _genfen.scss (which loads
