@@ -27,16 +27,13 @@
   }
 }
 
-// Auto black/white text colour for an arbitrary background colour — pure CSS
-// relative-colour syntax: YIQ luminance threshold pushed to 0/255, so the
-// result is always #000 or #fff. Requires Chromium 119+ (Obsidian 1.5+);
-// $fallback keeps a readable colour on older engines (they drop the
-// relative-colour declaration as invalid).
-//
-// Emitted via interpolation so Sass does not evaluate the channel math.
+// Text colour for a themed background. Auto black/white via CSS relative
+// colour syntax was removed: mobile WebViews don't support it — a var()
+// substituted `rgb(from …)` is invalid at computed-value time, silently
+// unsetting the property (the preceding fallback declaration does NOT
+// rescue it). Use the explicit $fallback colour instead.
 @mixin contrast-text($bg, $fallback: null) {
   @if $fallback {
     color: $fallback;
   }
-  color: #{"rgb(from #{$bg} clamp(0, (128 - (299 * r + 587 * g + 114 * b) / 1000) * 255, 255) clamp(0, (128 - (299 * r + 587 * g + 114 * b) / 1000) * 255, 255) clamp(0, (128 - (299 * r + 587 * g + 114 * b) / 1000) * 255, 255))"};
 }
