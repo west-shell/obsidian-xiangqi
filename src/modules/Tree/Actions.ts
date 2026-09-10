@@ -184,7 +184,9 @@ const ActionsModule = {
       host.currentNode = host.nodeMap.get(id)!;
       host.fen = host.currentNode.fen;
       emitNodeEval(host);
-      host.eventBus.emit("updateMainPath");
+      if (!host.currentPath.includes(id)) {
+        host.eventBus.emit("updateMainPath");
+      }
       host.eventBus.emit("updateUI");
     });
 
@@ -310,6 +312,7 @@ const ActionsModule = {
                 host.nodeMap.clear();
                 host.currentNode = { ...host.currentNode };
                 host.nodeMap.set(host.currentNode.id, host.currentNode);
+                eventBus.emit("updateMainPath");
                 eventBus.emit("node-click", host.currentNode.id);
                 eventBus.emit("modified", null);
               }
