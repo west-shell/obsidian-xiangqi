@@ -54,10 +54,13 @@ body.#{$cls-prefix}-resizing {
   margin: 1rem 0;
 }
 
-// PGN file view host
-.#{$cls-prefix}-file-view {
-  overflow: hidden !important;
-  margin: 0 !important;
+// PGN file view host — `.view-content` compound for specificity over
+// Obsidian/theme `.view-content` rules. padding keeps !important: Obsidian
+// mobile writes runtime inline safe-area padding (gesture navigation), and
+// only !important can override inline styles.
+.view-content.#{$cls-prefix}-file-view {
+  overflow: hidden;
+  margin: 0;
   padding-top: var(--#{$cls-prefix}-board-margin-top, 0px) !important;
   padding-bottom: var(--#{$cls-prefix}-board-margin-bottom, 0px) !important;
 }
