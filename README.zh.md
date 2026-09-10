@@ -3,6 +3,7 @@
 ![版本](https://img.shields.io/github/v/release/west-shell/obsidian-xiangqi)
 [![许可证: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-blue)](./LICENSE)
 [![PayPal](https://img.shields.io/badge/PayPal-Sponsor-blue?logo=paypal)](https://paypal.com/paypalme/weshell1988)
+[![爱发电](https://img.shields.io/badge/爱发电-赞助-946CE6?logo=afdian)](https://afdian.com/a/weshell)
 
 [English](./README.md) | [中文](./README.zh.md)
 
@@ -173,10 +174,10 @@ Obsidian 中国象棋插件，提供笔记内棋局渲染与探索功能。支�
 
 ### 可选参数
 
-| 名称            | 值         | 描述                                |
-| --------------- | ---------- | ----------------------------------- |
-| `protected`/`p` | true/false | true 时保存按钮失效，默认 false     |
-| `rotated`/`r`   | true/false | true 时倒转棋盘（红方在下）         |
+| 名称            | 值         | 描述                            |
+| --------------- | ---------- | ------------------------------- |
+| `protected`/`p` | true/false | true 时保存按钮失效，默认 false |
+| `rotated`/`r`   | true/false | true 时倒转棋盘（红方在下）     |
 
 #### 示例
 
@@ -236,5 +237,6 @@ p:true
 如果喜欢该插件，可以打赏一下哦
 
 [![PayPal](https://img.shields.io/badge/PayPal-Sponsor-blue?logo=paypal)](https://paypal.com/paypalme/weshell1988)
+[![爱发电](https://img.shields.io/badge/爱发电-赞助-946CE6?logo=afdian)](https://afdian.com/a/weshell)
 
 ![打赏](./IMAGE/打赏.png)

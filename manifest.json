@@ -6,7 +6,8 @@
   "author": "weshell",
   "authorUrl": "https://github.com/west-shell",
   "fundingUrl": {
-    "PayPal": "https://www.paypal.com/paypalme/weshell1988"
+    "PayPal": "https://www.paypal.com/paypalme/weshell1988",
+    "爱发电": "https://afdian.com/a/weshell"
   },
   "minAppVersion": "1.5.7",
   "isDesktopOnly": false
