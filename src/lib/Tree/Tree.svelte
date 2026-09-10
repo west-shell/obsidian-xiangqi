@@ -476,11 +476,6 @@
   let spacingX = $derived(getTreeSpacingX(nodeMode));
   function cycleNodeMode() {
     nodeMode = (nodeMode + 1) % 2;
-    void tick().then(() => {
-      if (destroyed) return undefined;
-      resetView();
-      return undefined;
-    });
   }
 
   // svelte-ignore state_referenced_locally
