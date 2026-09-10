@@ -18,11 +18,11 @@
     getNodeTextColor,
     getNodeWidth,
     getStartLabel,
+    getTreeSpacingX,
     LAYOUT_CHANGE_EVENT,
     NODE_CHAR_DY,
     PRIMARY_PLAYER_KEY,
     TREE_LAYOUT_SPACING,
-    TREE_SPACING_X,
   } from "../../chess";
   import { Menu, setIcon } from "obsidian";
   import { onLangChange, t } from "../../i18n";
@@ -131,7 +131,6 @@
     return `translate(${t.x},${t.y}) scale(${t.k})`;
   });
 
-  const spacingX = TREE_SPACING_X;
   const spacingY = 15;
   const nodeHeight = 11;
 
@@ -474,8 +473,14 @@
 
   let nodeMode = $state(0);
   const MODE_ICONS = ["club", "align-justify"];
+  let spacingX = $derived(getTreeSpacingX(nodeMode));
   function cycleNodeMode() {
     nodeMode = (nodeMode + 1) % 2;
+    void tick().then(() => {
+      if (destroyed) return undefined;
+      resetView();
+      return undefined;
+    });
   }
 
   // svelte-ignore state_referenced_locally
