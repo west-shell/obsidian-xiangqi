@@ -58,7 +58,7 @@ export const TREE_LAYOUT_SPACING = 0.4;
 
 /** Horizontal pixel spacing per layout x-unit, varies with node display mode. */
 export function getTreeSpacingX(mode: number): number {
-  return mode === 1 ? 22 : 15;
+  return mode === 1 ? 22 : 22;
 }
 export const NODE_CHAR_DY = 0;
 export const DEFAULT_LANG = "zh";
