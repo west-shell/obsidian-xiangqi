@@ -96,14 +96,19 @@
     currentNode.move ? [currentNode.move.from, currentNode.move.to] : null,
   );
   let rotated = $state((() => options?.rotated ?? false)());
-  let mainVariation = $derived(
-    currentNode.children.length > 0 && currentNode.children[0].move
-      ? [currentNode.children[0].move]
-      : [],
-  );
+  let nextPathChild = $derived.by(() => {
+    const idx = currentPath.indexOf(currentNode.id);
+    if (idx === -1 || idx >= currentPath.length - 1) return null;
+    const next = nodeMap.get(currentPath[idx + 1]);
+    return next && next.parentID === currentNode.id ? next : null;
+  });
+  let mainVariation = $derived.by(() => {
+    const main = nextPathChild ?? currentNode.children[0];
+    return main?.move ? [main.move] : [];
+  });
   let otherVariations = $derived(
     currentNode.children
-      .slice(1)
+      .filter((child) => child !== (nextPathChild ?? currentNode.children[0]))
       .map((child) => child.move)
       .filter((m): m is Move => m != null) ?? [],
   );
