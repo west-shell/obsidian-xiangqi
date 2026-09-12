@@ -36,6 +36,7 @@ export const DEFAULT_TREE_BLOCK_NAMES = ["xiangqi", "xq"];
 export const DEFAULT_FEN_BLOCK_NAMES = ["fen"];
 export const RIBBON_ICON = "xiangqi-icon";
 export const DEFAULT_FILENAME = "Untitled";
+export const PGN_PLACEHOLDER = "H2-E2 H8-E8 ...";
 export const PIECE_CHARS: Record<string, string> | null = {
   K: "帅",
   A: "仕",

@@ -4,15 +4,22 @@ import type { ChessNode, GameSlot, IHost } from "../types";
 import { PGNParser } from "../modules/Source/parser";
 import { validateFen } from "./chessEngine";
 import { activateGame } from "./parse";
-import { CLS_PREFIX } from "../chess";
+import { CLS_PREFIX, DEFAULT_FEN, PGN_PLACEHOLDER } from "../chess";
+
+export type SaveConfirmResult = {
+  action: "save" | "saveAll" | "cancel";
+  includeEval: boolean;
+};
 
 export class SaveConfirmModal extends Modal {
-  private resolvePromise: (value: "save" | "saveAll" | "cancel") => void;
-  public readonly promise: Promise<"save" | "saveAll" | "cancel">;
+  private resolvePromise: (value: SaveConfirmResult) => void;
+  public promise: Promise<SaveConfirmResult>;
+  private includeEval = true;
 
   constructor(
     app: App,
     private readonly hasBranches: boolean,
+    private readonly hasEval: boolean,
     private readonly t: (key: string) => string,
   ) {
     super(app);
@@ -26,6 +33,16 @@ export class SaveConfirmModal extends Modal {
     const { contentEl } = this;
     new Setting(contentEl).setName(this.t("confirm.saveTitle")).setHeading();
 
+    if (this.hasEval) {
+      new Setting(contentEl)
+        .setName(this.t("confirm.saveEval"))
+        .addToggle((toggle) => {
+          toggle.setValue(this.includeEval).onChange((val) => {
+            this.includeEval = val;
+          });
+        });
+    }
+
     if (this.hasBranches) {
       contentEl.createEl("p", { text: this.t("confirm.saveBranchesMsg") });
 
@@ -36,7 +53,7 @@ export class SaveConfirmModal extends Modal {
         cls: "mod-cta",
       });
       saveMainBtn.addEventListener("click", () => {
-        this.resolvePromise("save");
+        this.resolvePromise({ action: "save", includeEval: this.includeEval });
         this.close();
       });
 
@@ -44,7 +61,10 @@ export class SaveConfirmModal extends Modal {
         text: this.t("confirm.saveAll"),
       });
       saveAllBtn.addEventListener("click", () => {
-        this.resolvePromise("saveAll");
+        this.resolvePromise({
+          action: "saveAll",
+          includeEval: this.includeEval,
+        });
         this.close();
       });
 
@@ -52,7 +72,10 @@ export class SaveConfirmModal extends Modal {
         text: this.t("confirm.cancel"),
       });
       cancelBtn.addEventListener("click", () => {
-        this.resolvePromise("cancel");
+        this.resolvePromise({
+          action: "cancel",
+          includeEval: this.includeEval,
+        });
         this.close();
       });
     } else {
@@ -65,7 +88,7 @@ export class SaveConfirmModal extends Modal {
         cls: "mod-cta",
       });
       confirmBtn.addEventListener("click", () => {
-        this.resolvePromise("save");
+        this.resolvePromise({ action: "save", includeEval: this.includeEval });
         this.close();
       });
 
@@ -73,7 +96,10 @@ export class SaveConfirmModal extends Modal {
         text: this.t("confirm.cancel"),
       });
       cancelBtn.addEventListener("click", () => {
-        this.resolvePromise("cancel");
+        this.resolvePromise({
+          action: "cancel",
+          includeEval: this.includeEval,
+        });
         this.close();
       });
     }
@@ -87,7 +113,7 @@ export class SaveConfirmModal extends Modal {
 
 export class ConfirmModal extends Modal {
   private resolvePromise: (value: boolean) => void;
-  public readonly promise: Promise<boolean>;
+  public promise: Promise<boolean>;
 
   constructor(
     app: App,
@@ -106,21 +132,26 @@ export class ConfirmModal extends Modal {
   onOpen() {
     const { contentEl } = this;
 
+    // 标题
     new Setting(contentEl).setName(this.title).setHeading();
 
+    // 消息内容
     contentEl.createEl("p", { text: this.message });
 
+    // 按钮容器
     const buttonContainer = contentEl.createDiv("modal-button-container");
 
+    // 确认按钮（使用 Obsidian 的主色调样式）
     const confirmBtn = buttonContainer.createEl("button", {
       text: this.confirmText,
-      cls: "mod-cta",
+      cls: "mod-cta", // Obsidian 的强调按钮样式
     });
     confirmBtn.addEventListener("click", () => {
       this.resolvePromise(true);
       this.close();
     });
 
+    // 取消按钮
     const cancelBtn = buttonContainer.createEl("button", {
       text: this.cancelText,
     });
@@ -129,6 +160,7 @@ export class ConfirmModal extends Modal {
       this.close();
     });
 
+    // 回车键确认，ESC 键取消
     confirmBtn.focus();
     this.scope.register([], "Enter", () => {
       this.resolvePromise(true);
@@ -328,8 +360,7 @@ export class ImportModal extends Modal {
       cls: `${CLS_PREFIX}-modal-textarea`,
       attr: {
         rows: "3",
-        placeholder:
-          "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w",
+        placeholder: DEFAULT_FEN,
       },
     });
     fenArea.addEventListener("input", () => {
@@ -353,7 +384,7 @@ export class ImportModal extends Modal {
     new Setting(contentEl).setName(t("import.pgn"));
     const pgnArea = contentEl.createEl("textarea", {
       cls: `${CLS_PREFIX}-modal-textarea`,
-      attr: { rows: "6", placeholder: "H2-E2 H8-E8 ..." },
+      attr: { rows: "6", placeholder: PGN_PLACEHOLDER },
     });
     pgnArea.addEventListener("input", () => {
       this.pgnValue = pgnArea.value;
@@ -453,7 +484,7 @@ export class ImportModal extends Modal {
       host.games.push(newSlot);
       activateGame(host, host.games.length - 1);
       host.currentTurn =
-        host.currentNode.move?.color === "w" ? "black" : "white";
+        host.currentNode.move?.color === "b" ? "white" : "black";
       eventBus.emit("updateMainPath");
       eventBus.emit("updateUI");
       eventBus.emit("modified", null);
@@ -493,7 +524,7 @@ export class ImportModal extends Modal {
 
     host.currentNode = host.nodeMap.get("node-root")!;
     host.fen = host.currentNode.fen;
-    host.currentTurn = host.currentNode.move?.color === "w" ? "black" : "white";
+    host.currentTurn = host.currentNode.move?.color === "b" ? "white" : "black";
 
     eventBus.emit("updateMainPath");
     eventBus.emit("updateUI");
@@ -516,8 +547,10 @@ export class ImportModal extends Modal {
 export class ExportModal extends Modal {
   private includeComments = true;
   private includeEval = true;
-  private allPgnArea!: HTMLTextAreaElement;
-  private branchPgnArea!: HTMLTextAreaElement;
+  private fenMode: "current" | "root" = "current";
+  private pgnMode: "branch" | "all" | "allGames" = "branch";
+  private fenArea!: HTMLTextAreaElement;
+  private pgnArea!: HTMLTextAreaElement;
 
   constructor(
     app: App,
@@ -534,46 +567,60 @@ export class ExportModal extends Modal {
     const { contentEl } = this;
     const host = this.host;
 
-    new Setting(contentEl).setName(t("export.title")).setHeading();
+    contentEl.createDiv({
+      text: t("export.fen"),
+      cls: `${CLS_PREFIX}-export-section-title`,
+    });
+    this.createSegmented(
+      contentEl,
+      [
+        { key: "current", label: t("export.currentFen") },
+        { key: "root", label: t("export.rootFen") },
+      ],
+      this.fenMode,
+      (key) => {
+        this.fenMode = key as "current" | "root";
+        this.setAreaValue(this.fenArea, this.buildFen());
+      },
+    );
+    this.fenArea = this.createExportArea(contentEl, this.buildFen());
 
-    const rootFen = host.root.fen;
-    const currentFen = host.currentNode.fen;
-
-    this.addExportSection(contentEl, t("export.rootFen"), rootFen, null);
-    this.addExportSection(contentEl, t("export.currentFen"), currentFen, null);
-
-    new Setting(contentEl)
-      .setName(t("export.includeComments"))
-      .addToggle((toggle) => {
-        toggle.setValue(this.includeComments).onChange((val) => {
-          this.includeComments = val;
-          this.refreshPgn();
-        });
-      });
-
-    new Setting(contentEl)
-      .setName(t("export.includeEval"))
-      .addToggle((toggle) => {
-        toggle.setValue(this.includeEval).onChange((val) => {
-          this.includeEval = val;
-          this.refreshPgn();
-        });
-      });
-
-    const allPgn =
-      host.tags + "\n\n" + host.stringifyPGN(host.root, this.includeEval);
-    this.addExportSection(contentEl, t("export.allPgn"), allPgn, "allPgn");
-
-    const branchPgn = this.getCurrentBranchPGN(
+    contentEl.createDiv({
+      text: t("export.pgn"),
+      cls: `${CLS_PREFIX}-export-section-title ${CLS_PREFIX}-export-section-title--divider`,
+    });
+    const togglesRow = contentEl.createDiv(`${CLS_PREFIX}-export-toggles`);
+    this.createToggle(
+      togglesRow,
+      t("export.includeComments"),
+      () => {
+        this.includeComments = !this.includeComments;
+        this.setAreaValue(this.pgnArea, this.buildPgn());
+      },
       this.includeComments,
+    );
+    this.createToggle(
+      togglesRow,
+      t("export.includeEval"),
+      () => {
+        this.includeEval = !this.includeEval;
+        this.setAreaValue(this.pgnArea, this.buildPgn());
+      },
       this.includeEval,
     );
-    this.addExportSection(
-      contentEl,
-      t("export.currentBranchPgn"),
-      branchPgn,
-      "branchPgn",
-    );
+
+    const pgnOptions: { key: string; label: string }[] = [
+      { key: "branch", label: t("export.currentBranchPgn") },
+      { key: "all", label: t("export.allPgn") },
+    ];
+    if (host.games && host.games.length > 1) {
+      pgnOptions.push({ key: "allGames", label: t("export.allGames") });
+    }
+    this.createSegmented(contentEl, pgnOptions, this.pgnMode, (key) => {
+      this.pgnMode = key as "branch" | "all" | "allGames";
+      this.setAreaValue(this.pgnArea, this.buildPgn());
+    });
+    this.pgnArea = this.createExportArea(contentEl, this.buildPgn());
 
     const btnContainer = contentEl.createDiv("modal-button-container");
     const closeBtn = btnContainer.createEl("button", {
@@ -582,25 +629,87 @@ export class ExportModal extends Modal {
     closeBtn.addEventListener("click", () => this.close());
   }
 
-  private refreshPgn() {
-    const host = this.host;
-    const allPgn =
-      host.tags + "\n\n" + host.stringifyPGN(host.root, this.includeEval);
-    if (this.allPgnArea) this.allPgnArea.value = allPgn;
-    const branchPgn = this.getCurrentBranchPGN(
-      this.includeComments,
-      this.includeEval,
-    );
-    if (this.branchPgnArea) this.branchPgnArea.value = branchPgn;
-  }
-
-  private addExportSection(
+  private createToggle(
     container: HTMLElement,
     label: string,
-    value: string,
-    areaKey: "allPgn" | "branchPgn" | null,
+    onChange: () => void,
+    checked: boolean,
   ) {
-    new Setting(container).setName(label);
+    const wrap = container.createEl("label", {
+      cls: `${CLS_PREFIX}-export-toggle`,
+    });
+    const input = wrap.createEl("input", { attr: { type: "checkbox" } });
+    input.checked = checked;
+    input.addEventListener("change", onChange);
+    wrap.appendText(label);
+  }
+
+  private buildFen(): string {
+    const host = this.host;
+    return this.fenMode === "root" ? host.root.fen : host.currentNode.fen;
+  }
+
+  private buildPgn(): string {
+    const host = this.host;
+    if (this.pgnMode === "allGames") return this.getAllGamesPGN();
+    if (this.pgnMode === "all") {
+      return (
+        host.tags + "\n\n" + host.stringifyPGN(host.root, this.includeEval)
+      );
+    }
+    return this.getCurrentBranchPGN(this.includeComments, this.includeEval);
+  }
+
+  private getAllGamesPGN(): string {
+    const host = this.host;
+    const parts: string[] = [];
+    for (const slot of host.games) {
+      if (slot.parsed) {
+        const pgn = host.stringifyPGN(slot.parsed.root, this.includeEval);
+        const content = [slot.parsed.tags?.trim(), pgn]
+          .filter(Boolean)
+          .join("\n");
+        parts.push(content);
+      } else {
+        parts.push(slot.raw.trim());
+      }
+    }
+    return parts.join("\n\n");
+  }
+
+  private setAreaValue(area: HTMLTextAreaElement, value: string) {
+    area.value = value;
+    area.setAttribute(
+      "rows",
+      String(Math.max(2, Math.min(value.split("\n").length, 10))),
+    );
+  }
+
+  private createSegmented(
+    container: HTMLElement,
+    options: { key: string; label: string }[],
+    activeKey: string,
+    onChange: (key: string) => void,
+  ) {
+    const group = container.createDiv(`${CLS_PREFIX}-export-segmented`);
+    const buttons = new Map<string, HTMLButtonElement>();
+    for (const opt of options) {
+      const btn = group.createEl("button", { text: opt.label });
+      buttons.set(opt.key, btn);
+      btn.addEventListener("click", () => {
+        for (const [key, b] of buttons) {
+          b.classList.toggle("mod-cta", key === opt.key);
+        }
+        onChange(opt.key);
+      });
+    }
+    buttons.get(activeKey)?.classList.add("mod-cta");
+  }
+
+  private createExportArea(
+    container: HTMLElement,
+    value: string,
+  ): HTMLTextAreaElement {
     const area = container.createEl("textarea", {
       cls: `${CLS_PREFIX}-modal-textarea ${CLS_PREFIX}-modal-textarea--fixed`,
       attr: {
@@ -610,10 +719,8 @@ export class ExportModal extends Modal {
     });
     area.value = value;
 
-    if (areaKey === "allPgn") this.allPgnArea = area;
-    else if (areaKey === "branchPgn") this.branchPgnArea = area;
-
-    const copyBtn = container.createEl("button", {
+    const copyRow = container.createDiv(`${CLS_PREFIX}-export-copy-row`);
+    const copyBtn = copyRow.createEl("button", {
       text: t("export.copy"),
       cls: "mod-cta",
     });
@@ -626,6 +733,7 @@ export class ExportModal extends Modal {
         })
         .catch(() => {});
     });
+    return area;
   }
 
   onClose() {
