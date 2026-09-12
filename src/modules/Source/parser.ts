@@ -8,7 +8,7 @@ import {
   PRIMARY_MOVE_TOKEN_TYPES,
   SHAPE_PART_REGEX,
 } from "../../chess";
-import { type ChessNode, type NodeShape } from "../../types";
+import { type ChessNode, type NodeShape, type ParseWarning } from "../../types";
 import {
   ANNOTATION_PREFIX,
   isAnnotationKey,
@@ -29,6 +29,8 @@ export class PGNParser {
   currentStep: number = 0;
   tags: Map<string, string> = new Map();
   chess: Chess;
+  private readonly skippedTokens: ParseWarning[] = [];
+  private parseAborted = false;
 
   constructor(
     input: string | Token[],
@@ -56,7 +58,7 @@ export class PGNParser {
 
     this.currentNode = this.rootNode;
 
-    while (!this.match("eof")) {
+    while (!this.match("eof") && !this.parseAborted) {
       if (this.match("tag")) {
         this.parseTag();
       } else if (this.isMoveToken()) {
@@ -70,6 +72,8 @@ export class PGNParser {
         this.parseComment();
       } else if (this.match("result")) {
         this.parseResult();
+      } else if (this.match("unknown")) {
+        this.parseUnknown();
       } else {
         this.consume();
       }
@@ -78,6 +82,30 @@ export class PGNParser {
     if (this.strict && this.nodeMap.size <= 1) {
       throw new Error("PGN contains no legal moves");
     }
+  }
+
+  parseUnknown() {
+    const first = this.peek();
+    let text = "";
+    let endLine = first.line;
+    let endColumn = first.column;
+    // Merge only source-contiguous unknown tokens (no whitespace between).
+    while (this.match("unknown")) {
+      const tok = this.peek();
+      if (text && (tok.line !== endLine || tok.column !== endColumn)) break;
+      text += tok.value;
+      endLine = tok.line;
+      endColumn = tok.column + tok.value.length;
+      this.consume();
+    }
+    if (this.strict) throw new Error(`Unrecognized content: ${text}`);
+    this.skippedTokens.push({
+      text,
+      line: first.line,
+      column: first.column,
+      kind: "unknown",
+    });
+    this.parseAborted = true;
   }
 
   isMoveToken(): boolean {
@@ -102,6 +130,13 @@ export class PGNParser {
         this.haveFEN = true;
       } catch {
         if (this.strict) throw new Error(`Invalid FEN tag: ${tagValue}`);
+        this.skippedTokens.push({
+          text: `[FEN "${tagValue}"]`,
+          line: token.line,
+          column: token.column,
+          kind: "fen",
+        });
+        this.parseAborted = true;
       }
     }
   }
@@ -136,12 +171,20 @@ export class PGNParser {
   }
 
   processMove(token: string, tokenType: MoveTokenType) {
+    const tok = this.tokens[this.currentIndex - 1];
     const fen = this.currentNode.fen;
     this.chess.load(fen);
     try {
       const move = parseMoveInGame(this.chess, token, tokenType);
       if (!move) {
         if (this.strict) throw new Error(`Invalid move: ${token}`);
+        this.skippedTokens.push({
+          text: token,
+          line: tok.line,
+          column: tok.column,
+          kind: "move",
+        });
+        this.parseAborted = true;
         return;
       }
 
@@ -151,6 +194,13 @@ export class PGNParser {
       this.currentStep++;
     } catch (e) {
       if (this.strict) throw e;
+      this.skippedTokens.push({
+        text: token,
+        line: tok.line,
+        column: tok.column,
+        kind: "move",
+      });
+      this.parseAborted = true;
     }
   }
 
@@ -159,7 +209,11 @@ export class PGNParser {
 
     const variationParentID = this.currentNode.parentID;
     if (!variationParentID) {
-      while (!this.match("right-paren") && !this.match("eof")) {
+      while (
+        !this.match("right-paren") &&
+        !this.match("eof") &&
+        !this.parseAborted
+      ) {
         this.consume();
       }
       if (this.match("right-paren")) this.consume();
@@ -191,6 +245,8 @@ export class PGNParser {
           this.currentNode.result = token.value;
         }
         break;
+      } else if (this.match("unknown")) {
+        this.parseUnknown();
       } else {
         this.consume();
       }
@@ -281,6 +337,9 @@ export class PGNParser {
   }
   public getMap(): Map<string, ChessNode> {
     return this.nodeMap;
+  }
+  public getSkipped(): ParseWarning[] {
+    return this.skippedTokens;
   }
   public getMainLine(): ChessNode[] {
     const mainLine: ChessNode[] = [];

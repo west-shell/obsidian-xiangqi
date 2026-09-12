@@ -109,6 +109,15 @@ export type GameSlot = {
   parsed?: ParsedGame;
 };
 
+export type ParseWarningKind = "move" | "fen" | "unknown";
+
+export type ParseWarning = {
+  text: string;
+  line: number;
+  column: number;
+  kind: ParseWarningKind;
+};
+
 type SvelteComponent = {
   $set?(props: Partial<Record<string, unknown>>): void;
   $destroy?(): void;
@@ -135,6 +144,8 @@ export interface IHost {
   currentNode: ChessNode;
   currentPath: string[];
   options: IOptions;
+  /** Source content that failed to parse and was skipped (moves, FEN tags) */
+  parseWarnings: ParseWarning[];
   stringifyPGN: (root: ChessNode, includeEval?: boolean) => string;
   games: GameSlot[];
   currentGameIndex: number;

@@ -11,6 +11,7 @@
     ISettings,
     NodeMap,
     NodeShape,
+    ParseWarning,
   } from "../../types";
   import type { EventBus } from "../../core/event-bus";
   import {
@@ -25,6 +26,7 @@
   } from "../../chess";
   import type ChessPlugin from "../../main";
   import { onDestroy, onMount, tick } from "svelte";
+  import { onLangChange, t } from "../../i18n";
   import { annotationShapes } from "../../utils/glyphs";
   import { badgeBoardSvg } from "../../utils/icon";
 
@@ -66,6 +68,7 @@
     currentNode: ChessNode;
     currentPath: string[];
     options: IOptions;
+    parseWarnings?: ParseWarning[];
     editing?: boolean;
     selectedPiece?: Piece | null;
     isFenMode?: boolean;
@@ -83,6 +86,7 @@
     currentNode,
     currentPath,
     options,
+    parseWarnings = [],
     editing = false,
     selectedPiece = null,
     isFenMode = false,
@@ -113,6 +117,26 @@
       .filter((m): m is Move => m != null) ?? [],
   );
   let userShapes = $derived(loadShapes(currentNode));
+  let _lv = $state(0);
+  const unsubLang = onLangChange(() => _lv++);
+  let warningKey = $derived(
+    parseWarnings.map((w) => `${w.line}:${w.column}:${w.text}`).join("|"),
+  );
+  let dismissedWarning = $state("");
+  let showParseWarning = $derived(
+    parseWarnings.length > 0 && dismissedWarning !== warningKey,
+  );
+
+  function warningLoc(w: ParseWarning): string {
+    return (
+      t("source.parseWarningLinePrefix", _lv) +
+      w.line +
+      t("source.parseWarningLineSuffix", _lv) +
+      t("source.parseWarningColPrefix", _lv) +
+      w.column +
+      t("source.parseWarningColSuffix", _lv)
+    );
+  }
   let engineBestMove: { from: Square; to: Square } | null = $state(null);
   let enginePonder: { from: Square; to: Square } | null = $state(null);
   let glyphShapes = $derived.by(() => {
@@ -157,6 +181,7 @@
   let destroyed = false;
   onDestroy(() => {
     destroyed = true;
+    unsubLang();
   });
 
   onMount(async () => {
@@ -241,6 +266,34 @@
     };
   });
 </script>
+
+{#if showParseWarning}
+  <div class="{CLS_PREFIX}-parse-warning">
+    <div class="{CLS_PREFIX}-parse-warning-head">
+      <span class="{CLS_PREFIX}-parse-warning-title">
+        {t("source.parseWarning", _lv)}
+      </span>
+      <button
+        class="{CLS_PREFIX}-parse-warning-close"
+        aria-label={t("source.parseWarningClose", _lv)}
+        onclick={() => (dismissedWarning = warningKey)}>×</button
+      >
+    </div>
+    {#each parseWarnings as w (`${w.line}:${w.column}:${w.text}`)}
+      <div class="{CLS_PREFIX}-parse-warning-item">
+        <span class="{CLS_PREFIX}-parse-warning-loc">{warningLoc(w)}</span>
+        <span class="{CLS_PREFIX}-parse-warning-text">{w.text}</span>
+        <span class="{CLS_PREFIX}-parse-warning-reason">
+          {w.kind === "fen"
+            ? t("source.parseWarningFen", _lv)
+            : w.kind === "unknown"
+              ? t("source.parseWarningUnknown", _lv)
+              : t("source.parseWarningMove", _lv)}
+        </span>
+      </div>
+    {/each}
+  </div>
+{/if}
 
 {#if editing}
   <div class="{CLS_PREFIX}-layout {CLS_PREFIX}-layout--edit">

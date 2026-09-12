@@ -178,6 +178,7 @@ export function activateGame(host: IHost, index: number): void {
 
   const game = slot.parsed;
   host.parser = game.parser;
+  host.parseWarnings = game.parser.getSkipped();
   host.root = game.root;
   host.nodeMap = game.nodeMap;
   host.tags = game.tags;

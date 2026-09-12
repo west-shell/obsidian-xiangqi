@@ -68,6 +68,7 @@ const ActionsModule = {
         currentNode: host.currentNode,
         currentPath: host.currentPath,
         options: { ...host.options },
+        parseWarnings: host.parseWarnings,
         editing: host.editing,
         isFenMode: host.isFenMode,
         selectedPiece: host.selectedPiece,

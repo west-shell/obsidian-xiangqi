@@ -60,6 +60,7 @@ const SourceModule = {
           host.nodeMap = parser.getMap();
           host.tags = parser.getTags();
           host.options = opts;
+          host.parseWarnings = parser.getSkipped();
           const game: ParsedGame = {
             root: host.root,
             nodeMap: host.nodeMap,
@@ -99,6 +100,7 @@ const SourceModule = {
           host.currentTurn = getTurnFromFen(fen);
           host.tags = "";
           host.options = {};
+          host.parseWarnings = [];
           host.games = [];
           host.currentGameIndex = 0;
           eventBus.emit("updateMainPath");

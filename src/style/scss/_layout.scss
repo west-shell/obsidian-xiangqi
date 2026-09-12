@@ -206,3 +206,69 @@
     }
   }
 }
+
+// ============================================================================
+// Parse warning banner — shown above the layout when the source PGN/FEN
+// contained content that could not be parsed (skipped moves, invalid FEN tag).
+// ============================================================================
+
+.#{$cls-prefix}-parse-warning {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: $layout-gap;
+  padding: 6px 10px;
+  border-left: 3px solid var(--text-error);
+  border-radius: var(--radius-s);
+  background: var(--background-secondary);
+  color: var(--text-normal);
+  font-size: var(--font-ui-smaller);
+
+  &-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &-title {
+    flex: 1;
+  }
+
+  &-item {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+
+  &-loc {
+    flex-shrink: 0;
+    color: var(--text-muted);
+  }
+
+  &-text {
+    flex: 1;
+    overflow-wrap: anywhere;
+  }
+
+  &-reason {
+    flex-shrink: 0;
+    color: var(--text-error);
+  }
+
+  &-close {
+    flex-shrink: 0;
+    padding: 0 4px;
+    background: none;
+    border: none;
+    box-shadow: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: var(--font-ui-medium);
+    line-height: 1;
+
+    &:hover {
+      background: none;
+      color: var(--text-normal);
+    }
+  }
+}

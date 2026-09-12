@@ -12,6 +12,7 @@ export type TokenType =
   | "comment"
   | "tag"
   | "result"
+  | "unknown"
   | "eof";
 
 export interface Token {
@@ -53,13 +54,21 @@ export function tokenize(pgn: string): Token[] {
     const rest = pgn.slice(pos);
     const char = rest[0];
 
-    if (/^\s/.test(rest)) {
+    if (/^[\s\uFEFF]/.test(rest)) {
       advance(1);
       continue;
     }
 
-    const step = matchAndConsume(/^\d+\.(\s*\.\.\.)?/);
+    const step = matchAndConsume(/^\d+\s*(?:\.\s*)+/);
     if (step) {
+      continue;
+    }
+
+    // NAGs ($1, $14, ...) and % escape lines are legal PGN, skip silently.
+    if (matchAndConsume(/^\$\d+/)) {
+      continue;
+    }
+    if (matchAndConsume(/^%.*/)) {
       continue;
     }
 
@@ -148,6 +157,12 @@ export function tokenize(pgn: string): Token[] {
       continue;
     }
 
+    tokens.push({
+      type: "unknown",
+      value: char,
+      line: startLine,
+      column: startCol,
+    });
     advance(1);
   }
 
