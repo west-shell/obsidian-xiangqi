@@ -258,10 +258,32 @@
     });
 
     menu.addItem((mi) => {
+      mi.setTitle(t("toolbar.removeOtherVariations", _lv))
+        .setIcon("scissors")
+        .onClick(() => emitEvent("removeOtherVariations"));
+    });
+
+    menu.addSeparator();
+
+    menu.addItem((mi) => {
       mi.setTitle(t("toolbar.promote", _lv))
         .setIcon("arrow-up-wide-narrow")
         .onClick(() => emitEvent("promote"));
     });
+
+    menu.addItem((mi) => {
+      mi.setTitle(t("toolbar.moveUp", _lv))
+        .setIcon("arrow-up")
+        .onClick(() => emitEvent("moveUp"));
+    });
+
+    menu.addItem((mi) => {
+      mi.setTitle(t("toolbar.moveDown", _lv))
+        .setIcon("arrow-down")
+        .onClick(() => emitEvent("moveDown"));
+    });
+
+    menu.addSeparator();
 
     menu.addItem((mi) => {
       mi.setTitle(t("toolbar.annotate", _lv)).setIcon("tag");
