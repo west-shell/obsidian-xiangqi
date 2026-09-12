@@ -30,7 +30,10 @@ export class PGNParser {
   tags: Map<string, string> = new Map();
   chess: Chess;
 
-  constructor(input: string | Token[]) {
+  constructor(
+    input: string | Token[],
+    private readonly strict = false,
+  ) {
     this.nodeMap = new Map<string, ChessNode>();
     this.tokens = typeof input === "string" ? tokenize(input) : input;
     this.currentIndex = 0;
@@ -71,6 +74,10 @@ export class PGNParser {
         this.consume();
       }
     }
+
+    if (this.strict && this.nodeMap.size <= 1) {
+      throw new Error("PGN contains no legal moves");
+    }
   }
 
   isMoveToken(): boolean {
@@ -94,7 +101,7 @@ export class PGNParser {
         this.rootNode.fen = tagValue;
         this.haveFEN = true;
       } catch {
-        // invalid FEN, keep default
+        if (this.strict) throw new Error(`Invalid FEN tag: ${tagValue}`);
       }
     }
   }
@@ -133,14 +140,17 @@ export class PGNParser {
     this.chess.load(fen);
     try {
       const move = parseMoveInGame(this.chess, token, tokenType);
-      if (!move) return;
+      if (!move) {
+        if (this.strict) throw new Error(`Invalid move: ${token}`);
+        return;
+      }
 
       const newNode = this.createNode(move, this.chess.fen());
       this.currentNode.children.push(newNode);
       this.currentNode = newNode;
       this.currentStep++;
-    } catch {
-      // invalid move, skip
+    } catch (e) {
+      if (this.strict) throw e;
     }
   }
 

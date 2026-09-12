@@ -461,7 +461,7 @@ export class ImportModal extends Modal {
 
     let parser: PGNParser;
     try {
-      parser = new PGNParser(pgn);
+      parser = new PGNParser(pgn, true);
     } catch {
       new Notice(t("import.invalidPgn"));
       return;
