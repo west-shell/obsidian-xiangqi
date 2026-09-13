@@ -311,10 +311,12 @@ button.#{$cls-prefix}-gamenav__arrow svg {
 
 // ---- Move list -----------------------------------------------------------------------
 
+// Cap in em so the list widens when the font-size setting grows (200px at the
+// 12px default); CJK notation rows otherwise clip against a fixed pixel cap.
 .#{$cls-prefix}-moves {
   width: auto;
   min-width: 0;
-  max-width: 200px;
+  max-width: 16.67em;
   display: flex;
   flex-direction: column;
   font-size: var(--#{$cls-prefix}-font-size, 12px);
