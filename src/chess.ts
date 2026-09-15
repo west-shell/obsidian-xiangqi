@@ -20,6 +20,7 @@ import type {
   Piece,
   Square,
 } from "@weshell/xiangqi.js";
+import type { ChessNode, IHost } from "./types";
 
 // ========== Constants ==========
 export const DEFAULT_FEN =
@@ -274,6 +275,46 @@ export function applyThemeCSSVars(
     settings.showCoordinateLabels ? "flex" : "none",
   );
 }
+
+// ========== Online Analysis Sites ==========
+export interface AnalysisSite {
+  label: string;
+  labelZh: string;
+  icon: string;
+  positionUrl: (host: IHost) => string;
+  gameUrl: (host: IHost) => string;
+}
+
+function buildBranchIccs(host: IHost): string {
+  const nodes: ChessNode[] = [];
+  let node: ChessNode | null = host.currentNode;
+  while (node) {
+    nodes.push(node);
+    node = node.parentID ? (host.nodeMap.get(node.parentID) ?? null) : null;
+  }
+  nodes.reverse();
+  const moves: string[] = [];
+  for (let i = 1; i < nodes.length; i++) {
+    const move = nodes[i].move;
+    if (!move?.iccs) continue;
+    moves.push(move.iccs.replace("-", "").toLowerCase());
+  }
+  return moves.join("");
+}
+
+export const ANALYSIS_SITES: AnalysisSite[] = [
+  {
+    label: "Pikafish",
+    labelZh: "皮卡鱼",
+    icon: "external-link",
+    positionUrl: (host) => `https://xiangqiai.com/#/${host.fen}`,
+    gameUrl: (host) => {
+      const moves = buildBranchIccs(host);
+      if (!moves) return `https://xiangqiai.com/#/${host.root.fen}`;
+      return `https://xiangqiai.com/#/${host.root.fen} moves ${moves}`;
+    },
+  },
+];
 
 // ========== Other ==========
 export function parseExternalUrl(source: string): string | null {

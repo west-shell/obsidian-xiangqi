@@ -1,11 +1,11 @@
 <script lang="ts">
   import { Menu, setIcon } from "obsidian";
   import { onDestroy } from "svelte";
-  import { CLS_PREFIX } from "../../chess";
+  import { ANALYSIS_SITES, CLS_PREFIX } from "../../chess";
   import type { EventBus } from "../../core/event-bus";
   import type { IOptions, ISettings } from "../../types";
   import type ChessPlugin from "../../main";
-  import { onLangChange, t } from "../../i18n";
+  import { getLang, onLangChange, t } from "../../i18n";
 
   interface Props {
     eventBus: EventBus;
@@ -199,7 +199,7 @@
     }
   }
 
-  function emitEvent(name: string, payload: string | null = null) {
+  function emitEvent(name: string, payload: unknown = null) {
     eventBus.emit("btn-click", { name, payload });
   }
 
@@ -451,6 +451,23 @@
           }
         });
     });
+
+    if (ANALYSIS_SITES.length > 0) {
+      menu.addSeparator();
+      for (const site of ANALYSIS_SITES) {
+        const label = getLang() === "zh" ? site.labelZh : site.label;
+        menu.addItem((mi) => {
+          mi.setTitle(`${label}: ${t("toolbar.analyzePosition", _lv)}`)
+            .setIcon(site.icon)
+            .onClick(() => emitEvent("open-analysis", site.positionUrl));
+        });
+        menu.addItem((mi) => {
+          mi.setTitle(`${label}: ${t("toolbar.analyzeGame", _lv)}`)
+            .setIcon(site.icon)
+            .onClick(() => emitEvent("open-analysis", site.gameUrl));
+        });
+      }
+    }
 
     menu.showAtMouseEvent(evt);
   }

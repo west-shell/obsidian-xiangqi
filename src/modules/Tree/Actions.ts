@@ -625,6 +625,12 @@ const ActionsModule = {
             eventBus.emit("rotate");
             break;
           }
+          case "open-analysis": {
+            const buildUrl = data as unknown as (h: IHost) => string;
+            if (!host.fen) break;
+            activeWindow.open(buildUrl(host));
+            break;
+          }
         }
         emitNodeEval(host);
         eventBus.emit("updateUI");
