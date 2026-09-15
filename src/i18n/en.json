@@ -72,7 +72,7 @@
   "toolbar.analyzeBatch": "Analyze All",
   "toolbar.cancelBatch": "Cancel Batch",
   "toolbar.analyzePosition": "Position",
-  "toolbar.analyzeGame": "Game",
+  "toolbar.analyzeGame": "Branch",
   "genfen.turn": "Turn",
   "genfen.empty": "Empty",
   "genfen.full": "Full",

@@ -73,7 +73,7 @@
   "toolbar.analyzeBatch": "批量分析",
   "toolbar.cancelBatch": "取消批量",
   "toolbar.analyzePosition": "当前局面",
-  "toolbar.analyzeGame": "整局",
+  "toolbar.analyzeGame": "当前分支",
   "genfen.turn": "先",
   "genfen.empty": "清空棋盘",
   "genfen.full": "满",
