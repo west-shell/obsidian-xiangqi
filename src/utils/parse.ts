@@ -9,8 +9,14 @@ import {
   type ParsedGame,
 } from "../types";
 
-export function hasFenTag(tags: string): boolean {
-  return /\[FEN\s+"[^"]*"\]/.test(tags);
+// A game "starts from the default opening" when it has no FEN tag, the tag
+// is empty, or its position matches the variant default. Only the board
+// placement is compared because external files often append move counters
+// (and xiangqi FENs may omit them), which the variant DEFAULT_FEN lacks.
+export function isDefaultStart(tags: string): boolean {
+  const fen = tags.match(/\[FEN\s+"([^"]*)"\]/i)?.[1].trim();
+  if (!fen) return true;
+  return fen.split(/\s+/)[0] === DEFAULT_FEN.split(/\s+/)[0];
 }
 export function parseSource(source: string): {
   fen: string;
@@ -189,7 +195,7 @@ export function activateGame(host: IHost, index: number): void {
 
   const shouldJump =
     host.settings.autoJump === "always" ||
-    (host.settings.autoJump === "auto" && !hasFenTag(host.tags));
+    (host.settings.autoJump === "auto" && isDefaultStart(host.tags));
   if (shouldJump && host.currentPath.length > 0) {
     host.currentNode = host.nodeMap.get(
       host.currentPath[host.currentPath.length - 1],

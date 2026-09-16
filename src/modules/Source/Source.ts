@@ -6,7 +6,7 @@ import {
   parseExternalUrl,
 } from "../../chess";
 import { type IBlockHost, type ParsedGame } from "../../types";
-import { extractHeaders, hasFenTag, parseOption } from "../../utils/parse";
+import { extractHeaders, isDefaultStart, parseOption } from "../../utils/parse";
 
 import { PGNParser } from "./parser";
 
@@ -78,7 +78,7 @@ const SourceModule = {
 
           const shouldJump =
             host.settings.autoJump === "always" ||
-            (host.settings.autoJump === "auto" && !hasFenTag(host.tags));
+            (host.settings.autoJump === "auto" && isDefaultStart(host.tags));
           if (shouldJump && host.currentPath.length > 0) {
             host.currentNode = host.nodeMap.get(
               host.currentPath[host.currentPath.length - 1],
