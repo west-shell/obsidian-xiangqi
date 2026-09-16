@@ -366,6 +366,7 @@ button.#{$cls-prefix}-gamenav__arrow svg {
 }
 
 span.#{$cls-prefix}-moves__move {
+  position: relative;
   display: inline-block;
   line-height: 1.1;
   text-align: center;
@@ -412,6 +413,56 @@ span.#{$cls-prefix}-moves__move--active {
   @include contrast-text(var(--color-accent), var(--text-on-accent));
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
   font-weight: 500;
+}
+
+// ---- Moves list markers ----------------------------------------------------------------
+
+// Inner label wraps the notation + glyph/annotation marks; the comment
+// underline only applies to it so the trailing eval text stays plain.
+.#{$cls-prefix}-moves__label--comment {
+  text-decoration: underline dotted var(--color-blue);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+// Engine glyph symbols (!? ?? …) rendered as plain text right after the move.
+.#{$cls-prefix}-moves__glyph {
+  font-weight: 600;
+  font-size: 0.9em;
+}
+// The template omits the inline glyph colour on the active move so the symbol
+// re-colours with the accent background automatically.
+.#{$cls-prefix}-moves__move--active .#{$cls-prefix}-moves__glyph {
+  color: inherit;
+}
+.#{$cls-prefix}-moves__move--active .#{$cls-prefix}-moves__label--comment {
+  text-decoration-color: currentColor;
+}
+
+// Annotation badge (thumbs up/down, handshake, bookmark, star) as an inline
+// SVG reusing the tree graph badge artwork; solid circle keeps its own
+// contrast on any accent background.
+svg.#{$cls-prefix}-moves__annot {
+  display: inline-block;
+  width: 0.9em;
+  height: 0.9em;
+  margin-left: 1px;
+  vertical-align: -0.08em;
+  overflow: visible;
+}
+
+// Stored engine evaluation as a thin horizontal bar under the move — same
+// visual language as the tree graph node eval bar (width + colour follow the
+// evaluation magnitude, computed inline). Absolutely positioned so it adds
+// no row width and can never be clipped by overflow-x on narrow panels.
+.#{$cls-prefix}-moves__evalbar {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 2px;
+  border-radius: 1px;
+  pointer-events: none;
 }
 
 // ---- Comment row -----------------------------------------------------------------------

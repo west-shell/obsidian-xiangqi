@@ -6,6 +6,7 @@
     type ChessNode,
     type GameSlot,
     type ISettings,
+    type NodeEval,
     type NodeMap,
   } from "../../types";
   import {
@@ -73,12 +74,30 @@
   let foldedNodes = $state(new SvelteSet<string>());
 
   // ---- List mode ----
-  let listMoves = $derived(
-    currentPath
+  let _uiVer = $state(0);
+  const onUiVer = () => {
+    _uiVer++;
+  };
+  let listMoves = $derived.by(() => {
+    // Engine/save code mutates plain ChessNode fields (eval, glyph, comments,
+    // annotation) without Svelte signals; `updateUI` bumps _uiVer after each
+    // mutation, so reading it here keeps the move list in sync.
+    void _uiVer;
+    return currentPath
       .map((id) => nodeMap.get(id)!)
-      .filter((n): n is ChessNode => n != null && n.move !== null),
-  );
+      .filter((n): n is ChessNode => n != null && n.move !== null);
+  });
   let listCurrentStep = $derived(currentPath.indexOf(currentNode?.id ?? ""));
+  let startMarks = $derived.by(() => {
+    void _uiVer;
+    const node =
+      currentPath.length > 0 ? (nodeMap.get(currentPath[0]) ?? null) : null;
+    // Wrap in a fresh object on every recompute: Svelte 5 skips notifying
+    // dependents when a derived recomputes to a reference-equal value, and
+    // the root node object never changes identity, so marks set on it
+    // (eval / glyph / annotation / comments) would never re-render.
+    return { node };
+  });
   let listItemRefs: HTMLLIElement[] = [];
   let listUlRef: HTMLUListElement | null = $state(null);
 
@@ -113,6 +132,26 @@
   function onClickStep(step: number) {
     const nodeId = step === 0 ? currentPath[0] : currentPath[step];
     if (nodeId) eventBus.emit("slider-navigate", nodeId);
+  }
+
+  function annotBadge(key: string): string {
+    const size = 10;
+    const r = size / 2;
+    return `<svg class="${CLS_PREFIX}-moves__annot" viewBox="${-r} ${-r} ${size} ${size}" aria-hidden="true">${badgeSvg(key, size)}</svg>`;
+  }
+
+  function evalBarStyle(ev: NodeEval): string {
+    // Same intensity/colour logic as the tree graph node eval bar
+    const intensity =
+      ev.scoreType === "mate" ? 1 : Math.min(Math.abs(ev.score) / 300, 1);
+    const color =
+      ev.score > 0 || (ev.scoreType === "mate" && ev.score >= 0)
+        ? `color-mix(in srgb, var(--eval-plus) ${60 + intensity * 40}%, transparent)`
+        : ev.score < 0 || (ev.scoreType === "mate" && ev.score < 0)
+          ? `color-mix(in srgb, var(--eval-minus) ${60 + intensity * 40}%, transparent)`
+          : `color-mix(in srgb, var(--text-muted) 60%, transparent)`;
+    const width = Math.round(20 + intensity * 60);
+    return `width:${width}%;background-color:${color}`;
   }
 
   // ---- D3 Zoom ----
@@ -492,10 +531,6 @@
   let _lv = $state(0);
   const unsubLang = onLangChange(() => _lv++);
 
-  let _uiVer = $state(0);
-  const onUiVer = () => {
-    _uiVer++;
-  };
   onMount(() => {
     eventBus.on("updateUI", onUiVer);
   });
@@ -1177,6 +1212,45 @@
         ></button>
       </div>
     </div>
+    {#snippet moveLabelContent(node: ChessNode, isActive: boolean)}
+      {#if node.glyph && settings?.showEngineAnnotations !== false}
+        <span
+          class={`${CLS_PREFIX}-moves__glyph`}
+          style={isActive ? undefined : `color:${node.glyph.color}`}
+          >{node.glyph.symbol}</span
+        >
+      {/if}
+      {#if node.annotation}
+        <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+        {@html annotBadge(node.annotation)}
+      {/if}
+    {/snippet}
+    {#snippet moveSpan(node: ChessNode, step: number)}
+      {@const m = node.move}
+      {@const hasComment = (node.comments ?? []).length > 0}
+      {@const isActive = listCurrentStep === step}
+      <!-- svelte-ignore a11y_click_events_have_key_events -->
+      <!-- svelte-ignore a11y_no_static_element_interactions -->
+      <span
+        class={`${CLS_PREFIX}-moves__move ${getMoveListSideClass(
+          node.color,
+        )} ${isActive ? `${CLS_PREFIX}-moves__move--active` : ""}`}
+        onclick={() => onClickStep(step)}
+      >
+        <span
+          class={`${CLS_PREFIX}-moves__label ${hasComment ? `${CLS_PREFIX}-moves__label--comment` : ""}`}
+        >
+          {m ? getMoveNotation(m) : "..."}
+          {@render moveLabelContent(node, isActive)}
+        </span>
+        {#if node.eval}
+          <span
+            class="{CLS_PREFIX}-moves__evalbar"
+            style={evalBarStyle(node.eval)}
+          ></span>
+        {/if}
+      </span>
+    {/snippet}
     {#if listVisible}
       <ul class="{CLS_PREFIX}-moves" bind:this={listUlRef}>
         <li
@@ -1190,38 +1264,39 @@
             class={`${CLS_PREFIX}-moves__move ${CLS_PREFIX}-moves__move--start ${listCurrentStep === 0 ? `${CLS_PREFIX}-moves__move--active` : ""}`}
             onclick={() => onClickStep(0)}
           >
-            {getStartLabel()}
+            <span
+              class={`${CLS_PREFIX}-moves__label ${(startMarks.node?.comments ?? []).length > 0 ? `${CLS_PREFIX}-moves__label--comment` : ""}`}
+            >
+              {getStartLabel()}
+              {#if startMarks.node}
+                {@render moveLabelContent(
+                  startMarks.node,
+                  listCurrentStep === 0,
+                )}
+              {/if}
+            </span>
+            {#if startMarks.node?.eval}
+              <span
+                class="{CLS_PREFIX}-moves__evalbar"
+                style={evalBarStyle(startMarks.node.eval)}
+              ></span>
+            {/if}
           </span>
         </li>
-        {#each listMoves as move, i (i)}
+        {#each listMoves as move, i (move.id)}
           {#if i % 2 === 0}
             <li
               class="{CLS_PREFIX}-moves__row"
               bind:this={listItemRefs[i / 2 + 1]}
             >
               <span class="{CLS_PREFIX}-moves__num">{i / 2 + 1}</span>
-              <!-- svelte-ignore a11y_click_events_have_key_events -->
-              <!-- svelte-ignore a11y_no_static_element_interactions -->
-              <span
-                class={`${CLS_PREFIX}-moves__move ${getMoveListSideClass(move.color)} ${listCurrentStep === i + 1 ? `${CLS_PREFIX}-moves__move--active` : ""}`}
-                onclick={() => onClickStep(i + 1)}
-              >
-                {move.move ? getMoveNotation(move.move) : "..."}
-              </span>
+              <!-- Read listMoves[i] (the reactive derived) instead of the
+                   each-item value: the item reference never changes when the
+                   array recomputes, so Svelte would skip re-rendering white
+                   moves when engine analysis mutates node.eval in place. -->
+              {@render moveSpan(listMoves[i]!, i + 1)}
               {#if listMoves[i + 1]}
-                <!-- svelte-ignore a11y_click_events_have_key_events -->
-                <!-- svelte-ignore a11y_no_static_element_interactions -->
-                <span
-                  class={`${CLS_PREFIX}-moves__move ${getMoveListSideClass(
-                    listMoves[i + 1].color,
-                  )} ${listCurrentStep === i + 2 ? `${CLS_PREFIX}-moves__move--active` : ""}`}
-                  onclick={() => onClickStep(i + 2)}
-                >
-                  {(() => {
-                    const m = listMoves[i + 1].move;
-                    return m ? getMoveNotation(m) : "...";
-                  })()}
-                </span>
+                {@render moveSpan(listMoves[i + 1], i + 2)}
               {/if}
             </li>
           {/if}
