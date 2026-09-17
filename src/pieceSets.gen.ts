@@ -7,6 +7,8 @@ export interface PieceSetDef {
 
 export const PIECE_SETS: readonly PieceSetDef[] = [
   { key: "traditional", name: "传统" },
+  { key: "faction", name: "阵营" },
   { key: "letter", name: "字母" },
-  { key: "blind", name: "盲棋" },
+  { key: "shapes", name: "图形" },
+  { key: "disguised", name: "盲棋" },
 ];

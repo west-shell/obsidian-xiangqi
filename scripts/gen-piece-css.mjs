@@ -57,13 +57,23 @@ const THUMB_FILES = ["wknight", "bknight"];
 const CLS_PREFIX = "xq";
 
 // Canonical display order.
-const CANONICAL_ORDER = ["traditional", "letter", "blind"];
+const CANONICAL_ORDER = [
+  "traditional",
+  "faction",
+  "letter",
+  "shapes",
+  "disguised",
+];
 
 // Display names (Chinese-first audience; the plugin's default language is zh).
+// "disguised" mirrors the chess repo's lila set of the same key (all pieces
+// look identical — "no one can tell the pieces apart"); shown as 盲棋 here.
 const DISPLAY_NAMES = {
   traditional: "传统",
+  faction: "阵营",
   letter: "字母",
-  blind: "盲棋",
+  shapes: "图形",
+  disguised: "盲棋",
 };
 
 const AUTO_HEADER =
