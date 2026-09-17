@@ -98,7 +98,8 @@
     // (eval / glyph / annotation / comments) would never re-render.
     return { node };
   });
-  let listItemRefs: HTMLLIElement[] = [];
+  // Rows use display: contents, so scroll anchors are the number spans.
+  let listItemRefs: HTMLSpanElement[] = [];
   let listUlRef: HTMLUListElement | null = $state(null);
 
   $effect(() => {
@@ -1240,7 +1241,7 @@
         <span
           class={`${CLS_PREFIX}-moves__label ${hasComment ? `${CLS_PREFIX}-moves__label--comment` : ""}`}
         >
-          {m ? getMoveNotation(m) : "..."}
+          {m ? getMoveNotation(m, settings?.notationType) : "..."}
           {@render moveLabelContent(node, isActive)}
         </span>
         {#if node.eval}
@@ -1253,11 +1254,10 @@
     {/snippet}
     {#if listVisible}
       <ul class="{CLS_PREFIX}-moves" bind:this={listUlRef}>
-        <li
-          class="{CLS_PREFIX}-moves__row {CLS_PREFIX}-moves__row--start"
-          bind:this={listItemRefs[0]}
-        >
-          <span class="{CLS_PREFIX}-moves__num">0</span>
+        <li class="{CLS_PREFIX}-moves__row {CLS_PREFIX}-moves__row--start">
+          <span class="{CLS_PREFIX}-moves__num" bind:this={listItemRefs[0]}
+            >0</span
+          >
           <!-- svelte-ignore a11y_click_events_have_key_events -->
           <!-- svelte-ignore a11y_no_static_element_interactions -->
           <span
@@ -1285,11 +1285,11 @@
         </li>
         {#each listMoves as move, i (move.id)}
           {#if i % 2 === 0}
-            <li
-              class="{CLS_PREFIX}-moves__row"
-              bind:this={listItemRefs[i / 2 + 1]}
-            >
-              <span class="{CLS_PREFIX}-moves__num">{i / 2 + 1}</span>
+            <li class="{CLS_PREFIX}-moves__row">
+              <span
+                class="{CLS_PREFIX}-moves__num"
+                bind:this={listItemRefs[i / 2 + 1]}>{i / 2 + 1}</span
+              >
               <!-- Read listMoves[i] (the reactive derived) instead of the
                    each-item value: the item reference never changes when the
                    array recomputes, so Svelte would skip re-rendering white
@@ -1297,6 +1297,11 @@
               {@render moveSpan(listMoves[i]!, i + 1)}
               {#if listMoves[i + 1]}
                 {@render moveSpan(listMoves[i + 1], i + 2)}
+              {:else}
+                <!-- Placeholder keeps the black column occupied so grid
+                     auto-placement does not shift the next row. -->
+                <span class="{CLS_PREFIX}-moves__empty" aria-hidden="true"
+                ></span>
               {/if}
             </li>
           {/if}

@@ -10,7 +10,9 @@ import {
 import {
   CLS_PREFIX,
   DEFAULT_FEN_BLOCK_NAMES,
+  DEFAULT_NOTATION_TYPE,
   DEFAULT_TREE_BLOCK_NAMES,
+  NOTATION_TYPES,
 } from "./chess";
 import { getLang, initI18n, t } from "./i18n";
 import type ChessPlugin from "./main";
@@ -143,6 +145,7 @@ export const DEFAULT_SETTINGS: ISettings = {
   autoJump: "auto",
   enableSpeech: true,
   showMovelist: true,
+  notationType: DEFAULT_NOTATION_TYPE,
   boardMarginTop: 20,
   boardMarginBottom: 20,
   viewOnly: false,
@@ -706,6 +709,27 @@ export class ChessSettingTab extends PluginSettingTab {
         this.plugin.refresh();
       },
     );
+
+    // Variants exposing a single notation mode (e.g. xiangqi) skip the
+    // setting entirely instead of showing a one-option dropdown.
+    if (NOTATION_TYPES.length > 1) {
+      new Setting(containerEl)
+        .setName(t("movelist.notation"))
+        .setDesc(t("movelist.notation.desc"))
+        .addDropdown((dropdown) => {
+          const options: Record<string, string> = {};
+          for (const value of NOTATION_TYPES) {
+            options[value] = t(`movelist.notation.${value}`);
+          }
+          dropdown
+            .addOptions(options)
+            .setValue(settings.notationType)
+            .onChange(async (value) => {
+              settings.notationType = value;
+              this.plugin.refresh();
+            });
+        });
+    }
 
     // ---- 引擎 ----
     new Setting(containerEl).setName(t("engine.title")).setHeading();

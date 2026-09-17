@@ -26,6 +26,7 @@ export interface ISettings {
   autoJump: "never" | "always" | "auto";
   enableSpeech: boolean;
   showMovelist: boolean;
+  notationType: string;
   boardMarginTop: number;
   boardMarginBottom: number;
   viewOnly?: boolean;

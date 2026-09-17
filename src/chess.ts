@@ -70,7 +70,13 @@ export const HAS_PROMOTION = false;
 export const PRIMARY_PLAYER_KEY = "Red";
 
 // ========== Move Functions ==========
-export function getMoveNotation(move: Move): string {
+
+// Xiangqi notation (中文纵线格式) has no figurine form, so only letter
+// notation is offered in the shared move-list settings.
+export const NOTATION_TYPES: readonly string[] = ["letter"];
+export const DEFAULT_NOTATION_TYPE = "letter";
+
+export function getMoveNotation(move: Move, _notationType?: string): string {
   return move.zh ?? move.iccs ?? "";
 }
 

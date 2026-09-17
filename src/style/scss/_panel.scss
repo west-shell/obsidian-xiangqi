@@ -317,12 +317,25 @@ button.#{$cls-prefix}-gamenav__arrow svg {
   width: auto;
   min-width: 0;
   max-width: 16.67em;
-  display: flex;
-  flex-direction: column;
+  // One shared grid for the whole list so the number / white / black columns
+  // keep a single width across all rows: each track sizes to the longest
+  // item in that column (max-content). Rows flatten into it via
+  // display: contents — see the __row rule below.
+  display: grid;
+  grid-template-columns: max-content max-content max-content;
+  column-gap: 0.25em;
+  // align-content: start keeps auto rows at content height — otherwise the
+  // implicit rows stretch to share the container's full height (the list
+  // fills the panel column), inflating the vertical spacing.
+  align-content: start;
+  // Spans keep their natural width and hug the left edge of their column
+  // track instead of stretching across it.
+  justify-items: start;
+  align-items: center;
   font-size: var(--#{$cls-prefix}-font-size, 12px);
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 0;
+  padding: 0 0.25em;
   margin: 0;
   color: var(--text-normal);
   background-color: var(--background-primary-alt);
@@ -331,18 +344,12 @@ button.#{$cls-prefix}-gamenav__arrow svg {
   list-style: none;
 }
 
+// Row <li> generates no box of its own; its cells (number + moves) become
+// direct items of the shared grid above. Every row fills all three tracks
+// (the start label spans tracks 2-3, missing black moves get a placeholder
+// span) so auto-placement never shifts cells between rows.
 .#{$cls-prefix}-moves__row {
-  display: flex;
-  flex-wrap: nowrap;
-  flex-shrink: 0;
-  flex-grow: 0;
-  align-items: center;
-  gap: 0.25em;
-  padding: 0 0.25em;
-  margin: 0;
-  border-bottom: none;
-  white-space: nowrap;
-  width: 100%;
+  display: contents;
 }
 
 // Obsidian's markdown list rules (e.g. ".markdown-rendered ul > li") out-rank
@@ -389,7 +396,13 @@ span.#{$cls-prefix}-moves__move--white {
 
 span.#{$cls-prefix}-moves__move--black {
   min-width: 2.5em;
-  text-align: right;
+  text-align: left;
+}
+
+// The start label spans both move columns so its long text does not
+// inflate the white-move column width.
+span.#{$cls-prefix}-moves__move--start {
+  grid-column: 2 / -1;
 }
 
 // Only real-pointer devices get hover feedback; touch devices leave a sticky
