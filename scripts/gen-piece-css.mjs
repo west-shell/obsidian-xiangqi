@@ -63,6 +63,7 @@ const CANONICAL_ORDER = [
   "faction",
   "letter",
   "shapes",
+  "cartoon",
   "disguised",
 ];
 
@@ -74,6 +75,7 @@ const DISPLAY_NAMES = {
   faction: "阵营",
   letter: "字母",
   shapes: "图形",
+  cartoon: "卡通",
   disguised: "盲棋",
 };
 

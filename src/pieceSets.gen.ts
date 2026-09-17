@@ -10,5 +10,6 @@ export const PIECE_SETS: readonly PieceSetDef[] = [
   { key: "faction", name: "阵营" },
   { key: "letter", name: "字母" },
   { key: "shapes", name: "图形" },
+  { key: "cartoon", name: "卡通" },
   { key: "disguised", name: "盲棋" },
 ];
