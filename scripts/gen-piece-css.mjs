@@ -41,7 +41,8 @@ const CHECK = process.argv.includes("--check");
 
 // The 14 standard piece images every set must provide. File name is
 // <w|b><role>.svg; the letter codes map to chessground element classes
-// (e.g. wknight -> piece.knight.white).
+// (e.g. wknight -> piece.knight.white) — or just w.svg + b.svg for sets
+// where all pieces of a side share one image, e.g. "disguised".
 const ROLES = ["king", "advisor", "bishop", "rook", "knight", "cannon", "pawn"];
 const PIECE_FILES = [];
 for (const w of ["w", "b"]) {
@@ -89,6 +90,12 @@ function pieceFile(dir, code) {
   return existsSync(file) ? file : null;
 }
 
+// Resolve the per-side shared image assets/pieces/<set>/<w|b>.svg.
+function sideFile(dir, color) {
+  const file = join(dir, `${color}.svg`);
+  return existsSync(file) ? file : null;
+}
+
 // ---- collect valid sets -----------------------------------------------------
 
 if (!existsSync(SRC_DIR)) {
@@ -102,8 +109,16 @@ for (const entry of readdirSync(SRC_DIR, { withFileTypes: true })) {
   const dir = join(SRC_DIR, entry.name);
   const missing = PIECE_FILES.filter((code) => pieceFile(dir, code) === null);
   if (missing.length > 0) {
-    console.warn(`SKIP ${entry.name}/ — missing: ${missing.join(", ")}`);
-    continue;
+    // Shared-art set: no per-piece files, but both side images present —
+    // all pieces of a side share one image (e.g. "disguised").
+    if (
+      missing.length !== PIECE_FILES.length ||
+      !sideFile(dir, "w") ||
+      !sideFile(dir, "b")
+    ) {
+      console.warn(`SKIP ${entry.name}/ — missing: ${missing.join(", ")}`);
+      continue;
+    }
   }
   sets.push(entry.name);
 }
@@ -129,6 +144,28 @@ const outputs = new Map(); // path -> content
 for (const set of sets) {
   const dir = join(SRC_DIR, set);
   let css = `/* ${AUTO_HEADER} Source: assets/pieces/${set}/ */\n`;
+  const sharedW = sideFile(dir, "w");
+  const sharedB = sideFile(dir, "b");
+  if (sharedW && sharedB && pieceFile(dir, "wking") === null) {
+    // Shared-art set: a single rule per side covers every role and the
+    // picker thumbnail. Thumbnail selectors must require the scope class
+    // ON the picker tile itself — see the comment below.
+    for (const [c, file] of [
+      ["w", sharedW],
+      ["b", sharedB],
+    ]) {
+      const selectors = ROLES.map(
+        (role) =>
+          `.${CLS_PREFIX}-pieceset-${set} .xq-wrap piece.${role}.${COLOR[c]}`,
+      );
+      selectors.push(
+        `.${CLS_PREFIX}-piece-set-picker__tile.${CLS_PREFIX}-pieceset-${set} .${CLS_PREFIX}-piece-thumb.${c}knight`,
+      );
+      css += `${selectors.join(",\n")} {\n  background-image: ${dataUri(file)};\n}\n`;
+    }
+    outputs.set(join(CSS_DIR, `${set}.css`), css);
+    continue;
+  }
   for (const code of PIECE_FILES) {
     const color = COLOR[code[0]];
     const role = code.slice(1);
