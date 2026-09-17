@@ -254,6 +254,79 @@ $cls-prefix: "xq";
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
+// ---- Piece-set picker modal (board menu -> "Piece set…") --------------------
+// Board piece images themselves come from the generated per-set CSS files
+// (src/style/pieceSets/*.css, scoped under .xq-pieceset-<set> on <body>);
+// this only styles the picker modal layout. Thumbnails reuse the generated
+// .xq-piece-thumb.wknight / .bknight rules via the tile's own
+// .xq-pieceset-<set> class.
+
+.#{$cls-prefix}-piece-set-picker {
+  .#{$cls-prefix}-piece-set-picker__title {
+    font-size: 1.1em;
+    font-weight: 600;
+    margin-bottom: 0.75em;
+    color: var(--text-normal);
+  }
+
+  .#{$cls-prefix}-piece-set-picker__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 8px;
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+
+  .#{$cls-prefix}-piece-set-picker__tile {
+    all: unset;
+    box-sizing: border-box;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 6px;
+    border-radius: var(--radius-m, 10px);
+    border: 1px solid var(--background-modifier-border-hover);
+    background: var(--background-secondary);
+    transition:
+      background 0.15s,
+      border-color 0.15s;
+  }
+
+  .#{$cls-prefix}-piece-set-picker__tile:hover {
+    background: var(--background-modifier-hover);
+    border-color: var(--color-accent);
+  }
+
+  .#{$cls-prefix}-piece-set-picker__tile--active {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 1px var(--color-accent);
+  }
+
+  .#{$cls-prefix}-piece-set-picker__thumbs {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+  }
+
+  .#{$cls-prefix}-piece-thumb {
+    width: 34px;
+    height: 34px;
+    background-color: #cfcfcf;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 6px;
+  }
+
+  .#{$cls-prefix}-piece-set-picker__name {
+    font-size: 0.9em;
+    color: var(--text-muted);
+    text-align: center;
+  }
+}
+
 // ---- Variant-tunable values ---------------------------------------------------
 
 // Board aspect ratio (width / height): chess = 1, xiangqi = 0.9

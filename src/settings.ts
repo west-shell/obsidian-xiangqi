@@ -16,7 +16,12 @@ import {
 } from "./chess";
 import { getLang, initI18n, t } from "./i18n";
 import type ChessPlugin from "./main";
-import { getThemeDisplayName, THEME_KEYS } from "./themes";
+import {
+  getThemeDisplayName,
+  PIECE_SETS,
+  resolvePieceSetKey,
+  THEME_KEYS,
+} from "./themes";
 import type { ISettings } from "./types";
 
 const VALID_NAME_RE = /^[a-z0-9-]+$/;
@@ -135,6 +140,7 @@ function addTagInput(
 export const DEFAULT_SETTINGS: ISettings = {
   lang: "auto",
   theme: "wood",
+  pieceSet: "",
   zoom: 80,
   fontSize: 12,
   showCoordinateLabels: true,
@@ -595,6 +601,25 @@ export class ChessSettingTab extends PluginSettingTab {
           this.plugin.refresh();
         });
       });
+
+    // Hidden when the variant provides no piece sets (PIECE_SETS is empty
+    // outside this repo, e.g. in the xiangqi sibling synced from here).
+    if (PIECE_SETS.length > 0) {
+      new Setting(containerEl)
+        .setName(t("board.pieceSet"))
+        .setDesc(t("board.pieceSet.desc"))
+        .addDropdown((dropdown) => {
+          dropdown.addOptions(
+            Object.fromEntries(PIECE_SETS.map((s) => [s.key, s.name])),
+          );
+          dropdown
+            .setValue(resolvePieceSetKey(settings.pieceSet))
+            .onChange((pieceSet) => {
+              settings.pieceSet = pieceSet;
+              this.plugin.refresh();
+            });
+        });
+    }
 
     addSliderWithValue(
       containerEl,

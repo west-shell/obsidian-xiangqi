@@ -2,6 +2,7 @@
   import { Menu, setIcon } from "obsidian";
   import { onDestroy } from "svelte";
   import { ANALYSIS_SITES, CLS_PREFIX } from "../../chess";
+  import { PIECE_SET_PICKER } from "../../themes";
   import type { EventBus } from "../../core/event-bus";
   import type { IOptions, ISettings } from "../../types";
   import type ChessPlugin from "../../main";
@@ -305,6 +306,16 @@
 
   function handleBoardMenu(evt: MouseEvent) {
     const menu = new Menu();
+
+    if (PIECE_SET_PICKER && plugin) {
+      menu.addItem((mi) => {
+        mi.setTitle(t("boardMenu.pieceSet", _lv))
+          .setIcon("crown")
+          .onClick(() => {
+            void PIECE_SET_PICKER.open(plugin);
+          });
+      });
+    }
 
     menu.addItem((mi) => {
       mi.setTitle(t("boardMenu.flip", _lv))

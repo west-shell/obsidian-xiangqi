@@ -16,6 +16,7 @@ export { DEFAULT_FEN };
 export interface ISettings {
   lang: "auto" | "en" | "zh";
   theme: ThemeName;
+  pieceSet: string;
   zoom: number;
   fontSize: number;
   showCoordinateLabels: boolean;

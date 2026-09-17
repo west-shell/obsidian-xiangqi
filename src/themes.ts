@@ -5,6 +5,15 @@ import woodB64 from "../assets/wood.jpg?base64";
 
 import type { ISettings } from "./types";
 import { applyThemeCSSVars, type ThemeData } from "./chess";
+import {
+  applyPieceSet,
+  PIECE_SET_PICKER,
+  PIECE_SETS,
+  resolvePieceSetKey,
+} from "./pieceSets";
+
+export { PIECE_SETS, PIECE_SET_PICKER, resolvePieceSetKey };
+export type { PieceSetDef } from "./pieceSets";
 
 // Two default highlight sets — deep marks for light boards, bright marks
 // for dark boards. Themes pick from these per field; textured boards
@@ -255,4 +264,7 @@ export function applyThemes(settings: ISettings, app?: App) {
   body.setProperty("--xq-brush-green", t.brushGreen);
   body.setProperty("--xq-brush-red", t.brushRed);
   body.setProperty("--xq-brush-yellow", t.brushYellow);
+
+  // Board piece artwork (generated per-set CSS, scoped by a body class).
+  applyPieceSet(settings);
 }
