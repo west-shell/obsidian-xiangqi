@@ -1,10 +1,12 @@
-import { type App } from "obsidian";
+import { type App, Modal } from "obsidian";
 
 import bambooB64 from "../assets/bamboo.jpg?base64";
 import woodB64 from "../assets/wood.jpg?base64";
 
 import type { ISettings } from "./types";
 import { applyThemeCSSVars, type ThemeData } from "./chess";
+import { getLang, t } from "./i18n";
+import type ChessPlugin from "./main";
 import {
   applyPieceSet,
   PIECE_SET_PICKER,
@@ -268,3 +270,53 @@ export function applyThemes(settings: ISettings, app?: App) {
   // Board piece artwork (generated per-set CSS, scoped by a body class).
   applyPieceSet(settings);
 }
+
+/** Board-menu picker: a modal grid of board-style swatches. */
+function openBoardThemePicker(plugin: ChessPlugin): void {
+  const modal = new Modal(plugin.app);
+  modal.onOpen = () => {
+    const { contentEl } = modal;
+    contentEl.addClass("xq-board-theme-picker");
+
+    const title = contentEl.createDiv("xq-board-theme-picker__title");
+    title.setText(t("boardMenu.boardTheme"));
+
+    const grid = contentEl.createDiv("xq-board-theme-picker__grid");
+    for (const key of THEME_KEYS) {
+      const def = themes[key];
+      if (!def) continue;
+      const active = key === plugin.settings.theme;
+      const tile = grid.createEl("button", {
+        cls: `xq-board-theme-picker__tile${active ? " xq-board-theme-picker__tile--active" : ""}`,
+      });
+      const swatch = tile.createDiv("xq-board-theme-picker__swatch");
+      if (/\.(png|jpe?g|gif|webp|svg|bmp)$/i.test(def.bg)) {
+        const url = plugin.app.vault.adapter.getResourcePath(
+          `${plugin.app.vault.configDir}/${def.bg}`,
+        );
+        swatch.style.backgroundImage = `url('${url}')`;
+      } else {
+        swatch.style.backgroundColor = def.bg;
+      }
+      // Gridded themes overlay faint crossing lines in the grid color.
+      if (def.grid === "dark" || def.grid === "light") {
+        swatch.createDiv(`xq-board-theme-picker__grid-lines--${def.grid}`);
+      }
+      const label = tile.createDiv("xq-board-theme-picker__name");
+      label.setText(getThemeDisplayName(key, getLang()));
+      tile.addEventListener("click", () => {
+        plugin.settings.theme = key;
+        void plugin.saveSettings();
+        plugin.refresh();
+        modal.close();
+      });
+    }
+  };
+  modal.onClose = () => {
+    (modal as { contentEl: HTMLElement }).contentEl.empty();
+  };
+  modal.open();
+}
+
+/** Adapter capability consumed by the shared toolbar. */
+export const BOARD_THEME_PICKER = { open: openBoardThemePicker };

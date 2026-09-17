@@ -6,7 +6,7 @@ import { initI18n, t } from "./i18n";
 import { BlockHost } from "./host/BlockHost";
 import { FileHost } from "./host/FileHost";
 import { ChessSettingTab, DEFAULT_SETTINGS } from "./settings";
-import { applyThemes } from "./themes";
+import { applyThemes, ensureBoardAssets } from "./themes";
 import { RIBBON_ICON_SVG } from "./utils/icon";
 import type { ISettings } from "./types";
 import {
@@ -29,6 +29,7 @@ export default class ChessPlugin extends Plugin {
     if (RIBBON_ICON_SVG) {
       addIcon(RIBBON_ICON, RIBBON_ICON_SVG);
     }
+    await ensureBoardAssets(this.app);
     applyThemes(this.settings, this.app);
 
     this.registerCodeBlocks();

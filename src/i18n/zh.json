@@ -1,7 +1,7 @@
 {
   "board.title": "棋盘外观",
-  "board.theme": "主题",
-  "board.theme.desc": "棋盘配色方案",
+  "board.theme": "棋盘样式",
+  "board.theme.desc": "棋盘的样式与配色",
   "board.pieceSet": "棋子样式",
   "board.pieceSet.desc": "棋盘上棋子的外观样式",
   "board.zoom": "界面大小",
@@ -59,6 +59,7 @@
   "toolbar.flip": "翻转",
   "toolbar.board": "棋盘",
   "boardMenu.flip": "翻转棋盘",
+  "boardMenu.boardTheme": "棋盘样式…",
   "boardMenu.pieceSet": "棋子样式…",
   "boardMenu.showLastMove": "显示当前着法",
   "boardMenu.showNextMove": "显示下一步招法",

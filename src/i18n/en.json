@@ -1,7 +1,7 @@
 {
   "board.title": "Board",
-  "board.theme": "Theme",
-  "board.theme.desc": "Board color scheme",
+  "board.theme": "Board style",
+  "board.theme.desc": "Board appearance and colors",
   "board.pieceSet": "Piece set",
   "board.pieceSet.desc": "Chess piece artwork on the board",
   "board.zoom": "Board size",
@@ -58,6 +58,7 @@
   "toolbar.flip": "Flip",
   "toolbar.board": "Board",
   "boardMenu.flip": "Flip board",
+  "boardMenu.boardTheme": "Board style…",
   "boardMenu.pieceSet": "Piece set…",
   "boardMenu.showLastMove": "Show last move",
   "boardMenu.showNextMove": "Show next move",
