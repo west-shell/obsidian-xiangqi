@@ -319,12 +319,14 @@
 
     menu.addItem((mi) => {
       mi.setTitle(t("boardMenu.flip", _lv))
+        .setIcon("refresh-cw")
         .setChecked(rotated)
         .onClick(() => eventBus.emit("rotate"));
     });
 
     menu.addItem((mi) => {
       mi.setTitle(t("boardMenu.showCoordinates", _lv))
+        .setIcon("hash")
         .setChecked(settings?.showCoordinateLabels ?? true)
         .onClick(() => {
           if (!plugin) return;
@@ -337,6 +339,7 @@
 
     menu.addItem((mi) => {
       mi.setTitle(t("boardMenu.showTurnBorder", _lv))
+        .setIcon("box-select")
         .setChecked(settings?.showTurnBorder ?? true)
         .onClick(() => {
           if (!plugin) return;
@@ -350,6 +353,7 @@
 
     menu.addItem((mi) => {
       mi.setTitle(t("boardMenu.showLastMove", _lv))
+        .setIcon("history")
         .setChecked(settings?.showLastMove ?? true)
         .onClick(() => {
           if (!plugin) return;
@@ -361,6 +365,7 @@
 
     menu.addItem((mi) => {
       mi.setTitle(t("boardMenu.showNextMove", _lv))
+        .setIcon("chevrons-right")
         .setChecked(settings?.showNextMove ?? true)
         .onClick(() => {
           if (!plugin) return;
@@ -373,6 +378,7 @@
     if (settings?.showNextMove) {
       menu.addItem((mi) => {
         mi.setTitle(t("boardMenu.showOtherVariations", _lv))
+          .setIcon("git-branch")
           .setChecked(settings.showOtherVariations ?? true)
           .onClick(() => {
             if (!plugin) return;
@@ -388,6 +394,7 @@
 
     menu.addItem((mi) => {
       mi.setTitle(t("boardMenu.showEngineBestMove", _lv))
+        .setIcon("lightbulb")
         .setChecked(settings?.showEngineBestMove ?? true)
         .onClick(() => {
           if (!plugin) return;
@@ -400,6 +407,7 @@
 
     menu.addItem((mi) => {
       mi.setTitle(t("boardMenu.showEnginePonder", _lv))
+        .setIcon("eye")
         .setChecked(settings?.showEnginePonder ?? true)
         .onClick(() => {
           if (!plugin) return;
@@ -411,6 +419,7 @@
 
     menu.addItem((mi) => {
       mi.setTitle(t("boardMenu.showAnnotations", _lv))
+        .setIcon("pencil")
         .setChecked(settings?.showBoardAnnotations ?? true)
         .onClick(() => {
           if (!plugin) return;
