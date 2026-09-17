@@ -71,12 +71,21 @@ export const PRIMARY_PLAYER_KEY = "Red";
 
 // ========== Move Functions ==========
 
-// Xiangqi notation (中文纵线格式) has no figurine form, so only letter
-// notation is offered in the shared move-list settings.
-export const NOTATION_TYPES: readonly string[] = ["letter"];
-export const DEFAULT_NOTATION_TYPE = "letter";
+// Notation modes for the shared move-list settings: Chinese file-rank
+// notation (炮二平五) and ICCS coordinates (h2e6).
+export const NOTATION_TYPES: readonly {
+  value: string;
+  labelKey: string;
+}[] = [
+  { value: "zh", labelKey: "movelist.notation.zh" },
+  { value: "iccs", labelKey: "movelist.notation.iccs" },
+];
+export const DEFAULT_NOTATION_TYPE = "zh";
 
-export function getMoveNotation(move: Move, _notationType?: string): string {
+export function getMoveNotation(move: Move, notationType?: string): string {
+  if (notationType === "iccs") {
+    return move.iccs ?? move.zh ?? "";
+  }
   return move.zh ?? move.iccs ?? "";
 }
 
@@ -115,9 +124,13 @@ export const PROMOTION_PIECES:
 export type NodeDisplay =
   { type: "icon"; value: string } | { type: "char"; value: string } | null;
 
-export function getNodeLabel(move: Move | null, mode: number): string {
+export function getNodeLabel(
+  move: Move | null,
+  mode: number,
+  notationType?: string,
+): string {
   if (!move) return "= 开局 =";
-  if (mode === 1) return move.zh ?? move.iccs ?? "";
+  if (mode === 1) return getMoveNotation(move, notationType);
   return "";
 }
 
@@ -132,9 +145,10 @@ export function getNodeWidth(
   move: Move | null,
   mode: number,
   _measureFn?: (text: string, fontSize: string) => number,
+  notationType?: string,
 ): number {
   if (mode === 0) return 13;
-  const notation = move ? (move.zh ?? move.iccs ?? "") : "= 开局 =";
+  const notation = move ? getMoveNotation(move, notationType) : "= 开局 =";
   if (_measureFn) {
     return Math.max(13, Math.ceil(_measureFn(notation, "6px")) + 4);
   }

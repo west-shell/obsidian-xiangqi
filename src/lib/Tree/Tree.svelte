@@ -647,7 +647,7 @@
   let nodeModeTitle = $derived(t("tree.nodeMode", _lv));
 
   function nodeLabel(node: ChessNode): string {
-    return getNodeLabel(node.move, nodeMode);
+    return getNodeLabel(node.move, nodeMode, settings?.notationType);
   }
   function nodeFontSize(): string {
     if (nodeMode === 1) return "6px";
@@ -662,7 +662,12 @@
   }
   function localGetNodeWidth(node: ChessNode): number {
     if (nodeMode === 0) return 13;
-    return getNodeWidth(node.move, nodeMode, measureTextWidth);
+    return getNodeWidth(
+      node.move,
+      nodeMode,
+      measureTextWidth,
+      settings?.notationType,
+    );
   }
   let modeIcon = $derived(MODE_ICONS[nodeMode]);
   function useSetIcon(el: HTMLElement, icon: string) {
@@ -1214,14 +1219,14 @@
       </div>
     </div>
     {#snippet moveLabelContent(node: ChessNode, isActive: boolean)}
-      {#if node.glyph && settings?.showEngineAnnotations !== false}
+      {#if node.glyph && settings?.showEngineAnnotations !== false && settings?.showListGlyph !== false}
         <span
           class={`${CLS_PREFIX}-moves__glyph`}
           style={isActive ? undefined : `color:${node.glyph.color}`}
           >{node.glyph.symbol}</span
         >
       {/if}
-      {#if node.annotation}
+      {#if node.annotation && settings?.showListAnnotation !== false}
         <!-- eslint-disable-next-line svelte/no-at-html-tags -->
         {@html annotBadge(node.annotation)}
       {/if}
@@ -1239,12 +1244,12 @@
         onclick={() => onClickStep(step)}
       >
         <span
-          class={`${CLS_PREFIX}-moves__label ${hasComment ? `${CLS_PREFIX}-moves__label--comment` : ""}`}
+          class={`${CLS_PREFIX}-moves__label ${hasComment && settings?.showListCommentMark !== false ? `${CLS_PREFIX}-moves__label--comment` : ""}`}
         >
           {m ? getMoveNotation(m, settings?.notationType) : "..."}
           {@render moveLabelContent(node, isActive)}
         </span>
-        {#if node.eval}
+        {#if node.eval && settings?.showListEval !== false}
           <span
             class="{CLS_PREFIX}-moves__evalbar"
             style={evalBarStyle(node.eval)}
@@ -1265,7 +1270,7 @@
             onclick={() => onClickStep(0)}
           >
             <span
-              class={`${CLS_PREFIX}-moves__label ${(startMarks.node?.comments ?? []).length > 0 ? `${CLS_PREFIX}-moves__label--comment` : ""}`}
+              class={`${CLS_PREFIX}-moves__label ${(startMarks.node?.comments ?? []).length > 0 && settings?.showListCommentMark !== false ? `${CLS_PREFIX}-moves__label--comment` : ""}`}
             >
               {getStartLabel()}
               {#if startMarks.node}
@@ -1275,7 +1280,7 @@
                 )}
               {/if}
             </span>
-            {#if startMarks.node?.eval}
+            {#if startMarks.node?.eval && settings?.showListEval !== false}
               <span
                 class="{CLS_PREFIX}-moves__evalbar"
                 style={evalBarStyle(startMarks.node.eval)}

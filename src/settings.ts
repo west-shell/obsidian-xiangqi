@@ -146,6 +146,10 @@ export const DEFAULT_SETTINGS: ISettings = {
   enableSpeech: true,
   showMovelist: true,
   notationType: DEFAULT_NOTATION_TYPE,
+  showListEval: true,
+  showListAnnotation: true,
+  showListGlyph: true,
+  showListCommentMark: true,
   boardMarginTop: 20,
   boardMarginBottom: 20,
   viewOnly: false,
@@ -710,25 +714,73 @@ export class ChessSettingTab extends PluginSettingTab {
       },
     );
 
-    // Variants exposing a single notation mode (e.g. xiangqi) skip the
-    // setting entirely instead of showing a one-option dropdown.
+    // Variants exposing a single notation mode skip the setting entirely
+    // instead of showing a one-option dropdown. Option labels are notation
+    // examples (labelKey per mode, defined by the adapter).
     if (NOTATION_TYPES.length > 1) {
       new Setting(containerEl)
         .setName(t("movelist.notation"))
-        .setDesc(t("movelist.notation.desc"))
         .addDropdown((dropdown) => {
           const options: Record<string, string> = {};
-          for (const value of NOTATION_TYPES) {
-            options[value] = t(`movelist.notation.${value}`);
+          for (const { value, labelKey } of NOTATION_TYPES) {
+            options[value] = t(labelKey);
           }
           dropdown
             .addOptions(options)
-            .setValue(settings.notationType)
+            .setValue(
+              NOTATION_TYPES.some((n) => n.value === settings.notationType)
+                ? settings.notationType
+                : DEFAULT_NOTATION_TYPE,
+            )
             .onChange(async (value) => {
               settings.notationType = value;
               this.plugin.refresh();
             });
         });
+    }
+
+    // Move-list marks: eval bar, annotation badge, engine glyph, comment
+    // underline — each can be turned off independently.
+    const listMarkToggles: {
+      key:
+        | "showListEval"
+        | "showListAnnotation"
+        | "showListGlyph"
+        | "showListCommentMark";
+      name: string;
+      desc: string;
+    }[] = [
+      {
+        key: "showListEval",
+        name: t("movelist.showEval"),
+        desc: t("movelist.showEval.desc"),
+      },
+      {
+        key: "showListAnnotation",
+        name: t("movelist.showAnnotation"),
+        desc: t("movelist.showAnnotation.desc"),
+      },
+      {
+        key: "showListGlyph",
+        name: t("movelist.showGlyph"),
+        desc: t("movelist.showGlyph.desc"),
+      },
+      {
+        key: "showListCommentMark",
+        name: t("movelist.showCommentMark"),
+        desc: t("movelist.showCommentMark.desc"),
+      },
+    ];
+    for (const { key, name, desc } of listMarkToggles) {
+      new Setting(containerEl)
+        .setName(name)
+        .setDesc(desc)
+        .addToggle((toggle) =>
+          toggle.setValue(settings[key]).onChange((value) => {
+            settings[key] = value;
+            this.plugin.refresh();
+          }),
+        );
     }
 
     // ---- 引擎 ----

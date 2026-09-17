@@ -27,6 +27,10 @@ export interface ISettings {
   enableSpeech: boolean;
   showMovelist: boolean;
   notationType: string;
+  showListEval: boolean;
+  showListAnnotation: boolean;
+  showListGlyph: boolean;
+  showListCommentMark: boolean;
   boardMarginTop: number;
   boardMarginBottom: number;
   viewOnly?: boolean;
