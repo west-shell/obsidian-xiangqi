@@ -17,6 +17,11 @@
 // shared files abbreviate it as {prefix}.
 $cls-prefix: "xq";
 
+// Board aspect ratio (width / height): chess = 1, xiangqi = 0.9.
+// Defined here (not in the tunables section at the bottom) because the
+// board-theme picker swatch below renders at this ratio.
+$board-ratio: 0.9;
+
 // ---- Reusable board visuals ---------------------------------------------------
 
 // Corner-bracket frame (four L-shaped marks) — same visual language as
@@ -328,8 +333,12 @@ $cls-prefix: "xq";
 }
 
 // ---- Board-theme picker modal (board menu -> "Board style…") ----------------
-// Each tile previews the theme's board color (or texture image); gridded
-// themes overlay faint crossing lines like the real board's grid.
+// Each tile previews the theme's board color (or texture image) plus the
+// native board grid SVG (GRID_SVG, the same artwork the real board
+// renders), tinted with the theme's grid color.
+// Swatches use the board aspect ratio (not a square): board-art images
+// (bamboo) are authored at this ratio with a baked-in frame + grid, so a
+// square `cover` swatch would crop the frame and clip the edge lines.
 
 .#{$cls-prefix}-board-theme-picker {
   .#{$cls-prefix}-board-theme-picker__title {
@@ -377,7 +386,7 @@ $cls-prefix: "xq";
   .#{$cls-prefix}-board-theme-picker__swatch {
     position: relative;
     width: 100%;
-    aspect-ratio: 1;
+    aspect-ratio: #{$board-ratio};
     border-radius: 6px;
     overflow: hidden;
     border: 1px solid var(--background-modifier-border);
@@ -385,45 +394,24 @@ $cls-prefix: "xq";
     background-position: center;
   }
 
-  // Crossing grid lines: dark grid = dark lines, light grid = pale lines.
-  .#{$cls-prefix}-board-theme-picker__grid-lines--dark {
-    position: absolute;
-    inset: 0;
-    background-image:
-      repeating-linear-gradient(
-        90deg,
-        rgba(0, 0, 0, 0.35) 0,
-        rgba(0, 0, 0, 0.35) 1px,
-        transparent 1px,
-        transparent 25%
-      ),
-      repeating-linear-gradient(
-        0deg,
-        rgba(0, 0, 0, 0.35) 0,
-        rgba(0, 0, 0, 0.35) 1px,
-        transparent 1px,
-        transparent 25%
-      );
+  // Native grid overlay: themes.ts injects GRID_SVG into the swatch and
+  // tints it per tile via --xq-grid-color. The SVG is authored for a
+  // 450-unit board, so its 1-unit strokes would fall below a device
+  // pixel at swatch size; non-scaling-stroke keeps every line a crisp
+  // 1px at any tile width (vector-effect does not inherit -> wildcard;
+  // CSS rules win over the SVG's presentation attributes).
+  .#{$cls-prefix}-board-theme-picker__swatch svg.xq-grid * {
+    vector-effect: non-scaling-stroke;
   }
 
-  .#{$cls-prefix}-board-theme-picker__grid-lines--light {
-    position: absolute;
-    inset: 0;
-    background-image:
-      repeating-linear-gradient(
-        90deg,
-        rgba(255, 255, 255, 0.4) 0,
-        rgba(255, 255, 255, 0.4) 1px,
-        transparent 1px,
-        transparent 25%
-      ),
-      repeating-linear-gradient(
-        0deg,
-        rgba(255, 255, 255, 0.4) 0,
-        rgba(255, 255, 255, 0.4) 1px,
-        transparent 1px,
-        transparent 25%
-      );
+  .#{$cls-prefix}-board-theme-picker__swatch svg.xq-grid g {
+    stroke-width: 1;
+  }
+
+  // Outer frame keeps a hint of its native extra weight (3 vs 1 units):
+  // the first rect is the 3-unit frame, the second the 1-unit boundary.
+  .#{$cls-prefix}-board-theme-picker__swatch svg.xq-grid rect:first-child {
+    stroke-width: 2;
   }
 
   .#{$cls-prefix}-board-theme-picker__name {
@@ -435,8 +423,7 @@ $cls-prefix: "xq";
 
 // ---- Variant-tunable values ---------------------------------------------------
 
-// Board aspect ratio (width / height): chess = 1, xiangqi = 0.9
-$board-ratio: 0.9;
+// Board aspect ratio: defined at the top of this file ($board-ratio).
 
 // Primary dimension driving the col2 board+toolbar rail ("uniboard"):
 // "width" for the square chess board, "height" for a taller board.

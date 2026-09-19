@@ -4,7 +4,7 @@ import bambooB64 from "../assets/bamboo.jpg?base64";
 import woodB64 from "../assets/wood.jpg?base64";
 
 import type { ISettings } from "./types";
-import { applyThemeCSSVars, type ThemeData } from "./chess";
+import { applyThemeCSSVars, GRID_SVG, type ThemeData } from "./chess";
 import { getLang, t } from "./i18n";
 import type ChessPlugin from "./main";
 import {
@@ -282,6 +282,10 @@ function openBoardThemePicker(plugin: ChessPlugin): void {
     title.setText(t("boardMenu.boardTheme"));
 
     const grid = contentEl.createDiv("xq-board-theme-picker__grid");
+    // "auto" mirrors the Obsidian appearance at apply time (applyThemes
+    // swaps in the light/dark base); resolve the same way here so its
+    // thumbnail matches the board the user currently sees.
+    const obsidianDark = activeDocument.body.classList.contains("theme-dark");
     for (const key of THEME_KEYS) {
       const def = themes[key];
       if (!def) continue;
@@ -297,10 +301,31 @@ function openBoardThemePicker(plugin: ChessPlugin): void {
         swatch.style.backgroundImage = `url('${url}')`;
       } else {
         swatch.style.backgroundColor = def.bg;
+        // Same background stack as the real board: the texture gradient
+        // layers over the base color (parchment / green).
+        if (def.texture) {
+          swatch.style.backgroundImage = def.texture;
+        }
       }
-      // Gridded themes overlay faint crossing lines in the grid color.
-      if (def.grid === "dark" || def.grid === "light") {
-        swatch.createDiv(`xq-board-theme-picker__grid-lines--${def.grid}`);
+      // Gridded themes overlay the native board grid SVG — the exact
+      // artwork the real board renders — tinted per theme via
+      // --xq-grid-color. Bamboo (grid "none") has the grid baked into
+      // its board image and needs no overlay.
+      const gridStyle =
+        key === "auto" ? (obsidianDark ? "light" : "dark") : def.grid;
+      if ((gridStyle === "dark" || gridStyle === "light") && GRID_SVG) {
+        swatch.style.setProperty(
+          "--xq-grid-color",
+          gridStyle === "dark" ? "#555" : "#ccc",
+        );
+        // Parsed via DOMParser (not insertAdjacentHTML) so the static
+        // GRID_SVG artwork lands in the SVG namespace without tripping
+        // no-unsanitized; same artwork the real board injects.
+        const svg = new DOMParser().parseFromString(
+          GRID_SVG,
+          "image/svg+xml",
+        ).documentElement;
+        swatch.appendChild(svg);
       }
       const label = tile.createDiv("xq-board-theme-picker__name");
       label.setText(getThemeDisplayName(key, getLang()));
