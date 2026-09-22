@@ -74,7 +74,7 @@ For the best experience on mobile devices, it's recommended to install the Full 
 
 ### Board Appearance
 
-- **Theme**: Auto, Light, Dark, Parchment, Green, Wood, Bamboo
+- **Board Style**: Auto, Light, Dark, Parchment, Green, Wood, Bamboo — switchable in settings or via the board menu's swatch picker
 - **Board Size**: Adjust board and piece display size (0–100%)
 - **Show Coordinates**: Show coordinate labels on board edges
 
@@ -82,6 +82,7 @@ For the best experience on mobile devices, it's recommended to install the Full 
 
 - **Show Last Move**: Highlight the origin and destination of the previous move
 - **Show Next Moves**: Whether to show next moves
+- **Show Other Variations**: Highlight alternative variation moves on the board
 - **Show Turn Border**: Show a highlighted border indicating whose turn it is
 - **Speech**: Read moves aloud (unavailable on mobile)
 - **Auto Jump**: Where to position the board when opening a game — Never / Always / Only for default position
@@ -90,6 +91,8 @@ For the best experience on mobile devices, it's recommended to install the Full 
 
 - **Show Move List**: Display the move list panel when opening a tree
 - **Move Text Size**: Font size for the move list
+- **Notation**: Chinese (炮二平五) or coordinates (h2e6)
+- **Move Marks**: Eval bar, annotation badge, glyph and comment underline shown next to moves — each can be toggled independently
 
 ### Board Margins
 
@@ -109,8 +112,10 @@ Customize code block aliases in **Settings > Xiangqi > Code Block Names**:
 
 - **Engine Depth**: Search depth for Pikafish analysis (1–30, default 18)
 - **Engine Skill Level**: Skill level for engine play (0–20, default 20)
-- **Save Eval by Default**: Automatically include eval data when saving (default off)
-- **Save Eval Prompt**: Show prompt when saving with eval data (default on)
+- **Show Best Move**: Show the engine's best-move arrow (default on)
+- **Show Ponder Move**: Show the ponder-move arrow (default on)
+- **Show Engine Annotations**: Show engine glyphs on analyzed moves (default on)
+- **Show Board Annotations**: Draw engine annotations on the board (default on)
 
 ### Save
 
@@ -130,7 +135,8 @@ Enable/disable PGN file view and customize file extensions:
 
 - **Complete Rules Engine**: Check/checkmate detection, move validation — all via xiangqi.js
 - **Board Rendering**: High-quality chessboard via xiangqiground with drag-and-drop moves
-- **Move List**: Full move record with click-to-navigate
+- **Board Styles**: 7 board styles including texture-based Wood and Bamboo, switchable from the board menu's swatch picker
+- **Move List**: Grid-aligned move columns with Chinese/coordinate notation and per-move marks (eval, annotation, glyph, comment)
 - **Variation Tree**: Tree graph with icon/WXF display modes for node labels
 - **Visual FEN Editor**: Drag/click to place pieces, clear/fill board, toggle side to move
 - **PGN Saving**:
@@ -163,6 +169,8 @@ Enable/disable PGN file view and customize file extensions:
 3. Controls:
    - The variation tree displays all branches graphically
    - Click any node to navigate to that position
+   - The board menu (board icon in the toolbar) flips the board and toggles highlights, coordinates, and annotations on the fly
+   - Switch board style instantly from the board menu's swatch picker
 4. Click **Save** to overwrite the original PGN
 5. Click **Edit board** in the Edit menu to switch to position editor mode
    - Modify the position by dragging/clicking pieces
@@ -230,8 +238,8 @@ This plugin is available on the official Obsidian plugin marketplace. Search for
 3. Build the plugin:
 
    ```bash
-   npm run build        # Dev build (unminified, with sourcemaps)
-   npm run build:min    # Minified build (for release)
+   npm run build        # Minified production build (for release)
+   npm run build:debug  # Unminified production build (with sourcemaps)
    ```
 
 ## Donation
