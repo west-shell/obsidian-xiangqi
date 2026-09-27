@@ -6,6 +6,7 @@ import { getLang, t } from "../../i18n";
 import type { Move } from "../../chess";
 import { getMoveNotation } from "../../chess";
 import type { IHost } from "../../types";
+import { playMoveSound } from "../../utils/sound";
 
 const PIECE_SPEECH_KEYS: Record<string, string> = {
   K: "speech.pieceK",
@@ -79,14 +80,22 @@ const SpeakerModule = {
     let lastSpokenNodeId: string | null = null;
 
     eventBus.on("updateUI", () => {
+      const node = host.currentNode;
+      if (!node || !node.move) {
+        // Back at a root node: clear the guard so replaying the same
+        // first move triggers sound/speech again.
+        lastSpokenNodeId = null;
+        return;
+      }
+      if (node.id === lastSpokenNodeId) return;
+      lastSpokenNodeId = node.id;
+
+      // Sound first (WebAudio, works on mobile), then speech narration.
+      if (host.settings.soundEnabled) {
+        playMoveSound(node.move, host.settings.soundVolume / 100);
+      }
       if (!host.settings.enableSpeech) return;
       if (!window.speechSynthesis) return;
-
-      const node = host.currentNode;
-      if (!node || !node.move) return;
-      if (node.id === lastSpokenNodeId) return;
-
-      lastSpokenNodeId = node.id;
       speak(node.move);
     });
   },

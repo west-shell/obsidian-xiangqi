@@ -26,6 +26,8 @@ export interface ISettings {
   showTurnBorder: boolean;
   autoJump: "never" | "always" | "auto";
   enableSpeech: boolean;
+  soundEnabled: boolean;
+  soundVolume: number;
   showMovelist: boolean;
   notationType: string;
   showListEval: boolean;

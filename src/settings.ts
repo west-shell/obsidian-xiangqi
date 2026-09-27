@@ -23,6 +23,7 @@ import {
   THEME_KEYS,
 } from "./themes";
 import type { ISettings } from "./types";
+import { playSound } from "./utils/sound";
 
 const VALID_NAME_RE = /^[a-z0-9-]+$/;
 // Characters the tag input accepts as they are typed (committed to
@@ -150,6 +151,8 @@ export const DEFAULT_SETTINGS: ISettings = {
   showTurnBorder: true,
   autoJump: "auto",
   enableSpeech: true,
+  soundEnabled: true,
+  soundVolume: 50,
   showMovelist: true,
   notationType: DEFAULT_NOTATION_TYPE,
   showListEval: true,
@@ -685,6 +688,29 @@ export class ChessSettingTab extends PluginSettingTab {
           this.plugin.refresh();
         }),
       );
+
+    new Setting(containerEl)
+      .setName(t("game.sound"))
+      .setDesc(t("game.sound.desc"))
+      .addToggle((toggle) =>
+        toggle.setValue(settings.soundEnabled).onChange((value) => {
+          settings.soundEnabled = value;
+          if (value) playSound("move", settings.soundVolume / 100);
+        }),
+      );
+
+    addSliderWithValue(
+      containerEl,
+      t("game.soundVolume"),
+      t("game.soundVolume.desc"),
+      settings.soundVolume,
+      { min: 0, max: 100, step: 5 },
+      "%",
+      (v) => {
+        settings.soundVolume = v;
+        playSound("move", v / 100);
+      },
+    );
 
     if (window.speechSynthesis) {
       new Setting(containerEl)

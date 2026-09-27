@@ -84,6 +84,7 @@ For the best experience on mobile devices, it's recommended to install the Full 
 - **Show Next Moves**: Whether to show next moves
 - **Show Other Variations**: Highlight alternative variation moves on the board
 - **Show Turn Border**: Show a highlighted border indicating whose turn it is
+- **Move Sounds**: Sound effects for moves, captures and checkmate, with adjustable volume
 - **Speech**: Read moves aloud (unavailable on mobile)
 - **Auto Jump**: Where to position the board when opening a game — Never / Always / Only for default position
 
