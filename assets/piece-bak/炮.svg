@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   version="1.1"
+   id="svg1"
+   width="2048"
+   height="2048"
+   viewBox="0 0 2048 2048"
+   sodipodi:docname="中国象棋平面棋子设计 (8).svg"
+   inkscape:version="1.4.4 (dcaf3e7, 2026-05-05)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#505050"
+     bordercolor="#eeeeee"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#505050"
+     showgrid="false"
+     inkscape:zoom="0.36083984"
+     inkscape:cx="831.39378"
+     inkscape:cy="760.7253"
+     inkscape:window-width="1920"
+     inkscape:window-height="974"
+     inkscape:window-x="-11"
+     inkscape:window-y="-11"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g1" />
+  <g
+     inkscape:groupmode="layer"
+     inkscape:label="Image"
+     id="g1">
+    <rect
+       style="fill:#000000;stroke:none"
+       id="rect2"
+       width="874.35132"
+       height="86.424927"
+       x="460.50928"
+       y="1314.6586"
+       ry="33.212524" />
+    <path
+       style="fill:#000000;stroke:none"
+       d="m 542.81306,1289.5067 h 707.42064 l -33.3135,-72.5865 H 1115.0203 V 934.73584 h -39.1923 c -1.9596,78.38456 -114.96399,72.50576 -113.65756,0 h -27.4346 L 701.54178,1218.8799 h -127.3749 z"
+       id="path2"
+       sodipodi:nodetypes="ccccccccccc" />
+    <circle
+       style="fill:#000000;stroke:none"
+       id="path3"
+       cx="1018.9993"
+       cy="934.81659"
+       r="37" />
+    <path
+       style="fill:#000000;stroke:none"
+       d="M 1134.6165,985.6858 1493.2258,809.32055 1424.6393,644.71298 642.75337,921.01854 734.85522,1140.4953 926.89739,917.09932 c 0,0 10.45128,0 35.27305,0 16.98331,-52.90958 98.96046,-54.86919 113.65756,0 28.4144,0 56.8288,0 56.8288,0 z"
+       id="path4"
+       sodipodi:nodetypes="cccccccccc" />
+    <rect
+       style="fill:#000000;stroke:none"
+       id="rect4"
+       width="226.33266"
+       height="92.613632"
+       x="1105.3345"
+       y="-1199.4679"
+       transform="rotate(67.956843)"
+       ry="25.404097" />
+    <path
+       style="fill:#000000;stroke:none"
+       d="M 613.39954,917.05893 717.2187,1164.0107 c 0,0 -89.71333,52.3722 -145.09221,-96.1827 -55.37888,-148.55494 41.27305,-150.76907 41.27305,-150.76907 z"
+       id="path5"
+       sodipodi:nodetypes="cczc" />
+    <path
+       style="fill:#000000;stroke:none"
+       d="m 544.64953,1049.8945 22.6587,53.858 c 0,0 -8.91556,26.8666 -41.15189,12.4926 -11.41543,-8.4952 -20.8772,-30.3121 -16.41177,-47.0308 6.42505,-24.3121 34.90496,-19.3198 34.90496,-19.3198 z"
+       id="path6"
+       sodipodi:nodetypes="ccccc" />
+  </g>
+</svg>
