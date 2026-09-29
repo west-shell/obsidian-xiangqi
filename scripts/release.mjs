@@ -16,6 +16,8 @@ mfst.version = pkg.version;
 writeFileSync("manifest.json", JSON.stringify(mfst, null, 2) + "\n");
 
 process.stdout.write(`Release: ${pkg.version}\n`);
-execSync("git add -A", { stdio: "inherit" });
+execSync("git add package.json package-lock.json manifest.json", {
+  stdio: "inherit",
+});
 execSync(`git commit -m "${pkg.version}"`, { stdio: "inherit" });
 execSync(`git tag ${pkg.version}`, { stdio: "inherit" });
