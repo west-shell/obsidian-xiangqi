@@ -1,5 +1,5 @@
 import type { Move } from "../chess";
-import { isMoveCheckmate } from "../chess";
+import { isMoveCheck, isMoveCheckmate } from "../chess";
 
 // ========== Move Sound Profiles ==========
 // Pure WebAudio oscillator presets: no audio asset files (GPL-friendly,
@@ -19,13 +19,17 @@ export interface SoundTone {
   gain?: number;
 }
 
-export type MoveSoundKind = "move" | "capture" | "checkmate";
+export type MoveSoundKind = "move" | "capture" | "check" | "checkmate";
 
 export const MOVE_SOUNDS: Record<MoveSoundKind, SoundTone[]> = {
   move: [{ freq: 660, jitter: 60, type: "sine", dur: 0.06 }],
   capture: [
     { freq: 300, type: "triangle", dur: 0.09 },
     { freq: 150, type: "sine", dur: 0.12 },
+  ],
+  check: [
+    { freq: 880, jitter: 30, type: "triangle", dur: 0.07 },
+    { freq: 1175, jitter: 30, type: "triangle", dur: 0.09, delay: 0.08 },
   ],
   checkmate: [
     { freq: 523, type: "sine", dur: 0.14 },
@@ -77,12 +81,15 @@ export function playSound(kind: MoveSoundKind, volume: number): void {
   }
 }
 
-/** Play the matching sound for a move; volume is 0–1. */
+/** Play the matching sound(s) for a move; volume is 0–1. Checkmate and
+ * check can accompany a capture, so both sounds are layered. */
 export function playMoveSound(move: Move, volume: number): void {
-  const kind: MoveSoundKind = isMoveCheckmate(move)
-    ? "checkmate"
-    : move.captured
-      ? "capture"
-      : "move";
-  playSound(kind, volume);
+  if (move.captured) playSound("capture", volume);
+  if (isMoveCheckmate(move)) {
+    playSound("checkmate", volume);
+  } else if (isMoveCheck(move)) {
+    playSound("check", volume);
+  } else if (!move.captured) {
+    playSound("move", volume);
+  }
 }
