@@ -20,6 +20,7 @@
     getNodeWidth,
     getStartLabel,
     getTreeSpacingX,
+    getTurnFromFen,
     LAYOUT_CHANGE_EVENT,
     NODE_CHAR_DY,
     PRIMARY_PLAYER_KEY,
@@ -88,6 +89,17 @@
       .filter((n): n is ChessNode => n != null && n.move !== null);
   });
   let listCurrentStep = $derived(currentPath.indexOf(currentNode?.id ?? ""));
+  // lila-style fixed columns: the first side keeps the left column even when
+  // black is to move first — the first row then pads the left cell with a
+  // "..." placeholder (PGN "1. ..." convention) instead of swapping columns.
+  let blackStarts = $derived.by(() => {
+    if (currentPath.length === 0) return false;
+    const root = nodeMap.get(currentPath[0]);
+    return root != null && getTurnFromFen(root.fen) === "black";
+  });
+  // Move rows pair up starting at this listMoves index; when black starts,
+  // listMoves[0] gets its own "1. ..." row above and pairing begins at 1.
+  let pairOffset = $derived(blackStarts ? 1 : 0);
   let startMarks = $derived.by(() => {
     void _uiVer;
     const node =
@@ -105,10 +117,13 @@
   $effect(() => {
     const step = listCurrentStep;
     void listMoves;
+    void pairOffset;
     (async () => {
       await tick();
       if (destroyed) return;
-      const index = step <= 0 ? 0 : Math.ceil(step / 2);
+      // Row number of the current step: rows pair two moves each, shifted by
+      // pairOffset when black moves first (its first move sits alone in row 1).
+      const index = step <= 0 ? 0 : Math.floor((step + 1 + pairOffset) / 2);
       const targetEl = listItemRefs[index];
       if (targetEl) {
         scrollToBTN(targetEl, listUlRef);
@@ -1288,12 +1303,30 @@
             {/if}
           </span>
         </li>
+        {#if blackStarts}
+          <!-- Black moves first: pad the left column with "..." so black's
+               first move lands in the right column (lila/PGN convention). -->
+          <li class="{CLS_PREFIX}-moves__row">
+            <span class="{CLS_PREFIX}-moves__num" bind:this={listItemRefs[1]}
+              >1</span
+            >
+            <span class="{CLS_PREFIX}-moves__placeholder" aria-hidden="true"
+              >...</span
+            >
+            {#if listMoves[0]}
+              {@render moveSpan(listMoves[0]!, 1)}
+            {:else}
+              <span class="{CLS_PREFIX}-moves__empty" aria-hidden="true"></span>
+            {/if}
+          </li>
+        {/if}
         {#each listMoves as move, i (move.id)}
-          {#if i % 2 === 0}
+          {#if i >= pairOffset && (i - pairOffset) % 2 === 0}
+            {@const row = (i - pairOffset) / 2 + 1 + pairOffset}
             <li class="{CLS_PREFIX}-moves__row">
               <span
                 class="{CLS_PREFIX}-moves__num"
-                bind:this={listItemRefs[i / 2 + 1]}>{i / 2 + 1}</span
+                bind:this={listItemRefs[row]}>{row}</span
               >
               <!-- Read listMoves[i] (the reactive derived) instead of the
                    each-item value: the item reference never changes when the
@@ -1303,7 +1336,7 @@
               {#if listMoves[i + 1]}
                 {@render moveSpan(listMoves[i + 1], i + 2)}
               {:else}
-                <!-- Placeholder keeps the black column occupied so grid
+                <!-- Placeholder keeps the right column occupied so grid
                      auto-placement does not shift the next row. -->
                 <span class="{CLS_PREFIX}-moves__empty" aria-hidden="true"
                 ></span>
