@@ -558,9 +558,15 @@
     const slot = games[currentGameIndex ?? 0];
     return slot ? slot.headers.size > 0 : false;
   });
-  let showGameInfo = $derived(
-    games != null && games.length > 0 && (hasHeaders || !isBlockMode),
-  );
+  let showGameInfo = $derived.by(() => {
+    void _uiVer;
+    if (!games || games.length === 0) return false;
+    if (games.length === 1) {
+      const h = games[0].headers;
+      if (!h.get(PRIMARY_PLAYER_KEY) && !h.get("Black")) return false;
+    }
+    return hasHeaders || !isBlockMode;
+  });
   let gameLabel = $derived(
     showGameNav
       ? t("game.label", _lv)
