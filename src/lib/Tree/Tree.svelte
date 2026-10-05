@@ -117,7 +117,6 @@
   $effect(() => {
     const step = listCurrentStep;
     void listMoves;
-    void pairOffset;
     (async () => {
       await tick();
       if (destroyed) return;
@@ -1328,7 +1327,13 @@
         {/if}
         {#each listMoves as move, i (move.id)}
           {#if i >= pairOffset && (i - pairOffset) % 2 === 0}
-            {@const row = (i - pairOffset) / 2 + 1 + pairOffset}
+            <!-- Row number expressed via i's parity only: row-opening items
+                 are even i when white starts and odd i when black starts, so
+                 this equals (i - pairOffset) / 2 + 1 + pairOffset WITHOUT
+                 reading the pairOffset derived — a derived read inside the
+                 bind:this index expression freezes list updates after the
+                 first $set when props are forwarded through a parent. -->
+            {@const row = Math.floor(i / 2) + 1 + (i % 2)}
             <li class="{CLS_PREFIX}-moves__row">
               <span
                 class="{CLS_PREFIX}-moves__num"
