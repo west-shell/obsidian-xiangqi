@@ -60,12 +60,19 @@ export type IOptions = {
 
 export type ITurn = "white" | "black";
 
+export type PvLine = {
+  score: number;
+  scoreType: "cp" | "mate";
+  moves: string[];
+};
+
 export type NodeEval = {
   score: number;
   scoreType: "cp" | "mate";
   depth: number;
   bestmove?: string;
   ponder?: string;
+  pvs?: PvLine[];
 };
 
 export type MoveGlyph =

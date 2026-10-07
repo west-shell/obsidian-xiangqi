@@ -1,11 +1,15 @@
-import type { ChessNode, IHost, NodeEval } from "../../types";
+import type { ChessNode, IHost, NodeEval, PvLine } from "../../types";
 import type { Move } from "../../chess";
+import { moveToUci } from "../../chess";
 import {
   registerBlockModule,
   registerFileModule,
 } from "../../core/module-system";
 import { engine } from "./Engine";
 import { computeGlyph } from "../../utils/winningChances";
+
+/** Number of candidate lines requested from the engine (MultiPV). */
+const MULTI_PV = 3;
 
 function initEngine(host: object) {
   const h = host as IHost;
@@ -36,6 +40,7 @@ function initEngine(host: object) {
     );
     engine.postCommand(`setoption name Ponder value false`);
     engine.postCommand(`setoption name Hash value 16`);
+    engine.postCommand(`setoption name MultiPV value ${MULTI_PV}`);
   }
 
   function toWhiteView(
@@ -53,6 +58,48 @@ function initEngine(host: object) {
     return s;
   }
 
+  function toWhiteViewPvs(
+    pvs: PvLine[] | undefined,
+    fen: string,
+  ): PvLine[] | undefined {
+    if (!pvs) return undefined;
+    return pvs.map((pv) => ({
+      score: toWhiteView(pv.score, pv.scoreType, fen),
+      scoreType: pv.scoreType,
+      moves: pv.moves,
+    }));
+  }
+
+  /**
+   * Attribute an eval to the move leading to `node`:
+   * prefer the PV line from the SAME search of the parent position
+   * (exact, no search jitter), otherwise fall back to the child node's
+   * own eval from a separate search (subject to the noise band).
+   */
+  function playedMoveEval(
+    parentEval: NodeEval | undefined,
+    node: ChessNode,
+  ): { ev: NodeEval; sameSearch: boolean } | null {
+    const uci = node.move ? moveToUci(node.move) : "";
+    if (parentEval?.pvs && uci) {
+      const pv = parentEval.pvs.find((p) => p.moves[0] === uci);
+      if (pv) {
+        return {
+          ev: {
+            score: pv.score,
+            scoreType: pv.scoreType,
+            depth: parentEval.depth,
+          },
+          sameSearch: true,
+        };
+      }
+    }
+    if (node.eval) {
+      return { ev: node.eval, sameSearch: false };
+    }
+    return null;
+  }
+
   function setNodeGlyph(node: ChessNode) {
     if (!settings.showEngineAnnotations) {
       node.glyph = null;
@@ -61,21 +108,16 @@ function initEngine(host: object) {
       }
       return;
     }
-    if (!node.parentID) {
-      node.glyph = null;
-      for (const child of node.children) {
-        if (child.eval) {
-          child.glyph = computeGlyph(node.eval, child.eval, child.color);
-        }
-      }
-      return;
-    }
-    const parent = h.nodeMap.get(node.parentID);
-    node.glyph = computeGlyph(parent?.eval, node.eval, node.color);
+    const parent = node.parentID ? h.nodeMap.get(node.parentID) : undefined;
+    const self = playedMoveEval(parent?.eval, node);
+    node.glyph = self
+      ? computeGlyph(parent?.eval, self.ev, node.color, self.sameSearch)
+      : null;
     for (const child of node.children) {
-      if (child.eval) {
-        child.glyph = computeGlyph(node.eval, child.eval, child.color);
-      }
+      const played = playedMoveEval(node.eval, child);
+      child.glyph = played
+        ? computeGlyph(node.eval, played.ev, child.color, played.sameSearch)
+        : null;
     }
   }
 
@@ -235,6 +277,7 @@ function initEngine(host: object) {
           depth: result.depth ?? 0,
           bestmove: result.bestmove !== "(none)" ? result.bestmove : undefined,
           ponder: result.ponder,
+          pvs: toWhiteViewPvs(result.pvs, node.fen),
         };
         node.eval = nodeEval;
         setNodeGlyph(node);
@@ -317,6 +360,7 @@ function initEngine(host: object) {
               bestmove:
                 result.bestmove !== "(none)" ? result.bestmove : undefined,
               ponder: result.ponder,
+              pvs: toWhiteViewPvs(result.pvs, node.fen),
             };
             setNodeGlyph(node);
             if (h.currentNode.id === nodeId) {

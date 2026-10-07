@@ -1,9 +1,15 @@
+import type { PvLine } from "../../types";
+
+export type { PvLine };
+
 export interface EngineResult {
   bestmove: string;
   ponder?: string;
   score?: number;
   depth?: number;
   scoreType?: "cp" | "mate";
+  /** Top N candidate lines from a MultiPV search, in engine POV (side to move) */
+  pvs?: PvLine[];
 }
 
 import type ChessPlugin from "../../main";
@@ -89,6 +95,7 @@ export abstract class BaseEngine {
       let lastScore: number | undefined;
       let lastDepth: number | undefined;
       let lastScoreType: "cp" | "mate" | undefined;
+      const pvMap = new Map<number, PvLine>();
 
       this.analyzeTimeout = window.setTimeout(() => {
         this.analyzeTimeout = null;
@@ -100,19 +107,39 @@ export abstract class BaseEngine {
 
       this.msgHandler = (msg: string) => {
         if (msg.startsWith("info")) {
+          // Skip bound-flagged lines: their scores are not exact
+          const isBound = / (lowerbound|upperbound) /.test(msg);
+          const mpvMatch = msg.match(/ multipv (\d+)/);
+          const mpv = mpvMatch ? Number.parseInt(mpvMatch[1]) : 1;
+          let score: number | undefined;
+          let scoreType: "cp" | "mate" | undefined;
           const mateMatch = msg.match(/score mate (-?\d+)/);
           if (mateMatch) {
-            lastScoreType = "mate";
-            lastScore = Number.parseInt(mateMatch[1]);
+            scoreType = "mate";
+            score = Number.parseInt(mateMatch[1]);
           } else {
             const cpMatch = msg.match(/score cp (-?\d+)/);
             if (cpMatch) {
-              lastScoreType = "cp";
-              lastScore = Number.parseInt(cpMatch[1]);
+              scoreType = "cp";
+              score = Number.parseInt(cpMatch[1]);
             }
           }
-          const depthMatch = msg.match(/depth (\d+)/);
-          if (depthMatch) lastDepth = Number.parseInt(depthMatch[1]);
+          const pvMatch = msg.match(/ pv (.+)$/);
+          if (!isBound && score !== undefined && scoreType && pvMatch) {
+            pvMap.set(mpv, {
+              score,
+              scoreType,
+              moves: pvMatch[1].trim().split(/\s+/),
+            });
+          }
+          if (mpv === 1 && !isBound) {
+            if (score !== undefined && scoreType) {
+              lastScore = score;
+              lastScoreType = scoreType;
+            }
+            const depthMatch = msg.match(/depth (\d+)/);
+            if (depthMatch) lastDepth = Number.parseInt(depthMatch[1]);
+          }
         } else if (msg.startsWith("bestmove")) {
           const parts = msg.split(/\s+/);
           const bestmove = parts[1];
@@ -128,12 +155,16 @@ export abstract class BaseEngine {
             this.analyzeTimeout = null;
           }
           if (bestmove) {
+            const pvs = [...pvMap.entries()]
+              .sort((a, b) => a[0] - b[0])
+              .map(([, pv]) => pv);
             resolve({
               bestmove,
               ponder,
               score: lastScore,
               depth: lastDepth,
               scoreType: lastScoreType,
+              pvs: pvs.length > 0 ? pvs : undefined,
             });
           } else {
             reject(new Error("No move found"));

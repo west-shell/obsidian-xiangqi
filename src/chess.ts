@@ -109,6 +109,10 @@ export function matchMove(existing: Move, incoming: Move): boolean {
   return existing.from === incoming.from && existing.to === incoming.to;
 }
 
+export function moveToUci(move: Move): string {
+  return move.from + move.to;
+}
+
 export function isPromotionRank(_to: string, _color: "w" | "b"): boolean {
   return false;
 }

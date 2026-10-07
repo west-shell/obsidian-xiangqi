@@ -13,11 +13,21 @@ const GLYPH_DEFS: Record<string, MoveGlyph> = {
 
 export { GLYPH_DEFS };
 
+/**
+ * Noise band for cross-search comparisons (lila's areSimilarEvals):
+ * winning-chance deltas within this margin are considered measurement
+ * noise and never trigger an annotation.
+ */
+export const EVAL_NOISE_BAND = 0.14;
+
 function winningChances(cp: number): number {
   return 2 / (1 + Math.exp(-0.003_682_08 * cp)) - 1;
 }
 
-function winningChancesFromEval(ev: NodeEval): number {
+function winningChancesFromEval(ev: {
+  score: number;
+  scoreType: "cp" | "mate";
+}): number {
   if (ev.scoreType === "mate") {
     if (ev.score === 0) return 0;
     return ev.score > 0 ? 1 : -1;
@@ -25,18 +35,31 @@ function winningChancesFromEval(ev: NodeEval): number {
   return winningChances(ev.score);
 }
 
+/**
+ * Compute the glyph for a played move.
+ *
+ * `prevEval` is the evaluation of the position BEFORE the move,
+ * `playedEval` the evaluation attributed to the played move itself:
+ * either the matching PV line from the SAME search of the parent
+ * position (sameSearch = true, exact measurement), or the child
+ * node's own eval from a separate search (sameSearch = false,
+ * subject to the noise band).
+ */
 export function computeGlyph(
   prevEval: NodeEval | undefined,
-  curEval: NodeEval | undefined,
+  playedEval: NodeEval | undefined,
   color: string | null,
+  sameSearch: boolean,
 ): MoveGlyph | null {
-  if (!prevEval || !curEval || !color) return null;
+  if (!prevEval || !playedEval || !color) return null;
 
   const prevChances = winningChancesFromEval(prevEval);
-  const curChances = winningChancesFromEval(curEval);
+  const playedChances = winningChancesFromEval(playedEval);
 
-  let delta = curChances - prevChances;
+  let delta = playedChances - prevChances;
   if (color === "black") delta = -delta;
+
+  if (Math.abs(delta) <= (sameSearch ? 0 : EVAL_NOISE_BAND)) return null;
 
   if (delta <= -0.3) return GLYPH_DEFS["??"];
   if (delta <= -0.2) return GLYPH_DEFS["?"];
