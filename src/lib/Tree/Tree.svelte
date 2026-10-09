@@ -1199,7 +1199,7 @@
                   {@html badgeSvg("checkmate")}
                 </g>
               {/if}
-              {#if node.glyph && settings?.showEngineAnnotations !== false}
+              {#if node.glyph}
                 <g
                   transform="translate({nw / 2} {nodeHeight / 2})"
                   style="pointer-events: none"
@@ -1338,7 +1338,7 @@
       </div>
     </div>
     {#snippet moveLabelContent(node: ChessNode, isActive: boolean)}
-      {#if node.glyph && settings?.showEngineAnnotations !== false && settings?.showListGlyph !== false}
+      {#if node.glyph && settings?.showListGlyph !== false}
         <span
           class={`${CLS_PREFIX}-moves__glyph`}
           style={isActive ? undefined : `color:${node.glyph.color}`}

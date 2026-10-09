@@ -140,8 +140,7 @@
   let engineBestMove: { from: Square; to: Square } | null = $state(null);
   let enginePonder: { from: Square; to: Square } | null = $state(null);
   let glyphShapes = $derived.by(() => {
-    if (!settings.showEngineAnnotations || !settings.showBoardAnnotations)
-      return [];
+    if (!settings.showBoardAnnotations) return [];
     const node = currentNode;
     const shapes: DrawShape[] = [];
     const dest = node.move ? getMoveDest(node.move) : undefined;

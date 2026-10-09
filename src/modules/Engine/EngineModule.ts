@@ -101,13 +101,9 @@ function initEngine(host: object) {
   }
 
   function setNodeGlyph(node: ChessNode) {
-    if (!settings.showEngineAnnotations) {
-      node.glyph = null;
-      for (const child of node.children) {
-        child.glyph = null;
-      }
-      return;
-    }
+    // Auto-annotate off: the engine neither writes nor clears glyphs.
+    // Imported or manually added annotations are never touched.
+    if (!settings.showEngineAnnotations) return;
     const parent = node.parentID ? h.nodeMap.get(node.parentID) : undefined;
     const self = playedMoveEval(parent?.eval, node);
     node.glyph = self
