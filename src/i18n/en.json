@@ -12,6 +12,8 @@
   "board.layout.bottom": "Bottom",
   "board.coordinates": "Show coordinates",
   "board.coordinates.desc": "Show file letters and rank numbers on board edges",
+  "board.showAnnotations": "Show annotations",
+  "board.showAnnotations.desc": "Display move quality glyphs on the board",
   "game.title": "Game Hints",
   "game.lastMove": "Show last move",
   "game.lastMove.desc": "Highlight the origin and destination of the previous move",

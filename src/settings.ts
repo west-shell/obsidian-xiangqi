@@ -646,6 +646,16 @@ export class ChessSettingTab extends PluginSettingTab {
         }),
       );
 
+    new Setting(containerEl)
+      .setName(t("board.showAnnotations"))
+      .setDesc(t("board.showAnnotations.desc"))
+      .addToggle((toggle) =>
+        toggle.setValue(settings.showBoardAnnotations).onChange((value) => {
+          settings.showBoardAnnotations = value;
+          this.plugin.refresh();
+        }),
+      );
+
     // ==================== 对局提示 ====================
     new Setting(containerEl).setName(t("game.title")).setHeading();
 

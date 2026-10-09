@@ -12,6 +12,8 @@
   "board.layout.bottom": "纵向",
   "board.coordinates": "显示坐标标签",
   "board.coordinates.desc": "在棋盘边缘显示行列坐标",
+  "board.showAnnotations": "显示评注",
+  "board.showAnnotations.desc": "在棋盘上显示着法质量评注符号",
   "game.title": "对局提示",
   "game.lastMove": "显示当前着法",
   "game.lastMove.desc": "高亮上一步走棋的起止位置",
