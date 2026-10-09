@@ -3,7 +3,10 @@ import { GLYPH_DEFS } from "./winningChances";
 
 /**
  * Lichess study glyph catalog (lila public/glyphs.json) plus the plugin's
- * legacy custom annotations.
+ * legacy custom annotations. Trimmed to the essentials: move quality
+ * ($1..$6), the four position glyphs ($10, $13, $16, $17) and the legacy
+ * custom marks — observation glyphs, move extras and the graded/winning
+ * position variants are intentionally omitted.
  *
  * Standard glyphs are keyed by their NAG number as a string ("16" for $16)
  * and exported as `$n` NAGs. The five legacy custom keys ("+", "-", "=",
@@ -11,7 +14,7 @@ import { GLYPH_DEFS } from "./winningChances";
  * `#a:` comment form and are never written as NAGs, so lichess files and
  * custom marks never bleed into each other.
  */
-export type AnnotationCategory = "move" | "position" | "observation" | "custom";
+export type AnnotationCategory = "move" | "position" | "custom";
 
 export interface AnnotationGlyph {
   /** Internal key: NAG number as string, or a legacy custom key. */
@@ -45,10 +48,10 @@ const entry = (
 });
 
 /**
- * Menu order follows lichess (move, position, observation); the legacy
- * custom marks come last. Quality glyphs ($1..$6) live in the single
- * `node.glyph` slot and are mutually exclusive; position glyphs replace
- * each other; everything else stacks freely.
+ * Menu order: move quality first, then position, then the legacy custom
+ * marks. Quality glyphs ($1..$6) live in the single `node.glyph` slot and
+ * are mutually exclusive; position glyphs replace each other; custom
+ * marks toggle freely.
  */
 export const STUDY_GLYPHS: AnnotationGlyph[] = [
   // -- move quality (exclusive, stored in node.glyph) --
@@ -58,27 +61,11 @@ export const STUDY_GLYPHS: AnnotationGlyph[] = [
   entry(4, "??", "move", "annotation.blunder", "#df5353"),
   entry(5, "!?", "move", "annotation.interesting", "#ea45d8"),
   entry(6, "?!", "move", "annotation.dubious", "#56b4e9"),
-  // -- move extras (stack freely) --
-  entry(7, "□", "move", "annotation.onlyMove", "#7d8590"),
-  entry(22, "⨀", "move", "annotation.zugzwang", "#8d6e63"),
-  // -- position (mutually exclusive) --
+  // -- position (mutually exclusive, trimmed to the four essentials) --
   entry(10, "=", "position", "annotation.equal", "#82c2ef"),
   entry(13, "∞", "position", "annotation.unclear", "#a46de0"),
-  entry(14, "⩲", "position", "annotation.wSlightly", "#8fbf4d"),
-  entry(15, "⩱", "position", "annotation.bSlightly", "#e8a33d"),
   entry(16, "±", "position", "annotation.wBetter", "#5aa832"),
   entry(17, "∓", "position", "annotation.bBetter", "#d9772f"),
-  entry(18, "+−", "position", "annotation.wWinning", "#168226"),
-  entry(19, "−+", "position", "annotation.bWinning", "#df5353"),
-  // -- observation (stack freely) --
-  entry(146, "N", "observation", "annotation.novelty", "#7aa0c4"),
-  entry(32, "↑↑", "observation", "annotation.development", "#4fa3a5"),
-  entry(36, "↑", "observation", "annotation.initiative", "#cf9c3a"),
-  entry(40, "→", "observation", "annotation.attack", "#d95f5f"),
-  entry(132, "⇆", "observation", "annotation.counterplay", "#6fa8dc"),
-  entry(138, "⊕", "observation", "annotation.timeTrouble", "#b06ac9"),
-  entry(44, "=∞", "observation", "annotation.compensation", "#63b0cd"),
-  entry(140, "∆", "observation", "annotation.idea", "#8f7fd1"),
   // -- legacy custom annotations (kept verbatim, private #a: format) --
   {
     key: "+",
@@ -163,8 +150,8 @@ export function pushAnnotation(node: ChessNode, key: string): void {
 
 /**
  * User toggle from the annotation menu. Quality glyphs swap the single
- * node.glyph slot; position glyphs replace each other; everything else
- * (move extras, observations, custom marks) toggles freely in the array.
+ * node.glyph slot; position glyphs replace each other; custom marks
+ * toggle freely in the array.
  */
 export function applyAnnotationToggle(node: ChessNode, key: string): void {
   const def = GLYPH_BY_KEY[key];

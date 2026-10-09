@@ -61,7 +61,7 @@ describe("中国象棋PGN解析器", () => {
   });
 
   test("解析私有标注与研究字形NAG", () => {
-    const pgn = "1. H2-E2 {#a:+} $16 H7-E7 $36";
+    const pgn = "1. H2-E2 {#a:+} $16 H7-E7 $17";
     const parser = new PGNParser(pgn);
     const gameTree = parser.getRoot();
 
@@ -69,6 +69,6 @@ describe("中国象棋PGN解析器", () => {
     expect(redMove.annotations).toEqual(["+", "16"]);
 
     const blackMove = redMove.children[0];
-    expect(blackMove.annotations).toEqual(["36"]);
+    expect(blackMove.annotations).toEqual(["17"]);
   });
 });

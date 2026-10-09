@@ -95,26 +95,12 @@ const BADGE_DEFS: Record<
   "=": { icon: "handshake", bgColor: "#82c2ef", fgColor: "#fff" },
   bm: { icon: "bookmark", bgColor: "#e69f00", fgColor: "#fff" },
   st: { icon: "star", bgColor: "#22ac38", fgColor: "#fff" },
-  // Lichess study glyphs (annotation-glyphs.ts catalog) — rendered as text
-  // symbols on a coloured disc; colours mirror the catalog definitions.
-  "7": { text: "□", bgColor: "#7d8590", fgColor: "#fff" },
-  "22": { text: "⨀", bgColor: "#8d6e63", fgColor: "#fff" },
+  // Lichess study position glyphs (annotation-glyphs.ts catalog, trimmed) —
+  // rendered as text symbols on a coloured disc; colours mirror the catalog.
   "10": { text: "=", bgColor: "#82c2ef", fgColor: "#fff" },
   "13": { text: "∞", bgColor: "#a46de0", fgColor: "#fff" },
-  "14": { text: "⩲", bgColor: "#8fbf4d", fgColor: "#fff" },
-  "15": { text: "⩱", bgColor: "#e8a33d", fgColor: "#fff" },
   "16": { text: "±", bgColor: "#5aa832", fgColor: "#fff" },
   "17": { text: "∓", bgColor: "#d9772f", fgColor: "#fff" },
-  "18": { text: "+−", bgColor: "#168226", fgColor: "#fff" },
-  "19": { text: "−+", bgColor: "#df5353", fgColor: "#fff" },
-  "146": { text: "N", bgColor: "#7aa0c4", fgColor: "#fff" },
-  "32": { text: "↑↑", bgColor: "#4fa3a5", fgColor: "#fff" },
-  "36": { text: "↑", bgColor: "#cf9c3a", fgColor: "#fff" },
-  "40": { text: "→", bgColor: "#d95f5f", fgColor: "#fff" },
-  "132": { text: "⇆", bgColor: "#6fa8dc", fgColor: "#fff" },
-  "138": { text: "⊕", bgColor: "#b06ac9", fgColor: "#fff" },
-  "44": { text: "=∞", bgColor: "#63b0cd", fgColor: "#fff" },
-  "140": { text: "∆", bgColor: "#8f7fd1", fgColor: "#fff" },
   checkmate: { icon: "crown", bgColor: "#df5353", fgColor: "#fff" },
   "result_1-0": { icon: "crown", bgColor: "#22ac38", fgColor: "#fff" },
   "result_0-1": { icon: "crown", bgColor: "#df5353", fgColor: "#fff" },

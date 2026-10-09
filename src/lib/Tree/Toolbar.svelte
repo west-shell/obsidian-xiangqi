@@ -160,20 +160,17 @@
 
   let btnCount = $derived(navButtons.length + menuButtons.length + 2);
 
-  // Annotation menu sections mirror the lichess study glyph panel:
-  // move (quality + □/⨀), position, observation, then the legacy custom
-  // marks. Catalog order is authoritative (annotation-glyphs.ts).
+  // Annotation menu sections follow the catalog (annotation-glyphs.ts):
+  // move quality, position, then the legacy custom marks.
   const buildAnnotationSections = (v: number) =>
-    (["move", "position", "observation", "custom"] as const).map(
-      (category) => ({
-        category,
-        items: STUDY_GLYPHS.filter((g) => g.category === category).map((g) => ({
-          title: `${g.symbol} ${t(g.nameKey, v)}`,
-          icon: g.icon,
-          key: g.key,
-        })),
-      }),
-    );
+    (["move", "position", "custom"] as const).map((category) => ({
+      category,
+      items: STUDY_GLYPHS.filter((g) => g.category === category).map((g) => ({
+        title: `${g.symbol} ${t(g.nameKey, v)}`,
+        icon: g.icon,
+        key: g.key,
+      })),
+    }));
   let annotationSections = $derived(buildAnnotationSections(_lv));
   function handleMenuButton(event: string, evt: MouseEvent) {
     if (event === "toggle-edit-menu") {
