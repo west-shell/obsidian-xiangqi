@@ -893,16 +893,6 @@ export class ChessSettingTab extends PluginSettingTab {
         }),
       );
 
-    new Setting(containerEl)
-      .setName(t("engine.showBoardAnnotations"))
-      .setDesc(t("engine.showBoardAnnotations.desc"))
-      .addToggle((toggle) =>
-        toggle.setValue(settings.showBoardAnnotations).onChange((value) => {
-          settings.showBoardAnnotations = value;
-          this.plugin.refresh();
-        }),
-      );
-
     // ---- 保存 ----
     new Setting(containerEl).setName(t("save.title")).setHeading();
 

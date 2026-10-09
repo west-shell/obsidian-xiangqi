@@ -259,8 +259,6 @@
   "engine.showPonder.desc": "Display the engine's ponder (expected response) as a yellow arrow on the board",
   "engine.showEngineAnnotations": "Auto annotate",
   "engine.showEngineAnnotations.desc": "When enabled, the engine annotates move quality during analysis (!! Brilliant, ! Good move, !? Interesting, ?! Inaccuracy, ? Mistake, ?? Blunder). Turn off to stop the engine from writing glyphs; existing (imported or manually added) annotations are kept",
-  "engine.showBoardAnnotations": "Show annotations on board",
-  "engine.showBoardAnnotations.desc": "Display move quality glyphs on the board",
   "engine.analyzing": "Analyzing…",
   "engine.failed": "Analysis failed",
   "engine.mate": "M",

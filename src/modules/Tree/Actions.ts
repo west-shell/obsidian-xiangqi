@@ -678,7 +678,6 @@ const ActionsModule = {
       let showBestMove = host.settings.showEngineBestMove;
       let showPonder = host.settings.showEnginePonder;
       let showEngineAnn = host.settings.showEngineAnnotations;
-      let showBoardAnn = host.settings.showBoardAnnotations;
 
       engineModal.onOpen = () => {
         const { contentEl } = engineModal;
@@ -748,20 +747,6 @@ const ActionsModule = {
           showEngineAnn = engineAnnToggle.checked;
         });
 
-        const boardAnnContainer = contentEl.createDiv(
-          `${CLS_PREFIX}-engine-toggle`,
-        );
-        const boardAnnToggle = boardAnnContainer.createEl("input", {
-          type: "checkbox",
-        });
-        boardAnnToggle.checked = showBoardAnn;
-        boardAnnContainer.createEl("label", {
-          text: t("engine.showBoardAnnotations"),
-        });
-        boardAnnToggle.addEventListener("change", () => {
-          showBoardAnn = boardAnnToggle.checked;
-        });
-
         const btnContainer = contentEl.createDiv("modal-button-container");
         const okBtn = btnContainer.createEl("button", {
           text: t("confirm.yes"),
@@ -777,7 +762,6 @@ const ActionsModule = {
           host.settings.showEngineBestMove = showBestMove;
           host.settings.showEnginePonder = showPonder;
           host.settings.showEngineAnnotations = showEngineAnn;
-          host.settings.showBoardAnnotations = showBoardAnn;
           void host.plugin.saveSettings();
           host.plugin.refresh();
           engineModal.close();
