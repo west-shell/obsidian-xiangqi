@@ -1072,7 +1072,7 @@
 
           {#each sortedRenderedNodes as node (node.id)}
             {@const nw = localGetNodeWidth(node)}
-            {@const primaryAnnotation = node.annotation}
+            {@const primaryAnnotation = node.annotations?.[0]}
             {@const isCurrent = node.id === currentNode?.id}
             <!-- svelte-ignore a11y_click_events_have_key_events -->
             <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -1345,9 +1345,9 @@
           >{node.glyph.symbol}</span
         >
       {/if}
-      {#if node.annotation && settings?.showListAnnotation !== false}
+      {#if node.annotations?.length && settings?.showListAnnotation !== false}
         <!-- eslint-disable-next-line svelte/no-at-html-tags -->
-        {@html annotBadge(node.annotation)}
+        {@html node.annotations.map(annotBadge).join("")}
       {/if}
     {/snippet}
     {#snippet moveSpan(node: ChessNode, step: number)}

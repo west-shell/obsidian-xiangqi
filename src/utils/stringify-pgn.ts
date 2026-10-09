@@ -21,14 +21,6 @@ function genNodeBrothers(root: ChessNode): Map<ChessNode, ChessNode[]> {
   return map;
 }
 
-/** `#a:` annotation key -> standard NAG; unmappable keys keep `#a:` form. */
-const ANNOTATION_NAG: Record<string, string> = {
-  "+": "$16",
-  "-": "$17",
-  "=": "$10",
-  st: "$24",
-};
-
 const COLOR_BY_BRUSH: Record<string, string> = {
   g: "G",
   r: "R",
@@ -80,10 +72,12 @@ export function serializeNodeMeta(
     meta += node.glyph.symbol;
   }
 
-  if (node.annotation) {
-    const nag = ANNOTATION_NAG[node.annotation];
-    // Keys without a standard NAG (e.g. bm) keep the private #a: comment.
-    meta += nag ? ` ${nag}` : ` {${ANNOTATION_PREFIX}${node.annotation}}`;
+  if (node.annotations?.length) {
+    for (const key of node.annotations) {
+      // NAG-number keys ("16") export as $n; legacy custom keys keep the
+      // private #a: comment so they never masquerade as lichess glyphs.
+      meta += /^\d+$/.test(key) ? ` $${key}` : ` {${ANNOTATION_PREFIX}${key}}`;
+    }
   }
 
   if (includeComments && node.comments?.length) {

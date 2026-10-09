@@ -9,6 +9,7 @@
     "src/**/*.ts",
     "src/**/*.js",
     "src/**/*.svelte",
+    "tests/**/*.ts",
     "../../node_modules/**/*.d.ts"
   ]
 }

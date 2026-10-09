@@ -11,7 +11,7 @@ import {
 } from "../../chess";
 import { Notice } from "obsidian";
 import { validateFen } from "../../utils/chessEngine";
-import { isAnnotationKey } from "../../utils/icon";
+import { applyAnnotationToggle } from "../../utils/annotation-glyphs";
 import {
   getFullmoveFromFen,
   serializeNodeMeta,
@@ -287,14 +287,7 @@ const ActionsModule = {
         switch (name) {
           case "annotation": {
             if (!host.currentNode) break;
-            const node = host.currentNode;
-            if (isAnnotationKey(data)) {
-              if (node.annotation === data) {
-                node.annotation = undefined;
-              } else {
-                node.annotation = data;
-              }
-            }
+            applyAnnotationToggle(host.currentNode, data);
             eventBus.emit("modified", null);
             break;
           }

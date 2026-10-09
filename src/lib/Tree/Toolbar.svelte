@@ -4,9 +4,10 @@
   import { ANALYSIS_SITES, CLS_PREFIX } from "../../chess";
   import { BOARD_THEME_PICKER, PIECE_SET_PICKER } from "../../themes";
   import type { EventBus } from "../../core/event-bus";
-  import type { IOptions, ISettings } from "../../types";
+  import type { ChessNode, IOptions, ISettings } from "../../types";
   import type ChessPlugin from "../../main";
   import { getLang, onLangChange, t } from "../../i18n";
+  import { hasAnnotation, STUDY_GLYPHS } from "../../utils/annotation-glyphs";
 
   interface Props {
     eventBus: EventBus;
@@ -14,6 +15,8 @@
     settings?: ISettings;
     plugin?: ChessPlugin;
     rotated?: boolean;
+    /** Current tree node, for the annotation menu's checked state. */
+    getCurrentNode?: () => ChessNode | null;
   }
   let {
     eventBus,
@@ -21,6 +24,7 @@
     settings,
     plugin,
     rotated = false,
+    getCurrentNode,
   }: Props = $props();
 
   let _lv = $state(0);
@@ -156,40 +160,21 @@
 
   let btnCount = $derived(navButtons.length + menuButtons.length + 2);
 
-  const buildAnnotations = (v: number) => [
-    {
-      title: t("annotation.w+", v),
-      icon: "thumbs-up",
-      symbol: "+",
-      event: "annotation",
-    },
-    {
-      title: t("annotation.b+", v),
-      icon: "thumbs-down",
-      symbol: "-",
-      event: "annotation",
-    },
-    {
-      title: t("annotation.eq", v),
-      icon: "handshake",
-      symbol: "=",
-      event: "annotation",
-    },
-    {
-      title: t("annotation.key", v),
-      icon: "bookmark",
-      symbol: "bm",
-      event: "annotation",
-    },
-    {
-      title: t("annotation.br", v),
-      icon: "star",
-      symbol: "st",
-      event: "annotation",
-    },
-  ];
-  let annotations = $derived(buildAnnotations(_lv));
-
+  // Annotation menu sections mirror the lichess study glyph panel:
+  // move (quality + □/⨀), position, observation, then the legacy custom
+  // marks. Catalog order is authoritative (annotation-glyphs.ts).
+  const buildAnnotationSections = (v: number) =>
+    (["move", "position", "observation", "custom"] as const).map(
+      (category) => ({
+        category,
+        items: STUDY_GLYPHS.filter((g) => g.category === category).map((g) => ({
+          title: `${g.symbol} ${t(g.nameKey, v)}`,
+          icon: g.icon,
+          key: g.key,
+        })),
+      }),
+    );
+  let annotationSections = $derived(buildAnnotationSections(_lv));
   function handleMenuButton(event: string, evt: MouseEvent) {
     if (event === "toggle-edit-menu") {
       handleEditMenu(evt);
@@ -290,13 +275,18 @@
       mi.setTitle(t("toolbar.annotate", _lv)).setIcon("tag");
       mi.onClick(() => {
         const sub = new Menu();
-        annotations.forEach((ann) => {
-          sub.addItem((si) => {
-            si.setTitle(ann.title)
-              .setIcon(ann.icon)
-              .onClick(() => emitEvent(ann.event, ann.symbol));
-          });
-        });
+        const node = getCurrentNode?.() ?? null;
+        for (const [sectionIdx, section] of annotationSections.entries()) {
+          if (sectionIdx > 0) sub.addSeparator();
+          for (const item of section.items) {
+            sub.addItem((si) => {
+              si.setTitle(item.title);
+              if (item.icon) si.setIcon(item.icon);
+              if (node) si.setChecked(hasAnnotation(node, item.key));
+              si.onClick(() => emitEvent("annotation", item.key));
+            });
+          }
+        }
         sub.showAtMouseEvent(evt);
       });
     });

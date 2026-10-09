@@ -82,13 +82,39 @@ const ICONS: Record<string, IconNode> = {
 
 const BADGE_DEFS: Record<
   string,
-  { icon?: string; glyph?: string; bgColor: string; fgColor: string }
+  {
+    icon?: string;
+    glyph?: string;
+    text?: string;
+    bgColor: string;
+    fgColor: string;
+  }
 > = {
   "+": { icon: "thumbs_up", bgColor: "#22ac38", fgColor: "#fff" },
   "-": { icon: "thumbs_down", bgColor: "#df5353", fgColor: "#fff" },
   "=": { icon: "handshake", bgColor: "#82c2ef", fgColor: "#fff" },
   bm: { icon: "bookmark", bgColor: "#e69f00", fgColor: "#fff" },
   st: { icon: "star", bgColor: "#22ac38", fgColor: "#fff" },
+  // Lichess study glyphs (annotation-glyphs.ts catalog) — rendered as text
+  // symbols on a coloured disc; colours mirror the catalog definitions.
+  "7": { text: "□", bgColor: "#7d8590", fgColor: "#fff" },
+  "22": { text: "⨀", bgColor: "#8d6e63", fgColor: "#fff" },
+  "10": { text: "=", bgColor: "#82c2ef", fgColor: "#fff" },
+  "13": { text: "∞", bgColor: "#a46de0", fgColor: "#fff" },
+  "14": { text: "⩲", bgColor: "#8fbf4d", fgColor: "#fff" },
+  "15": { text: "⩱", bgColor: "#e8a33d", fgColor: "#fff" },
+  "16": { text: "±", bgColor: "#5aa832", fgColor: "#fff" },
+  "17": { text: "∓", bgColor: "#d9772f", fgColor: "#fff" },
+  "18": { text: "+−", bgColor: "#168226", fgColor: "#fff" },
+  "19": { text: "−+", bgColor: "#df5353", fgColor: "#fff" },
+  "146": { text: "N", bgColor: "#7aa0c4", fgColor: "#fff" },
+  "32": { text: "↑↑", bgColor: "#4fa3a5", fgColor: "#fff" },
+  "36": { text: "↑", bgColor: "#cf9c3a", fgColor: "#fff" },
+  "40": { text: "→", bgColor: "#d95f5f", fgColor: "#fff" },
+  "132": { text: "⇆", bgColor: "#6fa8dc", fgColor: "#fff" },
+  "138": { text: "⊕", bgColor: "#b06ac9", fgColor: "#fff" },
+  "44": { text: "=∞", bgColor: "#63b0cd", fgColor: "#fff" },
+  "140": { text: "∆", bgColor: "#8f7fd1", fgColor: "#fff" },
   checkmate: { icon: "crown", bgColor: "#df5353", fgColor: "#fff" },
   "result_1-0": { icon: "crown", bgColor: "#22ac38", fgColor: "#fff" },
   "result_0-1": { icon: "crown", bgColor: "#df5353", fgColor: "#fff" },
@@ -151,6 +177,10 @@ export function badgeSvg(key: string, size: number = 6): string {
   if (def.glyph) {
     const s = size / 100;
     inner = `<g transform="translate(${-r},${-r}) scale(${s})">${def.glyph}</g>`;
+  } else if (def.text) {
+    // Multi-codepoint symbols ("+−", "↑↑", "=∞") shrink to stay inside the disc.
+    const fs = [...def.text].length > 1 ? size * 0.42 : size * 0.56;
+    inner = `<text x="0" y="0" text-anchor="middle" dominant-baseline="central" font-size="${fs}" font-weight="700" font-family="sans-serif" fill="${def.fgColor}">${def.text}</text>`;
   } else if (def.icon) {
     const nodes = ICONS[def.icon];
     if (nodes) {
@@ -178,6 +208,9 @@ export function badgeBoardSvg(key: string, stack: number = 0): string {
   let inner = "";
   if (def.glyph) {
     inner = def.glyph;
+  } else if (def.text) {
+    const fs = [...def.text].length > 1 ? 40 : 54;
+    inner = `<text x="50" y="50" text-anchor="middle" dominant-baseline="central" font-size="${fs}" font-weight="700" font-family="sans-serif" fill="#fff">${def.text}</text>`;
   } else if (def.icon) {
     const nodes = ICONS[def.icon];
     if (nodes) {

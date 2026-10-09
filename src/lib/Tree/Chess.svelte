@@ -149,15 +149,19 @@
       const engineShapes = annotationShapes(dest, node.glyph);
       shapes.push(...engineShapes);
     }
-    const ann = node.annotation;
-    if (ann && dest) {
-      const svg = badgeBoardSvg(ann, shapes.filter((s) => s.customSvg).length);
-      if (svg) {
-        shapes.push({
-          orig: dest as DrawShape["orig"],
-          brush: "",
-          customSvg: { html: svg },
-        });
+    if (dest) {
+      for (const ann of node.annotations ?? []) {
+        const svg = badgeBoardSvg(
+          ann,
+          shapes.filter((s) => s.customSvg).length,
+        );
+        if (svg) {
+          shapes.push({
+            orig: dest as DrawShape["orig"],
+            brush: "",
+            customSvg: { html: svg },
+          });
+        }
       }
     }
     if (node.isCheckmate && dest) {
@@ -325,7 +329,14 @@
       {enginePonder}
       {glyphShapes}
     />
-    <Toolbar {eventBus} {options} {settings} {plugin} {rotated} />
+    <Toolbar
+      {eventBus}
+      {options}
+      {settings}
+      {plugin}
+      {rotated}
+      getCurrentNode={() => currentNode}
+    />
     <Tree
       {nodeMap}
       {eventBus}

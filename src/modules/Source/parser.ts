@@ -9,17 +9,17 @@ import {
   SHAPE_PART_REGEX,
 } from "../../chess";
 import { type ChessNode, type NodeShape, type ParseWarning } from "../../types";
+import {
+  nagToAnnotationKey,
+  pushAnnotation,
+} from "../../utils/annotation-glyphs";
 import { extractCommentMeta } from "../../utils/comment-meta";
 import {
   ANNOTATION_PREFIX,
   isAnnotationKey,
   SHAPES_PREFIX,
 } from "../../utils/icon";
-import {
-  GLYPH_DEFS,
-  nagToAnnotation,
-  nagToGlyph,
-} from "../../utils/winningChances";
+import { GLYPH_DEFS, nagToGlyph } from "../../utils/winningChances";
 
 import { type Token, tokenize, type TokenType } from "./Tokenizer";
 
@@ -305,7 +305,7 @@ export class PGNParser {
     if (raw.startsWith(ANNOTATION_PREFIX)) {
       const key = raw.slice(ANNOTATION_PREFIX.length);
       if (isAnnotationKey(key)) {
-        this.currentNode.annotation = key;
+        pushAnnotation(this.currentNode, key);
         return;
       }
     }
@@ -364,9 +364,9 @@ export class PGNParser {
       this.currentNode.glyph ??= glyphDef;
       return;
     }
-    const annotationKey = nagToAnnotation(token.value);
-    if (annotationKey && !this.currentNode.annotation) {
-      this.currentNode.annotation = annotationKey;
+    const annotationKey = nagToAnnotationKey(token.value);
+    if (annotationKey) {
+      pushAnnotation(this.currentNode, annotationKey);
     }
   }
 

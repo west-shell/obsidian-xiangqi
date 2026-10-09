@@ -51,26 +51,6 @@ export function glyphToNag(glyph: MoveGlyph): string | null {
 }
 
 /**
- * Positional/annotation NAGs mapped onto the plugin's `#a:` annotation keys.
- * Import mapping is a superset of the export mapping (ANNOTATION_NAG in
- * stringify-pgn) so foreign files with $14/$15/$18/$19 degrade gracefully.
- */
-const NAG_TO_ANNOTATION: Record<string, string> = {
-  $10: "=",
-  $14: "+",
-  $15: "-",
-  $16: "+",
-  $17: "-",
-  $18: "+",
-  $19: "-",
-  $24: "st",
-};
-
-export function nagToAnnotation(nag: string): string | null {
-  return NAG_TO_ANNOTATION[nag] ?? null;
-}
-
-/**
  * Noise band for cross-search comparisons (lila's areSimilarEvals):
  * winning-chance deltas within this margin are considered measurement
  * noise and never trigger an annotation.

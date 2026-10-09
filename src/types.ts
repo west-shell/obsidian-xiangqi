@@ -103,7 +103,13 @@ export type ChessNode = {
   comments?: string[];
   eval?: NodeEval;
   glyph?: MoveGlyph | null;
-  annotation?: string;
+  /**
+   * Study glyph / custom annotation keys on this node. NAG-number keys
+   * ("16" for ±) export as $n; legacy custom keys ("+","-","=","bm","st")
+   * keep the private #a: form. Position keys are mutually exclusive; the
+   * rest stack freely.
+   */
+  annotations?: string[];
   shapes?: NodeShape[];
   /** Remaining clock time after this move ("H:MM:SS"), from lichess [%clk]. */
   clock?: string;
