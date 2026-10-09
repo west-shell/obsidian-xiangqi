@@ -335,6 +335,7 @@
       {games}
       {currentGameIndex}
       {isBlockMode}
+      {plugin}
     />
   </div>
 {/if}

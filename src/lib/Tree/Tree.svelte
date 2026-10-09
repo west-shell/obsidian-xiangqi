@@ -10,6 +10,7 @@
     type NodeMap,
   } from "../../types";
   import {
+    ANNOTATOR_URL_PREFIX,
     CLS_PREFIX,
     getMoveListSideClass,
     getMoveNotation,
@@ -26,7 +27,8 @@
     PRIMARY_PLAYER_KEY,
     TREE_LAYOUT_SPACING,
   } from "../../chess";
-  import { Menu, setIcon } from "obsidian";
+  import { MarkdownRenderer, Menu, setIcon } from "obsidian";
+  import type ChessPlugin from "../../main";
   import { onLangChange, t } from "../../i18n";
   import { calculateTreeLayout } from "./layout";
   import { badgeSvg, iconSvg } from "../../utils/icon";
@@ -42,6 +44,7 @@
     games?: GameSlot[];
     currentGameIndex?: number;
     isBlockMode?: boolean;
+    plugin?: ChessPlugin;
   }
 
   let {
@@ -53,6 +56,7 @@
     games = [],
     currentGameIndex = 0,
     isBlockMode = false,
+    plugin,
   }: Props = $props();
 
   let commentsText = $state("");
@@ -201,6 +205,94 @@
     }, 700);
   }
 
+  // ---- Comment rendered view (clickable links) ----
+  let commentEditing = $state(false);
+  let commentViewEl: HTMLDivElement | undefined = $state();
+
+  // Wrap bare URLs in angle brackets so markdown linkifies them; URLs
+  // already inside markdown links ](...) or <...> autolinks are skipped.
+  const BARE_URL_REGEX =
+    /(?<!<)(?<!\]\()((?:https?|obsidian):\/\/[^\s<>"')\]]+)/g;
+
+  function autolinkBareUrls(text: string): string {
+    return text.replace(BARE_URL_REGEX, (url: string) => {
+      const trailing = url.match(/[.,;:!?]+$/)?.[0] ?? "";
+      return `<${url.slice(0, url.length - trailing.length)}>${trailing}`;
+    });
+  }
+
+  $effect(() => {
+    void _uiVer;
+    const node = currentNode;
+    const el = commentViewEl;
+    if (!el || !plugin || !node) return;
+    // Render into a fresh container per run: a still-pending previous
+    // render then writes into a detached node instead of interleaving.
+    el.replaceChildren();
+    const inner = document.createElement("div");
+    el.appendChild(inner);
+    // Each comment block renders with its own [%anno] author byline, so
+    // several comments by different authors stay correctly attributed.
+    const markdown = (node.comments ?? [])
+      .map((text, i) => {
+        let part = autolinkBareUrls(text);
+        const author = node.commentAuthors?.[i];
+        if (author) part += `\n\n${bylineMarkdown(author)}`;
+        return part;
+      })
+      .join("\n\n");
+    const sourcePath = plugin.app.workspace.getActiveFile()?.path ?? "";
+    void MarkdownRenderer.render(
+      plugin.app,
+      markdown,
+      inner,
+      sourcePath,
+      plugin,
+    );
+  });
+
+  function bylineMarkdown(author: { name: string; user: string }): string {
+    const name = author.name || author.user;
+    const linked =
+      author.user && ANNOTATOR_URL_PREFIX
+        ? `<a href="${ANNOTATOR_URL_PREFIX}${encodeURI(author.user)}" target="_blank" rel="noopener">${escapeHtml(name)}</a>`
+        : escapeHtml(name);
+    return `<small class="${CLS_PREFIX}-comment__byline">${t("tree.annotatedBy", _lv)} ${linked}</small>`;
+  }
+
+  function escapeHtml(value: string): string {
+    return value.replace(/[&<>"']/g, (ch) => {
+      if (ch === "&") return "&amp;";
+      if (ch === "<") return "&lt;";
+      if (ch === ">") return "&gt;";
+      if (ch === '"') return "&quot;";
+      return "&#39;";
+    });
+  }
+
+  function enterCommentEdit(evt: MouseEvent) {
+    // Clicks on links navigate instead of starting edit mode; selecting
+    // rendered text to copy should not enter editing either.
+    if ((evt.target as HTMLElement).closest("a")) return;
+    if (activeWindow.getSelection()?.toString()) return;
+    commentEditing = true;
+    void tick().then(() => {
+      if (destroyed || !textareaEl) return undefined;
+      adjustTextareaHeight();
+      textareaEl.focus();
+      const len = textareaEl.value.length;
+      textareaEl.setSelectionRange(len, len);
+      return undefined;
+    });
+  }
+
+  function handleCommentsKeydown(evt: KeyboardEvent) {
+    if (evt.key === "Escape") {
+      evt.stopPropagation();
+      textareaEl?.blur();
+    }
+  }
+
   let layoutChangeHandler: (() => void) | null = null;
   let handleSliderMouseMove: ((evt: MouseEvent) => void) | null = null;
   let handleSliderMouseUp: (() => void) | null = null;
@@ -245,6 +337,7 @@
       saveTimeout = undefined;
     }
     saveComments();
+    commentEditing = false;
   }
 
   function saveComments() {
@@ -257,6 +350,10 @@
       regularComments.length !== oldComments.length ||
       regularComments.some((c, i) => c !== oldComments[i]);
     currentNode.comments = regularComments;
+    if (changed) {
+      // Rewritten lines no longer map to their original [%anno] authors.
+      currentNode.commentAuthors = undefined;
+    }
     eventBus.emit("updateUI");
     if (changed) eventBus.emit("modified");
   }
@@ -791,10 +888,12 @@
   $effect(() => {
     if (!currentNode) {
       commentsText = "";
+      commentEditing = false;
       return;
     }
     const node = currentNode;
     commentsText = (node.comments ?? []).join("\n");
+    commentEditing = false;
     tick().then(() => {
       if (destroyed) return;
       if (textareaEl) adjustTextareaHeight();
@@ -1360,14 +1459,26 @@
   </div>
 
   <div class="{CLS_PREFIX}-panel__comment">
-    <textarea
-      bind:value={commentsText}
-      class="{CLS_PREFIX}-comment__input {CLS_PREFIX}-comment__input--auto"
-      placeholder={t("tree.placeholder")}
-      bind:this={textareaEl}
-      oninput={handleCommentsInput}
-      onblur={handleCommentsBlur}
-      rows="1"></textarea>
+    {#if plugin && !commentEditing && commentsText}
+      <!-- svelte-ignore a11y_click_events_have_key_events -->
+      <!-- svelte-ignore a11y_no_static_element_interactions -->
+      <div
+        class="{CLS_PREFIX}-comment__view"
+        bind:this={commentViewEl}
+        title={t("tree.editComment", _lv)}
+        onclick={enterCommentEdit}
+      ></div>
+    {:else}
+      <textarea
+        bind:value={commentsText}
+        class="{CLS_PREFIX}-comment__input {CLS_PREFIX}-comment__input--auto"
+        placeholder={t("tree.placeholder")}
+        bind:this={textareaEl}
+        oninput={handleCommentsInput}
+        onblur={handleCommentsBlur}
+        onkeydown={handleCommentsKeydown}
+        rows="1"></textarea>
+    {/if}
     <button
       class="{CLS_PREFIX}-btn {CLS_PREFIX}-comment__toggle"
       title={listVisible ? t("tree.hideList", _lv) : t("tree.showList", _lv)}

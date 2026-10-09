@@ -9,12 +9,17 @@ import {
   SHAPE_PART_REGEX,
 } from "../../chess";
 import { type ChessNode, type NodeShape, type ParseWarning } from "../../types";
+import { extractCommentMeta } from "../../utils/comment-meta";
 import {
   ANNOTATION_PREFIX,
   isAnnotationKey,
   SHAPES_PREFIX,
 } from "../../utils/icon";
-import { GLYPH_DEFS } from "../../utils/winningChances";
+import {
+  GLYPH_DEFS,
+  nagToAnnotation,
+  nagToGlyph,
+} from "../../utils/winningChances";
 
 import { type Token, tokenize, type TokenType } from "./Tokenizer";
 
@@ -70,6 +75,8 @@ export class PGNParser {
         this.parseVariation();
       } else if (this.match("comment")) {
         this.parseComment();
+      } else if (this.match("nag")) {
+        this.parseNag();
       } else if (this.match("result")) {
         this.parseResult();
       } else if (this.match("unknown")) {
@@ -228,7 +235,11 @@ export class PGNParser {
     this.currentNode = variationBase;
     this.currentStep = variationBase.step!;
 
-    while (!this.match("right-paren") && !this.match("eof")) {
+    while (
+      !this.match("right-paren") &&
+      !this.match("eof") &&
+      !this.parseAborted
+    ) {
       if (this.isMoveToken()) {
         this.processMove(
           this.consume().value,
@@ -236,6 +247,8 @@ export class PGNParser {
         );
       } else if (this.match("comment")) {
         this.parseComment();
+      } else if (this.match("nag")) {
+        this.parseNag();
       } else if (this.match("left-paren")) {
         this.parseVariation();
       } else if (this.match("result")) {
@@ -310,8 +323,51 @@ export class PGNParser {
       }
     }
 
-    this.currentNode.comments ??= [];
-    this.currentNode.comments.push(raw);
+    const {
+      shapes,
+      eval: evalMeta,
+      clock,
+      annotator,
+      text,
+    } = extractCommentMeta(raw);
+    if (shapes.length > 0) {
+      // Lichess shapes accumulate across comment blocks (lila: shapes ++ s).
+      (this.currentNode.shapes ??= []).push(...shapes);
+    }
+    if (evalMeta) {
+      // Lichess [%eval]; later blocks win (same rule as %e: comments).
+      this.currentNode.eval = { ...evalMeta, depth: 0 };
+    }
+    if (clock) {
+      // Lichess [%clk]; later blocks win (same rule as %e: comments).
+      this.currentNode.clock = clock;
+    }
+    if (text) {
+      this.currentNode.comments ??= [];
+      this.currentNode.comments.push(text);
+      if (annotator) {
+        // [%anno] belongs to THIS comment block; align by comments index.
+        (this.currentNode.commentAuthors ??= [])[
+          this.currentNode.comments.length - 1
+        ] = annotator;
+      }
+    }
+  }
+
+  parseNag() {
+    const token = this.consume();
+    // A NAG annotates the move that was just played; NAGs before any move
+    // are legal PGN but have no target node, so they are dropped.
+    if (!this.currentNode.move) return;
+    const glyphDef = nagToGlyph(token.value);
+    if (glyphDef) {
+      this.currentNode.glyph ??= glyphDef;
+      return;
+    }
+    const annotationKey = nagToAnnotation(token.value);
+    if (annotationKey && !this.currentNode.annotation) {
+      this.currentNode.annotation = annotationKey;
+    }
   }
 
   parseResult() {
@@ -329,6 +385,12 @@ export class PGNParser {
     const lines: string[] = [];
     for (const [key, value] of this.tags.entries()) {
       lines.push(`[${key} "${value}"]`);
+    }
+    // A non-default start position pairs [FEN] with [SetUp "1"]
+    // (lichess export style).
+    const fenIndex = lines.findIndex((line) => /^\[FEN "/.test(line));
+    if (fenIndex !== -1 && !lines.some((line) => /^\[SetUp "/.test(line))) {
+      lines.splice(fenIndex + 1, 0, `[SetUp "1"]`);
     }
     return lines.join("\n");
   }

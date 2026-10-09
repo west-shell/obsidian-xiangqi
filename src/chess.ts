@@ -218,9 +218,13 @@ export function parseMoveInGame(
 }
 
 export const SHAPE_SQUARE_REGEX = /[a-i][0-9]/;
+/** Square coordinate pattern (variant adapter); embed into other regexes. */
+export const SQUARE_PATTERN = "[a-i][0-9]";
 export const SHAPE_PART_REGEX = /^([a-i][0-9])([a-i][0-9])?:([gryb])$/;
 export const EVAL_REGEX =
   /^%e:([m+-]?\d+(?:\.\d+)?|[m+-]?[+-]\d+(?:\.\d+)?),?([a-i0-9]+)?,?([a-i0-9]+)?,?(!\?|\?!|\?\?|[?!]|!!)?$/;
+/** Lichess study annotator profile URL prefix; null = no per-user pages. */
+export const ANNOTATOR_URL_PREFIX: string | null = null;
 
 export function getTurnFromFen(fen: string): "white" | "black" {
   return fen.split(" ")[1] === "b" ? "black" : "white";

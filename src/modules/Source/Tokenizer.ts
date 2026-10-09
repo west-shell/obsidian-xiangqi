@@ -10,6 +10,7 @@ export type TokenType =
   | "left-paren"
   | "right-paren"
   | "comment"
+  | "nag"
   | "tag"
   | "result"
   | "unknown"
@@ -64,8 +65,16 @@ export function tokenize(pgn: string): Token[] {
       continue;
     }
 
-    // NAGs ($1, $14, ...) and % escape lines are legal PGN, skip silently.
-    if (matchAndConsume(/^\$\d+/)) {
+    // NAGs ($1, $14, ...) annotate the preceding move; % escape lines are
+    // legal PGN, skip silently.
+    const nag = matchAndConsume(/^\$\d+/);
+    if (nag) {
+      tokens.push({
+        type: "nag",
+        value: nag,
+        line: startLine,
+        column: startCol,
+      });
       continue;
     }
     if (matchAndConsume(/^%.*/)) {
@@ -80,6 +89,20 @@ export function tokenize(pgn: string): Token[] {
         line: startLine,
         column: startCol,
       });
+      // Suffix glyph annotations (e4! / a5?? / Nf3!?) directly follow the
+      // move and are equivalent to NAGs; emit them as nag tokens.
+      for (;;) {
+        const suffixLine = line;
+        const suffixCol = column;
+        const suffix = matchAndConsume(/^(!!|\?\?|!\?|\?!|[!?])/);
+        if (!suffix) break;
+        tokens.push({
+          type: "nag",
+          value: suffix,
+          line: suffixLine,
+          column: suffixCol,
+        });
+      }
       continue;
     }
 

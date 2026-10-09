@@ -187,6 +187,8 @@
   "tag.Black": "黑方",
   "tag.Result": "结果",
   "tree.placeholder": "添加注释",
+  "tree.editComment": "点击编辑评论",
+  "tree.annotatedBy": "注释作者",
   "tree.zoomIn": "放大",
   "tree.zoomOut": "缩小",
   "tree.resetView": "重置视图",

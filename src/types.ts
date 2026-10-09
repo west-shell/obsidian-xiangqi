@@ -105,6 +105,14 @@ export type ChessNode = {
   glyph?: MoveGlyph | null;
   annotation?: string;
   shapes?: NodeShape[];
+  /** Remaining clock time after this move ("H:MM:SS"), from lichess [%clk]. */
+  clock?: string;
+  /**
+   * Per-comment annotation authors (lichess [%anno]), sparse array aligned
+   * with `comments` by index; holes = unauthored comments. Cleared when the
+   * user edits comment text, since rewritten lines lose their attribution.
+   */
+  commentAuthors?: ({ name: string; user: string } | undefined)[];
   isCheckmate?: boolean;
   result?: string;
 };

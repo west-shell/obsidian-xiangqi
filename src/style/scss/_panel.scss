@@ -526,6 +526,50 @@ svg.#{$cls-prefix}-moves__annot {
   box-shadow: 0 0 0 1px var(--interactive-accent);
 }
 
+// Rendered (non-editing) comment view: markdown output with clickable
+// links. Mirrors the textarea's box so switching modes does not jump.
+.#{$cls-prefix}-comment__view {
+  flex: 1 1 auto;
+  min-height: 20px;
+  max-height: 80px;
+  overflow-y: auto;
+  font-family: var(--font-family);
+  font-size: var(--font-size-normal);
+  color: var(--text-normal);
+  background: var(--background-secondary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s, 4px);
+  padding: 4px 8px;
+  cursor: text;
+
+  p {
+    margin: 0 0 0.25em;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  ul,
+  ol {
+    margin: 0.25em 0;
+    padding-inline-start: 1.4em;
+  }
+
+  a {
+    cursor: pointer;
+  }
+
+  .task-list-item {
+    list-style: none;
+  }
+}
+
+// [%anno] author byline appended after an authored comment.
+.#{$cls-prefix}-comment__byline {
+  color: var(--text-muted);
+}
+
 button.#{$cls-prefix}-comment__toggle {
   width: 28px;
   height: auto;

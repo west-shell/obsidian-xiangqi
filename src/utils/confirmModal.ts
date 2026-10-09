@@ -746,5 +746,5 @@ function updateFenTag(tags: string, newFen: string): string {
   if (tags.includes('[FEN "')) {
     return tags.replace(/\[FEN "[^"]*"\]/, `[FEN "${newFen}"]`);
   }
-  return `[FEN "${newFen}"]\n${tags}`;
+  return `[FEN "${newFen}"]\n[SetUp "1"]\n${tags}`;
 }
