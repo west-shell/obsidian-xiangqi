@@ -1184,7 +1184,7 @@
               {/if}
               {#if node.result}
                 <g
-                  transform="translate({-nw / 2} {-nodeHeight / 2})"
+                  transform="translate({-nw / 2} {-3.5})"
                   style="pointer-events: none"
                 >
                   <!-- eslint-disable-next-line svelte/no-at-html-tags -->
@@ -1192,7 +1192,7 @@
                 </g>
               {:else if node.isCheckmate}
                 <g
-                  transform="translate({-nw / 2} {-nodeHeight / 2})"
+                  transform="translate({-nw / 2} {-3.5})"
                   style="pointer-events: none"
                 >
                   <!-- eslint-disable-next-line svelte/no-at-html-tags -->
@@ -1210,7 +1210,7 @@
               {/if}
               {#if (node.comments ?? []).length > 0}
                 <g
-                  transform="translate({0.3 * nw} {-0.65 * nodeHeight})"
+                  transform="translate({nw / 2 - 3.5} {-7})"
                   style="pointer-events: none"
                 >
                   <!-- eslint-disable-next-line svelte/no-at-html-tags -->
