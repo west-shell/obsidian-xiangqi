@@ -62,10 +62,11 @@ export const STUDY_GLYPHS: AnnotationGlyph[] = [
   entry(5, "!?", "move", "annotation.interesting", "#ea45d8"),
   entry(6, "?!", "move", "annotation.dubious", "#56b4e9"),
   // -- position (mutually exclusive, trimmed to the four essentials) --
+  // Badge colours mirror lila's prerendered set (ui/lib/src/game/glyphs.ts).
   entry(10, "=", "position", "annotation.equal", "#82c2ef"),
-  entry(13, "∞", "position", "annotation.unclear", "#a46de0"),
-  entry(16, "±", "position", "annotation.wBetter", "#5aa832"),
-  entry(17, "∓", "position", "annotation.bBetter", "#d9772f"),
+  entry(13, "∞", "position", "annotation.unclear", "#f5918f"),
+  entry(16, "±", "position", "annotation.wBetter", "#aaa"),
+  entry(17, "∓", "position", "annotation.bBetter", "#444"),
   // -- legacy custom annotations (kept verbatim, private #a: format) --
   {
     key: "+",

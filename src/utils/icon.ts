@@ -90,29 +90,30 @@ const BADGE_DEFS: Record<
   bm: { icon: "bookmark", bgColor: "#e69f00", fgColor: "#fff" },
   st: { icon: "star", bgColor: "#22ac38", fgColor: "#fff" },
   // Lichess study position glyphs (annotation-glyphs.ts catalog, trimmed).
-  // Solid path glyphs like the quality glyphs above, hand-drawn in a
-  // 100x100 box (no <text> elements); colours mirror the catalog.
+  // Paths and colours copied verbatim from lila's prerendered badge set
+  // (ui/lib/src/game/glyphs.ts, 100x100 box, stroke-based, no <text>).
   "10": {
-    glyph: '<path fill="#fff" d="M26 35h48v11H26zM26 54h48v11H26z"/>',
+    glyph:
+      '<path stroke="#fff" stroke-width="7" fill="none" d="M 27,40 h 46 M 27,60 h 46"/>',
     bgColor: "#82c2ef",
     fgColor: "#fff",
   },
   "13": {
     glyph:
-      '<path fill="#fff" d="M50 50C43 36 18 36 18 50C18 64 43 64 50 50C57 36 82 36 82 50C82 64 57 64 50 50Z"/>',
-    bgColor: "#a46de0",
+      '<path stroke="#fff" stroke-width="7" fill="none" d="M 40,40 A 14.14 14.14 0 1 0 40,60 L 60,40 A 14.14 14.14 0 1 1 60,60 L 40,40"/>',
+    bgColor: "#f5918f",
     fgColor: "#fff",
   },
   "16": {
     glyph:
-      '<path fill="#fff" d="M45 18h10v13h13v10H55v13H45V41H32V31h13zM32 60h36v10H32z"/>',
-    bgColor: "#5aa832",
+      '<path fill="none" stroke="#fff" stroke-width="7" d="M50 59V13M27 36h46M27 72h46"/>',
+    bgColor: "#aaa",
     fgColor: "#fff",
   },
   "17": {
     glyph:
-      '<path fill="#fff" d="M32 28h36v10H32zM45 46h10v13h13v10H55v13H45V69H32V59h13z"/>',
-    bgColor: "#d9772f",
+      '<path fill="none" stroke="#fff" stroke-width="7" d="M50 41v46M27 64h46M27 28h46"/>',
+    bgColor: "#444",
     fgColor: "#fff",
   },
   checkmate: { icon: "crown", bgColor: "#df5353", fgColor: "#fff" },
