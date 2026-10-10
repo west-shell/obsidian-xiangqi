@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Menu, setIcon } from "obsidian";
+  import { addIcon, Menu, setIcon } from "obsidian";
   import { onDestroy } from "svelte";
   import { ANALYSIS_SITES, CLS_PREFIX } from "../../chess";
   import { BOARD_THEME_PICKER, PIECE_SET_PICKER } from "../../themes";
@@ -8,6 +8,7 @@
   import type ChessPlugin from "../../main";
   import { getLang, onLangChange, t } from "../../i18n";
   import { hasAnnotation, STUDY_GLYPHS } from "../../utils/annotation-glyphs";
+  import { annotationBadgeIconSvg } from "../../utils/icon";
 
   interface Props {
     eventBus: EventBus;
@@ -161,17 +162,34 @@
   let btnCount = $derived(navButtons.length + menuButtons.length + 2);
 
   // Annotation menu sections follow the catalog (annotation-glyphs.ts):
-  // move quality, position, then the legacy custom marks.
+  // move quality, position, then the legacy custom marks. Every item gets
+  // a badge-style SVG icon (annotationBadgeIconSvg) alongside its label.
   const buildAnnotationSections = (v: number) =>
     (["move", "position", "custom"] as const).map((category) => ({
       category,
       items: STUDY_GLYPHS.filter((g) => g.category === category).map((g) => ({
-        title: `${g.symbol} ${t(g.nameKey, v)}`,
-        icon: g.icon,
+        title: t(g.nameKey, v),
+        symbol: g.symbol,
         key: g.key,
       })),
     }));
   let annotationSections = $derived(buildAnnotationSections(_lv));
+
+  // Custom SVG icons registered via addIcon, keyed by annotation key.
+  const registeredAnnotIcons: Record<string, true> = {};
+  function ensureAnnotationIcon(item: {
+    key: string;
+    symbol: string;
+  }): string | null {
+    const name = `chess-annot-${item.key}`;
+    if (!registeredAnnotIcons[name]) {
+      const svg = annotationBadgeIconSvg(item.key, item.symbol);
+      if (!svg) return null;
+      addIcon(name, svg);
+      registeredAnnotIcons[name] = true;
+    }
+    return name;
+  }
   function handleMenuButton(event: string, evt: MouseEvent) {
     if (event === "toggle-edit-menu") {
       handleEditMenu(evt);
@@ -276,9 +294,10 @@
         for (const [sectionIdx, section] of annotationSections.entries()) {
           if (sectionIdx > 0) sub.addSeparator();
           for (const item of section.items) {
+            const iconName = ensureAnnotationIcon(item);
             sub.addItem((si) => {
               si.setTitle(item.title);
-              if (item.icon) si.setIcon(item.icon);
+              if (iconName) si.setIcon(iconName);
               if (node) si.setChecked(hasAnnotation(node, item.key));
               si.onClick(() => emitEvent("annotation", item.key));
             });

@@ -221,6 +221,34 @@ export function badgeBoardSvg(key: string, stack: number = 0): string {
   return `<g transform="matrix(.4 0 0 .4 ${x} ${y})"><circle cx="50" cy="50" r="50" fill="${def.bgColor}"/>${inner}</g>`;
 }
 
+/**
+ * Badge-style SVG for the annotation menu: coloured disc + white glyph,
+ * mirroring the badges drawn on board, move list and tree. Position and
+ * custom keys resolve through their own BADGE_DEFS entry; quality keys
+ * (no "1".."6" entry) fall back to the `glyph_<symbol>` def.
+ */
+export function annotationBadgeIconSvg(key: string, symbol?: string): string {
+  const def =
+    BADGE_DEFS[key] ?? (symbol ? BADGE_DEFS[`glyph_${symbol}`] : undefined);
+  if (!def) return "";
+  let inner = def.glyph ?? "";
+  if (!inner && def.icon) {
+    const nodes = ICONS[def.icon];
+    if (nodes) {
+      const children = nodes
+        .map(([tag, attrs]) => {
+          const attrStr = Object.entries(attrs)
+            .map(([k, v]) => `${k}="${v}"`)
+            .join(" ");
+          return `<${tag} ${attrStr}/>`;
+        })
+        .join("");
+      inner = `<g transform="translate(26,26) scale(2)" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${children}</g>`;
+    }
+  }
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="${def.bgColor}"/>${inner}</svg>`;
+}
+
 export function iconPaths(name: string): string {
   const nodes = ICONS[name];
   if (!nodes) return "";
