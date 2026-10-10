@@ -159,6 +159,23 @@
     return `<svg class="${CLS_PREFIX}-moves__badge" viewBox="${-r} ${-r} ${size} ${size}" aria-hidden="true">${badgeSvg(key, size)}</svg>`;
   }
 
+  /**
+   * All move-list badges concatenated into ONE html string: rendering them
+   * through a single {@html} keeps the badges 1px apart (svg margin-left).
+   * Separate {@html} blocks would leave a collapsed space text node between
+   * them in the DOM, widening the gap to a full word space.
+   */
+  function moveBadges(node: ChessNode): string {
+    let html = "";
+    if (node.glyph && settings?.showListGlyph !== false) {
+      html += listBadge(`glyph_${node.glyph.symbol}`);
+    }
+    if (node.annotations?.length && settings?.showListAnnotation !== false) {
+      html += node.annotations.map(listBadge).join("");
+    }
+    return html;
+  }
+
   function evalBarStyle(ev: NodeEval): string {
     // Same intensity/colour logic as the tree graph node eval bar
     const intensity =
@@ -1338,13 +1355,10 @@
       </div>
     </div>
     {#snippet moveLabelContent(node: ChessNode)}
-      {#if node.glyph && settings?.showListGlyph !== false}
+      {@const badges = moveBadges(node)}
+      {#if badges}
         <!-- eslint-disable-next-line svelte/no-at-html-tags -->
-        {@html listBadge(`glyph_${node.glyph.symbol}`)}
-      {/if}
-      {#if node.annotations?.length && settings?.showListAnnotation !== false}
-        <!-- eslint-disable-next-line svelte/no-at-html-tags -->
-        {@html node.annotations.map(listBadge).join("")}
+        {@html badges}
       {/if}
     {/snippet}
     {#snippet moveSpan(node: ChessNode, step: number)}
