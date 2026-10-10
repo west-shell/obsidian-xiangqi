@@ -448,24 +448,15 @@ span.#{$cls-prefix}-moves__move--active {
   text-underline-offset: 2px;
 }
 
-// Engine glyph symbols (!? ?? …) rendered as plain text right after the move.
-.#{$cls-prefix}-moves__glyph {
-  font-weight: 600;
-  font-size: 0.9em;
-}
-// The template omits the inline glyph colour on the active move so the symbol
-// re-colours with the accent background automatically.
-.#{$cls-prefix}-moves__move--active .#{$cls-prefix}-moves__glyph {
-  color: inherit;
-}
+// On the active move the dotted comment underline follows the accent text.
 .#{$cls-prefix}-moves__move--active .#{$cls-prefix}-moves__label--comment {
   text-decoration-color: currentColor;
 }
 
-// Annotation badge (thumbs up/down, handshake, bookmark, star) as an inline
-// SVG reusing the tree graph badge artwork; solid circle keeps its own
-// contrast on any accent background.
-svg.#{$cls-prefix}-moves__annot {
+// Inline move badges (engine glyph discs !/!!/? and annotation thumbs up/
+// down, star…) as inline SVGs reusing the tree graph badge artwork; the
+// solid circle keeps its own contrast on any accent background.
+svg.#{$cls-prefix}-moves__badge {
   display: inline-block;
   width: 0.9em;
   height: 0.9em;

@@ -153,10 +153,10 @@
     if (nodeId) eventBus.emit("slider-navigate", nodeId);
   }
 
-  function annotBadge(key: string): string {
+  function listBadge(key: string): string {
     const size = 10;
     const r = size / 2;
-    return `<svg class="${CLS_PREFIX}-moves__annot" viewBox="${-r} ${-r} ${size} ${size}" aria-hidden="true">${badgeSvg(key, size)}</svg>`;
+    return `<svg class="${CLS_PREFIX}-moves__badge" viewBox="${-r} ${-r} ${size} ${size}" aria-hidden="true">${badgeSvg(key, size)}</svg>`;
   }
 
   function evalBarStyle(ev: NodeEval): string {
@@ -1337,17 +1337,14 @@
         ></button>
       </div>
     </div>
-    {#snippet moveLabelContent(node: ChessNode, isActive: boolean)}
+    {#snippet moveLabelContent(node: ChessNode)}
       {#if node.glyph && settings?.showListGlyph !== false}
-        <span
-          class={`${CLS_PREFIX}-moves__glyph`}
-          style={isActive ? undefined : `color:${node.glyph.color}`}
-          >{node.glyph.symbol}</span
-        >
+        <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+        {@html listBadge(`glyph_${node.glyph.symbol}`)}
       {/if}
       {#if node.annotations?.length && settings?.showListAnnotation !== false}
         <!-- eslint-disable-next-line svelte/no-at-html-tags -->
-        {@html node.annotations.map(annotBadge).join("")}
+        {@html node.annotations.map(listBadge).join("")}
       {/if}
     {/snippet}
     {#snippet moveSpan(node: ChessNode, step: number)}
@@ -1366,7 +1363,7 @@
           class={`${CLS_PREFIX}-moves__label ${hasComment && settings?.showListCommentMark !== false ? `${CLS_PREFIX}-moves__label--comment` : ""}`}
         >
           {m ? getMoveNotation(m, settings?.notationType) : "..."}
-          {@render moveLabelContent(node, isActive)}
+          {@render moveLabelContent(node)}
         </span>
         {#if node.eval && settings?.showListEval !== false}
           <span
@@ -1393,10 +1390,7 @@
             >
               {getStartLabel()}
               {#if startMarks.node}
-                {@render moveLabelContent(
-                  startMarks.node,
-                  listCurrentStep === 0,
-                )}
+                {@render moveLabelContent(startMarks.node)}
               {/if}
             </span>
             {#if startMarks.node?.eval && settings?.showListEval !== false}

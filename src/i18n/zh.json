@@ -44,7 +44,7 @@
   "movelist.showAnnotation": "显示标注",
   "movelist.showAnnotation.desc": "在着法列表的着法上显示标注徽章（点赞、星级等）",
   "movelist.showGlyph": "显示引擎标记",
-  "movelist.showGlyph.desc": "在着法列表的着法上显示引擎符号（!、!!、? 等）",
+  "movelist.showGlyph.desc": "在着法列表的着法上显示引擎标记徽章（!、!!、? 等）",
   "movelist.showCommentMark": "显示评论标记",
   "movelist.showCommentMark.desc": "为着法列表中带评论的着法显示点状下划线",
   "movelist.autoJump": "开局跳转",
