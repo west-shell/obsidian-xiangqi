@@ -118,11 +118,11 @@ const BADGE_DEFS: Record<
   },
   // Checkmate marker: lichess's "#" on a red disc. lila web ships no such
   // SVG (its only mate asset is a puzzle-theme crown), so this is drawn
-  // to match lila's badge stroke style (span 27-73, stroke-width 7, no
-  // <text>).
+  // with lila's stroke conventions (stroke-width 7, no <text>), sized to
+  // the 70%-of-disc convention used by the lucide badge icons.
   checkmate: {
     glyph:
-      '<path fill="none" stroke="#fff" stroke-width="7" d="M27 40h46M27 60h46M40 27v46M60 27v46"/>',
+      '<path fill="none" stroke="#fff" stroke-width="7" d="M15 40h70M15 60h70M40 15v70M60 15v70"/>',
     bgColor: "#df5353",
     fgColor: "#fff",
   },
