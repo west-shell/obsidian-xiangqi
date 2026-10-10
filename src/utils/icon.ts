@@ -222,8 +222,12 @@ export function badgeBoardSvg(key: string, stack: number = 0): string {
 }
 
 /**
- * Badge-style SVG for the annotation menu: coloured disc + white glyph,
- * mirroring the badges drawn on board, move list and tree. Position and
+ * Badge-style icon content for the annotation menu: coloured disc +
+ * white glyph, mirroring the badges drawn on board, move list and tree.
+ * Returns the inner SVG markup only (no outer <svg> root, coordinates
+ * in a 100x100 box) — Obsidian's addIcon engine wraps registered
+ * content in its own <svg viewBox="0 0 100 100">, so a full <svg> root
+ * here would nest and collapse to a tiny corner dot. Position and
  * custom keys resolve through their own BADGE_DEFS entry; quality keys
  * (no "1".."6" entry) fall back to the `glyph_<symbol>` def.
  */
@@ -246,7 +250,7 @@ export function annotationBadgeIconSvg(key: string, symbol?: string): string {
       inner = `<g transform="translate(26,26) scale(2)" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${children}</g>`;
     }
   }
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="${def.bgColor}"/>${inner}</svg>`;
+  return `<circle cx="50" cy="50" r="50" fill="${def.bgColor}"/>${inner}`;
 }
 
 export function iconPaths(name: string): string {
