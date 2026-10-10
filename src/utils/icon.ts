@@ -247,7 +247,10 @@ export function annotationBadgeIconSvg(key: string, symbol?: string): string {
           return `<${tag} ${attrStr}/>`;
         })
         .join("");
-      inner = `<g transform="translate(26,26) scale(2)" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${children}</g>`;
+      // Match badgeSvg() proportions: the lucide glyph spans 70% of the
+      // disc diameter — translate (100-70)/2, scale 70/24. Stroke-width
+      // 2 in the 24-box scales with it, same as in badgeSvg.
+      inner = `<g transform="translate(15,15) scale(2.91667)" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${children}</g>`;
     }
   }
   return `<circle cx="50" cy="50" r="50" fill="${def.bgColor}"/>${inner}`;
