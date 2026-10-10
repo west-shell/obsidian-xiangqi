@@ -116,7 +116,16 @@ const BADGE_DEFS: Record<
     bgColor: "#444",
     fgColor: "#fff",
   },
-  checkmate: { icon: "crown", bgColor: "#df5353", fgColor: "#fff" },
+  // Checkmate marker: lichess's "#" on a red disc. lila web ships no such
+  // SVG (its only mate asset is a puzzle-theme crown), so this is drawn
+  // to match lila's badge stroke style (span 27-73, stroke-width 7, no
+  // <text>).
+  checkmate: {
+    glyph:
+      '<path fill="none" stroke="#fff" stroke-width="7" d="M27 40h46M27 60h46M40 27v46M60 27v46"/>',
+    bgColor: "#df5353",
+    fgColor: "#fff",
+  },
   "result_1-0": { icon: "crown", bgColor: "#22ac38", fgColor: "#fff" },
   "result_0-1": { icon: "crown", bgColor: "#df5353", fgColor: "#fff" },
   "result_1/2-1/2": { icon: "crown", bgColor: "#82c2ef", fgColor: "#fff" },
