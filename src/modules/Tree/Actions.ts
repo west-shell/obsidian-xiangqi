@@ -483,6 +483,8 @@ const ActionsModule = {
                 tagPairs.push({ key, value: "" });
               }
             }
+            const prevResult =
+              tagPairs.find((p) => p.key === "Result")?.value ?? "";
             const tagsModal = new Modal(host.plugin.app);
             let resolve: (value: boolean) => void;
             const tagsPromise = new Promise<boolean>((r) => {
@@ -550,6 +552,11 @@ const ActionsModule = {
               if (slot) {
                 slot.headers = extractHeaders(host.tags);
                 if (slot.parsed) slot.parsed.tags = host.tags;
+              }
+              const newResult =
+                tagPairs.find((p) => p.key === "Result")?.value ?? "";
+              if (newResult !== prevResult) {
+                syncMovetextResult(host, newResult);
               }
               eventBus.emit("modified", null);
               eventBus.emit("updateUI");
@@ -801,6 +808,31 @@ function emitNodeEval(host: IHost) {
     });
   } else {
     host.eventBus.emit("clear-engine-bestmove");
+  }
+}
+
+const TERMINAL_RESULTS = ["1-0", "0-1", "1/2-1/2"];
+
+// The game result lives in two places: the [Result] header tag and the
+// movetext terminator token, which the parser stores on the node carrying
+// it (node.result — shown as the crown badge and re-emitted by
+// stringifyPGN on save). Editing the tag must sync both, otherwise the
+// badge keeps the old result and the next save/reload resurrects it from
+// the movetext, overriding the edited tag.
+function syncMovetextResult(host: IHost, result: string): void {
+  const hasResult = TERMINAL_RESULTS.includes(result);
+  const resultNodes: ChessNode[] = [];
+  for (const node of host.nodeMap.values()) {
+    if (node.result) resultNodes.push(node);
+  }
+  if (resultNodes.length > 0) {
+    for (const node of resultNodes) {
+      node.result = hasResult ? result : undefined;
+    }
+  } else if (hasResult) {
+    let last = host.root;
+    while (last.children.length > 0) last = last.children[0];
+    if (last !== host.root) last.result = result;
   }
 }
 

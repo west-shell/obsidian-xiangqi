@@ -783,6 +783,16 @@
   function nodeLabel(node: ChessNode): string {
     return getNodeLabel(node.move, nodeMode, settings?.notationType);
   }
+  // node.result / isCheckmate are plain fields mutated outside Svelte
+  // signals (tag editing rewrites node.result in place); keyed-each items
+  // keep the same reference, so reading _uiVer here ties the badge to
+  // `updateUI` bumps and makes it re-render after such mutations.
+  function resultBadgeKey(node: ChessNode): string {
+    void _uiVer;
+    if (node.result) return `result_${node.result}`;
+    if (node.isCheckmate) return "checkmate";
+    return "";
+  }
   function nodeFontSize(): string {
     if (nodeMode === 1) return "6px";
     return "9px";
@@ -1199,21 +1209,13 @@
                   {@html badgeSvg(primaryAnnotation)}
                 </g>
               {/if}
-              {#if node.result}
+              {#if resultBadgeKey(node)}
                 <g
                   transform="translate({-nw / 2} {-3.5})"
                   style="pointer-events: none"
                 >
                   <!-- eslint-disable-next-line svelte/no-at-html-tags -->
-                  {@html badgeSvg(`result_${node.result}`)}
-                </g>
-              {:else if node.isCheckmate}
-                <g
-                  transform="translate({-nw / 2} {-3.5})"
-                  style="pointer-events: none"
-                >
-                  <!-- eslint-disable-next-line svelte/no-at-html-tags -->
-                  {@html badgeSvg("checkmate")}
+                  {@html badgeSvg(resultBadgeKey(node))}
                 </g>
               {/if}
               {#if node.glyph}
