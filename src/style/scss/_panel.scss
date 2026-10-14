@@ -479,20 +479,13 @@ svg.#{$cls-prefix}-moves__badge {
   pointer-events: none;
 }
 
-// ---- Game result row --------------------------------------------------------------------
-
-// Result wrapper <li> flattens into the shared move grid like __row.
-.#{$cls-prefix}-moves__crow {
-  display: contents;
-}
-
-// Game result ("1-0"...) after the last move of the finished mainline,
-// aligned with the move columns (pgn-viewer's bold result comment).
+// Game result ("1-0") rendered inline after the move that carries it —
+// the movetext terminator position (node.result, same source as the tree
+// crown badge), so variations without it show nothing and moves played
+// past the end keep the result attached to the game-ending move.
 .#{$cls-prefix}-moves__result {
-  grid-column: 2 / -1;
-  padding: 0.12em 0.4em;
   font-weight: 700;
-  white-space: nowrap;
+  margin-left: 0.35em;
 }
 
 // ---- Comment row -----------------------------------------------------------------------

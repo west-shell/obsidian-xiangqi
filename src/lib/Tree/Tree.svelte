@@ -104,15 +104,6 @@
   // Move rows pair up starting at this listMoves index; when black starts,
   // listMoves[0] gets its own "1. ..." row above and pairing begins at 1.
   let pairOffset = $derived(blackStarts ? 1 : 0);
-  // Game result ("1-0"...) always shown after the last rendered move —
-  // like pgn-viewer's result comment, but since our list only shows the
-  // path to the current node it labels the game outcome, not the line end.
-  let listResult = $derived.by(() => {
-    void _uiVer;
-    const slot = games?.[currentGameIndex ?? 0];
-    const raw = slot?.headers.get("Result") ?? "";
-    return !raw || raw === "*" ? "" : raw;
-  });
   let startMarks = $derived.by(() => {
     void _uiVer;
     const node =
@@ -1390,6 +1381,12 @@
           {m ? getMoveNotation(m, settings?.notationType) : "..."}
           {@render moveLabelContent(node)}
         </span>
+        {#if node.result}
+          <span
+            class="{CLS_PREFIX}-moves__result"
+            title={formatResult(node.result, _lv)}>{node.result}</span
+          >
+        {/if}
         {#if node.eval && settings?.showListEval !== false}
           <span
             class="{CLS_PREFIX}-moves__evalbar"
@@ -1418,6 +1415,13 @@
                 {@render moveLabelContent(startMarks.node)}
               {/if}
             </span>
+            {#if startMarks.node?.result}
+              <span
+                class="{CLS_PREFIX}-moves__result"
+                title={formatResult(startMarks.node.result, _lv)}
+                >{startMarks.node.result}</span
+              >
+            {/if}
             {#if startMarks.node?.eval && settings?.showListEval !== false}
               <span
                 class="{CLS_PREFIX}-moves__evalbar"
@@ -1473,14 +1477,6 @@
             </li>
           {/if}
         {/each}
-        {#if listResult}
-          <li class="{CLS_PREFIX}-moves__crow">
-            <span
-              class="{CLS_PREFIX}-moves__result"
-              title={formatResult(listResult, _lv)}>{listResult}</span
-            >
-          </li>
-        {/if}
       </ul>
     {/if}
   </div>
