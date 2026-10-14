@@ -1407,12 +1407,6 @@
           {m ? getMoveNotation(m, settings?.notationType) : "..."}
           {@render moveLabelContent(node)}
         </span>
-        {#if node.result}
-          <span
-            class="{CLS_PREFIX}-moves__result"
-            title={formatResult(node.result, _lv)}>{node.result}</span
-          >
-        {/if}
         {#if node.eval && settings?.showListEval !== false}
           <span
             class="{CLS_PREFIX}-moves__evalbar"
@@ -1442,13 +1436,6 @@
                   {@render moveLabelContent(startMarks.node)}
                 {/if}
               </span>
-              {#if startMarks.node?.result}
-                <span
-                  class="{CLS_PREFIX}-moves__result"
-                  title={formatResult(startMarks.node.result, _lv)}
-                  >{startMarks.node.result}</span
-                >
-              {/if}
               {#if startMarks.node?.eval && settings?.showListEval !== false}
                 <span
                   class="{CLS_PREFIX}-moves__evalbar"
@@ -1505,6 +1492,16 @@
               </li>
             {/if}
           {/each}
+          {#if branchResult}
+            <!-- pgn-viewer style: the game result as its own full-width row
+               at the end of the move list (comment.result). -->
+            <li
+              class="{CLS_PREFIX}-moves__result-row"
+              title={formatResult(branchResult, _lv)}
+            >
+              {branchResult}
+            </li>
+          {/if}
         </ul>
         <div class="{CLS_PREFIX}-resultbar">
           <button

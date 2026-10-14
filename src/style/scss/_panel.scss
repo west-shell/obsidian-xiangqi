@@ -492,13 +492,22 @@ svg.#{$cls-prefix}-moves__badge {
   pointer-events: none;
 }
 
-// Game result ("1-0") rendered inline after the move that carries it —
-// the movetext terminator position (node.result, same source as the tree
-// crown badge), so variations without it show nothing and moves played
-// past the end keep the result attached to the game-ending move.
-.#{$cls-prefix}-moves__result {
+// Game result ("1-0") as its own row at the end of the move list,
+// pgn-viewer style (comment.result): a full-width, centered, bold row
+// with a subtle inset card look. The child selector keeps the margin
+// safe from Obsidian's ".markdown-rendered ul > li" overrides; the li
+// is a real grid item (rows flatten via display: contents, this one
+// must NOT), stretched across all three tracks of the shared grid.
+.#{$cls-prefix}-moves > li.#{$cls-prefix}-moves__result-row {
+  grid-column: 1 / -1;
+  justify-self: stretch;
+  margin: 0.3em 0 0;
+  padding: 0.35em 1em;
+  text-align: center;
   font-weight: 700;
-  margin-left: 0.35em;
+  background-color: var(--background-primary);
+  border-top: 1px solid var(--background-modifier-border);
+  border-bottom: 1px solid var(--background-modifier-border);
 }
 
 // ---- Result toolbar --------------------------------------------------------------------
