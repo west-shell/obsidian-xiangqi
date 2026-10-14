@@ -2,17 +2,17 @@ import type { ChessNode } from "../types";
 import { GLYPH_DEFS } from "./winningChances";
 
 /**
- * Lichess study glyph catalog (lila public/glyphs.json) plus the plugin's
- * legacy custom annotations. Trimmed to the essentials: move quality
- * ($1..$6), the four position glyphs ($10, $13, $16, $17) and the legacy
- * custom marks — observation glyphs, move extras and the graded/winning
- * position variants are intentionally omitted.
+ * Lichess study glyph catalog (lila public/glyphs.json). Trimmed to the
+ * essentials: move quality ($1..$6), the four position glyphs ($10, $13,
+ * $16, $17) and the two legacy custom marks ("bm", "st") — observation
+ * glyphs, move extras and the graded/winning position variants are
+ * intentionally omitted.
  *
  * Standard glyphs are keyed by their NAG number as a string ("16" for $16)
- * and exported as `$n` NAGs. The five legacy custom keys ("+", "-", "=",
- * "bm", "st") are kept verbatim — they round-trip through the private
- * `#a:` comment form and are never written as NAGs, so lichess files and
- * custom marks never bleed into each other.
+ * and exported as `$n` NAGs. The legacy custom keys ("bm", "st") round-trip
+ * through the private `#a:` comment form and are never written as NAGs, so
+ * lichess files and custom marks never bleed into each other. The retired
+ * keys "+", "-", "=" migrate to "16", "17", "10" on import.
  */
 export type AnnotationCategory = "move" | "position" | "custom";
 
@@ -62,36 +62,13 @@ export const STUDY_GLYPHS: AnnotationGlyph[] = [
   entry(5, "!?", "move", "annotation.interesting", "#ea45d8"),
   entry(6, "?!", "move", "annotation.dubious", "#56b4e9"),
   // -- position (mutually exclusive, trimmed to the four essentials) --
-  // Badge colours mirror lila's prerendered set (ui/lib/src/game/glyphs.ts).
+  // Badge colours mirror the advantage/disadvantage/equal icon trio
+  // (src/utils/icon.ts BADGE_DEFS); $13 keeps lila's badge colour.
   entry(10, "=", "position", "annotation.equal", "#82c2ef"),
   entry(13, "∞", "position", "annotation.unclear", "#f5918f"),
-  entry(16, "±", "position", "annotation.wBetter", "#aaa"),
-  entry(17, "∓", "position", "annotation.bBetter", "#444"),
+  entry(16, "±", "position", "annotation.wBetter", "#22ac38"),
+  entry(17, "∓", "position", "annotation.bBetter", "#df5353"),
   // -- legacy custom annotations (kept verbatim, private #a: format) --
-  {
-    key: "+",
-    symbol: "+",
-    category: "custom",
-    nameKey: "annotation.w+",
-    color: "#22ac38",
-    icon: "thumbs-up",
-  },
-  {
-    key: "-",
-    symbol: "-",
-    category: "custom",
-    nameKey: "annotation.b+",
-    color: "#df5353",
-    icon: "thumbs-down",
-  },
-  {
-    key: "=",
-    symbol: "=",
-    category: "custom",
-    nameKey: "annotation.eq",
-    color: "#82c2ef",
-    icon: "handshake",
-  },
   {
     key: "bm",
     symbol: "bm",
@@ -142,8 +119,19 @@ export function hasAnnotation(node: ChessNode, key: string): boolean {
   return node.annotations?.includes(key) ?? false;
 }
 
+/**
+ * Retired custom keys, migrated to their standard NAG equivalents on
+ * import so old notes ({#a:+} etc.) keep rendering as position glyphs.
+ */
+const LEGACY_CUSTOM_KEYS: Record<string, string> = {
+  "+": "16",
+  "-": "17",
+  "=": "10",
+};
+
 /** Add an annotation key during import (dedupe, no exclusivity rules). */
-export function pushAnnotation(node: ChessNode, key: string): void {
+export function pushAnnotation(node: ChessNode, rawKey: string): void {
+  const key = LEGACY_CUSTOM_KEYS[rawKey] ?? rawKey;
   if (!GLYPH_BY_KEY[key]) return;
   node.annotations ??= [];
   if (!node.annotations.includes(key)) node.annotations.push(key);

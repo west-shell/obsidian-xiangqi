@@ -84,38 +84,22 @@ const BADGE_DEFS: Record<
   string,
   { icon?: string; glyph?: string; bgColor: string; fgColor: string }
 > = {
-  "+": { icon: "thumbs_up", bgColor: "#22ac38", fgColor: "#fff" },
-  "-": { icon: "thumbs_down", bgColor: "#df5353", fgColor: "#fff" },
-  "=": { icon: "handshake", bgColor: "#82c2ef", fgColor: "#fff" },
   bm: { icon: "bookmark", bgColor: "#e69f00", fgColor: "#fff" },
   st: { icon: "star", bgColor: "#22ac38", fgColor: "#fff" },
   // Lichess study position glyphs (annotation-glyphs.ts catalog, trimmed).
-  // Paths and colours copied verbatim from lila's prerendered badge set
-  // (ui/lib/src/game/glyphs.ts, 100x100 box, stroke-based, no <text>).
-  "10": {
-    glyph:
-      '<path stroke="#fff" stroke-width="7" fill="none" d="M 27,40 h 46 M 27,60 h 46"/>',
-    bgColor: "#82c2ef",
-    fgColor: "#fff",
-  },
+  // $10/$16/$17 render with the equal/advantage/disadvantage icons that the
+  // retired legacy "+"/"-"/"=" custom marks used; $13 keeps its path copied
+  // verbatim from lila's prerendered badge set (ui/lib/src/game/glyphs.ts,
+  // 100x100 box, stroke-based, no <text>).
+  "10": { icon: "handshake", bgColor: "#82c2ef", fgColor: "#fff" },
   "13": {
     glyph:
       '<path stroke="#fff" stroke-width="7" fill="none" d="M 40,40 A 14.14 14.14 0 1 0 40,60 L 60,40 A 14.14 14.14 0 1 1 60,60 L 40,40"/>',
     bgColor: "#f5918f",
     fgColor: "#fff",
   },
-  "16": {
-    glyph:
-      '<path fill="none" stroke="#fff" stroke-width="7" d="M50 59V13M27 36h46M27 72h46"/>',
-    bgColor: "#aaa",
-    fgColor: "#fff",
-  },
-  "17": {
-    glyph:
-      '<path fill="none" stroke="#fff" stroke-width="7" d="M50 41v46M27 64h46M27 28h46"/>',
-    bgColor: "#444",
-    fgColor: "#fff",
-  },
+  "16": { icon: "thumbs_up", bgColor: "#22ac38", fgColor: "#fff" },
+  "17": { icon: "thumbs_down", bgColor: "#df5353", fgColor: "#fff" },
   // Checkmate marker: lichess's "#" on a red disc. lila web ships no such
   // SVG (its only mate asset is a puzzle-theme crown), so this is drawn
   // with lila's stroke conventions (stroke-width 7, no <text>), sized to
@@ -167,6 +151,9 @@ const BADGE_DEFS: Record<
   },
 };
 
+// Keys recognised by the parser's legacy `#a:` handler. "+", "-", "=" are
+// retired catalog entries kept here so old notes still route through
+// pushAnnotation, which migrates them to "16"/"17"/"10".
 export const ANNOTATION_KEYS = ["+", "-", "=", "bm", "st"];
 export const ANNOTATION_PREFIX = "#a:";
 export const SHAPES_PREFIX = "&s:";

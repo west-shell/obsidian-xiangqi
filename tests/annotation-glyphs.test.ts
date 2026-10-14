@@ -66,20 +66,19 @@ describe("applyAnnotationToggle", () => {
 
   test("position toggle preserves custom keys", () => {
     const node = makeNode();
-    applyAnnotationToggle(node, "+");
+    applyAnnotationToggle(node, "bm");
     applyAnnotationToggle(node, "16");
     applyAnnotationToggle(node, "17");
-    expect(node.annotations).toEqual(["+", "17"]);
+    expect(node.annotations).toEqual(["bm", "17"]);
   });
 
   test("custom keys stack freely and dedupe", () => {
     const node = makeNode();
-    applyAnnotationToggle(node, "+");
-    applyAnnotationToggle(node, "-");
     applyAnnotationToggle(node, "bm");
-    expect(node.annotations).toEqual(["+", "-", "bm"]);
-    applyAnnotationToggle(node, "-");
-    expect(node.annotations).toEqual(["+", "bm"]);
+    applyAnnotationToggle(node, "st");
+    expect(node.annotations).toEqual(["bm", "st"]);
+    applyAnnotationToggle(node, "bm");
+    expect(node.annotations).toEqual(["st"]);
   });
 });
 
@@ -91,6 +90,16 @@ describe("pushAnnotation / hasAnnotation", () => {
     expect(node.annotations).toEqual(["16"]);
     expect(hasAnnotation(node, "16")).toBe(true);
     expect(hasAnnotation(node, "17")).toBe(false);
+  });
+
+  test("legacy custom keys migrate to their NAG equivalents", () => {
+    const node = makeNode();
+    pushAnnotation(node, "+");
+    pushAnnotation(node, "-");
+    pushAnnotation(node, "=");
+    expect(node.annotations).toEqual(["16", "17", "10"]);
+    expect(hasAnnotation(node, "16")).toBe(true);
+    expect(hasAnnotation(node, "+")).toBe(false);
   });
 
   test("hasAnnotation resolves quality keys via node.glyph", () => {

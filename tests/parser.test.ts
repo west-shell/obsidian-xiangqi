@@ -61,14 +61,26 @@ describe("中国象棋PGN解析器", () => {
   });
 
   test("解析私有标注与研究字形NAG", () => {
-    const pgn = "1. H2-E2 {#a:+} $16 H7-E7 $17";
+    const pgn = "1. H2-E2 {#a:bm} $16 H7-E7 $17";
     const parser = new PGNParser(pgn);
     const gameTree = parser.getRoot();
 
     const redMove = gameTree.children[0];
-    expect(redMove.annotations).toEqual(["+", "16"]);
+    expect(redMove.annotations).toEqual(["bm", "16"]);
 
     const blackMove = redMove.children[0];
     expect(blackMove.annotations).toEqual(["17"]);
+  });
+
+  test("旧版#a:自定义键迁移为NAG标注键", () => {
+    const pgn = "1. H2-E2 {#a:+} H7-E7 {#a:-} 2. B0-C2 {#a:=} H9-G7";
+    const parser = new PGNParser(pgn);
+    const gameTree = parser.getRoot();
+
+    expect(gameTree.children[0].annotations).toEqual(["16"]);
+    expect(gameTree.children[0].children[0].annotations).toEqual(["17"]);
+    expect(gameTree.children[0].children[0].children[0].annotations).toEqual([
+      "10",
+    ]);
   });
 });
