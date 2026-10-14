@@ -685,6 +685,9 @@
   function toggleBlackWinsResult() {
     eventBus.emit("set-result", branchResult === "0-1" ? "" : "0-1");
   }
+  function clearBranchResult() {
+    eventBus.emit("set-result", "");
+  }
 
   onMount(() => {
     eventBus.on("updateUI", onUiVer);
@@ -1492,7 +1495,7 @@
               </li>
             {/if}
           {/each}
-          {#if branchResult}
+          {#if branchResult && branchResult !== "*"}
             <!-- pgn-viewer style: the game result as its own full-width row
                at the end of the move list (comment.result). -->
             <li
@@ -1504,6 +1507,15 @@
           {/if}
         </ul>
         <div class="{CLS_PREFIX}-resultbar">
+          <button
+            class="{CLS_PREFIX}-btn {CLS_PREFIX}-resultbar__btn {!branchResult ||
+            branchResult === '*'
+              ? `${CLS_PREFIX}-resultbar__btn--active`
+              : ''}"
+            title={t("tree.undecided", _lv)}
+            aria-label={t("tree.undecided", _lv)}
+            onclick={clearBranchResult}>*</button
+          >
           <button
             class="{CLS_PREFIX}-btn {CLS_PREFIX}-resultbar__btn {branchResult ===
             '1-0'

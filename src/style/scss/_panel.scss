@@ -513,8 +513,8 @@ svg.#{$cls-prefix}-moves__badge {
 // ---- Result toolbar --------------------------------------------------------------------
 
 // Fixed at the bottom of the move list column: per-branch result buttons
-// (draw / resign). Clicking the active button clears the branch result;
-// the resign outcome follows the side to move at the branch tip.
+// (* undecided / primary wins / black wins / draw). The * button and
+// clicking an active button clear the branch result.
 .#{$cls-prefix}-resultbar {
   display: flex;
   flex-direction: row;
