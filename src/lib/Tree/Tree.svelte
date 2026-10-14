@@ -1514,7 +1514,7 @@
               : ''}"
             title={t("tree.undecided", _lv)}
             aria-label={t("tree.undecided", _lv)}
-            onclick={clearBranchResult}>*</button
+            onclick={clearBranchResult}>{t("tree.undecided", _lv)}</button
           >
           <button
             class="{CLS_PREFIX}-btn {CLS_PREFIX}-resultbar__btn {branchResult ===
