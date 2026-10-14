@@ -1,5 +1,6 @@
 import { getSaveNotation, getTurnFromFen } from "../chess";
-import type { ChessNode, NodeEval } from "../types";
+import type { AnnotationFormat, ChessNode, NodeEval } from "../types";
+import { GLYPH_BY_KEY, GLYPH_BY_SYMBOL } from "./annotation-glyphs";
 import { ANNOTATION_PREFIX } from "./icon";
 
 /** FEN fullmove number (field 6); defaults to 1 when absent/invalid. */
@@ -52,12 +53,13 @@ function formatPrivateEval(ev: NodeEval): string {
 export interface NodeMetaOptions {
   includeComments?: boolean;
   includeEval?: boolean;
+  annotationFormat?: AnnotationFormat;
 }
 
 /**
- * Serialize a node's metadata (glyph suffix, annotation NAG, comments,
- * shapes, eval) in lichess-compatible form, to be appended right after the
- * move notation:
+ * Serialize a node's metadata (glyph, annotation NAG, comments, shapes,
+ * eval) in lichess-compatible form, to be appended right after the move
+ * notation:
  *   e4!? $16 {comment} { [%csl Gb4][%cal Ge2e4] } { [%eval +0.35] }
  */
 export function serializeNodeMeta(
@@ -66,17 +68,34 @@ export function serializeNodeMeta(
 ): string {
   const includeComments = options.includeComments ?? true;
   const includeEval = options.includeEval ?? true;
+  const annotationFormat = options.annotationFormat ?? "suffix";
   let meta = "";
 
   if (node.glyph) {
-    meta += node.glyph.symbol;
+    if (annotationFormat === "nag") {
+      const nag = GLYPH_BY_SYMBOL[node.glyph.symbol]?.nag;
+      meta += nag ? ` $${nag}` : node.glyph.symbol;
+    } else if (annotationFormat === "comment") {
+      meta += ` {[${ANNOTATION_PREFIX}${node.glyph.symbol}]}`;
+    } else {
+      meta += node.glyph.symbol;
+    }
   }
 
   if (node.annotations?.length) {
     for (const key of node.annotations) {
-      // NAG-number keys ("16") export as $n; legacy custom keys keep the
-      // private #a: comment so they never masquerade as lichess glyphs.
-      meta += /^\d+$/.test(key) ? ` $${key}` : ` {${ANNOTATION_PREFIX}${key}}`;
+      if (/^\d+$/.test(key)) {
+        if (annotationFormat === "comment") {
+          const def = GLYPH_BY_KEY[key];
+          meta += def ? ` {[${ANNOTATION_PREFIX}${def.symbol}]}` : ` $${key}`;
+        } else {
+          meta += ` $${key}`;
+        }
+      } else {
+        // Legacy custom keys keep the private #a: comment so they never
+        // masquerade as lichess glyphs.
+        meta += ` {${ANNOTATION_PREFIX}${key}}`;
+      }
     }
   }
 
@@ -124,7 +143,11 @@ export function serializeNodeMeta(
   return meta;
 }
 
-export function stringifyPGN(root: ChessNode, includeEval = true): string {
+export function stringifyPGN(
+  root: ChessNode,
+  includeEval = true,
+  annotationFormat: AnnotationFormat = "suffix",
+): string {
   const nodeBrothers = genNodeBrothers(root);
 
   // Move numbering follows the root FEN: a fullmove-14 game resumes at
@@ -156,7 +179,7 @@ export function stringifyPGN(root: ChessNode, includeEval = true): string {
         result += lineStart ? `${stepNum}... ${notation}` : notation;
       }
     }
-    const meta = serializeNodeMeta(node, { includeEval });
+    const meta = serializeNodeMeta(node, { includeEval, annotationFormat });
     result += meta;
     const brothers = nodeBrothers.get(node);
     if (brothers?.length) {

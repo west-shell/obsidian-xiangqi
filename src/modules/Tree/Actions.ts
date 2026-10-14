@@ -661,7 +661,11 @@ const ActionsModule = {
     });
 
     host.stringifyPGN = (root: ChessNode, includeEval = true) =>
-      stringifyPGN(root, includeEval);
+      stringifyPGN(
+        root,
+        includeEval,
+        host.settings.annotationFormat ?? "suffix",
+      );
 
     eventBus.on("import", () => {
       const modal = new ImportModal(host.plugin.app, host, !isFileHost(host));
@@ -869,7 +873,11 @@ function stringifyCurrentBranchPGN(
       }
       stepNum++;
     }
-    result += serializeNodeMeta(node, { includeComments, includeEval });
+    result += serializeNodeMeta(node, {
+      includeComments,
+      includeEval,
+      annotationFormat: host.settings.annotationFormat ?? "suffix",
+    });
     if (i < pathIds.length - 1) result += " ";
   }
   return result;

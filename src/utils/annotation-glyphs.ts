@@ -91,6 +91,19 @@ export const GLYPH_BY_KEY: Record<string, AnnotationGlyph> = Object.fromEntries(
   STUDY_GLYPHS.map((g) => [g.key, g]),
 );
 
+/**
+ * Symbol-keyed view of the non-custom catalog ("!?" → $5 entry, "±" → $16
+ * entry), used to import comment-form glyph blocks ({[!?]} / {[±]}) and to
+ * map a glyph symbol back to its NAG number on export.
+ */
+export const GLYPH_BY_SYMBOL: Record<string, AnnotationGlyph> =
+  Object.fromEntries(
+    STUDY_GLYPHS.filter((g) => g.category !== "custom").map((g) => [
+      g.symbol,
+      g,
+    ]),
+  );
+
 /** Legacy NAGs our old exporter used for custom keys, kept importable. */
 const LEGACY_NAG_KEYS: Record<string, string> = {
   $24: "st",

@@ -176,6 +176,7 @@ export const DEFAULT_SETTINGS: ISettings = {
   showBoardAnnotations: true,
   saveEvalByDefault: false,
   saveEvalPrompt: true,
+  annotationFormat: "suffix",
 };
 
 function addSliderWithValue(
@@ -925,6 +926,23 @@ export class ChessSettingTab extends PluginSettingTab {
           void this.plugin.saveSettings();
         }),
       );
+
+    new Setting(containerEl)
+      .setName(t("save.annotationFormat"))
+      .setDesc(t("save.annotationFormat.desc"))
+      .addDropdown((dropdown) => {
+        dropdown
+          .addOptions({
+            suffix: t("save.annotationFormat.suffix"),
+            nag: t("save.annotationFormat.nag"),
+            comment: t("save.annotationFormat.comment"),
+          })
+          .setValue(settings.annotationFormat)
+          .onChange((value) => {
+            settings.annotationFormat = value as ISettings["annotationFormat"];
+            void this.plugin.saveSettings();
+          });
+      });
 
     // ---- 边距 ----
     new Setting(containerEl).setName(t("margin.title")).setHeading();

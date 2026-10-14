@@ -51,7 +51,16 @@ export interface ISettings {
   showBoardAnnotations: boolean;
   saveEvalByDefault: boolean;
   saveEvalPrompt: boolean;
+  annotationFormat: AnnotationFormat;
 }
+
+/**
+ * How glyphs and annotations are written into the PGN on save:
+ * - "suffix": glyph symbol after the move (e4!?), study NAGs as $n (default)
+ * - "nag": everything numeric ($1, $16)
+ * - "comment": bracketed symbol blocks ({[!?]}, {[±]})
+ */
+export type AnnotationFormat = "suffix" | "nag" | "comment";
 
 export type IOptions = {
   protected?: boolean;

@@ -10,6 +10,7 @@ import {
 } from "../../chess";
 import { type ChessNode, type NodeShape, type ParseWarning } from "../../types";
 import {
+  GLYPH_BY_SYMBOL,
   nagToAnnotationKey,
   pushAnnotation,
 } from "../../utils/annotation-glyphs";
@@ -302,10 +303,28 @@ export class PGNParser {
       return;
     }
 
-    if (raw.startsWith(ANNOTATION_PREFIX)) {
-      const key = raw.slice(ANNOTATION_PREFIX.length);
-      if (isAnnotationKey(key)) {
-        pushAnnotation(this.currentNode, key);
+    // Private annotation comment. Plain form: {#a:bm} (custom keys and
+    // the legacy +,-,= marks). The "comment" save format wraps the prefix
+    // in brackets with a catalog symbol: {[#a:!?]} for the move glyph,
+    // {[#a:±]} for study annotations.
+    let annotPayload: string | null = null;
+    if (raw.startsWith(`[${ANNOTATION_PREFIX}`) && raw.endsWith("]")) {
+      annotPayload = raw.slice(ANNOTATION_PREFIX.length + 1, -1);
+    } else if (raw.startsWith(ANNOTATION_PREFIX)) {
+      annotPayload = raw.slice(ANNOTATION_PREFIX.length);
+    }
+    if (annotPayload !== null) {
+      if (isAnnotationKey(annotPayload)) {
+        pushAnnotation(this.currentNode, annotPayload);
+        return;
+      }
+      const glyphDef = GLYPH_BY_SYMBOL[annotPayload];
+      if (glyphDef) {
+        if (glyphDef.category === "move") {
+          this.currentNode.glyph = GLYPH_DEFS[glyphDef.symbol];
+        } else {
+          pushAnnotation(this.currentNode, glyphDef.key);
+        }
         return;
       }
     }
