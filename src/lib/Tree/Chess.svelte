@@ -29,6 +29,7 @@
   import { onLangChange, t } from "../../i18n";
   import { annotationShapes } from "../../utils/glyphs";
   import { badgeBoardSvg } from "../../utils/icon";
+  import { parseOrientationTag } from "../../utils/parse";
 
   const BRUSH_MAP: Record<string, string> = {
     green: "g",
@@ -99,7 +100,27 @@
   let lastMove: [Square, Square] | null = $derived(
     currentNode.move ? [currentNode.move.from, currentNode.move.to] : null,
   );
-  let rotated = $state((() => options?.rotated ?? false)());
+  function orientationKey(): string {
+    return `${currentGameIndex}:${options?.rotated ?? ""}`;
+  }
+  function initialRotated(): boolean {
+    return (
+      options?.rotated ??
+      parseOrientationTag(games[currentGameIndex]?.raw ?? "") ??
+      false
+    );
+  }
+  let rotated = $state(initialRotated());
+  // Re-apply the initial orientation when the active game changes (a lichess
+  // [Orientation "black"] chapter flips the board); manual flips persist
+  // until then. Explicit block options (r:/[Rotated]) win over the tag.
+  let orientKey = orientationKey();
+  $effect(() => {
+    const key = orientationKey();
+    if (key === orientKey) return;
+    orientKey = key;
+    rotated = initialRotated();
+  });
   let nextPathChild = $derived.by(() => {
     const idx = currentPath.indexOf(currentNode.id);
     if (idx === -1 || idx >= currentPath.length - 1) return null;

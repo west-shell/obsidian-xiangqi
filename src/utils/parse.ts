@@ -87,6 +87,16 @@ export function parseOption(source: string): IOptions {
   return options;
 }
 
+/**
+ * Lichess study orientation tag: [Orientation "black"] flips the board
+ * (black at the bottom), [Orientation "white"] keeps it upright. Returns
+ * undefined when the tag is absent so callers can fall back.
+ */
+export function parseOrientationTag(raw: string): boolean | undefined {
+  const match = raw.match(/\[Orientation\s+"(black|white)"\]/i);
+  return match ? match[1].toLowerCase() === "black" : undefined;
+}
+
 export function splitPGN(pgn: string): GameSlot[] {
   const lines = pgn.split("\n");
   const games: GameSlot[] = [];
