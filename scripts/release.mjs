@@ -7,8 +7,15 @@ if (!["patch", "minor", "major"].includes(type)) {
   process.exit(1);
 }
 
-execSync(`npm version ${type} --no-git-tag-version`, { stdio: "inherit" });
-execSync("npm install --package-lock-only", { stdio: "inherit" });
+// `npm run release` exports every npm config as npm_config_* env vars; a
+// user-level `allow-scripts` entry then reaches the child npm as a
+// CLI-level --allow-scripts, which npm rejects in project-scoped
+// installs (EALLOWSCRIPTS). Strip it so the child reads its own config.
+const env = { ...process.env };
+delete env.npm_config_allow_scripts;
+
+execSync(`npm version ${type} --no-git-tag-version`, { stdio: "inherit", env });
+execSync("npm install --package-lock-only", { stdio: "inherit", env });
 
 const pkg = JSON.parse(readFileSync("package.json", "utf8"));
 const mfst = JSON.parse(readFileSync("manifest.json", "utf8"));
