@@ -104,6 +104,22 @@
   // Move rows pair up starting at this listMoves index; when black starts,
   // listMoves[0] gets its own "1. ..." row above and pairing begins at 1.
   let pairOffset = $derived(blackStarts ? 1 : 0);
+  // Game result ("1-0"...) shown after the last move, but only when the
+  // current line reaches the end of the mainline — pgn-viewer always
+  // renders it after the full movetext, while our list only shows the
+  // path to the current node, so gate it on the mainline leaf.
+  let listResult = $derived.by(() => {
+    void _uiVer;
+    const slot = games?.[currentGameIndex ?? 0];
+    const raw = slot?.headers.get("Result") ?? "";
+    if (!raw || raw === "*") return "";
+    const root =
+      currentPath.length > 0 ? nodeMap.get(currentPath[0]) : undefined;
+    if (!root || !currentNode) return "";
+    let leaf: ChessNode = root;
+    while (leaf.children.length > 0) leaf = leaf.children[0];
+    return leaf.id === currentNode.id ? raw : "";
+  });
   let startMarks = $derived.by(() => {
     void _uiVer;
     const node =
@@ -1464,6 +1480,14 @@
             </li>
           {/if}
         {/each}
+        {#if listResult}
+          <li class="{CLS_PREFIX}-moves__crow">
+            <span
+              class="{CLS_PREFIX}-moves__result"
+              title={formatResult(listResult, _lv)}>{listResult}</span
+            >
+          </li>
+        {/if}
       </ul>
     {/if}
   </div>

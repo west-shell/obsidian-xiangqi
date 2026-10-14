@@ -479,6 +479,22 @@ svg.#{$cls-prefix}-moves__badge {
   pointer-events: none;
 }
 
+// ---- Game result row --------------------------------------------------------------------
+
+// Result wrapper <li> flattens into the shared move grid like __row.
+.#{$cls-prefix}-moves__crow {
+  display: contents;
+}
+
+// Game result ("1-0"...) after the last move of the finished mainline,
+// aligned with the move columns (pgn-viewer's bold result comment).
+.#{$cls-prefix}-moves__result {
+  grid-column: 2 / -1;
+  padding: 0.12em 0.4em;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
 // ---- Comment row -----------------------------------------------------------------------
 
 .#{$cls-prefix}-panel__comment {
