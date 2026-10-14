@@ -35,6 +35,7 @@ import {
   ImportModal,
 } from "../../utils/confirmModal";
 import { activateGame, extractHeaders } from "../../utils/parse";
+import { branchTip, migrateBranchResult } from "../../utils/result";
 import { Modal, Setting } from "obsidian";
 import { mount, unmount } from "svelte";
 import Chess from "../../lib/Tree/Chess.svelte";
@@ -170,6 +171,10 @@ const ActionsModule = {
       };
       host.nodeMap.set(newNode.id, newNode);
       host.currentNode.children.push(newNode);
+      // A branch result follows the branch tip: extending the line
+      // carries the result along; a new variation (second child) never
+      // inherits the sibling line's result.
+      migrateBranchResult(host.currentNode, newNode);
       host.currentNode = newNode;
       host.fen = move.after;
       host.currentStep++;
@@ -177,6 +182,29 @@ const ActionsModule = {
       eventBus.emit("updateMainPath");
       eventBus.emit("updateUI");
       eventBus.emit("modified", null);
+    });
+
+    // Result toolbar: set or clear the current branch's result on its
+    // tip node. Results live per branch (node.result on the line's tip)
+    // and are never set through the [Result] header tag.
+    eventBus.on<string>("set-result", (result) => {
+      if (result === undefined) return;
+      const tip = branchTip(host.currentNode);
+      if (result === "") {
+        if (!tip.result) return;
+        tip.result = undefined;
+      } else {
+        if (tip.result === result) return;
+        tip.result = result;
+      }
+      // Keep the [Result] header in step with the mainline terminator
+      // (the parser re-derives the tag from it on load); variation
+      // results never touch the header.
+      if (tip === branchTip(host.root)) {
+        syncResultTag(host, result);
+      }
+      eventBus.emit("modified", null);
+      eventBus.emit("updateUI");
     });
 
     eventBus.on<string>("node-click", (id) => {
@@ -476,15 +504,12 @@ const ActionsModule = {
               "Round",
               PRIMARY_PLAYER_KEY,
               "Black",
-              "Result",
             ];
             for (const key of standardKeys) {
               if (!tagPairs.some((p) => p.key === key)) {
                 tagPairs.push({ key, value: "" });
               }
             }
-            const prevResult =
-              tagPairs.find((p) => p.key === "Result")?.value ?? "";
             const tagsModal = new Modal(host.plugin.app);
             let resolve: (value: boolean) => void;
             const tagsPromise = new Promise<boolean>((r) => {
@@ -496,27 +521,18 @@ const ActionsModule = {
                 .setName(t("confirm.editTagsTitle", 0))
                 .setHeading();
               for (const pair of tagPairs) {
+                // [Result] stays in tagPairs (untouched) so the rebuilt
+                // header preserves it, but it is not editable here:
+                // results are set per branch via the result toolbar.
+                if (pair.key === "Result") continue;
                 const setting = new Setting(contentEl).setName(
                   t(`tag.${pair.key}`, 0) || pair.key,
                 );
-                if (pair.key === "Result") {
-                  setting.addDropdown((dropdown) => {
-                    dropdown.addOption("*", "*");
-                    dropdown.addOption("1-0", "1-0");
-                    dropdown.addOption("0-1", "0-1");
-                    dropdown.addOption("1/2-1/2", "1/2-1/2");
-                    dropdown.setValue(pair.value || "*");
-                    dropdown.onChange((v) => {
-                      pair.value = v;
-                    });
+                setting.addText((text) => {
+                  text.setValue(pair.value).onChange((v) => {
+                    pair.value = v;
                   });
-                } else {
-                  setting.addText((text) => {
-                    text.setValue(pair.value).onChange((v) => {
-                      pair.value = v;
-                    });
-                  });
-                }
+                });
               }
               const btnContainer = contentEl.createDiv(
                 "modal-button-container",
@@ -552,11 +568,6 @@ const ActionsModule = {
               if (slot) {
                 slot.headers = extractHeaders(host.tags);
                 if (slot.parsed) slot.parsed.tags = host.tags;
-              }
-              const newResult =
-                tagPairs.find((p) => p.key === "Result")?.value ?? "";
-              if (newResult !== prevResult) {
-                syncMovetextResult(host, newResult);
               }
               eventBus.emit("modified", null);
               eventBus.emit("updateUI");
@@ -815,28 +826,21 @@ function emitNodeEval(host: IHost) {
   }
 }
 
-const TERMINAL_RESULTS = ["1-0", "0-1", "1/2-1/2"];
-
-// The game result lives in two places: the [Result] header tag and the
-// movetext terminator token, which the parser stores on the node carrying
-// it (node.result — shown as the crown badge and re-emitted by
-// stringifyPGN on save). Editing the tag must sync both, otherwise the
-// badge keeps the old result and the next save/reload resurrects it from
-// the movetext, overriding the edited tag.
-function syncMovetextResult(host: IHost, result: string): void {
-  const hasResult = TERMINAL_RESULTS.includes(result);
-  const resultNodes: ChessNode[] = [];
-  for (const node of host.nodeMap.values()) {
-    if (node.result) resultNodes.push(node);
+// Rewrite the [Result] header tag to match the mainline's result. The
+// tag is display/export metadata only — results are set per branch
+// (node.result via the result toolbar), never through this tag.
+function syncResultTag(host: IHost, result: string): void {
+  const value = result || "*";
+  const tags = host.tags ?? "";
+  if (/\[Result\s+"[^"]*"\]/.test(tags)) {
+    host.tags = tags.replace(/\[Result\s+"[^"]*"\]/, `[Result "${value}"]`);
+  } else if (result) {
+    host.tags = tags ? `${tags}\n[Result "${result}"]` : `[Result "${result}"]`;
   }
-  if (resultNodes.length > 0) {
-    for (const node of resultNodes) {
-      node.result = hasResult ? result : undefined;
-    }
-  } else if (hasResult) {
-    let last = host.root;
-    while (last.children.length > 0) last = last.children[0];
-    if (last !== host.root) last.result = result;
+  const slot = host.games[host.currentGameIndex];
+  if (slot) {
+    slot.headers = extractHeaders(host.tags);
+    if (slot.parsed) slot.parsed.tags = host.tags;
   }
 }
 

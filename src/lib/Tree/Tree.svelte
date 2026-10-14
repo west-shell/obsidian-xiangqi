@@ -660,6 +660,32 @@
   let _lv = $state(0);
   const unsubLang = onLangChange(() => _lv++);
 
+  // ---- Result toolbar ----
+  // The current branch's result lives on the line's tip node (the last
+  // id of currentPath). node.result mutates outside Svelte signals, so
+  // read _uiVer like the other list deriveds.
+  let branchResult = $derived.by(() => {
+    void _uiVer;
+    if (currentPath.length === 0) return "";
+    return nodeMap.get(currentPath[currentPath.length - 1])?.result ?? "";
+  });
+  // "1-0" is the primary side winning (White in chess, Red in xiangqi).
+  // Widen to string so the same synced comparison type-checks in both
+  // variants (each chess.ts types the constant as its own literal).
+  const primaryKey: string = PRIMARY_PLAYER_KEY;
+  let primaryWinsLabel = $derived(
+    primaryKey === "Red" ? t("tree.redWins", _lv) : t("tree.whiteWins", _lv),
+  );
+  function toggleDrawResult() {
+    eventBus.emit("set-result", branchResult === "1/2-1/2" ? "" : "1/2-1/2");
+  }
+  function togglePrimaryWinsResult() {
+    eventBus.emit("set-result", branchResult === "1-0" ? "" : "1-0");
+  }
+  function toggleBlackWinsResult() {
+    eventBus.emit("set-result", branchResult === "0-1" ? "" : "0-1");
+  }
+
   onMount(() => {
     eventBus.on("updateUI", onUiVer);
   });
@@ -1396,88 +1422,132 @@
       </span>
     {/snippet}
     {#if listVisible}
-      <ul class="{CLS_PREFIX}-moves" bind:this={listUlRef}>
-        <li class="{CLS_PREFIX}-moves__row {CLS_PREFIX}-moves__row--start">
-          <span class="{CLS_PREFIX}-moves__num" bind:this={listItemRefs[0]}
-            >0</span
-          >
-          <!-- svelte-ignore a11y_click_events_have_key_events -->
-          <!-- svelte-ignore a11y_no_static_element_interactions -->
-          <span
-            class={`${CLS_PREFIX}-moves__move ${CLS_PREFIX}-moves__move--start ${listCurrentStep === 0 ? `${CLS_PREFIX}-moves__move--active` : ""}`}
-            onclick={() => onClickStep(0)}
-          >
-            <span
-              class={`${CLS_PREFIX}-moves__label ${(startMarks.node?.comments ?? []).length > 0 && settings?.showListCommentMark !== false ? `${CLS_PREFIX}-moves__label--comment` : ""}`}
+      <div class="{CLS_PREFIX}-moves-col">
+        <ul class="{CLS_PREFIX}-moves" bind:this={listUlRef}>
+          <li class="{CLS_PREFIX}-moves__row {CLS_PREFIX}-moves__row--start">
+            <span class="{CLS_PREFIX}-moves__num" bind:this={listItemRefs[0]}
+              >0</span
             >
-              {getStartLabel()}
-              {#if startMarks.node}
-                {@render moveLabelContent(startMarks.node)}
+            <!-- svelte-ignore a11y_click_events_have_key_events -->
+            <!-- svelte-ignore a11y_no_static_element_interactions -->
+            <span
+              class={`${CLS_PREFIX}-moves__move ${CLS_PREFIX}-moves__move--start ${listCurrentStep === 0 ? `${CLS_PREFIX}-moves__move--active` : ""}`}
+              onclick={() => onClickStep(0)}
+            >
+              <span
+                class={`${CLS_PREFIX}-moves__label ${(startMarks.node?.comments ?? []).length > 0 && settings?.showListCommentMark !== false ? `${CLS_PREFIX}-moves__label--comment` : ""}`}
+              >
+                {getStartLabel()}
+                {#if startMarks.node}
+                  {@render moveLabelContent(startMarks.node)}
+                {/if}
+              </span>
+              {#if startMarks.node?.result}
+                <span
+                  class="{CLS_PREFIX}-moves__result"
+                  title={formatResult(startMarks.node.result, _lv)}
+                  >{startMarks.node.result}</span
+                >
+              {/if}
+              {#if startMarks.node?.eval && settings?.showListEval !== false}
+                <span
+                  class="{CLS_PREFIX}-moves__evalbar"
+                  style={evalBarStyle(startMarks.node.eval)}
+                ></span>
               {/if}
             </span>
-            {#if startMarks.node?.result}
-              <span
-                class="{CLS_PREFIX}-moves__result"
-                title={formatResult(startMarks.node.result, _lv)}
-                >{startMarks.node.result}</span
-              >
-            {/if}
-            {#if startMarks.node?.eval && settings?.showListEval !== false}
-              <span
-                class="{CLS_PREFIX}-moves__evalbar"
-                style={evalBarStyle(startMarks.node.eval)}
-              ></span>
-            {/if}
-          </span>
-        </li>
-        {#if blackStarts}
-          <!-- Black moves first: pad the left column with "..." so black's
-               first move lands in the right column (lila/PGN convention). -->
-          <li class="{CLS_PREFIX}-moves__row">
-            <span class="{CLS_PREFIX}-moves__num" bind:this={listItemRefs[1]}
-              >1</span
-            >
-            <span class="{CLS_PREFIX}-moves__placeholder" aria-hidden="true"
-              >...</span
-            >
-            {#if listMoves[0]}
-              {@render moveSpan(listMoves[0]!, 1)}
-            {:else}
-              <span class="{CLS_PREFIX}-moves__empty" aria-hidden="true"></span>
-            {/if}
           </li>
-        {/if}
-        {#each listMoves as move, i (move.id)}
-          {#if i >= pairOffset && (i - pairOffset) % 2 === 0}
-            <!-- Row number expressed via i's parity only: row-opening items
-                 are even i when white starts and odd i when black starts, so
-                 this equals (i - pairOffset) / 2 + 1 + pairOffset WITHOUT
-                 reading the pairOffset derived — a derived read inside the
-                 bind:this index expression freezes list updates after the
-                 first $set when props are forwarded through a parent. -->
-            {@const row = Math.floor(i / 2) + 1 + (i % 2)}
+          {#if blackStarts}
+            <!-- Black moves first: pad the left column with "..." so black's
+               first move lands in the right column (lila/PGN convention). -->
             <li class="{CLS_PREFIX}-moves__row">
-              <span
-                class="{CLS_PREFIX}-moves__num"
-                bind:this={listItemRefs[row]}>{row}</span
+              <span class="{CLS_PREFIX}-moves__num" bind:this={listItemRefs[1]}
+                >1</span
               >
-              <!-- Read listMoves[i] (the reactive derived) instead of the
-                   each-item value: the item reference never changes when the
-                   array recomputes, so Svelte would skip re-rendering white
-                   moves when engine analysis mutates node.eval in place. -->
-              {@render moveSpan(listMoves[i]!, i + 1)}
-              {#if listMoves[i + 1]}
-                {@render moveSpan(listMoves[i + 1], i + 2)}
+              <span class="{CLS_PREFIX}-moves__placeholder" aria-hidden="true"
+                >...</span
+              >
+              {#if listMoves[0]}
+                {@render moveSpan(listMoves[0]!, 1)}
               {:else}
-                <!-- Placeholder keeps the right column occupied so grid
-                     auto-placement does not shift the next row. -->
                 <span class="{CLS_PREFIX}-moves__empty" aria-hidden="true"
                 ></span>
               {/if}
             </li>
           {/if}
-        {/each}
-      </ul>
+          {#each listMoves as move, i (move.id)}
+            {#if i >= pairOffset && (i - pairOffset) % 2 === 0}
+              <!-- Row number expressed via i's parity only: row-opening items
+                 are even i when white starts and odd i when black starts, so
+                 this equals (i - pairOffset) / 2 + 1 + pairOffset WITHOUT
+                 reading the pairOffset derived — a derived read inside the
+                 bind:this index expression freezes list updates after the
+                 first $set when props are forwarded through a parent. -->
+              {@const row = Math.floor(i / 2) + 1 + (i % 2)}
+              <li class="{CLS_PREFIX}-moves__row">
+                <span
+                  class="{CLS_PREFIX}-moves__num"
+                  bind:this={listItemRefs[row]}>{row}</span
+                >
+                <!-- Read listMoves[i] (the reactive derived) instead of the
+                   each-item value: the item reference never changes when the
+                   array recomputes, so Svelte would skip re-rendering white
+                   moves when engine analysis mutates node.eval in place. -->
+                {@render moveSpan(listMoves[i]!, i + 1)}
+                {#if listMoves[i + 1]}
+                  {@render moveSpan(listMoves[i + 1], i + 2)}
+                {:else}
+                  <!-- Placeholder keeps the right column occupied so grid
+                     auto-placement does not shift the next row. -->
+                  <span class="{CLS_PREFIX}-moves__empty" aria-hidden="true"
+                  ></span>
+                {/if}
+              </li>
+            {/if}
+          {/each}
+        </ul>
+        <div class="{CLS_PREFIX}-resultbar">
+          <button
+            class="{CLS_PREFIX}-btn {CLS_PREFIX}-resultbar__btn {branchResult ===
+            '1-0'
+              ? `${CLS_PREFIX}-resultbar__btn--active`
+              : ''}"
+            title={branchResult === "1-0"
+              ? t("tree.clearResult", _lv)
+              : primaryWinsLabel}
+            aria-label={branchResult === "1-0"
+              ? t("tree.clearResult", _lv)
+              : primaryWinsLabel}
+            onclick={togglePrimaryWinsResult}>{primaryWinsLabel}</button
+          >
+          <button
+            class="{CLS_PREFIX}-btn {CLS_PREFIX}-resultbar__btn {branchResult ===
+            '0-1'
+              ? `${CLS_PREFIX}-resultbar__btn--active`
+              : ''}"
+            title={branchResult === "0-1"
+              ? t("tree.clearResult", _lv)
+              : t("tree.blackWins", _lv)}
+            aria-label={branchResult === "0-1"
+              ? t("tree.clearResult", _lv)
+              : t("tree.blackWins", _lv)}
+            onclick={toggleBlackWinsResult}>{t("tree.blackWins", _lv)}</button
+          >
+          <button
+            class="{CLS_PREFIX}-btn {CLS_PREFIX}-resultbar__btn {branchResult ===
+            '1/2-1/2'
+              ? `${CLS_PREFIX}-resultbar__btn--active`
+              : ''}"
+            title={branchResult === "1/2-1/2"
+              ? t("tree.clearResult", _lv)
+              : t("tree.draw", _lv)}
+            aria-label={branchResult === "1/2-1/2"
+              ? t("tree.clearResult", _lv)
+              : t("tree.draw", _lv)}
+            onclick={toggleDrawResult}>{t("tree.draw", _lv)}</button
+          >
+        </div>
+      </div>
     {/if}
   </div>
 

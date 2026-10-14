@@ -311,12 +311,24 @@ button.#{$cls-prefix}-gamenav__arrow svg {
 
 // ---- Move list -----------------------------------------------------------------------
 
+// Right-hand column of the panel row: the scrollable move list above the
+// fixed result toolbar. The width cap lives here (not on the ul) so the
+// toolbar spans the exact same column as the list.
+.#{$cls-prefix}-moves-col {
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 auto;
+  min-width: 0;
+  max-width: 16.67em;
+  background-color: var(--background-primary-alt);
+  border-left: 1px solid var(--background-modifier-border);
+}
+
 // Cap in em so the list widens when the font-size setting grows (200px at the
 // 12px default); CJK notation rows otherwise clip against a fixed pixel cap.
 .#{$cls-prefix}-moves {
   width: auto;
   min-width: 0;
-  max-width: 16.67em;
   // One shared grid for the whole list so the number / white / black columns
   // keep a single width across all rows: each track sizes to the longest
   // item in that column (max-content). Rows flatten into it via
@@ -338,9 +350,10 @@ button.#{$cls-prefix}-gamenav__arrow svg {
   padding: 0 0.25em;
   margin: 0;
   color: var(--text-normal);
-  background-color: var(--background-primary-alt);
-  border-left: 1px solid var(--background-modifier-border);
-  flex-shrink: 0;
+  // Fill the moves-col column and let the toolbar pin the rest; min-height
+  // keeps the grid scrollable instead of pushing the toolbar off-panel.
+  flex: 1 1 auto;
+  min-height: 0;
   list-style: none;
 }
 
@@ -486,6 +499,43 @@ svg.#{$cls-prefix}-moves__badge {
 .#{$cls-prefix}-moves__result {
   font-weight: 700;
   margin-left: 0.35em;
+}
+
+// ---- Result toolbar --------------------------------------------------------------------
+
+// Fixed at the bottom of the move list column: per-branch result buttons
+// (draw / resign). Clicking the active button clears the branch result;
+// the resign outcome follows the side to move at the branch tip.
+.#{$cls-prefix}-resultbar {
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  padding: 4px;
+  border-top: 1px solid var(--background-modifier-border);
+  flex-shrink: 0;
+}
+
+button.#{$cls-prefix}-resultbar__btn {
+  flex: 1 1 auto;
+  height: 22px;
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+button.#{$cls-prefix}-resultbar__btn:hover {
+  color: var(--text-normal);
+}
+
+button.#{$cls-prefix}-resultbar__btn--active {
+  background-color: var(--interactive-accent);
+  color: var(--text-on-accent);
+}
+
+button.#{$cls-prefix}-resultbar__btn--active:hover {
+  background-color: var(--interactive-accent);
+  color: var(--text-on-accent);
+  filter: brightness(1.1);
 }
 
 // ---- Comment row -----------------------------------------------------------------------
