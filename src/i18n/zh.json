@@ -278,6 +278,7 @@
   "save.annotationFormat.suffix": "符号后缀（e4!?）",
   "save.annotationFormat.nag": "NAG 编号（$1、$16）",
   "save.annotationFormat.comment": "注释形式（{[#a:!?]}、{[#a:±]}）",
+  "player.clock": "剩余用时",
   "game.prev": "上一局",
   "game.next": "下一局",
   "game.label": "第 {current}/{total} 局",

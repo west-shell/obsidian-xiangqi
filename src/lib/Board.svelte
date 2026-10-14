@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
+  import type { Snippet } from "svelte";
   import { SvelteMap } from "svelte/reactivity";
   import {
     type Api,
@@ -46,6 +47,10 @@
     engineBestMove?: { from: Square; to: Square } | null;
     enginePonder?: { from: Square; to: Square } | null;
     glyphShapes?: DrawShape[];
+    /** Optional player bar rendered above the board (names/clocks). */
+    topBar?: Snippet;
+    /** Optional player bar rendered below the board. */
+    bottomBar?: Snippet;
   }
 
   let {
@@ -63,7 +68,10 @@
     engineBestMove = null,
     enginePonder = null,
     glyphShapes = [],
+    topBar,
+    bottomBar,
   }: Props = $props();
+  let hasBars = $derived(!!(topBar || bottomBar));
 
   let boardElement!: HTMLDivElement;
   let api: Api | null = $state(null);
@@ -411,12 +419,19 @@
   }
 </script>
 
-<div class="{CLS_PREFIX}-layout__board {turnClass}" onwheel={handleWheel}>
+<div
+  class="{CLS_PREFIX}-layout__board {turnClass}{hasBars
+    ? ` ${CLS_PREFIX}-layout__board--bars`
+    : ''}"
+  onwheel={handleWheel}
+>
+  {#if topBar}{@render topBar()}{/if}
   <div
     bind:this={boardElement}
     class={WRAP_CLASS}
     style="--board-ratio: {BOARD_ASPECT_RATIO}"
   ></div>
+  {#if bottomBar}{@render bottomBar()}{/if}
   {#if HAS_PROMOTION && promotingMove}
     <!-- svelte-ignore a11y_click_events_have_key_events -->
     <!-- svelte-ignore a11y_no_static_element_interactions -->

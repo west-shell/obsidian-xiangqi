@@ -30,6 +30,14 @@
   import { annotationShapes } from "../../utils/glyphs";
   import { badgeBoardSvg } from "../../utils/icon";
   import { parseOrientationTag } from "../../utils/parse";
+  import {
+    clockForColor,
+    formatClock,
+    formatSeconds,
+    getPlayerInfo,
+    initialClockSeconds,
+    type PlayerInfo,
+  } from "../../utils/player";
 
   const BRUSH_MAP: Record<string, string> = {
     green: "g",
@@ -202,6 +210,57 @@
       : null,
   ) as "white" | "black" | null;
 
+  // ---- Player bars (names / ratings / clocks above and below the board) ---
+  let gameHeaders = $derived(games[currentGameIndex]?.headers);
+  /** First player (White/Red) sits at the bottom unless the board is flipped. */
+  let boardFirst = $derived(!rotated);
+  let bottomInfo = $derived(getPlayerInfo(gameHeaders, boardFirst));
+  let topInfo = $derived(getPlayerInfo(gameHeaders, !boardFirst));
+  let initialSeconds = $derived(
+    gameHeaders ? initialClockSeconds(gameHeaders) : undefined,
+  );
+  let bottomClock = $derived.by(() => {
+    const clk = clockForColor(
+      currentNode,
+      nodeMap,
+      boardFirst ? "white" : "black",
+    );
+    if (clk !== undefined) return formatClock(clk);
+    // The side has no [%clk] yet (or the game only has [TimeControl]):
+    // fall back to the initial time.
+    return initialSeconds !== undefined
+      ? formatSeconds(initialSeconds)
+      : undefined;
+  });
+  let topClock = $derived.by(() => {
+    const clk = clockForColor(
+      currentNode,
+      nodeMap,
+      boardFirst ? "black" : "white",
+    );
+    if (clk !== undefined) return formatClock(clk);
+    return initialSeconds !== undefined
+      ? formatSeconds(initialSeconds)
+      : undefined;
+  });
+  let turnColor = $derived(fen.split(" ")[1] === "b" ? "black" : "white") as
+    "white" | "black";
+  let bottomActive = $derived(
+    bottomClock !== undefined && turnColor === (boardFirst ? "white" : "black"),
+  );
+  let topActive = $derived(
+    topClock !== undefined && turnColor === (boardFirst ? "black" : "white"),
+  );
+  function hasPlayerText(info: PlayerInfo): boolean {
+    return !!(info.name || info.title || info.rating);
+  }
+  let showPlayerBar = $derived(
+    hasPlayerText(topInfo) ||
+      hasPlayerText(bottomInfo) ||
+      topClock !== undefined ||
+      bottomClock !== undefined,
+  );
+
   let destroyed = false;
   onDestroy(() => {
     destroyed = true;
@@ -291,6 +350,45 @@
   });
 </script>
 
+{#snippet barContent(
+  info: PlayerInfo,
+  clock: string | undefined,
+  active: boolean,
+)}
+  <span class="{CLS_PREFIX}-player-bar__person">
+    {#if info.title}
+      <span class="{CLS_PREFIX}-player-bar__title">{info.title}</span>
+    {/if}
+    {#if info.name}
+      <span class="{CLS_PREFIX}-player-bar__name">{info.name}</span>
+    {/if}
+    {#if info.rating}
+      <span class="{CLS_PREFIX}-player-bar__rating">({info.rating})</span>
+    {/if}
+  </span>
+  {#if clock !== undefined}
+    <span
+      class="{CLS_PREFIX}-player-bar__clock{active
+        ? ` ${CLS_PREFIX}-player-bar__clock--active`
+        : ''}"
+      role="timer"
+      aria-label={t("player.clock", _lv)}>{clock}</span
+    >
+  {/if}
+{/snippet}
+
+{#snippet topBar()}
+  <div class="{CLS_PREFIX}-player-bar {CLS_PREFIX}-player-bar--top">
+    {@render barContent(topInfo, topClock, topActive)}
+  </div>
+{/snippet}
+
+{#snippet bottomBar()}
+  <div class="{CLS_PREFIX}-player-bar {CLS_PREFIX}-player-bar--bottom">
+    {@render barContent(bottomInfo, bottomClock, bottomActive)}
+  </div>
+{/snippet}
+
 {#if showParseWarning}
   <div class="{CLS_PREFIX}-parse-warning">
     <div class="{CLS_PREFIX}-parse-warning-head">
@@ -348,6 +446,8 @@
       {engineBestMove}
       {enginePonder}
       {glyphShapes}
+      topBar={showPlayerBar ? topBar : undefined}
+      bottomBar={showPlayerBar ? bottomBar : undefined}
     />
     <Toolbar
       {eventBus}

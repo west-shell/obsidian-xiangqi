@@ -1,0 +1,73 @@
+// ============================================================================
+// Player bars — names / titles / ratings / clocks above and below the board
+// (lichess study style). Rendered inside -layout__board when the source PGN
+// carries player or clock information.
+// ============================================================================
+
+@use "variant" as *;
+
+// Vertical room consumed by the two bars (0.8em text, 1.5 line-height,
+// 2px gaps between bars and board). Subtracted from the board width so
+// board + bars keep the same envelope the board alone used to fill —
+// works in every context because it reuses the exact --board-width
+// expression the bare board sizing is built on.
+$player-bar-reserve: 2.7em;
+
+.#{$cls-prefix}-layout__board--bars {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: calc(
+    var(
+        --board-width,
+        min(
+          var(--board-max, 100vh) * var(--#{$cls-prefix}-board-scale, 0.85),
+          100%
+        )
+      ) -
+      #{$player-bar-reserve} * #{$board-ratio}
+  );
+}
+
+.#{$cls-prefix}-player-bar {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  gap: 1ch;
+  padding: 0 2px;
+  font-size: 0.8em;
+  line-height: 1.5;
+
+  &__person {
+    flex: 1 1 auto;
+    display: flex;
+    flex-flow: row wrap;
+    align-items: baseline;
+    gap: 1ch;
+    min-width: 0;
+  }
+
+  &__title {
+    font-weight: 700;
+  }
+
+  &__name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__rating {
+    opacity: 0.7;
+  }
+
+  &__clock {
+    font-family: var(--font-monospace);
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+
+    &--active {
+      color: var(--text-accent);
+    }
+  }
+}

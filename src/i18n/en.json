@@ -277,6 +277,7 @@
   "save.annotationFormat.suffix": "Symbol suffix (e4!?)",
   "save.annotationFormat.nag": "NAG ($1, $16)",
   "save.annotationFormat.comment": "Comment form ({[#a:!?]}, {[#a:±]})",
+  "player.clock": "Remaining time",
   "game.prev": "Previous game",
   "game.next": "Next game",
   "game.label": "Game {current}/{total}",

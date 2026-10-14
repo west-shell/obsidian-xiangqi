@@ -8,6 +8,7 @@
 //   base     → custom-property defaults + host containers
 //   layout   → {prefix}-layout grid (col1/col2) + host contexts
 //   board    → board area + shared board-lib overrides (cg-*/xq-* per variant → _variant)
+//   player   → player bars above/below the board (names / ratings / clocks)
 //   buttons  → {prefix}-btn system
 //   toolbar  → main toolbar rail
 //   panel    → tree panel (game nav / canvas / eval / slider / move list)
@@ -21,6 +22,7 @@
 @use "scss/base";
 @use "scss/layout";
 @use "scss/board";
+@use "scss/player";
 @use "scss/buttons";
 @use "scss/toolbar";
 @use "scss/panel";
