@@ -35,6 +35,7 @@
   import { onLangChange, t } from "../../i18n";
   import { calculateTreeLayout } from "./layout";
   import { badgeSvg, iconSvg } from "../../utils/icon";
+  import { GLYPH_BY_KEY } from "../../utils/annotation-glyphs";
   import { evalBarIntensity } from "../../utils/winningChances";
   import { scrollToBTN } from "../../utils/utils";
   import PreviewBoard from "./PreviewBoard.svelte";
@@ -1375,8 +1376,15 @@
                 />
               {/if}
               {#if primaryAnnotation}
+                <!-- Position annotations (均势/白优/黑优/不明) share the
+                     result badge's top-left corner; custom marks stay on
+                     the left edge so the two never occupy the same spot. -->
                 <g
-                  transform="translate({-nw / 2} {nodeHeight / 2})"
+                  transform="translate({-nw / 2} {GLYPH_BY_KEY[
+                    primaryAnnotation
+                  ]?.category === 'position'
+                    ? -3.5
+                    : nodeHeight / 2})"
                   style="pointer-events: none"
                 >
                   <!-- eslint-disable-next-line svelte/no-at-html-tags -->

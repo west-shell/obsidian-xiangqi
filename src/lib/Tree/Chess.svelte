@@ -30,6 +30,7 @@
   import { onDestroy, onMount, tick } from "svelte";
   import { onLangChange, t } from "../../i18n";
   import { annotationShapes } from "../../utils/glyphs";
+  import { GLYPH_BY_KEY } from "../../utils/annotation-glyphs";
   import { badgeBoardSvg } from "../../utils/icon";
   import { parseOrientationTag } from "../../utils/parse";
   import {
@@ -175,16 +176,33 @@
     const node = currentNode;
     const shapes: DrawShape[] = [];
     const dest = node.move ? getMoveDest(node.move) : undefined;
+    // Result mark on the last move's square; mirrors the tree node's
+    // resultBadgeKey (an explicit result wins, then the checkmate mark)
+    // so board and tree always show the same badge.
+    const resultKey = node.result
+      ? `result_${node.result}`
+      : node.isCheckmate
+        ? "checkmate"
+        : "";
+    const resultSvg = dest ? badgeBoardSvg(resultKey) : "";
     if (node.glyph && dest) {
       const engineShapes = annotationShapes(dest, node.glyph);
       shapes.push(...engineShapes);
     }
     if (dest) {
       for (const ann of node.annotations ?? []) {
-        const svg = badgeBoardSvg(
-          ann,
-          shapes.filter((s) => s.customSvg).length,
-        );
+        const def = GLYPH_BY_KEY[ann];
+        // Position annotations share the result mark's top-left corner;
+        // when that mark is drawn they are skipped, otherwise the
+        // diff-rendered badge stack can cover it.
+        if (resultSvg && def?.category === "position") continue;
+        let x = -12;
+        let y = -12;
+        if (def?.category === "custom") {
+          y = 68;
+          if (def.key === "st") x = 71;
+        }
+        const svg = badgeBoardSvg(ann, x, y);
         if (svg) {
           shapes.push({
             orig: dest as DrawShape["orig"],
@@ -194,12 +212,11 @@
         }
       }
     }
-    if (node.isCheckmate && dest) {
-      const svg = badgeBoardSvg("checkmate");
+    if (resultSvg) {
       shapes.push({
         orig: dest as DrawShape["orig"],
         brush: "",
-        customSvg: { html: svg },
+        customSvg: { html: resultSvg },
       });
     }
     return shapes;

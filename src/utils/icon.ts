@@ -66,9 +66,6 @@ const ICONS: Record<string, IconNode> = {
     ["path", { d: "M7 15h6" }],
     ["path", { d: "M7 7h8" }],
   ],
-  crown: [
-    ["path", { d: "M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14v2H5v-2z" }],
-  ],
   house: [
     ["path", { d: "M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" }],
     [
@@ -87,11 +84,15 @@ const BADGE_DEFS: Record<
   bm: { icon: "bookmark", bgColor: "#e69f00", fgColor: "#fff" },
   st: { icon: "star", bgColor: "#22ac38", fgColor: "#fff" },
   // Lichess study position glyphs (annotation-glyphs.ts catalog, trimmed).
-  // $10/$16/$17 render with the equal/advantage/disadvantage icons that the
-  // retired legacy "+"/"-"/"=" custom marks used; $13 keeps its path copied
-  // verbatim from lila's prerendered badge set (ui/lib/src/game/glyphs.ts,
-  // 100x100 box, stroke-based, no <text>).
-  "10": { icon: "handshake", bgColor: "#82c2ef", fgColor: "#fff" },
+  // $10 renders the equal "=" mark copied verbatim from lila's prerendered
+  // badge set (ui/lib/src/game/glyphs.ts, 100x100 box, stroke-based, no
+  // <text>); $13/$16/$17 keep their lila paths/icons.
+  "10": {
+    glyph:
+      '<path stroke="#fff" stroke-width="7" fill="none" d="M 27,40 h 46 M 27,60 h 46"/>',
+    bgColor: "#82c2ef",
+    fgColor: "#fff",
+  },
   "13": {
     glyph:
       '<path stroke="#fff" stroke-width="7" fill="none" d="M 40,40 A 14.14 14.14 0 1 0 40,60 L 60,40 A 14.14 14.14 0 1 1 60,60 L 40,40"/>',
@@ -110,9 +111,22 @@ const BADGE_DEFS: Record<
     bgColor: "#df5353",
     fgColor: "#fff",
   },
-  "result_1-0": { icon: "crown", bgColor: "#22ac38", fgColor: "#fff" },
-  "result_0-1": { icon: "crown", bgColor: "#df5353", fgColor: "#fff" },
-  "result_1/2-1/2": { icon: "crown", bgColor: "#82c2ef", fgColor: "#fff" },
+  // Node result badges: wins carry the same "#" checkmate mark as the
+  // board overlay (red = black mates, green = white mates), draws use
+  // the handshake; all stroke/fill shapes, no <text>.
+  "result_1-0": {
+    glyph:
+      '<path fill="none" stroke="#fff" stroke-width="7" d="M15 40h70M15 60h70M40 15v70M60 15v70"/>',
+    bgColor: "#22ac38",
+    fgColor: "#fff",
+  },
+  "result_0-1": {
+    glyph:
+      '<path fill="none" stroke="#fff" stroke-width="7" d="M15 40h70M15 60h70M40 15v70M60 15v70"/>',
+    bgColor: "#df5353",
+    fgColor: "#fff",
+  },
+  "result_1/2-1/2": { icon: "handshake", bgColor: "#82c2ef", fgColor: "#fff" },
   "glyph_?!": {
     glyph:
       '<path fill="#fff" d="M37.734 21.947c-3.714 0-7.128.464-10.242 1.393-3.113.928-6.009 2.13-8.685 3.605l4.343 8.766c2.35-1.202 4.644-2.157 6.883-2.867a22.366 22.366 0 0 1 6.799-1.065c2.294 0 4.07.464 5.326 1.393 1.311.874 1.967 2.186 1.967 3.933 0 1.748-.546 3.277-1.639 4.588-1.038 1.257-2.786 2.758-5.244 4.506-2.786 2.021-4.751 3.961-5.898 5.819-1.147 1.857-1.721 4.15-1.721 6.88v2.952h10.568v-2.377c0-1.147.137-2.103.41-2.868.328-.764.93-1.557 1.803-2.376.874-.82 2.104-1.803 3.688-2.95 2.13-1.584 3.906-3.058 5.326-4.424 1.42-1.42 2.485-2.95 3.195-4.59.71-1.638 1.065-3.576 1.065-5.816 0-4.206-1.584-7.675-4.752-10.406-3.114-2.731-7.51-4.096-13.192-4.096zm24.745.819 2.048 39.084h9.75l2.047-39.084zM35.357 68.73c-1.966 0-3.632.52-4.998 1.557-1.365.983-2.047 2.732-2.047 5.244 0 2.404.682 4.152 2.047 5.244 1.366 1.038 3.032 1.557 4.998 1.557 1.912 0 3.55-.519 4.916-1.557 1.366-1.092 2.05-2.84 2.05-5.244 0-2.512-.684-4.26-2.05-5.244-1.365-1.038-3.004-1.557-4.916-1.557zm34.004 0c-1.966 0-3.632.52-4.998 1.557-1.365.983-2.049 2.732-2.049 5.244 0 2.404.684 4.152 2.05 5.244 1.365 1.038 3.03 1.557 4.997 1.557 1.912 0 3.55-.519 4.916-1.557 1.366-1.092 2.047-2.84 2.047-5.244 0-2.512-.681-4.26-2.047-5.244-1.365-1.038-3.004-1.557-4.916-1.557z"/>',
@@ -193,11 +207,13 @@ export function badgeSvg(key: string, size: number = 6): string {
   return `<circle cx="0" cy="0" r="${r}" fill="${def.bgColor}"/>${inner}`;
 }
 
-export function badgeBoardSvg(key: string, stack: number = 0): string {
+export function badgeBoardSvg(
+  key: string,
+  x: number = -12,
+  y: number = -12,
+): string {
   const def = BADGE_DEFS[key];
   if (!def) return "";
-  const x = -12;
-  const y = stack > 0 ? 68 : -12;
   let inner = "";
   if (def.glyph) {
     inner = def.glyph;
