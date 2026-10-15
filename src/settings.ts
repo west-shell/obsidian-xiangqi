@@ -159,6 +159,7 @@ export const DEFAULT_SETTINGS: ISettings = {
   showListAnnotation: true,
   showListGlyph: true,
   showListCommentMark: true,
+  showTreePreview: true,
   boardMarginTop: 20,
   boardMarginBottom: 20,
   viewOnly: false,
@@ -844,6 +845,16 @@ export class ChessSettingTab extends PluginSettingTab {
           }),
         );
     }
+
+    new Setting(containerEl)
+      .setName(t("movelist.showTreePreview"))
+      .setDesc(t("movelist.showTreePreview.desc"))
+      .addToggle((toggle) =>
+        toggle.setValue(settings.showTreePreview).onChange((value) => {
+          settings.showTreePreview = value;
+          this.plugin.refresh();
+        }),
+      );
 
     // ---- 引擎 ----
     new Setting(containerEl).setName(t("engine.title")).setHeading();

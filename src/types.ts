@@ -34,6 +34,7 @@ export interface ISettings {
   showListAnnotation: boolean;
   showListGlyph: boolean;
   showListCommentMark: boolean;
+  showTreePreview: boolean;
   boardMarginTop: number;
   boardMarginBottom: number;
   viewOnly?: boolean;

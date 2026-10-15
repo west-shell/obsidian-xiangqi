@@ -12,6 +12,7 @@
   import {
     ANNOTATOR_URL_PREFIX,
     CLS_PREFIX,
+    DEFAULT_FEN,
     getMoveListSideClass,
     getMoveNotation,
     getNodeDisplay,
@@ -25,6 +26,7 @@
     LAYOUT_CHANGE_EVENT,
     NODE_CHAR_DY,
     PRIMARY_PLAYER_KEY,
+    type Square,
     TREE_LAYOUT_SPACING,
   } from "../../chess";
   import { MarkdownRenderer, Menu, setIcon } from "obsidian";
@@ -33,6 +35,7 @@
   import { calculateTreeLayout } from "./layout";
   import { badgeSvg, iconSvg } from "../../utils/icon";
   import { scrollToBTN } from "../../utils/utils";
+  import PreviewBoard from "./PreviewBoard.svelte";
   import * as d3 from "d3";
 
   interface Props {
@@ -646,6 +649,58 @@
     nodeMode = (nodeMode + 1) % 2;
   }
 
+  // ---- Tree node hover preview ----
+  // lila-style pv-board: hovering a node in the tree graph shows a mini
+  // board with the position after that node's move. The board mounts on
+  // first hover and stays mounted afterwards (visibility instead of
+  // display) so chessground keeps valid bounds.
+  const TREE_PREVIEW_SIZE = 150;
+  let canvasEl: HTMLDivElement | undefined = $state();
+  let previewEverShown = $state(false);
+  let previewNode = $state<ChessNode | null>(null);
+  let previewPos = $state({ x: 8, y: 8 });
+  let previewFen = $derived(previewNode?.fen ?? DEFAULT_FEN);
+  let previewLastMove = $derived.by(() => {
+    const m = previewNode?.move;
+    return m ? ([m.from, m.to] as [Square, Square]) : null;
+  });
+  let previewOrientation: "white" | "black" = $derived(
+    settings?.rotated ? "black" : "white",
+  );
+
+  function supportsHover(): boolean {
+    return activeWindow.matchMedia?.("(hover: hover)").matches ?? true;
+  }
+
+  function onNodeMouseEnter(node: ChessNode, evt: MouseEvent) {
+    if (settings?.showTreePreview === false) return;
+    if (!supportsHover()) return;
+    previewNode = node;
+    previewEverShown = true;
+    updatePreviewPos(evt);
+  }
+
+  function onNodeMouseLeave(node: ChessNode) {
+    if (previewNode === node) previewNode = null;
+  }
+
+  function updatePreviewPos(evt: MouseEvent) {
+    const canvas = canvasEl;
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    // Offset right of the cursor; clamp inside the canvas, keeping the
+    // TREE_PREVIEW_SIZE box in sync with the .ct-tree-preview scss width.
+    const x = Math.min(
+      Math.max(evt.clientX - rect.left + 14, 4),
+      Math.max(4, rect.width - TREE_PREVIEW_SIZE - 8),
+    );
+    const y = Math.min(
+      Math.max(evt.clientY - rect.top - TREE_PREVIEW_SIZE / 2, 4),
+      Math.max(4, rect.height - TREE_PREVIEW_SIZE - 8),
+    );
+    previewPos = { x, y };
+  }
+
   // svelte-ignore state_referenced_locally
   let listVisible = $state(settings?.showMovelist ?? true);
   function toggleListVisible() {
@@ -1032,7 +1087,7 @@
     </div>
   {/if}
   <div class="{CLS_PREFIX}-panel__row">
-    <div class="{CLS_PREFIX}-panel__canvas">
+    <div class="{CLS_PREFIX}-panel__canvas" bind:this={canvasEl}>
       {#if nodeMap.get(currentNode?.id ?? "")?.eval}
         {@const ce = nodeMap.get(currentNode!.id)!.eval!}
         {@const isZero = ce.scoreType !== "mate" && ce.score === 0}
@@ -1073,11 +1128,13 @@
           </div>
         </div>
       {/if}
+      <!-- svelte-ignore a11y_no_static_element_interactions -->
       <svg
         bind:this={svgEl}
         width="100%"
         height="100%"
         class="{CLS_PREFIX}-panel__svg"
+        onmouseleave={() => (previewNode = null)}
       >
         <g transform={TRANSFORM_SAFE}>
           {#each renderedNodes as node (node.id)}
@@ -1159,6 +1216,8 @@
                 : undefined}
               stroke-width={isCurrent ? 1 : 0.5}
               onclick={() => eventBus.emit("node-click", node.id)}
+              onmouseenter={(e) => onNodeMouseEnter(node, e)}
+              onmouseleave={() => onNodeMouseLeave(node)}
             >
               <rect
                 x={-nw / 2}
@@ -1291,6 +1350,21 @@
           {/each}
         </g>
       </svg>
+
+      {#if previewEverShown}
+        <div
+          class="{CLS_PREFIX}-tree-preview{previewNode
+            ? ''
+            : ` ${CLS_PREFIX}-tree-preview--hidden`}"
+          style="--tree-preview-x: {previewPos.x}px; --tree-preview-y: {previewPos.y}px"
+        >
+          <PreviewBoard
+            fen={previewFen}
+            lastMove={previewLastMove}
+            orientation={previewOrientation}
+          />
+        </div>
+      {/if}
 
       <div class="{CLS_PREFIX}-panel__toolbar {CLS_PREFIX}-btn-group">
         {#if canFold}

@@ -47,6 +47,8 @@
   "movelist.showGlyph.desc": "Show engine glyph badges (!, !!, ?...) on moves in the move list",
   "movelist.showCommentMark": "Show comment marks",
   "movelist.showCommentMark.desc": "Mark moves that have comments with a dotted underline in the move list",
+  "movelist.showTreePreview": "Show position preview on tree hover",
+  "movelist.showTreePreview.desc": "Hovering a node in the variation tree shows a mini board with that position",
   "movelist.autoJump": "Auto jump",
   "movelist.autoJump.desc": "Where to position the board when opening a game",
   "movelist.autoJump.never": "Never jump",
