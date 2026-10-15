@@ -1175,7 +1175,6 @@
     <div class="{CLS_PREFIX}-panel__canvas" bind:this={canvasEl}>
       <button
         class="{CLS_PREFIX}-btn {CLS_PREFIX}-preview-toggle"
-        title={t("tree.togglePreview", _lv)}
         aria-label={t("tree.togglePreview", _lv)}
         aria-pressed={treePreviewOn}
         use:useSetIcon={treePreviewOn ? "eye" : "eye-off"}
@@ -1704,7 +1703,6 @@
         <div class="{CLS_PREFIX}-resultbar">
           <button
             class="{CLS_PREFIX}-btn {CLS_PREFIX}-resultbar__btn"
-            title={t("tree.switchResult", _lv)}
             aria-label={t("tree.switchResult", _lv)}
             aria-haspopup={branchResultLocked ? undefined : "menu"}
             onclick={showResultMenu}
@@ -1738,7 +1736,6 @@
     {/if}
     <button
       class="{CLS_PREFIX}-btn {CLS_PREFIX}-comment__toggle"
-      title={listVisible ? t("tree.hideList", _lv) : t("tree.showList", _lv)}
       aria-label={listVisible
         ? t("tree.hideList", _lv)
         : t("tree.showList", _lv)}
