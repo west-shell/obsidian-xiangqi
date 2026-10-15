@@ -68,6 +68,10 @@ export const DEFAULT_LANG = "zh";
 // ========== Flags ==========
 export const HAS_PROMOTION = false;
 export const PRIMARY_PLAYER_KEY = "Red";
+/** Piece-color key of the first player, for player-bar side marks. */
+export const FIRST_PLAYER_COLOR = "red";
+/** Piece-color key of the second player, for player-bar side marks. */
+export const SECOND_PLAYER_COLOR = "black";
 
 // ========== Move Functions ==========
 

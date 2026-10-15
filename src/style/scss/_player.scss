@@ -4,15 +4,18 @@
 // carries player or clock information.
 // ============================================================================
 
+@use "tokens" as *;
+@use "mixins" as *;
 @use "variant" as *;
 
 // Vertical room consumed by the two bars (0.8em text, 1.5 line-height,
 // 2px gaps between bars and board). Subtracted from the board width so
-// board + bars keep the same envelope the board alone used to fill —
-// works in every context because it reuses the exact --board-width
-// expression the bare board sizing is built on.
+// board + bars keep the same envelope the board alone used to fill.
 $player-bar-reserve: 2.7em;
 
+// Default (col1 board, PGN file view): shrink the element by the bars'
+// height — the host either centers it or flex-packs its neighbours, so no
+// dead space appears next to the shrunken element.
 .#{$cls-prefix}-layout__board--bars {
   display: flex;
   flex-direction: column;
@@ -29,6 +32,30 @@ $player-bar-reserve: 2.7em;
   );
 }
 
+// Code-block col2 lays the board column on a FIXED grid track
+// (var(--{prefix}-col2-width)): shrinking only the element would leave the
+// track — and the toolbar column next to it — a reserve-sized gap away.
+// Narrow the track itself instead, and let the element fill it (the width
+// override above must not subtract the reserve a second time).
+@include col2 {
+  .#{$cls-prefix}-block .#{$cls-prefix}-layout--bars {
+    grid-template-columns:
+      calc(
+        var(--#{$cls-prefix}-col2-width) - #{$player-bar-reserve} *
+          #{$board-ratio}
+      )
+      auto
+      $uniboard-table;
+  }
+
+  .#{$cls-prefix}-block .#{$cls-prefix}-layout__board--bars {
+    width: min(
+      var(--board-max, 100vh) * var(--#{$cls-prefix}-board-scale, 0.85),
+      100%
+    );
+  }
+}
+
 .#{$cls-prefix}-player-bar {
   display: flex;
   flex-flow: row nowrap;
@@ -37,6 +64,15 @@ $player-bar-reserve: 2.7em;
   padding: 0 2px;
   font-size: 0.8em;
   line-height: 1.5;
+
+  // Side mark (white/black chip) — colour per variant in _variant.scss.
+  &__mark {
+    flex-shrink: 0;
+    width: 0.75em;
+    height: 0.75em;
+    border-radius: 2px;
+    box-shadow: inset 0 0 0 1px var(--background-modifier-border);
+  }
 
   &__person {
     flex: 1 1 auto;

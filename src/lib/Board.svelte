@@ -426,38 +426,40 @@
   onwheel={handleWheel}
 >
   {#if topBar}{@render topBar()}{/if}
-  <div
-    bind:this={boardElement}
-    class={WRAP_CLASS}
-    style="--board-ratio: {BOARD_ASPECT_RATIO}"
-  ></div>
-  {#if bottomBar}{@render bottomBar()}{/if}
-  {#if HAS_PROMOTION && promotingMove}
-    <!-- svelte-ignore a11y_click_events_have_key_events -->
-    <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <div class="{CLS_PREFIX}-promotion">
+  <div class="{CLS_PREFIX}-board-area">
+    <div
+      bind:this={boardElement}
+      class={WRAP_CLASS}
+      style="--board-ratio: {BOARD_ASPECT_RATIO}"
+    ></div>
+    {#if HAS_PROMOTION && promotingMove}
       <!-- svelte-ignore a11y_click_events_have_key_events -->
       <!-- svelte-ignore a11y_no_static_element_interactions -->
-      <div
-        class="{CLS_PREFIX}-promotion__choices"
-        onclick={(e) => e.stopPropagation()}
-      >
-        {#each PROMOTION_PIECES ?? [] as { type, icon } (type)}
-          <button
-            class="{CLS_PREFIX}-promotion__btn"
-            onclick={() => completePromotion(type)}
-          >
-            <!-- eslint-disable-next-line svelte/no-at-html-tags -->
-            {@html iconSvg(icon, promoIconSize, 1.2)}
-          </button>
-        {/each}
+      <div class="{CLS_PREFIX}-promotion">
+        <!-- svelte-ignore a11y_click_events_have_key_events -->
+        <!-- svelte-ignore a11y_no_static_element_interactions -->
+        <div
+          class="{CLS_PREFIX}-promotion__choices"
+          onclick={(e) => e.stopPropagation()}
+        >
+          {#each PROMOTION_PIECES ?? [] as { type, icon } (type)}
+            <button
+              class="{CLS_PREFIX}-promotion__btn"
+              onclick={() => completePromotion(type)}
+            >
+              <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+              {@html iconSvg(icon, promoIconSize, 1.2)}
+            </button>
+          {/each}
+        </div>
       </div>
-    </div>
-  {/if}
-  <!-- svelte-ignore a11y_no_static_element_interactions -->
-  <div
-    class="{CLS_PREFIX}-board-resize"
-    onmousedown={startResize}
-    ontouchstart={startResize}
-  ></div>
+    {/if}
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
+    <div
+      class="{CLS_PREFIX}-board-resize"
+      onmousedown={startResize}
+      ontouchstart={startResize}
+    ></div>
+  </div>
+  {#if bottomBar}{@render bottomBar()}{/if}
 </div>

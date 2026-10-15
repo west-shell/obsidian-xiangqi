@@ -18,10 +18,12 @@
     type cg,
     CLS_PREFIX,
     type DrawShape,
+    FIRST_PLAYER_COLOR,
     getMoveDest,
     isMoveCheck,
     type Move,
     type Piece,
+    SECOND_PLAYER_COLOR,
     type Square,
   } from "../../chess";
   import type ChessPlugin from "../../main";
@@ -251,6 +253,13 @@
   let topActive = $derived(
     topClock !== undefined && turnColor === (boardFirst ? "black" : "white"),
   );
+  /** Side marks: the first player (White/Red) sits bottom unless flipped. */
+  let bottomColor = $derived(
+    boardFirst ? FIRST_PLAYER_COLOR : SECOND_PLAYER_COLOR,
+  );
+  let topColor = $derived(
+    boardFirst ? SECOND_PLAYER_COLOR : FIRST_PLAYER_COLOR,
+  );
   function hasPlayerText(info: PlayerInfo): boolean {
     return !!(info.name || info.title || info.rating);
   }
@@ -354,7 +363,11 @@
   info: PlayerInfo,
   clock: string | undefined,
   active: boolean,
+  color: string,
 )}
+  <span
+    class="{CLS_PREFIX}-player-bar__mark {CLS_PREFIX}-player-bar__mark--{color}"
+  ></span>
   <span class="{CLS_PREFIX}-player-bar__person">
     {#if info.title}
       <span class="{CLS_PREFIX}-player-bar__title">{info.title}</span>
@@ -379,13 +392,13 @@
 
 {#snippet topBar()}
   <div class="{CLS_PREFIX}-player-bar {CLS_PREFIX}-player-bar--top">
-    {@render barContent(topInfo, topClock, topActive)}
+    {@render barContent(topInfo, topClock, topActive, topColor)}
   </div>
 {/snippet}
 
 {#snippet bottomBar()}
   <div class="{CLS_PREFIX}-player-bar {CLS_PREFIX}-player-bar--bottom">
-    {@render barContent(bottomInfo, bottomClock, bottomActive)}
+    {@render barContent(bottomInfo, bottomClock, bottomActive, bottomColor)}
   </div>
 {/snippet}
 
@@ -432,7 +445,11 @@
     <GenFENToolbar {eventBus} {fen} {isFenMode} />
   </div>
 {:else}
-  <div class="{CLS_PREFIX}-layout">
+  <div
+    class="{CLS_PREFIX}-layout{showPlayerBar
+      ? ` ${CLS_PREFIX}-layout--bars`
+      : ''}"
+  >
     <Board
       {settings}
       {fen}

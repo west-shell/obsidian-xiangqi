@@ -259,6 +259,16 @@ $board-ratio: 0.9;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
+// ---- Player-bar side marks (red / black chips) --------------------------------
+
+.#{$cls-prefix}-player-bar__mark--red {
+  background: var(--xq-piece-red);
+}
+
+.#{$cls-prefix}-player-bar__mark--black {
+  background: var(--xq-piece-black);
+}
+
 // ---- Piece-set picker modal (board menu -> "Piece set…") --------------------
 // Board piece images themselves come from the generated per-set CSS files
 // (src/style/pieceSets/*.css, scoped under .xq-pieceset-<set> on <body>);

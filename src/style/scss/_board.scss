@@ -22,6 +22,13 @@
   border-radius: 2px;
 }
 
+// Positioning wrapper around the chessground and its overlays (promotion
+// dialog, resize handle). Player bars live outside it, so the overlays and
+// the handle track the board squares instead of the bars.
+.#{$cls-prefix}-board-area {
+  position: relative;
+}
+
 // Turn indicator frame: a crisp ring around the board wrap (no blur → no
 // glow) in the side-to-move piece color. Lives in _variant.scss (not here)
 // because each variant owns its piece-color variable names

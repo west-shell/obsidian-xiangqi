@@ -25,12 +25,18 @@
 BlockHost  containerEl ─── .ct-block (+ Obsidian .block-language-*)
 FileHost   contentEl  ─── .view-content.ct-file-view
   └─ Chess.svelte
-      └─ .ct-layout [.ct-layout--edit]
+      └─ .ct-layout [.ct-layout--bars / .ct-layout--edit]
           ├─ Board.svelte
-          │    .ct-layout__board [--turn-white/--turn-black]
-          │    ├─ .cg-wrap  (chessground: cg-container > cg-board)
-          │    ├─ .ct-promotion > .ct-promotion__choices > .ct-promotion__btn
-          │    └─ .ct-board-resize
+          │    .ct-layout__board [--turn-white/--turn-black / --bars]
+          │    ├─ .ct-player-bar[--top]
+          │    │    ├─ .ct-player-bar__mark[--white/--black]
+          │    │    ├─ .ct-player-bar__person > __title + __name + __rating
+          │    │    └─ .ct-player-bar__clock[--active]
+          │    ├─ .ct-board-area
+          │    │    ├─ .cg-wrap  (chessground: cg-container > cg-board)
+          │    │    ├─ .ct-promotion > .ct-promotion__choices > .ct-promotion__btn
+          │    │    └─ .ct-board-resize
+          │    └─ .ct-player-bar[--bottom]
           ├─ Toolbar.svelte ─── .ct-toolbar
           │    └─ button.ct-btn [--saved/--unsaved/--engine/--busy]
           ├─ Tree.svelte ─── .ct-layout__panel
@@ -87,6 +93,7 @@ src/style/
     _base.scss         body 自定义属性默认值、宿主容器、拖拽状态
     _layout.scss       .ct-layout 主网格（col1/col2）+ .ct-file-view 上下文
     _board.scss        棋盘区 + 双变体共享的 chessground 覆盖（wrap/piece）
+    _player.scss       棋手信息栏（名字 / 头衔 / 等级分 / 计时钟）
     _buttons.scss      .ct-btn 按钮体系（含 pill 组、状态修饰符）
     _toolbar.scss      .ct-toolbar 主工具栏组件
     _panel.scss        棋树面板（gamenav/canvas/eval/slider/moves/comment）
