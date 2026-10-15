@@ -690,7 +690,9 @@
     evt: MouseEvent,
     side: "left" | "right" = "right",
   ) {
-    if (settings?.showTreePreview === false) return;
+    // One shared switch covers both hover previews; the side only
+    // decides the positioning origin ("left" = move list, "right" = tree).
+    if (settings?.showPreview === false) return;
     if (!supportsHover()) return;
     previewNode = node;
     previewEverShown = true;
@@ -739,6 +741,24 @@
           ? cy + 14
           : Math.min(Math.max(cy - TREE_PREVIEW_SIZE - 14, 4), maxY);
     previewPos = { x, y };
+  }
+
+  // Standalone preview switch pinned to the canvas' top-left corner; a
+  // single master switch for BOTH hover previews (tree graph + move
+  // list). Mutates plugin.settings (the settings prop is a per-render
+  // clone) so the value persists and survives later updateUI clones.
+  // svelte-ignore state_referenced_locally
+  let treePreviewOn = $state(settings?.showPreview !== false);
+  function toggleTreePreview() {
+    treePreviewOn = !treePreviewOn;
+    if (plugin) {
+      plugin.settings.showPreview = treePreviewOn;
+      void plugin.saveSettings();
+      eventBus.emit("updateUI");
+    } else if (settings) {
+      settings.showPreview = treePreviewOn;
+    }
+    if (!treePreviewOn) previewNode = null;
   }
 
   // svelte-ignore state_referenced_locally
@@ -1138,6 +1158,14 @@
   {/if}
   <div class="{CLS_PREFIX}-panel__row">
     <div class="{CLS_PREFIX}-panel__canvas" bind:this={canvasEl}>
+      <button
+        class="{CLS_PREFIX}-btn {CLS_PREFIX}-preview-toggle"
+        title={t("tree.togglePreview", _lv)}
+        aria-label={t("tree.togglePreview", _lv)}
+        aria-pressed={treePreviewOn}
+        use:useSetIcon={treePreviewOn ? "eye" : "eye-off"}
+        onclick={toggleTreePreview}
+      ></button>
       {#if nodeMap.get(currentNode?.id ?? "")?.eval}
         {@const ce = nodeMap.get(currentNode!.id)!.eval!}
         {@const isZero = ce.scoreType !== "mate" && ce.score === 0}

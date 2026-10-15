@@ -100,6 +100,29 @@ button.#{$cls-prefix}-gamenav__arrow svg {
   height: 100%;
 }
 
+// Standalone hover-preview toggle pinned to the canvas' top-left corner;
+// shares the flat .ct-btn look and the grouped toolbar buttons' sizing
+// (22px hit area, 14px icon, 0.5rem edge offset like the bottom toolbar).
+.#{$cls-prefix}-preview-toggle {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 5;
+  width: 22px;
+  height: 22px;
+  opacity: 0.55;
+}
+
+.#{$cls-prefix}-preview-toggle svg {
+  width: 14px;
+  height: 14px;
+}
+
+.#{$cls-prefix}-preview-toggle:hover,
+.#{$cls-prefix}-preview-toggle:focus-visible {
+  opacity: 1;
+}
+
 .#{$cls-prefix}-panel__svg {
   user-select: none;
   touch-action: none;

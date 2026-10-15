@@ -159,7 +159,7 @@ export const DEFAULT_SETTINGS: ISettings = {
   showListAnnotation: true,
   showListGlyph: true,
   showListCommentMark: true,
-  showTreePreview: true,
+  showPreview: true,
   boardMarginTop: 20,
   boardMarginBottom: 20,
   viewOnly: false,
@@ -847,11 +847,11 @@ export class ChessSettingTab extends PluginSettingTab {
     }
 
     new Setting(containerEl)
-      .setName(t("movelist.showTreePreview"))
-      .setDesc(t("movelist.showTreePreview.desc"))
+      .setName(t("movelist.showPreview"))
+      .setDesc(t("movelist.showPreview.desc"))
       .addToggle((toggle) =>
-        toggle.setValue(settings.showTreePreview).onChange((value) => {
-          settings.showTreePreview = value;
+        toggle.setValue(settings.showPreview).onChange((value) => {
+          settings.showPreview = value;
           this.plugin.refresh();
         }),
       );
