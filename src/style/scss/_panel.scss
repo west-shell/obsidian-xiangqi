@@ -442,7 +442,10 @@ span.#{$cls-prefix}-moves__move {
     color 0.15s ease;
   white-space: nowrap;
   flex-shrink: 0;
-  padding: 0.12em 0.3em;
+  // Uniform padding for every move cell (eval or not): the extra bottom
+  // room hosts the eval bar so all rows keep the same height and the
+  // bar never reaches the notation/comment underline above it.
+  padding: 0.12em 0.3em 0.25em;
   margin: 0;
   color: var(--text-normal);
 }
@@ -461,7 +464,7 @@ span.#{$cls-prefix}-moves__move--black {
 // first, so the first black move lands in the right column.
 span.#{$cls-prefix}-moves__placeholder {
   min-width: 2.5em;
-  padding: 0.12em 0.3em;
+  padding: 0.12em 0.3em 0.25em;
   color: var(--text-faint);
   user-select: none;
 }
@@ -499,10 +502,11 @@ span.#{$cls-prefix}-moves__move--active {
 
 // Inner label wraps the notation + glyph/annotation marks; the comment
 // underline only applies to it so the trailing eval text stays plain.
+// em-based so the mark scales with the move-list font-size setting.
 .#{$cls-prefix}-moves__label--comment {
   text-decoration: underline dotted var(--color-blue);
-  text-decoration-thickness: 1px;
-  text-underline-offset: 2px;
+  text-decoration-thickness: 0.14em;
+  text-underline-offset: 0.15em;
 }
 
 // On the active move the dotted comment underline follows the accent text.
@@ -533,8 +537,10 @@ svg.#{$cls-prefix}-moves__badge {
   // stretches across the column, so centering would detach the bar from
   // the left-aligned notation text.
   left: 0.3em;
-  height: 2px;
-  border-radius: 1px;
+  // em-based so the bar scales with the move-list font-size setting; thin
+  // enough to live inside the cell's uniform bottom padding.
+  height: 0.1em;
+  border-radius: 0.05em;
   pointer-events: none;
 }
 
