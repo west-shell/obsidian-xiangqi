@@ -35,6 +35,7 @@
   import { onLangChange, t } from "../../i18n";
   import { calculateTreeLayout } from "./layout";
   import { badgeSvg, iconSvg } from "../../utils/icon";
+  import { evalBarIntensity } from "../../utils/winningChances";
   import { scrollToBTN } from "../../utils/utils";
   import PreviewBoard from "./PreviewBoard.svelte";
   import * as d3 from "d3";
@@ -182,8 +183,7 @@
 
   function evalBarStyle(ev: NodeEval): string {
     // Same intensity/colour logic as the tree graph node eval bar
-    const intensity =
-      ev.scoreType === "mate" ? 1 : Math.min(Math.abs(ev.score) / 300, 1);
+    const intensity = evalBarIntensity(ev);
     const color =
       ev.score > 0 || (ev.scoreType === "mate" && ev.score >= 0)
         ? `color-mix(in srgb, var(--eval-plus) ${60 + intensity * 40}%, transparent)`
@@ -1177,14 +1177,11 @@
         {@const labelBg = isZero
           ? "linear-gradient(to bottom, var(--eval-plus) 50%, var(--eval-minus) 50%)"
           : evalColor}
-        {@const fillPercent =
-          ce.scoreType === "mate"
-            ? 50
-            : Math.min(Math.abs(ce.score) / 300, 1) * 50}
+        {@const fillPercent = evalBarIntensity(ce) * 50}
         {@const evalText =
           ce.scoreType === "mate"
-            ? (ce.score >= 0 ? "+" : "-") + "M"
-            : (ce.score > 0 ? "+" : "") + (ce.score / 100).toFixed(1)}
+            ? "#" + (ce.score >= 0 ? "+" : "-") + Math.abs(ce.score)
+            : (ce.score > 0 ? "+" : "") + (ce.score / 100).toFixed(2)}
         <div class="{CLS_PREFIX}-eval">
           <div class="{CLS_PREFIX}-eval__bar">
             {#if isPositive}
@@ -1357,10 +1354,7 @@
                 >
               {/if}
               {#if node.eval}
-                {@const intensity =
-                  node.eval.scoreType === "mate"
-                    ? 1
-                    : Math.min(Math.abs(node.eval.score) / 300, 1)}
+                {@const intensity = evalBarIntensity(node.eval)}
                 {@const color =
                   node.eval.score > 0 ||
                   (node.eval.scoreType === "mate" && node.eval.score >= 0)

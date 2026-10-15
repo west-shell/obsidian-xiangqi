@@ -61,6 +61,21 @@ function winningChances(cp: number): number {
   return 2 / (1 + Math.exp(-0.003_682_08 * cp)) - 1;
 }
 
+/**
+ * Length intensity (0..1) for the eval indicator bars (movelist, tree
+ * nodes, eval strip): lichess-style winning-chance magnitude, so bars
+ * keep growing subtly at high scores instead of hitting a hard
+ * saturation cliff (+1.00 ≈ 0.18, +3.00 ≈ 0.50, +5.00 ≈ 0.73,
+ * +10.00 ≈ 0.95). Mate always fills the bar.
+ */
+export function evalBarIntensity(ev: {
+  score: number;
+  scoreType: "cp" | "mate";
+}): number {
+  if (ev.scoreType === "mate") return 1;
+  return Math.abs(winningChances(ev.score));
+}
+
 function winningChancesFromEval(ev: {
   score: number;
   scoreType: "cp" | "mate";
