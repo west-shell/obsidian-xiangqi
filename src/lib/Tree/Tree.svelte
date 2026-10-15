@@ -672,6 +672,18 @@
     return activeWindow.matchMedia?.("(hover: hover)").matches ?? true;
   }
 
+  // Portals the preview overlay out of the panel into <body> so it floats
+  // above the whole window instead of being clipped by the tree canvas.
+  // ownerDocument keeps it inside the same document (popout-safe).
+  function portalToBody(node: HTMLElement): { destroy: () => void } {
+    node.ownerDocument.body.appendChild(node);
+    return {
+      destroy: () => {
+        node.remove();
+      },
+    };
+  }
+
   function onNodeMouseEnter(node: ChessNode, evt: MouseEvent) {
     if (settings?.showTreePreview === false) return;
     if (!supportsHover()) return;
@@ -685,18 +697,16 @@
   }
 
   function updatePreviewPos(evt: MouseEvent) {
-    const canvas = canvasEl;
-    if (!canvas) return;
-    const rect = canvas.getBoundingClientRect();
-    // Offset right of the cursor; clamp inside the canvas, keeping the
-    // TREE_PREVIEW_SIZE box in sync with the .ct-tree-preview scss width.
+    // Viewport (fixed-position) coordinates: the preview follows the cursor
+    // anywhere in the window and only clamps against the viewport itself.
+    const view = canvasEl?.ownerDocument.defaultView ?? activeWindow;
     const x = Math.min(
-      Math.max(evt.clientX - rect.left + 14, 4),
-      Math.max(4, rect.width - TREE_PREVIEW_SIZE - 8),
+      Math.max(evt.clientX + 14, 4),
+      Math.max(4, view.innerWidth - TREE_PREVIEW_SIZE - 8),
     );
     const y = Math.min(
-      Math.max(evt.clientY - rect.top - TREE_PREVIEW_SIZE / 2, 4),
-      Math.max(4, rect.height - TREE_PREVIEW_SIZE - 8),
+      Math.max(evt.clientY - TREE_PREVIEW_SIZE / 2, 4),
+      Math.max(4, view.innerHeight - TREE_PREVIEW_SIZE - 8),
     );
     previewPos = { x, y };
   }
@@ -1357,6 +1367,7 @@
             ? ''
             : ` ${CLS_PREFIX}-tree-preview--hidden`}"
           style="--tree-preview-x: {previewPos.x}px; --tree-preview-y: {previewPos.y}px"
+          use:portalToBody
         >
           <PreviewBoard
             fen={previewFen}

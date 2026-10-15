@@ -113,16 +113,18 @@ button.#{$cls-prefix}-gamenav__arrow svg {
 // ---- Tree node hover preview ---------------------------------------------------
 
 // Floating mini board shown beside the cursor while hovering tree nodes
-// (setting-gated, lila pv-board style). Kept in the DOM with visibility
-// (not display) once first hovered so the mounted chessground keeps valid
-// bounds; translate3d moves it without retriggering layout.
+// (setting-gated, lila pv-board style). Portaled to <body> by Tree.svelte
+// (portalToBody) so it floats above the whole window — never clipped by
+// the tree panel — at fixed viewport coordinates. Kept in the DOM with
+// visibility (not display) once first hovered so the mounted chessground
+// keeps valid bounds.
 .#{$cls-prefix}-tree-preview {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   // Keep in sync with TREE_PREVIEW_SIZE in Tree.svelte (clamping math).
   width: 150px;
-  z-index: 3;
+  z-index: var(--layer-tooltip, 70);
   pointer-events: none;
   border: 1px solid var(--background-modifier-border);
   border-radius: var(--radius-s, 4px);
