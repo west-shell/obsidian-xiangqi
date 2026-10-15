@@ -685,30 +685,59 @@
     };
   }
 
-  function onNodeMouseEnter(node: ChessNode, evt: MouseEvent) {
+  function onNodeMouseEnter(
+    node: ChessNode,
+    evt: MouseEvent,
+    side: "left" | "right" = "right",
+  ) {
     if (settings?.showTreePreview === false) return;
     if (!supportsHover()) return;
     previewNode = node;
     previewEverShown = true;
-    updatePreviewPos(evt);
+    updatePreviewPos(evt, side);
   }
 
   function onNodeMouseLeave(node: ChessNode) {
     if (previewNode === node) previewNode = null;
   }
 
-  function updatePreviewPos(evt: MouseEvent) {
+  function updatePreviewPos(evt: MouseEvent, side: "left" | "right" = "right") {
     // Viewport (fixed-position) coordinates: the preview follows the cursor
-    // anywhere in the window and only clamps against the viewport itself.
+    // anywhere in the window, dodging it on both axes — horizontally flip
+    // right→left when the right side overflows, vertically fall back to
+    // below→above the cursor when the centered position would not fit —
+    // and only clamps against the viewport itself as a last resort.
     const view = canvasEl?.ownerDocument.defaultView ?? activeWindow;
-    const x = Math.min(
-      Math.max(evt.clientX + 14, 4),
-      Math.max(4, view.innerWidth - TREE_PREVIEW_SIZE - 8),
-    );
-    const y = Math.min(
-      Math.max(evt.clientY - TREE_PREVIEW_SIZE / 2, 4),
-      Math.max(4, view.innerHeight - TREE_PREVIEW_SIZE - 8),
-    );
+    const maxX = Math.max(4, view.innerWidth - TREE_PREVIEW_SIZE - 8);
+    const maxY = Math.max(4, view.innerHeight - TREE_PREVIEW_SIZE - 8);
+    let x: number;
+    if (side === "left") {
+      // Move-list hovers: anchor to the hovered element's left edge so
+      // the preview clears the whole list column instead of covering
+      // the hovered move.
+      const anchor =
+        (evt.currentTarget as HTMLElement | null)?.getBoundingClientRect()
+          .left ?? evt.clientX;
+      x = Math.min(Math.max(anchor - TREE_PREVIEW_SIZE - 8, 4), maxX);
+    } else {
+      // Tree-graph hovers: prefer the right of the cursor; flip to the
+      // left when the right side would be clamped over the cursor.
+      const rightX = evt.clientX + 14;
+      x = Math.min(
+        rightX <= maxX
+          ? rightX
+          : Math.max(evt.clientX - TREE_PREVIEW_SIZE - 14, 4),
+        maxX,
+      );
+    }
+    const cy = evt.clientY;
+    const half = TREE_PREVIEW_SIZE / 2;
+    const y =
+      cy - half >= 4 && cy + half <= view.innerHeight - 8
+        ? cy - half
+        : cy + 14 + TREE_PREVIEW_SIZE <= view.innerHeight - 8
+          ? cy + 14
+          : Math.min(Math.max(cy - TREE_PREVIEW_SIZE - 14, 4), maxY);
     previewPos = { x, y };
   }
 
@@ -1513,6 +1542,8 @@
           node.color,
         )} ${isActive ? `${CLS_PREFIX}-moves__move--active` : ""}`}
         onclick={() => onClickStep(step)}
+        onmouseenter={(e) => onNodeMouseEnter(node, e, "left")}
+        onmouseleave={() => onNodeMouseLeave(node)}
       >
         <span
           class={`${CLS_PREFIX}-moves__label ${hasComment && settings?.showListCommentMark !== false ? `${CLS_PREFIX}-moves__label--comment` : ""}`}
@@ -1540,6 +1571,11 @@
             <span
               class={`${CLS_PREFIX}-moves__move ${CLS_PREFIX}-moves__move--start ${listCurrentStep === 0 ? `${CLS_PREFIX}-moves__move--active` : ""}`}
               onclick={() => onClickStep(0)}
+              onmouseenter={(e) => {
+                const root = nodeMap.get(currentPath[0]);
+                if (root) onNodeMouseEnter(root, e, "left");
+              }}
+              onmouseleave={() => (previewNode = null)}
             >
               <span
                 class={`${CLS_PREFIX}-moves__label ${(startMarks.node?.comments ?? []).length > 0 && settings?.showListCommentMark !== false ? `${CLS_PREFIX}-moves__label--comment` : ""}`}
