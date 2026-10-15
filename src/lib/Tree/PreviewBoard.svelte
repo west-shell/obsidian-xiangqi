@@ -13,14 +13,23 @@
 
   interface Props {
     fen: string;
+    /** Position before the hovered move; when set the board jumps to it and animates the move itself. */
+    animateFrom?: string | null;
     lastMove?: [Square, Square] | null;
     orientation?: "white" | "black";
   }
 
-  let { fen, lastMove = null, orientation = "white" }: Props = $props();
+  let {
+    fen,
+    animateFrom = null,
+    lastMove = null,
+    orientation = "white",
+  }: Props = $props();
 
   let boardElement!: HTMLDivElement;
   let api: Api | null = null;
+  // Last fen applied to the board; skip redundant sets when unchanged.
+  let lastFen = "";
 
   // Xiangqi boards need the grid lines injected into cg-board (GRID_SVG is
   // null for chess); re-inject after each fen change because chessground
@@ -54,10 +63,18 @@
   $effect(() => {
     if (!api) return;
     api.set({
-      fen,
       orientation,
       lastMove: lastMove ?? undefined,
     });
+    if (fen !== lastFen) {
+      if (animateFrom && animateFrom !== lastFen) {
+        // Jump to the pre-move position first (instant), so chessground
+        // then animates the hovered move itself (before -> after).
+        api.set({ fen: animateFrom, animation: { enabled: false } });
+      }
+      api.set({ fen, animation: { enabled: !!animateFrom, duration: 300 } });
+      lastFen = fen;
+    }
     injectGridSVG();
   });
 </script>

@@ -655,13 +655,17 @@
   // lila-style pv-board: hovering a node in the tree graph shows a mini
   // board with the position after that node's move. The board mounts on
   // first hover and stays mounted afterwards (visibility instead of
-  // display) so chessground keeps valid bounds.
+  // display) so chessground keeps valid bounds. The animation plays the
+  // hovered move itself: PreviewBoard jumps to the move's `before` fen
+  // and animates to `after` (chessground slides the moved piece), instead
+  // of morphing from whatever position the board last showed.
   const TREE_PREVIEW_SIZE = 150;
   let canvasEl: HTMLDivElement | undefined = $state();
   let previewEverShown = $state(false);
   let previewNode = $state<ChessNode | null>(null);
   let previewPos = $state({ x: 8, y: 8 });
   let previewFen = $derived(previewNode?.fen ?? DEFAULT_FEN);
+  let previewAnimateFrom = $derived(previewNode?.move?.before ?? null);
   let previewLastMove = $derived.by(() => {
     const m = previewNode?.move;
     return m ? ([m.from, m.to] as [Square, Square]) : null;
@@ -700,8 +704,18 @@
     updatePreviewPos(evt, side);
   }
 
+  // Leaving a node hides the preview right away; the cached position
+  // stays, so hovering the next node still animates from it. The guard
+  // keeps the preview visible when the pointer moves straight onto
+  // another node (its enter may fire before the old node's leave).
   function onNodeMouseLeave(node: ChessNode) {
     if (previewNode === node) previewNode = null;
+  }
+
+  // Container-level safety net: leaving the whole hover area (tree SVG,
+  // move list) hides the preview even if a node's mouseleave was missed.
+  function onPreviewAreaLeave() {
+    previewNode = null;
   }
 
   function updatePreviewPos(evt: MouseEvent, side: "left" | "right" = "right") {
@@ -1210,7 +1224,7 @@
         width="100%"
         height="100%"
         class="{CLS_PREFIX}-panel__svg"
-        onmouseleave={() => (previewNode = null)}
+        onmouseleave={onPreviewAreaLeave}
       >
         <g transform={TRANSFORM_SAFE}>
           {#each renderedNodes as node (node.id)}
@@ -1438,6 +1452,7 @@
         >
           <PreviewBoard
             fen={previewFen}
+            animateFrom={previewAnimateFrom}
             lastMove={previewLastMove}
             orientation={previewOrientation}
           />
@@ -1591,7 +1606,11 @@
     {/snippet}
     {#if listVisible}
       <div class="{CLS_PREFIX}-moves-col">
-        <ul class="{CLS_PREFIX}-moves" bind:this={listUlRef}>
+        <ul
+          class="{CLS_PREFIX}-moves"
+          bind:this={listUlRef}
+          onmouseleave={onPreviewAreaLeave}
+        >
           <li class="{CLS_PREFIX}-moves__row {CLS_PREFIX}-moves__row--start">
             <span class="{CLS_PREFIX}-moves__num" bind:this={listItemRefs[0]}
               >#</span
@@ -1605,7 +1624,7 @@
                 const root = nodeMap.get(currentPath[0]);
                 if (root) onNodeMouseEnter(root, e, "left");
               }}
-              onmouseleave={() => (previewNode = null)}
+              onmouseleave={onPreviewAreaLeave}
             >
               <span
                 class={`${CLS_PREFIX}-moves__label ${(startMarks.node?.comments ?? []).length > 0 && settings?.showListCommentMark !== false ? `${CLS_PREFIX}-moves__label--comment` : ""}`}
