@@ -1232,9 +1232,6 @@
               transform="translate({node.x! * spacingX} {node.y! *
                 spacingY}){isCurrent ? ' scale(1.2)' : ''}"
               opacity={currentPath.includes(node.id) ? 1 : 0.55}
-              filter={isCurrent
-                ? "drop-shadow(0 0 4px var(--color-accent))"
-                : undefined}
               stroke-width={isCurrent ? 1 : 0.5}
               onclick={() => eventBus.emit("node-click", node.id)}
               onmouseenter={(e) => onNodeMouseEnter(node, e)}
