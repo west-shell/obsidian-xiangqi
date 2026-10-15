@@ -512,9 +512,9 @@ svg.#{$cls-prefix}-moves__badge {
 
 // ---- Result toolbar --------------------------------------------------------------------
 
-// Fixed at the bottom of the move list column: per-branch result buttons
-// (* undecided / primary wins / black wins / draw). The * button and
-// clicking an active button clear the branch result.
+// Fixed at the bottom of the move list column: a single dropdown button
+// showing the current branch result; clicking opens the Obsidian Menu with
+// undecided / primary wins / black wins / draw options.
 .#{$cls-prefix}-resultbar {
   display: flex;
   flex-direction: row;
@@ -534,17 +534,6 @@ button.#{$cls-prefix}-resultbar__btn {
 
 button.#{$cls-prefix}-resultbar__btn:hover {
   color: var(--text-normal);
-}
-
-button.#{$cls-prefix}-resultbar__btn--active {
-  background-color: var(--interactive-accent);
-  color: var(--text-on-accent);
-}
-
-button.#{$cls-prefix}-resultbar__btn--active:hover {
-  background-color: var(--interactive-accent);
-  color: var(--text-on-accent);
-  filter: brightness(1.1);
 }
 
 // ---- Comment row -----------------------------------------------------------------------

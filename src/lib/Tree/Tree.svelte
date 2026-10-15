@@ -676,17 +676,34 @@
   let primaryWinsLabel = $derived(
     primaryKey === "Red" ? t("tree.redWins", _lv) : t("tree.whiteWins", _lv),
   );
-  function toggleDrawResult() {
-    eventBus.emit("set-result", branchResult === "1/2-1/2" ? "" : "1/2-1/2");
+  function resultLabel(value: string): string {
+    if (value === "1-0") return primaryWinsLabel;
+    if (value === "0-1") return t("tree.blackWins", _lv);
+    if (value === "1/2-1/2") return t("tree.draw", _lv);
+    return t("tree.undecided", _lv);
   }
-  function togglePrimaryWinsResult() {
-    eventBus.emit("set-result", branchResult === "1-0" ? "" : "1-0");
-  }
-  function toggleBlackWinsResult() {
-    eventBus.emit("set-result", branchResult === "0-1" ? "" : "0-1");
-  }
-  function clearBranchResult() {
-    eventBus.emit("set-result", "");
+  function showResultMenu(evt: MouseEvent) {
+    const items: Array<{ value: string; label: string }> = [
+      { value: "", label: t("tree.undecided", _lv) },
+      { value: "1-0", label: primaryWinsLabel },
+      { value: "0-1", label: t("tree.blackWins", _lv) },
+      { value: "1/2-1/2", label: t("tree.draw", _lv) },
+    ];
+    const menu = new Menu();
+    for (const item of items) {
+      const isCurrent =
+        item.value === branchResult ||
+        (item.value === "" && branchResult === "*");
+      menu.addItem((mi) =>
+        mi
+          .setTitle(item.label)
+          .setChecked(isCurrent)
+          .onClick(() => {
+            if (!isCurrent) eventBus.emit("set-result", item.value);
+          }),
+      );
+    }
+    menu.showAtMouseEvent(evt);
   }
 
   onMount(() => {
@@ -1508,52 +1525,11 @@
         </ul>
         <div class="{CLS_PREFIX}-resultbar">
           <button
-            class="{CLS_PREFIX}-btn {CLS_PREFIX}-resultbar__btn {!branchResult ||
-            branchResult === '*'
-              ? `${CLS_PREFIX}-resultbar__btn--active`
-              : ''}"
-            title={t("tree.undecided", _lv)}
-            aria-label={t("tree.undecided", _lv)}
-            onclick={clearBranchResult}>{t("tree.undecided", _lv)}</button
-          >
-          <button
-            class="{CLS_PREFIX}-btn {CLS_PREFIX}-resultbar__btn {branchResult ===
-            '1-0'
-              ? `${CLS_PREFIX}-resultbar__btn--active`
-              : ''}"
-            title={branchResult === "1-0"
-              ? t("tree.clearResult", _lv)
-              : primaryWinsLabel}
-            aria-label={branchResult === "1-0"
-              ? t("tree.clearResult", _lv)
-              : primaryWinsLabel}
-            onclick={togglePrimaryWinsResult}>{primaryWinsLabel}</button
-          >
-          <button
-            class="{CLS_PREFIX}-btn {CLS_PREFIX}-resultbar__btn {branchResult ===
-            '0-1'
-              ? `${CLS_PREFIX}-resultbar__btn--active`
-              : ''}"
-            title={branchResult === "0-1"
-              ? t("tree.clearResult", _lv)
-              : t("tree.blackWins", _lv)}
-            aria-label={branchResult === "0-1"
-              ? t("tree.clearResult", _lv)
-              : t("tree.blackWins", _lv)}
-            onclick={toggleBlackWinsResult}>{t("tree.blackWins", _lv)}</button
-          >
-          <button
-            class="{CLS_PREFIX}-btn {CLS_PREFIX}-resultbar__btn {branchResult ===
-            '1/2-1/2'
-              ? `${CLS_PREFIX}-resultbar__btn--active`
-              : ''}"
-            title={branchResult === "1/2-1/2"
-              ? t("tree.clearResult", _lv)
-              : t("tree.draw", _lv)}
-            aria-label={branchResult === "1/2-1/2"
-              ? t("tree.clearResult", _lv)
-              : t("tree.draw", _lv)}
-            onclick={toggleDrawResult}>{t("tree.draw", _lv)}</button
+            class="{CLS_PREFIX}-btn {CLS_PREFIX}-resultbar__btn"
+            title={t("tree.switchResult", _lv)}
+            aria-label={t("tree.switchResult", _lv)}
+            aria-haspopup="menu"
+            onclick={showResultMenu}>{resultLabel(branchResult)} ▾</button
           >
         </div>
       </div>
