@@ -90,6 +90,21 @@ export class PGNParser {
     if (this.strict && this.nodeMap.size <= 1) {
       throw new Error("PGN contains no legal moves");
     }
+
+    // A [Result] header without a movetext terminator (lichess studies,
+    // hand-written PGNs): carry the header result onto the mainline tip
+    // so the move list and result toolbar reflect it. An explicit
+    // movetext result token (set while parsing above) always wins.
+    const headerResult = this.tags.get("Result");
+    if (
+      headerResult === "1-0" ||
+      headerResult === "0-1" ||
+      headerResult === "1/2-1/2"
+    ) {
+      let tip = this.rootNode;
+      while (tip.children.length > 0) tip = tip.children[0];
+      tip.result ??= headerResult;
+    }
   }
 
   parseUnknown() {
