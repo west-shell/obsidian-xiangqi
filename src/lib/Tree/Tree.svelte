@@ -13,6 +13,7 @@
     ANNOTATOR_URL_PREFIX,
     CLS_PREFIX,
     DEFAULT_FEN,
+    getAutoResult,
     getMoveListSideClass,
     getMoveNotation,
     getNodeDisplay,
@@ -728,12 +729,20 @@
   // ---- Result toolbar ----
   // The current branch's result lives on the line's tip node (the last
   // id of currentPath). node.result mutates outside Svelte signals, so
-  // read _uiVer like the other list deriveds.
-  let branchResult = $derived.by(() => {
+  // read _uiVer like the other list deriveds. A terminal tip position
+  // (checkmate/stalemate) contributes the game-forced result — even when
+  // nothing was stored on the node — and locks the toolbar against
+  // manual changes.
+  let branchInfo = $derived.by(() => {
     void _uiVer;
-    if (currentPath.length === 0) return "";
-    return nodeMap.get(currentPath[currentPath.length - 1])?.result ?? "";
+    if (currentPath.length === 0) return { result: "", locked: false };
+    const tip = nodeMap.get(currentPath[currentPath.length - 1]);
+    if (!tip) return { result: "", locked: false };
+    const auto = getAutoResult(tip.fen);
+    return { result: tip.result ?? auto ?? "", locked: auto !== null };
   });
+  let branchResult = $derived(branchInfo.result);
+  let branchResultLocked = $derived(branchInfo.locked);
   // "1-0" is the primary side winning (White in chess, Red in xiangqi).
   // Widen to string so the same synced comparison type-checks in both
   // variants (each chess.ts types the constant as its own literal).
@@ -748,6 +757,8 @@
     return t("tree.undecided", _lv);
   }
   function showResultMenu(evt: MouseEvent) {
+    // Terminal positions keep their game-forced result.
+    if (branchResultLocked) return;
     const items: Array<{ value: string; label: string }> = [
       { value: "", label: t("tree.undecided", _lv) },
       { value: "1-0", label: primaryWinsLabel },
@@ -1613,8 +1624,9 @@
             class="{CLS_PREFIX}-btn {CLS_PREFIX}-resultbar__btn"
             title={t("tree.switchResult", _lv)}
             aria-label={t("tree.switchResult", _lv)}
-            aria-haspopup="menu"
-            onclick={showResultMenu}>{resultLabel(branchResult)} ▾</button
+            aria-haspopup={branchResultLocked ? undefined : "menu"}
+            onclick={showResultMenu}
+            >{resultLabel(branchResult)}{branchResultLocked ? "" : " ▾"}</button
           >
         </div>
       </div>

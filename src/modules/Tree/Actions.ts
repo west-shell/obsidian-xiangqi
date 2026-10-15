@@ -4,6 +4,7 @@ import {
   CLS_PREFIX,
   DEFAULT_FEN,
   EMPTY_FEN,
+  getAutoResult,
   getSaveNotation,
   isMoveCheckmate,
   matchMove,
@@ -175,6 +176,15 @@ const ActionsModule = {
       // carries the result along; a new variation (second child) never
       // inherits the sibling line's result.
       migrateBranchResult(host.currentNode, newNode);
+      // A mating/stalemating move ends the game: store the position's
+      // forced result on the new tip so the move list updates at once.
+      const autoResult = getAutoResult(move.after);
+      if (autoResult) {
+        newNode.result = autoResult;
+        if (branchTip(host.root) === newNode) {
+          syncResultTag(host, autoResult);
+        }
+      }
       host.currentNode = newNode;
       host.fen = move.after;
       host.currentStep++;
@@ -190,6 +200,9 @@ const ActionsModule = {
     eventBus.on<string>("set-result", (result) => {
       if (result === undefined) return;
       const tip = branchTip(host.currentNode);
+      // A terminal position (checkmate/stalemate) locks the branch
+      // result to the game-forced value.
+      if (getAutoResult(tip.fen)) return;
       if (result === "") {
         if (!tip.result) return;
         tip.result = undefined;

@@ -1,5 +1,6 @@
 import { describe, expect, test } from "vitest";
 
+import { getAutoResult } from "../src/chess";
 import { PGNParser } from "../src/modules/Source/parser";
 import type { ChessNode } from "../src/types";
 import { branchTip, migrateBranchResult } from "../src/utils/result";
@@ -16,6 +17,33 @@ function makeNode(id: string, result?: string): ChessNode {
     result,
   };
 }
+
+describe("getAutoResult", () => {
+  test("checkmate against black forces 1-0", () => {
+    // 将 e0 checked by 车 e1 (protected by 车 e8); d0/f0 covered by the
+    // neighbouring rooks — the bare king has no escape.
+    expect(getAutoResult("4k4/3RRR3/9/9/9/9/9/9/4R4/4K4 b")).toBe("1-0");
+  });
+
+  test("checkmate against red forces 0-1", () => {
+    expect(getAutoResult("4k4/4r4/9/9/9/9/9/9/3rrr3/4K4 w")).toBe("0-1");
+  });
+
+  test("stalemate (困毙) loses for the stranded side", () => {
+    // 黑将 e0 is not in check but d0/f0/e1 are all covered by the two
+    // red pawns — black has no legal move and loses.
+    expect(getAutoResult("4k4/3P1P3/9/9/9/9/9/9/9/3K5 b")).toBe("1-0");
+  });
+
+  test("ongoing positions and invalid FENs return null", () => {
+    expect(
+      getAutoResult(
+        "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w",
+      ),
+    ).toBeNull();
+    expect(getAutoResult("not a fen")).toBeNull();
+  });
+});
 
 describe("branchTip", () => {
   test("follows the first-child chain to the line's last node", () => {
