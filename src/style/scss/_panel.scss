@@ -368,14 +368,15 @@ button.#{$cls-prefix}-gamenav__arrow svg {
   // display: contents — see the __row rule below.
   display: grid;
   grid-template-columns: max-content max-content max-content;
-  column-gap: 0.25em;
+  column-gap: 0.15em;
   // align-content: start keeps auto rows at content height — otherwise the
   // implicit rows stretch to share the container's full height (the list
   // fills the panel column), inflating the vertical spacing.
   align-content: start;
-  // Spans keep their natural width and hug the left edge of their column
-  // track instead of stretching across it.
-  justify-items: start;
+  // Move cells stretch across their column track (max-content = widest move
+  // in that column), so the hover/active background and the clickable area
+  // fill the whole column instead of hugging the notation text.
+  justify-items: stretch;
   align-items: center;
   font-size: var(--#{$cls-prefix}-font-size, 12px);
   overflow-y: auto;
@@ -407,12 +408,20 @@ button.#{$cls-prefix}-gamenav__arrow svg {
   list-style: none;
 }
 
+// Move numbers are subordinate metadata, not content (lila tview2 parity:
+// `move index { font-size: 90% }`): interface font + 90% size + muted tone
+// versus the full-size monospace notation, so the moves carry the hierarchy.
+// Interface fonts have proportional digits — tabular-nums keeps columns
+// aligned; em sizing keeps everything relative to the font-size setting.
 .#{$cls-prefix}-moves__num {
   display: inline-block;
   min-width: 1.2em;
   max-width: 2em;
   text-align: right;
-  margin-right: 0.2em;
+  margin-right: 0.1em;
+  font-family: var(--font-interface);
+  font-size: 0.75em;
+  font-variant-numeric: tabular-nums;
   color: var(--text-muted);
   flex-shrink: 0;
   white-space: nowrap;
@@ -426,12 +435,13 @@ span.#{$cls-prefix}-moves__move {
   border-radius: var(--radius-s, 4px);
   cursor: pointer;
   font-family: var(--font-monospace);
+  font-variant-numeric: tabular-nums;
   transition:
     background-color 0.15s ease,
     color 0.15s ease;
   white-space: nowrap;
   flex-shrink: 0;
-  padding: 0.12em 0.4em;
+  padding: 0.12em 0.3em;
   margin: 0;
   color: var(--text-normal);
 }
@@ -450,7 +460,7 @@ span.#{$cls-prefix}-moves__move--black {
 // first, so the first black move lands in the right column.
 span.#{$cls-prefix}-moves__placeholder {
   min-width: 2.5em;
-  padding: 0.12em 0.4em;
+  padding: 0.12em 0.3em;
   color: var(--text-faint);
   user-select: none;
 }
@@ -518,8 +528,10 @@ svg.#{$cls-prefix}-moves__badge {
 .#{$cls-prefix}-moves__evalbar {
   position: absolute;
   bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
+  // Left-anchored like the tree graph node eval bar; the parent cell now
+  // stretches across the column, so centering would detach the bar from
+  // the left-aligned notation text.
+  left: 0.3em;
   height: 2px;
   border-radius: 1px;
   pointer-events: none;
@@ -537,6 +549,8 @@ svg.#{$cls-prefix}-moves__badge {
   margin: 0.3em 0 0;
   padding: 0.35em 1em;
   text-align: center;
+  font-family: var(--font-monospace);
+  font-variant-numeric: tabular-nums;
   font-weight: 700;
   background-color: var(--background-primary);
   border-top: 1px solid var(--background-modifier-border);

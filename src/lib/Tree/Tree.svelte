@@ -1525,7 +1525,7 @@
         <ul class="{CLS_PREFIX}-moves" bind:this={listUlRef}>
           <li class="{CLS_PREFIX}-moves__row {CLS_PREFIX}-moves__row--start">
             <span class="{CLS_PREFIX}-moves__num" bind:this={listItemRefs[0]}
-              >0</span
+              >#</span
             >
             <!-- svelte-ignore a11y_click_events_have_key_events -->
             <!-- svelte-ignore a11y_no_static_element_interactions -->
