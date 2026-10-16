@@ -260,13 +260,17 @@ $board-ratio: 0.9;
 }
 
 // ---- Player-bar side marks (red / black chips) --------------------------------
+// Fill in the side's own piece color, border in the opponent's, so each
+// chip stays readable on any background.
 
 .#{$cls-prefix}-player-bar__mark--red {
   background: var(--xq-piece-red);
+  border: 1px solid var(--xq-piece-black);
 }
 
 .#{$cls-prefix}-player-bar__mark--black {
   background: var(--xq-piece-black);
+  border: 1px solid var(--xq-piece-red);
 }
 
 // ---- Piece-set picker modal (board menu -> "Piece set…") --------------------
