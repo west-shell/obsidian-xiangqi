@@ -377,6 +377,9 @@ button.#{$cls-prefix}-gamenav__arrow svg {
   flex: 0 0 auto;
   min-width: 0;
   max-width: 16.67em;
+  // Font-size base for the whole column (moves, resultbar): children size
+  // in em so they scale with the font-size setting together.
+  font-size: var(--#{$cls-prefix}-font-size, 12px);
   background-color: var(--background-primary-alt);
   border-left: 1px solid var(--background-modifier-border);
 }
@@ -402,7 +405,7 @@ button.#{$cls-prefix}-gamenav__arrow svg {
   // fill the whole column instead of hugging the notation text.
   justify-items: stretch;
   align-items: center;
-  font-size: var(--#{$cls-prefix}-font-size, 12px);
+  // font-size inherited from moves-col.
   overflow-y: auto;
   overflow-x: hidden;
   padding: 0 0.25em;
@@ -595,16 +598,15 @@ svg.#{$cls-prefix}-moves__badge {
 .#{$cls-prefix}-resultbar {
   display: flex;
   flex-direction: row;
-  gap: 4px;
-  padding: 4px;
+  gap: 0.36em;
+  padding: 0.36em;
   border-top: 1px solid var(--background-modifier-border);
   flex-shrink: 0;
 }
 
 button.#{$cls-prefix}-resultbar__btn {
   flex: 1 1 auto;
-  height: 22px;
-  font-size: 11px;
+  height: 2em;
   color: var(--text-muted);
   white-space: nowrap;
 }
