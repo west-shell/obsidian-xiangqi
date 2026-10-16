@@ -34,7 +34,7 @@
   import type ChessPlugin from "../../main";
   import { onLangChange, t } from "../../i18n";
   import { calculateTreeLayout } from "./layout";
-  import { badgeSvg, iconSvg } from "../../utils/icon";
+  import { badgeSvg, iconSvg, resultBadgeKeyOf } from "../../utils/icon";
   import { GLYPH_BY_KEY } from "../../utils/annotation-glyphs";
   import { evalBarIntensity } from "../../utils/winningChances";
   import { scrollToBTN } from "../../utils/utils";
@@ -975,9 +975,7 @@
   // `updateUI` bumps and makes it re-render after such mutations.
   function resultBadgeKey(node: ChessNode): string {
     void _uiVer;
-    if (node.result) return `result_${node.result}`;
-    if (node.isCheckmate) return "checkmate";
-    return "";
+    return resultBadgeKeyOf(node.result, node.isCheckmate);
   }
   function nodeFontSize(): string {
     if (nodeMode === 1) return "6px";

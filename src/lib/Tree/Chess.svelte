@@ -31,7 +31,7 @@
   import { onLangChange, t } from "../../i18n";
   import { annotationShapes } from "../../utils/glyphs";
   import { GLYPH_BY_KEY } from "../../utils/annotation-glyphs";
-  import { badgeBoardSvg } from "../../utils/icon";
+  import { badgeBoardSvg, resultBadgeKeyOf } from "../../utils/icon";
   import { parseOrientationTag } from "../../utils/parse";
   import {
     clockForColor,
@@ -177,13 +177,9 @@
     const shapes: DrawShape[] = [];
     const dest = node.move ? getMoveDest(node.move) : undefined;
     // Result mark on the last move's square; mirrors the tree node's
-    // resultBadgeKey (an explicit result wins, then the checkmate mark)
-    // so board and tree always show the same badge.
-    const resultKey = node.result
-      ? `result_${node.result}`
-      : node.isCheckmate
-        ? "checkmate"
-        : "";
+    // resultBadgeKey via the shared helper so board and tree always
+    // show the same badge (# for mates, flag for resignations).
+    const resultKey = resultBadgeKeyOf(node.result, node.isCheckmate);
     const resultSvg = dest ? badgeBoardSvg(resultKey) : "";
     if (node.glyph && dest) {
       const engineShapes = annotationShapes(dest, node.glyph);
