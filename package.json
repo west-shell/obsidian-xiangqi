@@ -44,7 +44,7 @@
     "eslint-plugin-svelte": "^3.20.0",
     "eslint-plugin-unicorn": "^56.0.1",
     "globals": "^17.7.0",
-    "lint-staged": "^17.4.1",
+    "nano-staged": "^1.0.2",
     "obsidian": "^1.13.1",
     "prettier": "^3.9.4",
     "prettier-plugin-svelte": "^4.1.1",
@@ -65,9 +65,9 @@
     "@parcel/watcher@2.6.0": true
   },
   "simple-git-hooks": {
-    "pre-commit": "npx lint-staged"
+    "pre-commit": "npx nano-staged"
   },
-  "lint-staged": {
+  "nano-staged": {
     "*.{js,mjs,cjs,ts,mts,cts,svelte}": [
       "eslint --fix",
       "prettier --write"
