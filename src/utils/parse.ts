@@ -201,6 +201,7 @@ export function activateGame(host: IHost, index: number): void {
   host.currentNode = game.root;
   host.fen = game.root.fen;
   host.currentGameIndex = index;
+  host.pathChoices.clear();
   host.eventBus.emit("updateMainPath");
 
   const shouldJump =

@@ -182,6 +182,13 @@ export interface IHost {
   currentTurn: ITurn;
   currentNode: ChessNode;
   currentPath: string[];
+  /**
+   * Per-fork branch choices for the displayed path below the current
+   * node (fork node id → chosen child index). View state only: never
+   * saved into the PGN; reset whenever the tree or game is reloaded or
+   * children are reordered.
+   */
+  pathChoices: Map<string, number>;
   options: IOptions;
   /** Source content that failed to parse and was skipped (moves, FEN tags) */
   parseWarnings: ParseWarning[];

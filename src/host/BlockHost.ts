@@ -2,6 +2,7 @@ import "../core/event-bus";
 import "../modules/BoardClick";
 import "../modules/Tree/BlockHost";
 import "../modules/Tree/Actions";
+import "../modules/KeyboardNav";
 import "../modules/Engine/EngineModule";
 
 import {
@@ -19,6 +20,7 @@ export class BlockHost extends MarkdownRenderChild {
   settings: ISettings;
   eventBus!: EventBus;
   generation = 0;
+  pathChoices = new Map<string, number>();
   constructor(
     public containerEl: HTMLElement,
     public ctx: MarkdownPostProcessorContext,

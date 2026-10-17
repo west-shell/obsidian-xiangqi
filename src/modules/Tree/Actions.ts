@@ -36,6 +36,12 @@ import {
   ImportModal,
 } from "../../utils/confirmModal";
 import { activateGame, extractHeaders } from "../../utils/parse";
+import {
+  findForkAbove,
+  findForkBelow,
+  firstForkOnPath,
+  pathChild,
+} from "../../utils/branch-nav";
 import { branchTip, migrateBranchResult } from "../../utils/result";
 import { Modal, Setting } from "obsidian";
 import { mount, unmount } from "svelte";
@@ -138,10 +144,10 @@ const ActionsModule = {
       ancestors.reverse();
 
       const descendants: string[] = [];
-      node = currentNode.children?.[0] || null;
+      node = pathChild(currentNode, host.pathChoices);
       while (node) {
         descendants.push(node.id);
-        node = node.children?.[0] || null;
+        node = pathChild(node, host.pathChoices);
       }
 
       host.currentPath = [...ancestors, ...descendants];
@@ -345,6 +351,7 @@ const ActionsModule = {
               if (await modal.promise) {
                 host.currentNode.children = [];
                 host.nodeMap.clear();
+                host.pathChoices.clear();
                 host.currentNode = { ...host.currentNode };
                 host.nodeMap.set(host.currentNode.id, host.currentNode);
                 eventBus.emit("updateMainPath");
@@ -365,6 +372,7 @@ const ActionsModule = {
               host.nodeMap.delete(node.id);
             }
             deleteSubtree(removeNode);
+            host.pathChoices.clear();
             eventBus.emit("updateMainPath");
             eventBus.emit("node-click", host.currentNode.id);
             eventBus.emit("modified", null);
@@ -395,6 +403,7 @@ const ActionsModule = {
                 ? host.nodeMap.get(parent.parentID)
                 : undefined;
             }
+            host.pathChoices.clear();
             eventBus.emit("updateMainPath");
             eventBus.emit("node-click", host.currentNode.id);
             eventBus.emit("modified", null);
@@ -425,8 +434,9 @@ const ActionsModule = {
               const item = parent!.children[idx];
               parent!.children = [
                 item,
-                ...parent!.children.filter((c: ChessNode) => c.id !== item.id),
+                ...parent!.children.filter((c) => c.id !== item.id),
               ];
+              host.pathChoices.clear();
               eventBus.emit("modified", null);
             }
             eventBus.emit("updateMainPath");
@@ -449,6 +459,7 @@ const ActionsModule = {
               if (target >= 0 && target < parent.children.length) {
                 const [item] = parent.children.splice(idx, 1);
                 parent.children.splice(target, 0, item);
+                host.pathChoices.clear();
                 eventBus.emit("modified", null);
                 break;
               }
@@ -483,6 +494,32 @@ const ActionsModule = {
               host.currentPath[host.currentPath.length - 1],
             )!;
             host.fen = host.currentNode.fen;
+            break;
+          }
+          // Ctrl+Up / Ctrl+Down: jump the current node to the previous /
+          // next fork (a node with more than one child) along the line.
+          case "navPrevFork": {
+            const fork = findForkAbove(host.currentNode, host.nodeMap);
+            if (fork) eventBus.emit("node-click", fork.id);
+            break;
+          }
+          case "navNextFork": {
+            const fork = findForkBelow(host.currentNode, host.pathChoices);
+            if (fork) eventBus.emit("node-click", fork.id);
+            break;
+          }
+          // Ctrl+Left / Ctrl+Right: keep the current node in place and
+          // switch the displayed path's branch at the first fork on the
+          // path at or below the current node.
+          case "prevPathBranch":
+          case "nextPathBranch": {
+            const hit = firstForkOnPath(host.currentNode, host.pathChoices);
+            if (!hit) break;
+            const target =
+              hit.branchIndex + (name === "nextPathBranch" ? 1 : -1);
+            if (target < 0 || target >= hit.fork.children.length) break;
+            host.pathChoices.set(hit.fork.id, target);
+            eventBus.emit("updateMainPath");
             break;
           }
           case "edit-board": {

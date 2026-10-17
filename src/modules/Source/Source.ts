@@ -50,6 +50,7 @@ const SourceModule = {
     const eventBus = host.eventBus;
     eventBus.on<string>("load", (renderChild) => {
       host.generation++;
+      host.pathChoices.clear();
       switch (renderChild) {
         case "tree": {
           host.isFenMode = false;

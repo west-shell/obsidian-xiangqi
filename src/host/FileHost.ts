@@ -21,6 +21,7 @@ export class FileHost extends TextFileView {
   settings: ISettings;
   eventBus!: EventBus;
   generation = 0;
+  pathChoices = new Map<string, number>();
   constructor(
     leaf: WorkspaceLeaf,
     public plugin: ChessPlugin,
@@ -75,6 +76,28 @@ export class FileHost extends TextFileView {
     this.scope.register([], "ArrowRight", () => {
       if (isEditing()) return true;
       this.eventBus.emit("btn-click", { name: "toEnd" });
+      return false;
+    });
+    // Ctrl+arrows: branch navigation (fork jumping / path branch
+    // switching) — handled in the actions module, same as above.
+    this.scope.register(["Ctrl"], "ArrowUp", () => {
+      if (isEditing()) return true;
+      this.eventBus.emit("btn-click", { name: "navPrevFork" });
+      return false;
+    });
+    this.scope.register(["Ctrl"], "ArrowDown", () => {
+      if (isEditing()) return true;
+      this.eventBus.emit("btn-click", { name: "navNextFork" });
+      return false;
+    });
+    this.scope.register(["Ctrl"], "ArrowLeft", () => {
+      if (isEditing()) return true;
+      this.eventBus.emit("btn-click", { name: "prevPathBranch" });
+      return false;
+    });
+    this.scope.register(["Ctrl"], "ArrowRight", () => {
+      if (isEditing()) return true;
+      this.eventBus.emit("btn-click", { name: "nextPathBranch" });
       return false;
     });
   }
