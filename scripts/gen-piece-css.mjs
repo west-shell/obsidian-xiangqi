@@ -6,11 +6,11 @@
 //   node scripts/gen-piece-css.mjs --check  verify outputs are up to date
 //
 // Outputs (all committed to the repo, bundled into styles.css by Vite):
-//   src/style/pieceSets/<set>.css  14 board rules + 2 thumbnail rules,
+//   src/style/pieces/<set>.css     14 board rules + 2 thumbnail rules,
 //                                  base64 data URIs scoped under
 //                                  .xq-pieceset-<set>
-//   src/style/pieceSets/index.css  @import list
-//   src/pieceSets.gen.ts           PIECE_SETS registry for settings UI
+//   src/style/pieces/index.css     @import list
+//   src/style/pieces/pieceSets.gen.ts  PIECE_SETS registry for settings UI
 //
 // The base artwork of the default ("traditional") set is identical to
 // @weshell/xiangqiground's bundled xiangqiground.piece.css — its generated
@@ -33,9 +33,9 @@ import { join } from "node:path";
 
 const ROOT = import.meta.dirname;
 const SRC_DIR = join(ROOT, "..", "assets", "pieces");
-const CSS_DIR = join(ROOT, "..", "src", "style", "pieceSets");
+const CSS_DIR = join(ROOT, "..", "src", "style", "pieces");
 const INDEX_CSS = join(CSS_DIR, "index.css");
-const GEN_TS = join(ROOT, "..", "src", "pieceSets.gen.ts");
+const GEN_TS = join(CSS_DIR, "pieceSets.gen.ts");
 
 const CHECK = process.argv.includes("--check");
 

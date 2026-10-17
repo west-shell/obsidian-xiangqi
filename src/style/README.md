@@ -13,7 +13,7 @@
   不手写含前缀的字符串。
 - **chessground 库类不可改名**：`cg-wrap` / `cg-container` / `cg-board` /
   `coords` / `coord` / `piece` / `square` 属于 `@lichess-org/chessground`，
-  覆盖样式只允许出现在 `scss/_board.scss`。
+  覆盖样式只允许出现在 `layout/_board.scss`。
 - **组件不写 `<style>`**：全部样式收口在 `src/style/`，Svelte 组件只挂类名。
 - **CSS 自定义属性分两层**：写入 `<body>` 的全局变量带变体前缀
   （chess `--ct-*`，xiangqi `--xq-*`，见第 4 节）；有父容器作用域罩着的
@@ -85,27 +85,37 @@ FileHost   contentEl  ─── .view-content.ct-file-view
 
 ```
 src/style/
-  layout.scss          入口，@use 以下全部模块
-  scss/
-    _variant.scss      变体差异（变体专属选择器 + 数值；sync 排除，xiangqi 有自己的版本）
-    _tokens.scss       断点 / 间距 / col2 尺寸代数
-    _mixins.scss       col1/col2 媒体查询 mixin、宽度函数
-    _base.scss         body 自定义属性默认值、宿主容器、拖拽状态
-    _layout.scss       .ct-layout 主网格（col1/col2）+ .ct-file-view 上下文
-    _board.scss        棋盘区 + 双变体共享的 chessground 覆盖（wrap/piece）
-    _player.scss       棋手信息栏（名字 / 头衔 / 等级分 / 计时钟）
-    _buttons.scss      .ct-btn 按钮体系（含 pill 组、状态修饰符）
-    _toolbar.scss      .ct-toolbar 主工具栏组件
-    _panel.scss        棋树面板（gamenav/canvas/eval/slider/moves/comment）
-    _genfen.scss       FEN 编辑器（--edit 网格、palette、编辑工具）
-    _settings.scss     设置页 + 引擎/导入导出模态控件
+  README.md           本文档
+  themes/             棋盘主题（TS；sync 排除，各变体自有）
+    index.ts          主题表、Theme/高亮/棋子选择器、applyThemes/ensureBoardAssets；
+                      对外唯一门面（外部一律 import "./style/themes"），
+                      并 re-export pieces 的棋子皮肤 API
+  layout/             布局样式（除 _variant.scss 外全部共享同步）
+    index.scss        入口，@use 以下全部模块
+    _variant.scss     变体差异（变体专属选择器 + 数值；sync 排除，xiangqi 有自己的版本）
+    _tokens.scss      断点 / 间距 / col2 尺寸代数
+    _mixins.scss      col1/col2 媒体查询 mixin、宽度函数
+    _base.scss        body 自定义属性默认值、宿主容器、拖拽状态
+    _layout.scss      .ct-layout 主网格（col1/col2）+ .ct-file-view 上下文
+    _board.scss       棋盘区 + 双变体共享的 chessground 覆盖（wrap/piece）
+    _player.scss      棋手信息栏（名字 / 头衔 / 等级分 / 计时钟）
+    _buttons.scss     .ct-btn 按钮体系（含 pill 组、状态修饰符）
+    _toolbar.scss     .ct-toolbar 主工具栏组件
+    _panel.scss       棋树面板（gamenav/canvas/eval/slider/moves/comment）
+    _genfen.scss      FEN 编辑器（--edit 网格、palette、编辑工具）
+    _settings.scss    设置页 + 引擎/导入导出模态控件
+  pieces/             棋子皮肤（sync 排除，各变体自有）
+    index.css         生成的 @import 清单（scripts/gen-piece-css.mjs）
+    <set>.css …       生成的每套棋子 CSS（base64 内联，.ct-pieceset-<set> 作用域）
+    pieceSets.ts      棋子皮肤切换 + 选择器（body 级 .ct-pieceset-* 类切换）
+    pieceSets.gen.ts  生成的 PIECE_SETS 注册表（gen-piece-css.mjs 产物）
 ```
 
 ## 4. CSS 自定义属性
 
 **全局变量**（写入 `<body>`，或由共享 scss 定义在 `body` / 视图根上）一律带
 变体前缀，名字由前缀派生：chess 为 `--ct-*`，xiangqi 为 `--xq-*`。
-写入方：`themes.ts` / `chess.ts#applyThemeCSSVars`（各变体自有）与
+写入方：`themes/index.ts` / `chess.ts#applyThemeCSSVars`（各变体自有）与
 `_base.scss`；共享 scss 一律以 `var(--#{$cls-prefix}-…)` 消费。
 
 | 变量（chess 侧命名）                                                  | 说明                             |
@@ -166,13 +176,14 @@ xiangqi 注意避开 xiangqiground 库已占用的 `--xq-*` 名。
 
 ## 6. xiangqi 同步注意
 
-`scripts/sync-to-xiangqi.mjs` 单向复制 `src/`。本目录中除
-`scss/_variant.scss` 外全部共享，必须保持变体无关：
+`scripts/sync-to-xiangqi.mjs` 单向复制 `src/`。本目录中
+`layout/`（除 `_variant.scss` 外）与 `README.md` 全部共享，必须保持
+变体无关；`themes/` 与 `pieces/` 整目录排除，各变体自有：
 
 - 变体专属选择器（cg-board/xq-board 内部、坐标布局、主题色变量消费规则）
-  与变体数值（宽高比、主维度、palette 列数…）只写在 `_variant.scss`；
+  与变体数值（宽高比、主维度、palette 列数…）只写在 `layout/_variant.scss`；
 - 主题色变量名各变体独立：chess 用 `--ct-*`，xiangqi 用 `--xq-*`
   （注意避开 xiangqiground 库已占用的 `--xq-selected-color` 等），
-  由各自 `themes.ts` 写入；
+  由各自 `themes/index.ts` 写入；
 - 同步后 xiangqi 侧需手工更新其 `chess.ts`（`CLS_PREFIX = "xq"`）与
   `applyThemeCSSVars` 变量名。

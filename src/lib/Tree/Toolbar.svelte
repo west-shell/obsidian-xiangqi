@@ -2,7 +2,7 @@
   import { addIcon, Menu, setIcon } from "obsidian";
   import { onDestroy } from "svelte";
   import { ANALYSIS_SITES, CLS_PREFIX } from "../../chess";
-  import { BOARD_THEME_PICKER, PIECE_SET_PICKER } from "../../themes";
+  import { BOARD_THEME_PICKER, PIECE_SET_PICKER } from "../../style/themes";
   import type { EventBus } from "../../core/event-bus";
   import type { ChessNode, IOptions, ISettings } from "../../types";
   import type ChessPlugin from "../../main";

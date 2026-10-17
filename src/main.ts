@@ -6,7 +6,7 @@ import { initI18n, t } from "./i18n";
 import { BlockHost } from "./host/BlockHost";
 import { FileHost } from "./host/FileHost";
 import { ChessSettingTab, DEFAULT_SETTINGS } from "./settings";
-import { applyThemes, ensureBoardAssets } from "./themes";
+import { applyThemes, ensureBoardAssets } from "./style/themes";
 import { RIBBON_ICON_SVG } from "./utils/icon";
 import type { ISettings } from "./types";
 import {

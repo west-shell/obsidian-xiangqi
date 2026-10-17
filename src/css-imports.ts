@@ -1,4 +1,4 @@
 import "@weshell/xiangqiground/assets/xiangqiground.base.css";
 import "@weshell/xiangqiground/assets/xiangqiground.piece.css";
-import "./style/pieceSets/index.css";
-import "./style/layout.scss";
+import "./style/pieces/index.css";
+import "./style/layout/index.scss";

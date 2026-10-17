@@ -9,7 +9,7 @@ import { DEFAULT_FEN } from "./chess";
 import type { EventBus } from "./core/event-bus";
 import type ChessPlugin from "./main";
 import type { PGNParser } from "./modules/Source/parser";
-import type { ThemeName } from "./themes";
+import type { ThemeName } from "./style/themes";
 
 export { DEFAULT_FEN };
 

@@ -1,21 +1,21 @@
 import { type App, Modal } from "obsidian";
 
-import bambooB64 from "../assets/bamboo.jpg?base64";
-import woodB64 from "../assets/wood.jpg?base64";
+import bambooB64 from "../../../assets/bamboo.jpg?base64";
+import woodB64 from "../../../assets/wood.jpg?base64";
 
-import type { ISettings } from "./types";
-import { applyThemeCSSVars, GRID_SVG, type ThemeData } from "./chess";
-import { getLang, t } from "./i18n";
-import type ChessPlugin from "./main";
+import type { ISettings } from "../../types";
+import { applyThemeCSSVars, GRID_SVG, type ThemeData } from "../../chess";
+import { getLang, t } from "../../i18n";
+import type ChessPlugin from "../../main";
 import {
   applyPieceSet,
   PIECE_SET_PICKER,
   PIECE_SETS,
   resolvePieceSetKey,
-} from "./pieceSets";
+} from "../pieces/pieceSets";
 
 export { PIECE_SETS, PIECE_SET_PICKER, resolvePieceSetKey };
-export type { PieceSetDef } from "./pieceSets";
+export type { PieceSetDef } from "../pieces/pieceSets";
 
 // Two default highlight sets — deep marks for light boards, bright marks
 // for dark boards. Themes pick from these per field; textured boards
@@ -252,11 +252,11 @@ export function applyThemes(settings: ISettings, app?: App) {
   const body = activeDocument.body.style;
   body.setProperty("--xq-piece-red", t.red);
   body.setProperty("--xq-piece-black", t.black);
-  // Selected square: corner-bracket frame color (scss/_variant.scss).
+  // Selected square: corner-bracket frame color (layout/_variant.scss).
   body.setProperty("--xq-bracket-color", t.selected);
   // xiangqiground declares its RGB-triplet marker vars on `.xq-wrap`, which
   // shadows any value inherited from <body>; set plugin-owned hex vars here
-  // and override the marker rules in scss/_variant.scss instead.
+  // and override the marker rules in layout/_variant.scss instead.
   // Selection marks (dest dots / capture rings) share the selected color;
   // the next-move preview arrow is a distinct mark with its own color.
   body.setProperty("--xq-lastmove-color", t.lastMove);

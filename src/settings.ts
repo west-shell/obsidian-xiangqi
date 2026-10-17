@@ -20,7 +20,7 @@ import {
   PIECE_SETS,
   resolvePieceSetKey,
   THEME_KEYS,
-} from "./themes";
+} from "./style/themes";
 import type { ISettings } from "./types";
 import { playSound } from "./utils/sound";
 
