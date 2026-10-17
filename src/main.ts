@@ -1,4 +1,4 @@
-import "./css-imports";
+import "./style/css-imports";
 
 import { addIcon, MarkdownView, Plugin, TFile } from "obsidian";
 

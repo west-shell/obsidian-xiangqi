@@ -86,6 +86,7 @@ FileHost   contentEl  ─── .view-content.ct-file-view
 ```
 src/style/
   README.md           本文档
+  css-imports.ts      CSS 入口（sync 排除，各变体自有：chessground/xiangqiground 基础样式 + pieceSet + layout）
   themes/             棋盘主题（TS；sync 排除，各变体自有）
     index.ts          主题表、Theme/高亮/棋子选择器、applyThemes/ensureBoardAssets；
                       对外唯一门面（外部一律 import "./style/themes"），
