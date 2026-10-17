@@ -105,7 +105,7 @@ src/style/
     _genfen.scss      FEN 编辑器（--edit 网格、palette、编辑工具）
     _settings.scss    设置页 + 引擎/导入导出模态控件
   pieces/             棋子皮肤（sync 排除，各变体自有）
-    css/              生成 CSS 子目录
+    pieceSet/          生成 CSS 子目录
       index.css       生成的 @import 清单（scripts/gen-piece-css.mjs）
       <set>.css …     生成的每套棋子 CSS（base64 内联，.ct-pieceset-<set> 作用域）
     pieceSets.ts      棋子皮肤切换 + 选择器（body 级 .ct-pieceset-* 类切换）

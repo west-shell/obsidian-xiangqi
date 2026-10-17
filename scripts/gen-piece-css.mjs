@@ -6,10 +6,10 @@
 //   node scripts/gen-piece-css.mjs --check  verify outputs are up to date
 //
 // Outputs (all committed to the repo, bundled into styles.css by Vite):
-//   src/style/pieces/css/<set>.css  14 board rules + 2 thumbnail rules,
+//   src/style/pieces/pieceSet/<set>.css  14 board rules + 2 thumbnail rules,
 //                                  base64 data URIs scoped under
 //                                  .xq-pieceset-<set>
-//   src/style/pieces/css/index.css  @import list
+//   src/style/pieces/pieceSet/index.css  @import list
 //   src/style/pieces/pieceSets.gen.ts  PIECE_SETS registry for settings UI
 //
 // The base artwork of the default ("traditional") set is identical to
@@ -34,7 +34,7 @@ import { join } from "node:path";
 const ROOT = import.meta.dirname;
 const SRC_DIR = join(ROOT, "..", "assets", "pieces");
 const PIECES_DIR = join(ROOT, "..", "src", "style", "pieces");
-const CSS_DIR = join(PIECES_DIR, "css");
+const CSS_DIR = join(PIECES_DIR, "pieceSet");
 const INDEX_CSS = join(CSS_DIR, "index.css");
 const GEN_TS = join(PIECES_DIR, "pieceSets.gen.ts");
 
