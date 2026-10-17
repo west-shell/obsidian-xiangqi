@@ -1590,8 +1590,9 @@
         <span
           class={`${CLS_PREFIX}-moves__label ${hasComment && settings?.showListCommentMark !== false ? `${CLS_PREFIX}-moves__label--comment` : ""}`}
         >
-          {m ? getMoveNotation(m, settings?.notationType) : "..."}
-          {@render moveLabelContent(node)}
+          {m
+            ? getMoveNotation(m, settings?.notationType)
+            : "..."}{@render moveLabelContent(node)}
         </span>
         {#if node.eval && settings?.showListEval !== false}
           <span
@@ -1626,10 +1627,9 @@
               <span
                 class={`${CLS_PREFIX}-moves__label ${(startMarks.node?.comments ?? []).length > 0 && settings?.showListCommentMark !== false ? `${CLS_PREFIX}-moves__label--comment` : ""}`}
               >
-                {getStartLabel()}
-                {#if startMarks.node}
-                  {@render moveLabelContent(startMarks.node)}
-                {/if}
+                {getStartLabel()}{#if startMarks.node}{@render moveLabelContent(
+                    startMarks.node,
+                  )}{/if}
               </span>
               {#if startMarks.node?.eval && settings?.showListEval !== false}
                 <span
