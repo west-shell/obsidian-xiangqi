@@ -12,6 +12,20 @@ If you like this project, feel free to check out my page on
 [![Bilibili](https://img.shields.io/badge/Bilibili-Bilibili-ff69b4?logo=bilibili&logoColor=white)](https://space.bilibili.com/156446344)  
 Likes, coins, and feedback are greatly appreciated.
 
+## Table of Contents
+
+- [Overview](#overview)
+- [PGN File Support](#pgn-file-support)
+- [Code Blocks](#code-blocks)
+- [Keyboard Shortcuts](#keyboard-shortcuts)
+- [Mobile Usage](#mobile-usage)
+- [Settings](#settings)
+- [Features](#features)
+- [Usage](#usage)
+- [Installation](#installation)
+- [Build](#build)
+- [Donation](#donation)
+
 ## Overview
 
 Obsidian plugin for Chinese chess rendering and exploration inside notes. Supports PGN file viewing, two code block types (`fen`, `tree`), full xiangqi rules via [xiangqi.js](https://github.com/west-shell/xiangqi.js), interactive board via [xiangqiground](https://github.com/west-shell/xiangqiground), variation tree visualization, and built-in engine analysis powered by [Pikafish](https://github.com/official-pikafish/Pikafish) (WASM).
@@ -63,6 +77,27 @@ Two code block types — all code block names are customizable.
 ![FEN Editor](./IMAGE/FEN.png)
 
 ---
+
+## Keyboard Shortcuts
+
+Branch navigation shortcuts work in the PGN file view and in `xiangqi` code blocks (in code blocks the pointer must hover the block and no text editor may be focused). Basic navigation is available in the PGN file view.
+
+### Basic Navigation (PGN file view)
+
+| Shortcut  | Action                       |
+| --------- | ---------------------------- |
+| `←` / `→` | Jump to game start / end     |
+| `↑` / `↓` | Step one move back / forward |
+
+### Branch Navigation
+
+| Shortcut                    | Action                                                                                                                                        |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Ctrl+↑` / `Ctrl+↓`         | Jump to the previous / next fork (branching point) along the line                                                                             |
+| `Ctrl+←` / `Ctrl+→`         | Switch the displayed branch at the first fork below the current node — the current node stays in place; wraps around at the last/first branch |
+| `Ctrl+Alt+←` / `Ctrl+Alt+→` | Cycle through every variation below the current node (all branch combinations, including the node itself); wraps around                       |
+
+> **Note**: On macOS, `Ctrl+↑`/`Ctrl+↓` may conflict with system Mission Control shortcuts.
 
 ## Mobile Usage
 
@@ -139,6 +174,7 @@ Enable/disable PGN file view and customize file extensions:
 - **Board Styles**: 7 board styles including texture-based Wood and Bamboo, switchable from the board menu's swatch picker
 - **Move List**: Grid-aligned move columns with Chinese/coordinate notation and per-move marks (eval, annotation, glyph, comment)
 - **Variation Tree**: Tree graph with icon/WXF display modes for node labels
+- **Keyboard Navigation**: Arrow keys for move stepping, Ctrl+arrow shortcuts for fork jumping and branch switching, Ctrl+Alt+arrow to cycle all variations below the current node
 - **Visual FEN Editor**: Drag/click to place pieces, clear/fill board, toggle side to move
 - **PGN Saving**:
   - Button colors — **gray** (empty), **green** (saved), **orange** (modified)
