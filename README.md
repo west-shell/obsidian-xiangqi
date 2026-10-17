@@ -2,57 +2,29 @@
 
 ![Version](https://img.shields.io/github/v/release/west-shell/obsidian-xiangqi)
 [![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-blue)](./LICENSE)
+[![Discord](https://img.shields.io/badge/Discord-Server-5865F2?logo=discord&logoColor=white)](https://discord.gg/FQhgku2Cr)
 [![PayPal](https://img.shields.io/badge/PayPal-Sponsor-blue?logo=paypal)](https://paypal.com/paypalme/weshell1988)
 [![Afdian](https://img.shields.io/badge/Afdian-Sponsor-946CE6?logo=afdian)](https://afdian.com/a/weshell)
-[![Discord](https://img.shields.io/badge/Discord-Server-5865F2?logo=discord&logoColor=white)](https://discord.gg/FQhgku2Cr)
 
-[English](./README.md) | [中文](./README.zh.md)
+> Play, explore and analyze Chinese chess (xiangqi) right inside your Obsidian notes — full PGN support, interactive boards, variation trees and a built-in Pikafish engine (WASM).
 
-If you like this project, feel free to check out my page on  
-[![Bilibili](https://img.shields.io/badge/Bilibili-Bilibili-ff69b4?logo=bilibili&logoColor=white)](https://space.bilibili.com/156446344)  
-Likes, coins, and feedback are greatly appreciated.
+![Branch Diagram](./IMAGE/Tree.png)
 
-## Table of Contents
+English | [中文文档](./README.zh.md)
 
-- [Overview](#overview)
-- [PGN File Support](#pgn-file-support)
-- [Code Blocks](#code-blocks)
-- [Keyboard Shortcuts](#keyboard-shortcuts)
-- [Mobile Usage](#mobile-usage)
-- [Settings](#settings)
-- [Features](#features)
-- [Usage](#usage)
-- [Installation](#installation)
-- [Build](#build)
-- [Donation](#donation)
+## Getting Started
 
-## Overview
+There are three ways to use the plugin — all of them end up on the same interactive board.
 
-Obsidian plugin for Chinese chess rendering and exploration inside notes. Supports PGN file viewing, two code block types (`fen`, `tree`), full xiangqi rules via [xiangqi.js](https://github.com/west-shell/xiangqi.js), interactive board via [xiangqiground](https://github.com/west-shell/xiangqiground), variation tree visualization, and built-in engine analysis powered by [Pikafish](https://github.com/official-pikafish/Pikafish) (WASM).
+### Open a PGN file
 
-## PGN File Support
-
-Open `.pgn` files directly in Obsidian — the plugin registers a dedicated `.pgn` file view with an interactive board interface.
-
-- **Manual Save**: Any changes (moves, variations, comments, annotations) are saved back to the file when clicking Save button
-- **Variation Tree**: Interactive tree graph showing all branches — click nodes to navigate
-- **Comments & Annotations**: Supports branch diagram and board annotation symbols, comments
-- **Mode Toggle**: Switch between icon mode and text mode in branch diagram
-- **Quick Create**: New PGN files from the ribbon button
-- **Custom File Types**: Set specific file types as PGN files
-- **Context Menu**: Right-click PGN files to switch between PGN view and Markdown view
-
-- **Multi-Game Support**: Navigate between multiple games within a single `.pgn` file using the game navigation bar; create, delete, and reorder games
+Any `.pgn` file opens in a dedicated chess view: browse the variation tree, edit moves and comments, run engine analysis, and save back to the file with one click. Multiple games in one file are supported via the game navigation bar, and the ribbon button creates new PGN files instantly.
 
 ![PGN File](./IMAGE/PGN.png)
 
-## Code Blocks
+### Embed a game in a note
 
-Two code block types — all code block names are customizable.
-
----
-
-`xiangqi`: Display and explore Chinese chess games with variation tree
+Write moves in a `xiangqi` code block — the position renders as an interactive board with the full variation tree:
 
 ````markdown
 ```xiangqi
@@ -62,228 +34,120 @@ Two code block types — all code block names are customizable.
 ```
 ````
 
-![Branch Diagram](./IMAGE/Tree.png)
-
----
-
-`fen`: Visual board editor — set up a position and save as a `xiangqi` code block
-
-````markdown
-```fen
-
-```
-````
-
-![FEN Editor](./IMAGE/FEN.png)
-
----
-
-## Keyboard Shortcuts
-
-Branch navigation shortcuts work in the PGN file view and in `xiangqi` code blocks (in code blocks the pointer must hover the block and no text editor may be focused). Basic navigation is available in the PGN file view.
-
-### Basic Navigation (PGN file view)
-
-| Shortcut  | Action                       |
-| --------- | ---------------------------- |
-| `←` / `→` | Jump to game start / end     |
-| `↑` / `↓` | Step one move back / forward |
-
-### Branch Navigation
-
-| Shortcut                    | Action                                                                                                                                        |
-| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Ctrl+↑` / `Ctrl+↓`         | Jump to the previous / next fork (branching point) along the line                                                                             |
-| `Ctrl+←` / `Ctrl+→`         | Switch the displayed branch at the first fork below the current node — the current node stays in place; wraps around at the last/first branch |
-| `Ctrl+Alt+←` / `Ctrl+Alt+→` | Cycle through every variation below the current node (all branch combinations, including the node itself); wraps around                       |
-
-> **Note**: On macOS, `Ctrl+↑`/`Ctrl+↓` may conflict with system Mission Control shortcuts.
-
-## Mobile Usage
-
-For the best experience on mobile devices, it's recommended to install the Full Screen Toggle plugin ([donkeypacific/obsidian-full-screen-cross-platform-plugin](https://github.com/donkeypacific/obsidian-full-screen-cross-platform-plugin)) or similar fullscreen plugins and adjust the top/bottom margins in **Settings > Xiangqi > Board Margins** to optimize the board display area.
-
-![Mobile](./IMAGE/Mobile.jpg)
-
-## Settings
-
-### Board Appearance
-
-- **Board Style**: Auto, Light, Dark, Parchment, Green, Wood, Bamboo — switchable in settings or via the board menu's swatch picker
-- **Board Size**: Adjust board and piece display size (0–100%)
-- **Show Coordinates**: Show coordinate labels on board edges
-
-### Game Hints
-
-- **Show Last Move**: Highlight the origin and destination of the previous move
-- **Show Next Moves**: Whether to show next moves
-- **Show Other Variations**: Highlight alternative variation moves on the board
-- **Show Turn Border**: Show a highlighted border indicating whose turn it is
-- **Move Sounds**: Sound effects for moves, captures and checkmate, with adjustable volume
-- **Speech**: Read moves aloud (unavailable on mobile)
-- **Auto Jump**: Where to position the board when opening a game — Never / Always / Only for default position
-
-### Move List
-
-- **Show Move List**: Display the move list panel when opening a tree
-- **Move Text Size**: Font size for the move list
-- **Notation**: Chinese (炮二平五) or coordinates (h2e6)
-- **Move Marks**: Eval bar, annotation badge, glyph and comment underline shown next to moves — each can be toggled independently
-
-### Board Margins
-
-- **Top Margin**: Adjustable top margin (0–100 px)
-- **Bottom Margin**: Adjustable bottom margin (0–100 px)
-
-### Code Block Names
-
-Customize code block aliases in **Settings > Xiangqi > Code Block Names**:
-
-- **Code block names**: Default `xiangqi, tree` — both names render the tree view with variation tree and engine analysis. Add custom aliases separated by commas
-- **FEN save as**: Choose which code block name to use when saving from the FEN editor (default `tree`)
-
-> **Note**: Changes require restarting the plugin or Obsidian to take effect.
-
-### Engine Analysis
-
-- **Engine Depth**: Search depth for Pikafish analysis (1–30, default 18)
-- **Engine Skill Level**: Skill level for engine play (0–20, default 20)
-- **Show Best Move**: Show the engine's best-move arrow (default on)
-- **Show Ponder Move**: Show the ponder-move arrow (default on)
-- **Show Engine Annotations**: Show engine glyphs on analyzed moves (default on)
-- **Show Board Annotations**: Draw engine annotations on the board (default on)
-
-### Save
-
-- **Save Eval by Default**: Whether to include eval annotations when saving PGN (default off)
-- **Save Eval Prompt**: Whether to show a prompt about eval when saving (default on)
-
-### PGN File View
-
-Enable/disable PGN file view and customize file extensions:
-
-- **Enable PGN file view**: Toggle to register/unregister PGN view
-- **PGN file extensions**: Default `pgn`, add custom extensions separated by commas
-
-> **Note**: Changes require restarting the plugin or Obsidian to take effect.
-
-## Features
-
-- **Complete Rules Engine**: Check/checkmate detection, move validation — all via xiangqi.js
-- **Board Rendering**: High-quality chessboard via xiangqiground with drag-and-drop moves
-- **Board Styles**: 7 board styles including texture-based Wood and Bamboo, switchable from the board menu's swatch picker
-- **Move List**: Grid-aligned move columns with Chinese/coordinate notation and per-move marks (eval, annotation, glyph, comment)
-- **Variation Tree**: Tree graph with icon/WXF display modes for node labels
-- **Keyboard Navigation**: Arrow keys for move stepping, Ctrl+arrow shortcuts for fork jumping and branch switching, Ctrl+Alt+arrow to cycle all variations below the current node
-- **Visual FEN Editor**: Drag/click to place pieces, clear/fill board, toggle side to move
-- **PGN Saving**:
-  - Button colors — **gray** (empty), **green** (saved), **orange** (modified)
-  - Confirmation dialog before saving
-- **i18n**: Supports English and Chinese UI
-- **Board Markers**: Draw arrows and highlights on the board
-- **Engine Analysis**: Built-in Pikafish WASM engine with single position analysis, batch analysis, and auto-analysis
-  - **Best Move Arrow**: Green arrow shows the engine's best move; yellow arrow shows the ponder move
-  - **Eval Bar**: Left sidebar bar showing evaluation (green = red advantage, red = black advantage)
-  - **Eval Trend Chart**: Vertical polyline in the slider background showing evaluation across moves
-  - **Eval Color Bar**: Color bar on tree nodes indicating evaluation (green = red advantage, red = black advantage, gray = equal)
-  - **Eval Persistence**: Engine evaluations saved as `%e:` comments in PGN
-- **Responsive Layout**: Automatically switches between single-column and double-column based on screen orientation and width
-- **Mobile Friendly**: Adjust board size for small screens
-
-## Usage
-
-### `fen` Code Block
-
-1. Add a `fen` code block to start the editor
-2. Drag pieces or click piece buttons to set up the position
-3. Use clear/fill/turn buttons as needed
-4. Click Save — the `fen` code block is replaced with a `xiangqi` code block containing the FEN, ready for play
-
-### `xiangqi` Code Block
-
-1. Write your game inside a `xiangqi` code block (optionally with FEN and ICCS moves)
-2. FEN is optional — defaults to the standard starting position
-3. Controls:
-   - The variation tree displays all branches graphically
-   - Click any node to navigate to that position
-   - The board menu (board icon in the toolbar) flips the board and toggles highlights, coordinates, and annotations on the fly
-   - Switch board style instantly from the board menu's swatch picker
-4. Click **Save** to overwrite the original PGN
-5. Click **Edit board** in the Edit menu to switch to position editor mode
-   - Modify the position by dragging/clicking pieces
-   - Click Save to apply the new position (existing moves will be discarded)
-   - Click Cancel to return to tree view
-6. Use engine analysis:
-   - Click **Analyze** for single position analysis, **Batch** to analyze all nodes, or enable auto-analysis
-   - Green arrow = best move, yellow arrow = ponder move
-   - Eval bar on the left shows position evaluation
-   - Eval color bars on nodes and eval trend chart on the slider show evaluation across the game
-
-### Optional Parameters
-
-| Name              | Value        | Description                                       |
-| ----------------- | ------------ | ------------------------------------------------- |
-| `protected` / `p` | true / false | When true, Save button is disabled; default false |
-| `rotated` / `r`   | true / false | When true, board is flipped (Red on bottom)       |
-
-#### Example
+Optional parameters: `protected`/`p` (disable Save), `rotated`/`r` (flip board, Red on bottom). FEN is optional — with quotes or without:
 
 ````markdown
 ```xiangqi
 r:true
-p:true
-2bk1a3/5n3/3Pb4/R7p/2p6/C3p2N1/PR2c3P/1nr1B1C2/4A4/1rB1KA3 w
+[FEN "2bk1a3/5n3/3Pb4/R7p/2p6/C3p2N1/PR2c3P/1nr1B1C2/4A4/1rB1KA3 w"]
 1. G2-G9 F9-E8
 2. D7-D8 D9-E9
-3. D8-E8 E9-E8
-4. A6-A8 E8-E9
 ```
 ````
 
-- Colons can be Chinese or English; `r` and `p` are case-insensitive
-- FEN value works with or without quotes
-- PGN moves can be numbered together, not numbered, or written one by one
+Moves can be numbered together, unnumbered, or written one by one.
+
+### Set up a position
+
+A `fen` code block opens a visual position editor — drag or click to place pieces, set the side to move, then save. It becomes a playable `xiangqi` code block containing the FEN.
+
+![FEN Editor](./IMAGE/FEN.png)
+
+## Feature Tour
+
+### Variation Tree & Keyboard Navigation
+
+Every branch is visualized as a tree graph — click any node to jump to that position, and switch between icon and text label modes. Keyboard shortcuts keep your hands on the board:
+
+| Shortcut                         | Action                                                                       |
+| -------------------------------- | ---------------------------------------------------------------------------- |
+| `Ctrl+↑` / `Ctrl+↓`              | Jump to the previous / next fork (branching point) along the line            |
+| `Ctrl+←` / `Ctrl+→`              | Switch the displayed branch at the first fork below the current node (wraps) |
+| `Ctrl+Alt+←` / `Ctrl+Alt+→`      | Cycle through every variation below the current node (wraps)                 |
+| `↑` / `↓` / `←` / `→` (PGN view) | Step one move back / forward; jump to game start / end                       |
+
+Branch navigation works in both the PGN file view and `xiangqi` code blocks (in code blocks, hover the block and keep focus out of text editors). On macOS, `Ctrl+↑`/`Ctrl+↓` may conflict with Mission Control.
+
+### Engine Analysis
+
+Built-in Pikafish (WASM) — no external installation needed.
+
+- **Single / batch / auto analysis**: analyze one position, every node, or automatically as you play
+- **Best-move & ponder arrows**: green for best move, yellow for the ponder move
+- **Eval bar**: live evaluation beside the board (green = red advantage, red = black advantage)
+- **Eval trend chart & node color bars**: see the whole game's evaluation at a glance
+- **Persistence**: evaluations are stored as `%e:` comments in PGN
+- **Engine play**: play against the engine with configurable depth (1–30) and skill level (0–20)
+
+### Board & Pieces
+
+- **7 board styles**: Auto, Light, Dark, Parchment, Green, Wood, Bamboo — with a swatch picker in the board menu
+- **Adjustable size**: board and piece display scale (0–100%)
+- **Board markers**: draw arrows and highlights on the board
+- **Feedback options**: last-move highlight, next-move hints, other variations, turn border, move sounds, spoken moves (desktop)
+- **Board editor**: **Edit board** turns any game into a position editor; existing moves are discarded on save
+
+### Move List
+
+Grid-aligned move columns with Chinese (炮二平五) or coordinate (h2e6) notation, adjustable font size, and per-move marks — eval bar, annotation badge, glyph and comment underline — each independently toggleable.
+
+### Mobile
+
+The responsive layout automatically switches between single-column (portrait) and double-column (landscape) views. For best results, combine it with a fullscreen plugin (e.g. [obsidian-full-screen-cross-platform-plugin](https://github.com/donkeypacific/obsidian-full-screen-cross-platform-plugin)) and tune the top/bottom board margins in settings.
+
+![Mobile](./IMAGE/Mobile.jpg)
+
+## Settings Overview
+
+All options live in **Settings → Xiangqi**, grouped as follows:
+
+| Group            | What you can configure                                                          |
+| ---------------- | ------------------------------------------------------------------------------- |
+| Board Appearance | Board style, board/piece size, coordinate labels                                |
+| Game Hints       | Last move, next moves, other variations, turn border, sounds, speech, auto jump |
+| Move List        | Visibility, text size, notation, per-move marks                                 |
+| Board Margins    | Top/bottom margin (0–100 px) for fullscreen layouts                             |
+| Code Block Names | Aliases for `xiangqi`/`tree` blocks, FEN save target                            |
+| Engine Analysis  | Depth, skill level, arrows, engine/board annotations                            |
+| Save             | Include eval on save, eval prompt                                               |
+| PGN File View    | Enable/disable the view, custom file extensions                                 |
+
+Code block names, file extensions, and custom file types take effect after restarting the plugin or Obsidian.
 
 ## Installation
 
-This plugin is available on the official Obsidian plugin marketplace. Search for "Chinese chess" or "xiangqi" to install.
+This plugin is available on the official Obsidian community plugin marketplace:
 
-1. Open Obsidian
-2. Go to **Settings**
-3. Click **Community plugins**
-4. Ensure **Restricted mode** is off
-5. Click **Browse**
-6. Search for "Chinese chess" or "xiangqi"
-7. Find this plugin and click **Install**
-8. Click **Enable**
+1. Open **Settings → Community plugins** (Restricted mode off)
+2. Click **Browse** and search for **"Chinese chess"** or **"xiangqi"**
+3. Click **Install**, then **Enable**
 
 ## Build
 
-1. Clone this repository:
+```bash
+git clone https://github.com/west-shell/obsidian-xiangqi.git
+cd obsidian-xiangqi
+npm install
+npm run build        # Minified production build (for release)
+npm run build:debug  # Unminified production build (with sourcemaps)
+```
 
-   ```bash
-   git clone https://github.com/west-shell/obsidian-xiangqi.git
-   ```
+`xiangqi.js` and `xiangqiground` are installed from npm.
 
-2. Install dependencies (xiangqi.js and xiangqiground are installed from npm):
+## Credits & License
 
-   ```bash
-   cd obsidian-xiangqi
-   npm install
-   ```
+- Rules engine: [xiangqi.js](https://github.com/west-shell/xiangqi.js)
+- Board rendering: [xiangqiground](https://github.com/west-shell/xiangqiground)
+- Engine: [Pikafish](https://github.com/official-pikafish/Pikafish) (WASM)
+- i18n: English and Chinese UI
 
-3. Build the plugin:
+Released under [GPL-3.0](./LICENSE).
 
-   ```bash
-   npm run build        # Minified production build (for release)
-   npm run build:debug  # Unminified production build (with sourcemaps)
-   ```
-
-## Donation
-
-If you like this plugin, feel free to support me!
+## Support the Project
 
 [![PayPal](https://img.shields.io/badge/PayPal-Sponsor-blue?logo=paypal)](https://paypal.com/paypalme/weshell1988)
 [![Afdian](https://img.shields.io/badge/Afdian-Sponsor-946CE6?logo=afdian)](https://afdian.com/a/weshell)
+
+If you like this project, check out my [Bilibili](https://space.bilibili.com/156446344) page — likes, coins and feedback are greatly appreciated.
 
 ![Donation](./IMAGE/打赏.png)
