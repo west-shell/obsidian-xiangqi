@@ -1,11 +1,16 @@
 import { registerBlockModule } from "../core/module-system";
 import type { IBlockHost } from "../types";
 
-const ACTION_BY_KEY: Record<string, string> = {
+const CTRL_ACTION_BY_KEY: Record<string, string> = {
   ArrowUp: "navPrevFork",
   ArrowDown: "navNextFork",
   ArrowLeft: "prevPathBranch",
   ArrowRight: "nextPathBranch",
+};
+
+const CTRL_ALT_ACTION_BY_KEY: Record<string, string> = {
+  ArrowLeft: "prevAllBranches",
+  ArrowRight: "nextAllBranches",
 };
 
 /**
@@ -28,8 +33,10 @@ const KeyboardNavModule = {
     };
 
     const onKeyDown = (e: KeyboardEvent): void => {
-      if (!e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return;
-      const action = ACTION_BY_KEY[e.key];
+      if (!e.ctrlKey || e.metaKey || e.shiftKey) return;
+      const action = e.altKey
+        ? CTRL_ALT_ACTION_BY_KEY[e.key]
+        : CTRL_ACTION_BY_KEY[e.key];
       if (!action) return;
       if (isEditable(doc.activeElement)) return;
       if (!container.matches(":hover")) return;

@@ -115,3 +115,40 @@ export function branchStepDirection(
   const branchesRight = nodeDepth(fork, nodeMap) % 2 === 1;
   return right === branchesRight ? 1 : -1;
 }
+
+/**
+ * All displayed-path variations below `node` (the node itself included),
+ * in DFS child-index order: each entry is the list of child indices the
+ * path takes at every node from `node` down to a line tip.
+ */
+export function enumerateVariations(node: ChessNode): number[][] {
+  const variations: number[][] = [];
+  const walk = (cur: ChessNode, prefix: number[]): void => {
+    if (cur.children.length === 0) {
+      variations.push(prefix);
+      return;
+    }
+    cur.children.forEach((child, i) => walk(child, [...prefix, i]));
+  };
+  walk(node, []);
+  return variations;
+}
+
+/**
+ * The currently displayed variation below `node` (clamped child indices
+ * following the per-fork choices), in the same shape as the entries of
+ * `enumerateVariations`.
+ */
+export function currentVariation(
+  node: ChessNode,
+  pathChoices?: PathChoices,
+): number[] {
+  const indices: number[] = [];
+  let cur: ChessNode | null = node;
+  while (cur && cur.children.length > 0) {
+    const idx = pathBranchIndex(cur, pathChoices);
+    indices.push(idx);
+    cur = cur.children[idx];
+  }
+  return indices;
+}

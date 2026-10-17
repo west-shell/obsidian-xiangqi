@@ -38,6 +38,8 @@ import {
 import { activateGame, extractHeaders } from "../../utils/parse";
 import {
   branchStepDirection,
+  currentVariation,
+  enumerateVariations,
   findForkAbove,
   findForkBelow,
   firstForkOnPath,
@@ -526,6 +528,35 @@ const ActionsModule = {
             const count = hit.fork.children.length;
             const target = (hit.branchIndex + step + count) % count;
             host.pathChoices.set(hit.fork.id, target);
+            eventBus.emit("updateMainPath");
+            break;
+          }
+          // Ctrl+Alt+Left / Ctrl+Alt+Right: cycle through every
+          // displayed-path variation below the current node (the node
+          // itself included), wrapping around at the ends.
+          case "prevAllBranches":
+          case "nextAllBranches": {
+            const variations = enumerateVariations(host.currentNode);
+            if (variations.length < 2) break;
+            const current = currentVariation(
+              host.currentNode,
+              host.pathChoices,
+            );
+            const pos = Math.max(
+              0,
+              variations.findIndex(
+                (v) =>
+                  v.length === current.length &&
+                  v.every((x, i) => x === current[i]),
+              ),
+            );
+            const step = name === "nextAllBranches" ? 1 : -1;
+            const target = (pos + step + variations.length) % variations.length;
+            let cur: ChessNode | null = host.currentNode;
+            for (const idx of variations[target]) {
+              if (cur.children.length > 1) host.pathChoices.set(cur.id, idx);
+              cur = cur.children[idx];
+            }
             eventBus.emit("updateMainPath");
             break;
           }
