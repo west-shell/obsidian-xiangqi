@@ -523,8 +523,8 @@ const ActionsModule = {
               host.nodeMap,
               name === "nextPathBranch",
             );
-            const target = hit.branchIndex + step;
-            if (target < 0 || target >= hit.fork.children.length) break;
+            const count = hit.fork.children.length;
+            const target = (hit.branchIndex + step + count) % count;
             host.pathChoices.set(hit.fork.id, target);
             eventBus.emit("updateMainPath");
             break;
