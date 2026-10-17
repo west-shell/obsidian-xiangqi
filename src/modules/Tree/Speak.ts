@@ -41,13 +41,26 @@ const FILE_SPEECH: Record<string, string> = {
   h: "H",
 };
 
+const RANK_SPEECH: Record<string, string> = {
+  "1": "one",
+  "2": "two",
+  "3": "three",
+  "4": "four",
+  "5": "five",
+  "6": "six",
+  "7": "seven",
+  "8": "eight",
+};
+
 function speak(move: Move) {
   const san = getMoveNotation(move);
   if (!san) return;
   const isZh = getLang() === "zh";
   const preprocessed = isZh
     ? san
-    : san.replace(/[a-h]/g, (f) => FILE_SPEECH[f] + "-");
+    : san
+        .replace(/[a-h]/g, (f) => ` ${FILE_SPEECH[f]} `)
+        .replace(/[1-8]/g, (r) => ` ${RANK_SPEECH[r]} `);
   const finalSpeech = preprocessed
     .replace(/O-O-O/g, t("speech.queensideCastle"))
     .replace(/O-O/g, t("speech.kingsideCastle"))
@@ -67,9 +80,12 @@ function speak(move: Move) {
   utter.lang = isZh ? "zh-CN" : "en-US";
   if (!isZh) {
     const voices = loadVoices();
+    const norm = (v: SpeechSynthesisVoice) =>
+      (v.lang || "").replace("_", "-").toLowerCase();
     const enVoice =
-      voices.find((v) => v.lang === "en-US") ??
-      voices.find((v) => v.lang.startsWith("en"));
+      voices.find((v) => norm(v) === "en-us") ??
+      voices.find((v) => norm(v).startsWith("en")) ??
+      voices.find((v) => /english/i.test(v.name ?? ""));
     if (enVoice) utter.voice = enVoice;
   }
   window.speechSynthesis.cancel();
