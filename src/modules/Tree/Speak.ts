@@ -4,7 +4,7 @@ import {
 } from "../../core/module-system";
 import { getLang, t } from "../../i18n";
 import type { Move } from "../../chess";
-import { getMoveNotation } from "../../chess";
+import { applySpeechSubstitutions, getMoveNotation } from "../../chess";
 import type { IHost } from "../../types";
 import { playMoveSound } from "../../utils/sound";
 
@@ -61,7 +61,9 @@ function speak(move: Move) {
     .replace(/#/g, ` ${t("speech.checkmate")}`);
 
   if (!window.speechSynthesis) return;
-  const utter = new SpeechSynthesisUtterance(finalSpeech);
+  const utter = new SpeechSynthesisUtterance(
+    applySpeechSubstitutions(finalSpeech),
+  );
   utter.lang = isZh ? "zh-CN" : "en-US";
   if (!isZh) {
     const voices = loadVoices();

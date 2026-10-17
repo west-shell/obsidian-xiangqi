@@ -99,6 +99,16 @@ export function getSaveNotation(move: Move): string {
   return move.iccs ?? move.zh ?? "";
 }
 
+// 同音字替换，纠正 TTS 对中文着法的发音（沿用旧版语音播报的替换表）：
+// 卒 zú→足、车 jū→局、相 xiàng→象、将 jiàng→酱。
+export function applySpeechSubstitutions(text: string): string {
+  return text
+    .replace(/卒/g, "足")
+    .replace(/车/g, "局")
+    .replace(/相/g, "象")
+    .replace(/将/g, "酱");
+}
+
 export function isMoveCheckmate(move: Move): boolean {
   return move.isCheckmate ?? false;
 }
