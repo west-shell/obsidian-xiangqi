@@ -37,6 +37,7 @@ import {
 } from "../../utils/confirmModal";
 import { activateGame, extractHeaders } from "../../utils/parse";
 import {
+  branchStepDirection,
   findForkAbove,
   findForkBelow,
   firstForkOnPath,
@@ -510,13 +511,19 @@ const ActionsModule = {
           }
           // Ctrl+Left / Ctrl+Right: keep the current node in place and
           // switch the displayed path's branch at the first fork on the
-          // path at or below the current node.
+          // path at or below the current node. The index step follows the
+          // fork's depth parity: odd-layer forks stack branches to the
+          // right of the trunk, even-layer forks to its left.
           case "prevPathBranch":
           case "nextPathBranch": {
             const hit = firstForkOnPath(host.currentNode, host.pathChoices);
             if (!hit) break;
-            const target =
-              hit.branchIndex + (name === "nextPathBranch" ? 1 : -1);
+            const step = branchStepDirection(
+              hit.fork,
+              host.nodeMap,
+              name === "nextPathBranch",
+            );
+            const target = hit.branchIndex + step;
             if (target < 0 || target >= hit.fork.children.length) break;
             host.pathChoices.set(hit.fork.id, target);
             eventBus.emit("updateMainPath");

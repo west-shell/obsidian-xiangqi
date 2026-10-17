@@ -86,3 +86,32 @@ export function firstForkOnPath(
   }
   return null;
 }
+
+/**
+ * Depth of `node` in plies from the root (root = 0), matching the tree
+ * layout's layer numbering.
+ */
+export function nodeDepth(node: ChessNode, nodeMap: NodeMap): number {
+  let depth = 0;
+  let cur = node.parentID ? (nodeMap.get(node.parentID) ?? null) : null;
+  while (cur) {
+    depth++;
+    cur = cur.parentID ? (nodeMap.get(cur.parentID) ?? null) : null;
+  }
+  return depth;
+}
+
+/**
+ * Sibling-index step (+1/-1) matching a visual left/right move at `fork`.
+ * The tree layout stacks extra branches to the RIGHT of the trunk on odd
+ * layers and to its LEFT on even layers (root is layer 0), so which
+ * index direction is "right" flips with the fork's depth parity.
+ */
+export function branchStepDirection(
+  fork: ChessNode,
+  nodeMap: NodeMap,
+  right: boolean,
+): 1 | -1 {
+  const branchesRight = nodeDepth(fork, nodeMap) % 2 === 1;
+  return right === branchesRight ? 1 : -1;
+}
