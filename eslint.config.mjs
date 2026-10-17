@@ -178,4 +178,17 @@ export default tseslint.config(
     },
     rules: typeCheckedRules,
   },
+
+  {
+    files: ["src/settings.ts"],
+    rules: {
+      // Dual-path by design: display() stays as the fallback for users on
+      // Obsidian < 1.13 who install despite minAppVersion. Keep the rules
+      // off so `eslint --fix` (pre-commit) cannot auto-remove it or rewrite
+      // its internal this.display() refresh to this.update() (absent on
+      // old versions).
+      "obsidianmd/settings-tab/no-deprecated-display": "off",
+      "obsidianmd/settings-tab/prefer-update-over-display": "off",
+    },
+  },
 );

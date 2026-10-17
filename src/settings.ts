@@ -3,8 +3,7 @@ import {
   Notice,
   PluginSettingTab,
   Setting,
-  // type SettingDefinitionItem,
-  // type SettingGroupItem,
+  type SettingDefinitionItem,
 } from "obsidian";
 
 import {
@@ -216,6 +215,33 @@ function addSliderWithValue(
   return setting;
 }
 
+// Settings whose changes must be reflected immediately in open chess views.
+// The declarative settings API funnels every control change through
+// setControlValue, so live-refresh handling is centralized here.
+const REFRESH_KEYS = new Set<string>([
+  "theme",
+  "pieceSet",
+  "zoom",
+  "showBoardAnnotations",
+  "showLastMove",
+  "showNextMove",
+  "showOtherVariations",
+  "showTurnBorder",
+  "showMovelist",
+  "fontSize",
+  "notationType",
+  "showListEval",
+  "showListAnnotation",
+  "showListGlyph",
+  "showListCommentMark",
+  "showPreview",
+  "showEngineBestMove",
+  "showEnginePonder",
+  "showEngineAnnotations",
+  "boardMarginTop",
+  "boardMarginBottom",
+]);
+
 export class ChessSettingTab extends PluginSettingTab {
   plugin: ChessPlugin;
 
@@ -224,354 +250,458 @@ export class ChessSettingTab extends PluginSettingTab {
     this.plugin = plugin;
   }
 
-  // getSettingDefinitions(): SettingDefinitionItem[] {
-  //   const settings = this.plugin.settings;
-  //   return [
-  //     {
-  //       name: "Language / 语言",
-  //       control: {
-  //         type: "dropdown",
-  //         key: "lang",
-  //         options: { auto: "Auto/跟随软件", en: "English", zh: "中文" },
-  //       },
-  //     },
-  //     {
-  //       type: "group",
-  //       heading: t("board.title"),
-  //       items: [
-  //         {
-  //           name: t("board.theme"),
-  //           desc: t("board.theme.desc"),
-  //           control: {
-  //             type: "dropdown",
-  //             key: "theme",
-  //             options: Object.fromEntries(
-  //               THEME_KEYS.map((k) => [k, t(`theme.${k}`)]),
-  //             ),
-  //           },
-  //         },
-  //         {
-  //           name: t("board.zoom"),
-  //           desc: t("board.zoom.desc"),
-  //           control: {
-  //             type: "slider",
-  //             key: "zoom",
-  //             min: 0,
-  //             max: 100,
-  //             step: 1,
-  //             displayFormat: (v) => `${v}%`,
-  //           },
-  //         },
-  //         {
-  //           name: t("board.coordinates"),
-  //           desc: t("board.coordinates.desc"),
-  //           control: { type: "toggle", key: "showCoordinateLabels" },
-  //         },
-  //       ],
-  //     },
-  //     {
-  //       type: "group",
-  //       heading: t("game.title"),
-  //       items: [
-  //         {
-  //           name: t("game.lastMove"),
-  //           desc: t("game.lastMove.desc"),
-  //           control: { type: "toggle", key: "showLastMove" },
-  //         },
-  //         {
-  //           name: t("game.legalMoves"),
-  //           desc: t("game.legalMoves.desc"),
-  //           control: { type: "toggle", key: "showNextMove" },
-  //         },
-  //         {
-  //           name: t("game.turnBorder"),
-  //           desc: t("game.turnBorder.desc"),
-  //           control: { type: "toggle", key: "showTurnBorder" },
-  //         },
-  //         {
-  //           name: t("game.speech"),
-  //           desc: t("game.speech.desc"),
-  //           control: { type: "toggle", key: "enableSpeech" },
-  //           visible: () => !!window.speechSynthesis,
-  //         },
-  //         {
-  //           name: t("movelist.autoJump"),
-  //           desc: t("movelist.autoJump.desc"),
-  //           control: {
-  //             type: "dropdown",
-  //             key: "autoJump",
-  //             options: {
-  //               never: t("movelist.autoJump.never"),
-  //               always: t("movelist.autoJump.always"),
-  //               auto: t("movelist.autoJump.auto"),
-  //             },
-  //           },
-  //         },
-  //       ],
-  //     },
-  //     {
-  //       type: "group",
-  //       heading: t("movelist.title"),
-  //       items: [
-  //         {
-  //           name: t("movelist.show"),
-  //           desc: t("movelist.show.desc"),
-  //           control: { type: "toggle", key: "showMovelist" },
-  //         },
-  //         {
-  //           name: t("movelist.fontSize"),
-  //           desc: t("movelist.fontSize.desc"),
-  //           control: {
-  //             type: "slider",
-  //             key: "fontSize",
-  //             min: 10,
-  //             max: 25,
-  //             step: 1,
-  //             displayFormat: (v) => `${v}px`,
-  //           },
-  //         },
-  //       ],
-  //     },
-  //     {
-  //       type: "group",
-  //       heading: t("engine.title"),
-  //       items: [
-  //         {
-  //           name: t("engine.depth"),
-  //           desc: t("engine.depth.desc"),
-  //           control: {
-  //             type: "slider",
-  //             key: "engineDepth",
-  //             min: 1,
-  //             max: 30,
-  //             step: 1,
-  //           },
-  //         },
-  //         {
-  //           name: t("engine.skillLevel"),
-  //           desc: t("engine.skillLevel.desc"),
-  //           control: {
-  //             type: "slider",
-  //             key: "engineSkillLevel",
-  //             min: 0,
-  //             max: 20,
-  //             step: 1,
-  //           },
-  //         },
-  //         {
-  //           name: t("engine.showBestMove"),
-  //           desc: t("engine.showBestMove.desc"),
-  //           control: { type: "toggle", key: "showEngineBestMove" },
-  //         },
-  //         {
-  //           name: t("engine.showPonder"),
-  //           desc: t("engine.showPonder.desc"),
-  //           control: { type: "toggle", key: "showEnginePonder" },
-  //         },
-  //         {
-  //           name: t("engine.showEngineAnnotations"),
-  //           desc: t("engine.showEngineAnnotations.desc"),
-  //           control: { type: "toggle", key: "showEngineAnnotations" },
-  //         },
-  //         {
-  //           name: t("engine.showBoardAnnotations"),
-  //           desc: t("engine.showBoardAnnotations.desc"),
-  //           control: { type: "toggle", key: "showBoardAnnotations" },
-  //         },
-  //       ],
-  //     },
-  //     {
-  //       type: "group",
-  //       heading: t("save.title"),
-  //       items: [
-  //         {
-  //           name: t("save.saveEval"),
-  //           desc: t("save.saveEval.desc"),
-  //           control: { type: "toggle", key: "saveEvalByDefault" },
-  //         },
-  //         {
-  //           name: t("save.saveEvalPrompt"),
-  //           desc: t("save.saveEvalPrompt.desc"),
-  //           control: { type: "toggle", key: "saveEvalPrompt" },
-  //         },
-  //       ],
-  //     },
-  //     {
-  //       type: "group",
-  //       heading: t("margin.title"),
-  //       items: [
-  //         {
-  //           name: t("margin.top"),
-  //           desc: t("margin.top.desc"),
-  //           control: {
-  //             type: "slider",
-  //             key: "boardMarginTop",
-  //             min: 0,
-  //             max: 100,
-  //             step: 1,
-  //             displayFormat: (v) => `${v}px`,
-  //           },
-  //         },
-  //         {
-  //           name: t("margin.bottom"),
-  //           desc: t("margin.bottom.desc"),
-  //           control: {
-  //             type: "slider",
-  //             key: "boardMarginBottom",
-  //             min: 0,
-  //             max: 100,
-  //             step: 1,
-  //             displayFormat: (v) => `${v}px`,
-  //           },
-  //         },
-  //       ],
-  //     },
-  //     {
-  //       type: "group",
-  //       heading: t("settings.restartRequired.title"),
-  //       desc: t("settings.restartRequired.desc"),
-  //       items: [
-  //         ...(
-  //           [
-  //             {
-  //               key: "treeBlockNames" as const,
-  //               i18n: "treeAliases",
-  //               fallback: "chess, tree",
-  //               defaults: ["chess", "tree"] as const,
-  //             },
-  //           ] as const
-  //         ).flatMap((cfg): SettingGroupItem[] => {
-  //           return [
-  //             {
-  //               name: t(`codeblock.${cfg.i18n}`),
-  //               desc: t(`codeblock.${cfg.i18n}.desc`),
-  //               render: (setting: Setting) => {
-  //                 setting.addText((text) =>
-  //                   text
-  //                     .setValue(settings[cfg.key].join(", "))
-  //                     .setPlaceholder(cfg.fallback)
-  //                     .onChange((value) => {
-  //                       const { valid, invalid } = parseAndValidateNames(value);
-  //                       if (invalid.length) {
-  //                         new Notice(
-  //                           t("codeblock.invalidName").replace(
-  //                             "{name}",
-  //                             invalid[0],
-  //                           ),
-  //                         );
-  //                         const input =
-  //                           setting.controlEl.querySelector("input")!;
-  //                         input.value = valid.length
-  //                           ? valid.join(", ")
-  //                           : cfg.fallback;
-  //                       }
-  //                       if (!valid.length) return;
-  //                       settings[cfg.key] = valid;
-  //                       void this.plugin.saveSettings();
-  //                     }),
-  //                 );
-  //                 setting.addButton((button) =>
-  //                   button.setIcon("rotate-ccw").onClick(() => {
-  //                     settings[cfg.key] = [...cfg.defaults];
-  //                     const input = setting.controlEl.querySelector("input")!;
-  //                     input.value = cfg.fallback;
-  //                     void this.plugin.saveSettings();
-  //                   }),
-  //                 );
-  //               },
-  //             },
-  //           ];
-  //         }),
-  //         {
-  //           name: t("codeblock.fenSaveBlockName"),
-  //           desc: t("codeblock.fenSaveBlockName.desc"),
-  //           control: {
-  //             type: "dropdown",
-  //             key: "fenSaveBlockName",
-  //             options: Object.fromEntries(
-  //               settings.treeBlockNames.map((n) => [n, n]),
-  //             ),
-  //           },
-  //         },
-  //       ],
-  //     },
-  //     {
-  //       type: "group",
-  //       heading: t("pgn.title"),
-  //       items: [
-  //         {
-  //           name: t("pgn.enable"),
-  //           desc: t("pgn.enable.desc"),
-  //           control: { type: "toggle", key: "enableFileHost" },
-  //         },
-  //         {
-  //           name: t("pgn.extensions"),
-  //           desc: t("pgn.extensions.desc"),
-  //           render: (setting: Setting) => {
-  //             setting.addText((text) =>
-  //               text
-  //                 .setValue(settings.pgnFileExtensions.join(", "))
-  //                 .setPlaceholder("pgn")
-  //                 .onChange((value) => {
-  //                   const { valid, invalid } = parseAndValidateNames(value);
-  //                   if (invalid.length) {
-  //                     new Notice(
-  //                       t("codeblock.invalidName").replace(
-  //                         "{name}",
-  //                         invalid[0],
-  //                       ),
-  //                     );
-  //                     const input = setting.controlEl.querySelector("input")!;
-  //                     input.value = valid.length ? valid.join(", ") : "pgn";
-  //                   }
-  //                   if (!valid.length) return;
-  //                   settings.pgnFileExtensions = valid;
-  //                   void this.plugin.saveSettings();
-  //                 }),
-  //             );
-  //             setting.addButton((button) =>
-  //               button.setIcon("rotate-ccw").onClick(() => {
-  //                 settings.pgnFileExtensions = ["pgn"];
-  //                 const input = setting.controlEl.querySelector("input")!;
-  //                 input.value = "pgn";
-  //                 void this.plugin.saveSettings();
-  //               }),
-  //             );
-  //           },
-  //         },
-  //       ],
-  //     },
-  //   ];
-  // }
+  override getSettingDefinitions(): SettingDefinitionItem[] {
+    const settings = this.plugin.settings;
+    // Declarative rendering never runs display(), so apply the settings-tab
+    // container class here; this method runs on every tab display.
+    this.containerEl.parentElement?.classList.add(`${CLS_PREFIX}-settings`);
+    return [
+      {
+        name: "Language / 语言",
+        control: {
+          type: "dropdown",
+          key: "lang",
+          options: { auto: "Auto/跟随软件", en: "English", zh: "中文" },
+        },
+      },
+      {
+        type: "group",
+        heading: t("board.title"),
+        items: [
+          {
+            name: t("board.theme"),
+            desc: t("board.theme.desc"),
+            control: {
+              type: "dropdown",
+              key: "theme",
+              options: Object.fromEntries(
+                THEME_KEYS.map((k) => [k, getThemeDisplayName(k, getLang())]),
+              ),
+            },
+          },
+          {
+            name: t("board.pieceSet"),
+            desc: t("board.pieceSet.desc"),
+            visible: () => PIECE_SETS.length > 0,
+            control: {
+              type: "dropdown",
+              key: "pieceSet",
+              options: Object.fromEntries(
+                PIECE_SETS.map((s) => [s.key, s.name]),
+              ),
+            },
+          },
+          {
+            name: t("board.zoom"),
+            desc: t("board.zoom.desc"),
+            control: {
+              type: "slider",
+              key: "zoom",
+              min: 0,
+              max: 100,
+              step: 1,
+              displayFormat: (v) => `${v}%`,
+            },
+          },
+          {
+            name: t("board.coordinates"),
+            desc: t("board.coordinates.desc"),
+            control: { type: "toggle", key: "showCoordinateLabels" },
+          },
+          {
+            name: t("board.showAnnotations"),
+            desc: t("board.showAnnotations.desc"),
+            control: { type: "toggle", key: "showBoardAnnotations" },
+          },
+        ],
+      },
+      {
+        type: "group",
+        heading: t("game.title"),
+        items: [
+          {
+            name: t("game.lastMove"),
+            desc: t("game.lastMove.desc"),
+            control: { type: "toggle", key: "showLastMove" },
+          },
+          {
+            name: t("game.legalMoves"),
+            desc: t("game.legalMoves.desc"),
+            control: { type: "toggle", key: "showNextMove" },
+          },
+          {
+            name: t("game.otherVariations"),
+            desc: t("game.otherVariations.desc"),
+            control: { type: "toggle", key: "showOtherVariations" },
+          },
+          {
+            name: t("game.turnBorder"),
+            desc: t("game.turnBorder.desc"),
+            control: { type: "toggle", key: "showTurnBorder" },
+          },
+          {
+            name: t("game.sound"),
+            desc: t("game.sound.desc"),
+            control: { type: "toggle", key: "soundEnabled" },
+          },
+          {
+            name: t("game.soundVolume"),
+            desc: t("game.soundVolume.desc"),
+            control: {
+              type: "slider",
+              key: "soundVolume",
+              min: 0,
+              max: 100,
+              step: 5,
+              displayFormat: (v) => `${v}%`,
+            },
+          },
+          {
+            name: t("game.speech"),
+            desc: t("game.speech.desc"),
+            visible: () => !!window.speechSynthesis,
+            control: { type: "toggle", key: "enableSpeech" },
+          },
+          {
+            name: t("movelist.autoJump"),
+            desc: t("movelist.autoJump.desc"),
+            control: {
+              type: "dropdown",
+              key: "autoJump",
+              options: {
+                never: t("movelist.autoJump.never"),
+                always: t("movelist.autoJump.always"),
+                auto: t("movelist.autoJump.auto"),
+              },
+            },
+          },
+        ],
+      },
+      {
+        type: "group",
+        heading: t("movelist.title"),
+        items: [
+          {
+            name: t("movelist.show"),
+            desc: t("movelist.show.desc"),
+            control: { type: "toggle", key: "showMovelist" },
+          },
+          {
+            name: t("movelist.fontSize"),
+            desc: t("movelist.fontSize.desc"),
+            control: {
+              type: "slider",
+              key: "fontSize",
+              min: 10,
+              max: 25,
+              step: 1,
+              displayFormat: (v) => `${v}px`,
+            },
+          },
+          {
+            name: t("movelist.notation"),
+            visible: () => NOTATION_TYPES.length > 1,
+            control: {
+              type: "dropdown",
+              key: "notationType",
+              options: Object.fromEntries(
+                NOTATION_TYPES.map((n) => [n.value, t(n.labelKey)]),
+              ),
+            },
+          },
+          {
+            name: t("movelist.showEval"),
+            desc: t("movelist.showEval.desc"),
+            control: { type: "toggle", key: "showListEval" },
+          },
+          {
+            name: t("movelist.showAnnotation"),
+            desc: t("movelist.showAnnotation.desc"),
+            control: { type: "toggle", key: "showListAnnotation" },
+          },
+          {
+            name: t("movelist.showGlyph"),
+            desc: t("movelist.showGlyph.desc"),
+            control: { type: "toggle", key: "showListGlyph" },
+          },
+          {
+            name: t("movelist.showCommentMark"),
+            desc: t("movelist.showCommentMark.desc"),
+            control: { type: "toggle", key: "showListCommentMark" },
+          },
+          {
+            name: t("movelist.showPreview"),
+            desc: t("movelist.showPreview.desc"),
+            control: { type: "toggle", key: "showPreview" },
+          },
+        ],
+      },
+      {
+        type: "group",
+        heading: t("engine.title"),
+        items: [
+          {
+            name: t("engine.depth"),
+            desc: t("engine.depth.desc"),
+            control: {
+              type: "slider",
+              key: "engineDepth",
+              min: 1,
+              max: 30,
+              step: 1,
+            },
+          },
+          {
+            name: t("engine.skillLevel"),
+            desc: t("engine.skillLevel.desc"),
+            control: {
+              type: "slider",
+              key: "engineSkillLevel",
+              min: 0,
+              max: 20,
+              step: 1,
+            },
+          },
+          {
+            name: t("engine.showBestMove"),
+            desc: t("engine.showBestMove.desc"),
+            control: { type: "toggle", key: "showEngineBestMove" },
+          },
+          {
+            name: t("engine.showPonder"),
+            desc: t("engine.showPonder.desc"),
+            control: { type: "toggle", key: "showEnginePonder" },
+          },
+          {
+            name: t("engine.showEngineAnnotations"),
+            desc: t("engine.showEngineAnnotations.desc"),
+            control: { type: "toggle", key: "showEngineAnnotations" },
+          },
+        ],
+      },
+      {
+        type: "group",
+        heading: t("save.title"),
+        items: [
+          {
+            name: t("save.saveEval"),
+            desc: t("save.saveEval.desc"),
+            control: { type: "toggle", key: "saveEvalByDefault" },
+          },
+          {
+            name: t("save.saveEvalPrompt"),
+            desc: t("save.saveEvalPrompt.desc"),
+            control: { type: "toggle", key: "saveEvalPrompt" },
+          },
+          {
+            name: t("save.annotationFormat"),
+            desc: t("save.annotationFormat.desc"),
+            control: {
+              type: "dropdown",
+              key: "annotationFormat",
+              options: {
+                suffix: t("save.annotationFormat.suffix"),
+                nag: t("save.annotationFormat.nag"),
+                comment: t("save.annotationFormat.comment"),
+              },
+            },
+          },
+        ],
+      },
+      {
+        type: "group",
+        heading: t("margin.title"),
+        items: [
+          {
+            name: t("margin.top"),
+            desc: t("margin.top.desc"),
+            control: {
+              type: "slider",
+              key: "boardMarginTop",
+              min: 0,
+              max: 100,
+              step: 1,
+              displayFormat: (v) => `${v}px`,
+            },
+          },
+          {
+            name: t("margin.bottom"),
+            desc: t("margin.bottom.desc"),
+            control: {
+              type: "slider",
+              key: "boardMarginBottom",
+              min: 0,
+              max: 100,
+              step: 1,
+              displayFormat: (v) => `${v}px`,
+            },
+          },
+        ],
+      },
+      // ==================== 重启后生效的设置 ====================
+      {
+        name: t("settings.restartRequired.title"),
+        render: (setting: Setting) => {
+          setting
+            .setName(t("settings.restartRequired.title"))
+            .setDesc(t("settings.restartRequired.desc"))
+            .setHeading();
+        },
+      },
+      {
+        type: "group",
+        heading: t("codeblock.title"),
+        items: [
+          {
+            name: t("codeblock.treeAliases"),
+            desc:
+              t("codeblock.treeAliases.desc") +
+              " " +
+              t("settings.defaultSuffix").replace(
+                "{names}",
+                DEFAULT_TREE_BLOCK_NAMES.join(", "),
+              ),
+            render: (setting: Setting) => {
+              addTagInput(
+                setting,
+                () => settings.treeBlockNames,
+                (names) => {
+                  settings.treeBlockNames = names;
+                  if (!names.includes(settings.fenSaveBlockName)) {
+                    settings.fenSaveBlockName = names[0];
+                  }
+                  void this.plugin.saveSettings();
+                  // The FEN-save dropdown options follow the tree aliases,
+                  // so re-render the tab to rebuild them.
+                  this.update();
+                },
+              );
+              setting.addButton((button) =>
+                button.setIcon("rotate-ccw").onClick(() => {
+                  settings.treeBlockNames = [...DEFAULT_TREE_BLOCK_NAMES];
+                  if (
+                    !settings.treeBlockNames.includes(settings.fenSaveBlockName)
+                  ) {
+                    settings.fenSaveBlockName = settings.treeBlockNames[0];
+                  }
+                  void this.plugin.saveSettings();
+                  this.update();
+                }),
+              );
+            },
+          },
+          {
+            name: t("codeblock.fenAliases"),
+            desc:
+              t("codeblock.fenAliases.desc") +
+              " " +
+              t("settings.defaultSuffix").replace(
+                "{names}",
+                DEFAULT_FEN_BLOCK_NAMES.join(", "),
+              ),
+            render: (setting: Setting) => {
+              const tags = addTagInput(
+                setting,
+                () => settings.fenBlockNames,
+                (names) => {
+                  settings.fenBlockNames = names;
+                  void this.plugin.saveSettings();
+                },
+              );
+              setting.addButton((button) =>
+                button.setIcon("rotate-ccw").onClick(() => {
+                  settings.fenBlockNames = [...DEFAULT_FEN_BLOCK_NAMES];
+                  tags.refresh();
+                  void this.plugin.saveSettings();
+                }),
+              );
+            },
+          },
+          {
+            name: t("codeblock.fenSaveBlockName"),
+            desc: t("codeblock.fenSaveBlockName.desc"),
+            control: {
+              type: "dropdown",
+              key: "fenSaveBlockName",
+              options: Object.fromEntries(
+                settings.treeBlockNames.map((n) => [n, n]),
+              ),
+            },
+          },
+        ],
+      },
+      {
+        type: "group",
+        heading: t("pgn.title"),
+        items: [
+          {
+            name: t("pgn.enable"),
+            desc: t("pgn.enable.desc"),
+            control: { type: "toggle", key: "enableFileHost" },
+          },
+          {
+            name: t("pgn.extensions"),
+            desc:
+              t("pgn.extensions.desc") +
+              " " +
+              t("settings.defaultSuffix").replace("{names}", "pgn"),
+            render: (setting: Setting) => {
+              const tags = addTagInput(
+                setting,
+                () => settings.pgnFileExtensions,
+                (names) => {
+                  settings.pgnFileExtensions = names;
+                  void this.plugin.saveSettings();
+                },
+              );
+              setting.addButton((button) =>
+                button.setIcon("rotate-ccw").onClick(() => {
+                  settings.pgnFileExtensions = ["pgn"];
+                  tags.refresh();
+                  void this.plugin.saveSettings();
+                }),
+              );
+            },
+          },
+        ],
+      },
+    ];
+  }
 
-  // override setControlValue(key: string, value: unknown): void | Promise<void> {
-  //   if (!(key in DEFAULT_SETTINGS)) return;
-  //   (this.plugin.settings as unknown as Record<string, unknown>)[key] = value;
-  //   void this.plugin.saveSettings();
-  //   if (key === "lang" && typeof value === "string") {
-  //     initI18n(value);
-  //     this.update();
-  //   }
-  //   if (
-  //     [
-  //       "theme",
-  //       "zoom",
-  //       "showLastMove",
-  //       "showNextMove",
-  //       "showTurnBorder",
-  //       "showMovelist",
-  //       "fontSize",
-  //       "boardMarginTop",
-  //       "boardMarginBottom",
-  //       "showEngineBestMove",
-  //       "showEnginePonder",
-  //       "showEngineAnnotations",
-  //       "showBoardAnnotations",
-  //     ].includes(key)
-  //   ) {
-  //     this.plugin.refresh();
-  //   }
-  // }
+  override getControlValue(key: string): unknown {
+    const settings = this.plugin.settings;
+    // Stored values may be empty or unknown (older data); resolve them to
+    // valid dropdown keys for rendering.
+    if (key === "pieceSet") {
+      return resolvePieceSetKey(settings.pieceSet);
+    }
+    if (key === "notationType") {
+      return NOTATION_TYPES.some((n) => n.value === settings.notationType)
+        ? settings.notationType
+        : DEFAULT_NOTATION_TYPE;
+    }
+    return super.getControlValue(key);
+  }
+
+  override setControlValue(key: string, value: unknown): void | Promise<void> {
+    if (!(key in DEFAULT_SETTINGS)) return;
+    (this.plugin.settings as unknown as Record<string, unknown>)[key] = value;
+    void this.plugin.saveSettings();
+    if (key === "lang" && typeof value === "string") {
+      initI18n(value);
+      this.update();
+      return;
+    }
+    if (key === "soundEnabled" && value === true) {
+      playSound("move", this.plugin.settings.soundVolume / 100);
+    }
+    if (key === "soundVolume" && typeof value === "number") {
+      playSound("move", value / 100);
+    }
+    if (REFRESH_KEYS.has(key)) {
+      this.plugin.refresh();
+    }
+  }
 
   display(): void {
     const settings = this.plugin.settings;
