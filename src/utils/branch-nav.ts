@@ -294,3 +294,64 @@ export function orderedTips(
   }
   return tips;
 }
+
+/**
+ * The first steps of every visible branch below `root`, in DFS
+ * pre-order: the main line's first move (root itself when the tree
+ * has none) plus every extra (index ≥ 1) child of each unfolded
+ * fork. Branches hidden by folding are skipped.
+ */
+export function visibleBranchStarts(
+  root: ChessNode,
+  folded: Set<string> = new Set(),
+): ChessNode[] {
+  const starts: ChessNode[] = [root.children[0] ?? root];
+  const walk = (cur: ChessNode): void => {
+    if (cur.children.length === 0) return;
+    if (folded.size > 0 && folded.has(cur.id)) {
+      walk(cur.children[0]);
+      return;
+    }
+    for (let i = 1; i < cur.children.length; i++) {
+      starts.push(cur.children[i]);
+    }
+    for (const child of cur.children) walk(child);
+  };
+  walk(root);
+  return starts;
+}
+
+/**
+ * Visible branch starts ordered for Ctrl+Shift+Left/Right cycling: by
+ * the last computed layout x when every start has one (visual
+ * left→right), otherwise the DFS pre-order above.
+ */
+export function orderedBranchStarts(
+  root: ChessNode,
+  folded: Set<string> = new Set(),
+): ChessNode[] {
+  const starts = visibleBranchStarts(root, folded);
+  if (starts.every((n) => typeof n.x === "number" && Number.isFinite(n.x))) {
+    return [...starts].sort((a, b) => a.x! - b.x!);
+  }
+  return starts;
+}
+
+/**
+ * The nearest ancestor-or-self of `node` that is one of `starts`
+ * (matched by id) — the first step of the branch the current line
+ * belongs to. `null` when no ancestor is a visible branch start.
+ */
+export function nearestBranchStart(
+  node: ChessNode,
+  starts: ChessNode[],
+  nodeMap: NodeMap,
+): ChessNode | null {
+  const ids = new Set(starts.map((s) => s.id));
+  let cur: ChessNode | null = node;
+  while (cur) {
+    if (ids.has(cur.id)) return cur;
+    cur = cur.parentID ? (nodeMap.get(cur.parentID) ?? null) : null;
+  }
+  return null;
+}

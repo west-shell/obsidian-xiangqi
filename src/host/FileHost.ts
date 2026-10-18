@@ -137,6 +137,19 @@ export class FileHost extends TextFileView {
       this.eventBus.emit("btn-click", { name: "nextBranchEnd" });
       return false;
     });
+    // Ctrl+Shift+Left / Ctrl+Shift+Right: cycle between the first
+    // steps of every visible branch (branch starts hidden by folding
+    // are skipped, wraps).
+    this.scope.register(["Ctrl", "Shift"], "ArrowLeft", () => {
+      if (isEditing()) return true;
+      this.eventBus.emit("btn-click", { name: "prevBranchStart" });
+      return false;
+    });
+    this.scope.register(["Ctrl", "Shift"], "ArrowRight", () => {
+      if (isEditing()) return true;
+      this.eventBus.emit("btn-click", { name: "nextBranchStart" });
+      return false;
+    });
   }
 
   refresh() {

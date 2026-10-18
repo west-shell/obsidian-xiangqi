@@ -23,12 +23,18 @@ const ALT_SHIFT_ACTION_BY_KEY: Record<string, string> = {
   ArrowRight: "nextBranchEnd",
 };
 
+const CTRL_SHIFT_ACTION_BY_KEY: Record<string, string> = {
+  ArrowLeft: "prevBranchStart",
+  ArrowRight: "nextBranchStart",
+};
+
 /**
  * Ctrl/Alt(+Shift)+arrow branch navigation for chess blocks in
  * markdown. Blocks have no Obsidian Scope (unlike the PGN file view),
  * so each block listens on its own document and only reacts while the
  * pointer hovers the block and no editable element
- * (textarea/input/CodeMirror editor) has focus.
+ * (textarea/input/CodeMirror editor) has focus. Ctrl+Alt+Shift and
+ * bare Shift combos have no action.
  */
 const KeyboardNavModule = {
   init(host: IBlockHost) {
@@ -47,8 +53,10 @@ const KeyboardNavModule = {
       if (e.metaKey) return;
       let table: Record<string, string> | undefined;
       if (e.ctrlKey) {
-        if (!e.shiftKey) {
-          table = e.altKey ? CTRL_ALT_ACTION_BY_KEY : CTRL_ACTION_BY_KEY;
+        if (e.altKey) {
+          if (!e.shiftKey) table = CTRL_ALT_ACTION_BY_KEY;
+        } else {
+          table = e.shiftKey ? CTRL_SHIFT_ACTION_BY_KEY : CTRL_ACTION_BY_KEY;
         }
       } else if (e.altKey) {
         table = e.shiftKey ? ALT_SHIFT_ACTION_BY_KEY : ALT_ACTION_BY_KEY;

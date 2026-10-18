@@ -43,7 +43,9 @@ import {
   findForkAbove,
   findForkBelow,
   firstForkOnPath,
+  nearestBranchStart,
   nodeDepth,
+  orderedBranchStarts,
   orderedTips,
   pathChild,
   renderedTip,
@@ -630,6 +632,38 @@ const ActionsModule = {
                   ? tips[0]
                   : tips[tips.length - 1]
                 : tips[(pos + (next ? 1 : -1) + tips.length) % tips.length];
+            eventBus.emit("node-click", target.id);
+            break;
+          }
+          // Ctrl+Shift+Left / Ctrl+Shift+Right: cycle between the first
+          // steps of every visible branch (the main line's first move
+          // plus each unfolded fork's extra children), wrapping. The
+          // anchor is the first step of the branch the current line
+          // belongs to, so the shortcut always lands on a different
+          // branch start; branch starts hidden by folding are skipped.
+          case "prevBranchStart":
+          case "nextBranchStart": {
+            const folded = host.foldedNodes ?? new Set<string>();
+            const starts = orderedBranchStarts(host.root, folded);
+            if (starts.length === 0) break;
+            const anchor = nearestBranchStart(
+              host.currentNode,
+              starts,
+              host.nodeMap,
+            );
+            const pos = anchor
+              ? starts.findIndex((s) => s.id === anchor.id)
+              : -1;
+            if (starts.length < 2 && pos !== -1) break;
+            const next = name === "nextBranchStart";
+            const target =
+              pos === -1
+                ? next
+                  ? starts[0]
+                  : starts[starts.length - 1]
+                : starts[
+                    (pos + (next ? 1 : -1) + starts.length) % starts.length
+                  ];
             eventBus.emit("node-click", target.id);
             break;
           }
