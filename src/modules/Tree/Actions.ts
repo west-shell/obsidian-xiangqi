@@ -507,24 +507,35 @@ const ActionsModule = {
           }
           // Ctrl+Up / Ctrl+Down: jump the current node to the previous /
           // next fork (a node with more than one child) along the line.
+          // The downward walk follows the rendered path: it never enters
+          // branches hidden by folding.
           case "navPrevFork": {
             const fork = findForkAbove(host.currentNode, host.nodeMap);
             if (fork) eventBus.emit("node-click", fork.id);
             break;
           }
           case "navNextFork": {
-            const fork = findForkBelow(host.currentNode, host.pathChoices);
+            const fork = findForkBelow(
+              host.currentNode,
+              host.pathChoices,
+              host.foldedNodes ?? new Set<string>(),
+            );
             if (fork) eventBus.emit("node-click", fork.id);
             break;
           }
           // Ctrl+Left / Ctrl+Right: keep the current node in place and
-          // switch the displayed path's branch at the first fork on the
-          // path at or below the current node. The index step follows the
-          // fork's depth parity: odd-layer forks stack branches to the
-          // right of the trunk, even-layer forks to its left.
+          // switch the displayed path's branch at the first unfolded fork
+          // on the rendered path at or below the current node (folded
+          // forks are skipped). The index step follows the fork's depth
+          // parity: odd-layer forks stack branches to the right of the
+          // trunk, even-layer forks to its left.
           case "prevPathBranch":
           case "nextPathBranch": {
-            const hit = firstForkOnPath(host.currentNode, host.pathChoices);
+            const hit = firstForkOnPath(
+              host.currentNode,
+              host.pathChoices,
+              host.foldedNodes ?? new Set<string>(),
+            );
             if (!hit) break;
             const step = branchStepDirection(
               hit.fork,
@@ -537,16 +548,21 @@ const ActionsModule = {
             eventBus.emit("updateMainPath");
             break;
           }
-          // Ctrl+Alt+Left / Ctrl+Alt+Right: cycle through every
-          // displayed-path variation below the current node (the node
-          // itself included), wrapping around at the ends.
+          // Ctrl+Alt+Left / Ctrl+Alt+Right: cycle through every rendered
+          // variation below the current node (the node itself included),
+          // wrapping around at the ends. Branches hidden by folding are
+          // skipped.
           case "prevAllBranches":
           case "nextAllBranches": {
-            const variations = enumerateVariations(host.currentNode);
+            const variations = enumerateVariations(
+              host.currentNode,
+              host.foldedNodes ?? new Set<string>(),
+            );
             if (variations.length < 2) break;
             const current = currentVariation(
               host.currentNode,
               host.pathChoices,
+              host.foldedNodes ?? new Set<string>(),
             );
             const pos = Math.max(
               0,

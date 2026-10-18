@@ -100,8 +100,9 @@ export class FileHost extends TextFileView {
       this.eventBus.emit("btn-click", { name: "nextPathBranch" });
       return false;
     });
-    // Ctrl+Alt+Left / Ctrl+Alt+Right: cycle through all displayed-path
-    // variations below the current node (the node itself included).
+    // Ctrl+Alt+Left / Ctrl+Alt+Right: cycle through all rendered
+    // variations below the current node (the node itself included;
+    // branches hidden by folding are skipped).
     this.scope.register(["Ctrl", "Alt"], "ArrowLeft", () => {
       if (isEditing()) return true;
       this.eventBus.emit("btn-click", { name: "prevAllBranches" });
