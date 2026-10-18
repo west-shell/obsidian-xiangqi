@@ -44,7 +44,9 @@ import {
   findForkBelow,
   firstForkOnPath,
   nodeDepth,
+  orderedTips,
   pathChild,
+  renderedTip,
   samePlyNodes,
 } from "../../utils/branch-nav";
 import { branchTip, migrateBranchResult } from "../../utils/result";
@@ -602,6 +604,33 @@ const ActionsModule = {
               "node-click",
               nodes[(pos + step + nodes.length) % nodes.length].id,
             );
+            break;
+          }
+          // Alt+Shift+Left / Alt+Shift+Right: jump between the ends of
+          // every visible branch (rendered line tips), wrapping. The
+          // anchor is the current line's own visible tip, so the
+          // shortcut always lands on a different branch end; branch
+          // ends hidden by folding are skipped.
+          case "prevBranchEnd":
+          case "nextBranchEnd": {
+            const folded = host.foldedNodes ?? new Set<string>();
+            const tips = orderedTips(host.root, folded);
+            if (tips.length === 0) break;
+            const anchor = renderedTip(
+              host.currentNode,
+              host.pathChoices,
+              folded,
+            );
+            const pos = tips.findIndex((t) => t.id === anchor.id);
+            if (tips.length < 2 && pos !== -1) break;
+            const next = name === "nextBranchEnd";
+            const target =
+              pos === -1
+                ? next
+                  ? tips[0]
+                  : tips[tips.length - 1]
+                : tips[(pos + (next ? 1 : -1) + tips.length) % tips.length];
+            eventBus.emit("node-click", target.id);
             break;
           }
           case "edit-board": {

@@ -52,6 +52,25 @@ export function renderedChild(
 }
 
 /**
+ * The visible line tip the rendered continuation from `node` ends at
+ * (following the per-fork choices and, at folded nodes, the first
+ * child). `node` itself when its rendered continuation already ends.
+ */
+export function renderedTip(
+  node: ChessNode,
+  pathChoices?: PathChoices,
+  folded: Set<string> = new Set(),
+): ChessNode {
+  let cur = node;
+  let next = renderedChild(cur, pathChoices, folded);
+  while (next) {
+    cur = next;
+    next = renderedChild(cur, pathChoices, folded);
+  }
+  return cur;
+}
+
+/**
  * Nearest fork strictly above `node` (an ancestor with more than one
  * child). The current node itself is never returned.
  */
@@ -232,4 +251,46 @@ export function currentVariation(
     cur = cur.children[idx];
   }
   return indices;
+}
+
+/**
+ * All rendered line tips below `root` (visible leaves — nodes whose
+ * rendered continuation ends), in DFS pre-order. Branches hidden by
+ * folding are skipped (a folded node contributes only its first
+ * child's subtree).
+ */
+export function visibleTips(
+  root: ChessNode,
+  folded: Set<string> = new Set(),
+): ChessNode[] {
+  const tips: ChessNode[] = [];
+  const walk = (cur: ChessNode): void => {
+    if (cur.children.length === 0) {
+      tips.push(cur);
+      return;
+    }
+    const children =
+      folded.size > 0 && folded.has(cur.id)
+        ? cur.children.slice(0, 1)
+        : cur.children;
+    for (const child of children) walk(child);
+  };
+  walk(root);
+  return tips;
+}
+
+/**
+ * Rendered line tips ordered for Alt+Shift+Left/Right cycling: by the
+ * last computed layout x when every tip has one (visual left→right),
+ * otherwise the DFS pre-order above.
+ */
+export function orderedTips(
+  root: ChessNode,
+  folded: Set<string> = new Set(),
+): ChessNode[] {
+  const tips = visibleTips(root, folded);
+  if (tips.every((n) => typeof n.x === "number" && Number.isFinite(n.x))) {
+    return [...tips].sort((a, b) => a.x! - b.x!);
+  }
+  return tips;
 }
