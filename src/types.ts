@@ -189,6 +189,12 @@ export interface IHost {
    * children are reordered.
    */
   pathChoices: Map<string, number>;
+  /**
+   * Ids of nodes whose extra children are folded away in the tree graph
+   * (mirrored from Tree.svelte via the "folded-changed" event). Absent
+   * until the first mirror arrives; treat as "nothing folded".
+   */
+  foldedNodes?: Set<string>;
   options: IOptions;
   /** Source content that failed to parse and was skipped (moves, FEN tags) */
   parseWarnings: ParseWarning[];

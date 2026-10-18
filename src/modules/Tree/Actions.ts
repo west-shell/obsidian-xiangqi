@@ -43,7 +43,9 @@ import {
   findForkAbove,
   findForkBelow,
   firstForkOnPath,
+  nodeDepth,
   pathChild,
+  samePlyNodes,
 } from "../../utils/branch-nav";
 import { branchTip, migrateBranchResult } from "../../utils/result";
 import { Modal, Setting } from "obsidian";
@@ -154,6 +156,10 @@ const ActionsModule = {
       }
 
       host.currentPath = [...ancestors, ...descendants];
+    });
+    // Mirror of Tree.svelte's fold state (pure data, no UI update).
+    eventBus.on<Set<string>>("folded-changed", (folded) => {
+      host.foldedNodes = folded;
     });
     eventBus.on<Move>("runmove", (move) => {
       if (!move) return;
@@ -558,6 +564,28 @@ const ActionsModule = {
               cur = cur.children[idx];
             }
             eventBus.emit("updateMainPath");
+            break;
+          }
+          // Alt+Left / Alt+Right: cycle the current position through every
+          // visible branch's node at the same ply depth (the current node
+          // included, wrapping). Branches too short to reach the depth have
+          // no node there; branches hidden by folding are skipped — neither
+          // cycles.
+          case "prevSamePly":
+          case "nextSamePly": {
+            const depth = nodeDepth(host.currentNode, host.nodeMap);
+            const nodes = samePlyNodes(
+              host.root,
+              depth,
+              host.foldedNodes ?? new Set<string>(),
+            );
+            const pos = nodes.findIndex((n) => n.id === host.currentNode.id);
+            if (pos === -1 || nodes.length < 2) break;
+            const step = name === "nextSamePly" ? 1 : -1;
+            eventBus.emit(
+              "node-click",
+              nodes[(pos + step + nodes.length) % nodes.length].id,
+            );
             break;
           }
           case "edit-board": {

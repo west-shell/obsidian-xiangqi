@@ -59,12 +59,13 @@ A `fen` code block opens a visual position editor — drag or click to place pie
 
 Every branch is visualized as a tree graph — click any node to jump to that position, and switch between icon and text label modes. Keyboard shortcuts keep your hands on the board:
 
-| Shortcut                         | Action                                                                       |
-| -------------------------------- | ---------------------------------------------------------------------------- |
-| `Ctrl+↑` / `Ctrl+↓`              | Jump to the previous / next fork (branching point) along the line            |
-| `Ctrl+←` / `Ctrl+→`              | Switch the displayed branch at the first fork below the current node (wraps) |
-| `Ctrl+Alt+←` / `Ctrl+Alt+→`      | Cycle through every variation below the current node (wraps)                 |
-| `↑` / `↓` / `←` / `→` (PGN view) | Step one move back / forward; jump to game start / end                       |
+| Shortcut                         | Action                                                                                             |
+| -------------------------------- | -------------------------------------------------------------------------------------------------- |
+| `Ctrl+↑` / `Ctrl+↓`              | Jump to the previous / next fork (branching point) along the line                                  |
+| `Ctrl+←` / `Ctrl+→`              | Switch the displayed branch at the first fork below the current node (wraps)                       |
+| `Ctrl+Alt+←` / `Ctrl+Alt+→`      | Cycle through every variation below the current node (wraps)                                       |
+| `Alt+←` / `Alt+→`                | Cycle through every branch's node at the current ply (short or folded branches are skipped; wraps) |
+| `↑` / `↓` / `←` / `→` (PGN view) | Step one move back / forward; jump to game start / end                                             |
 
 Branch navigation works in both the PGN file view and `xiangqi` code blocks (in code blocks, hover the block and keep focus out of text editors). On macOS, `Ctrl+↑`/`Ctrl+↓` may conflict with Mission Control.
 

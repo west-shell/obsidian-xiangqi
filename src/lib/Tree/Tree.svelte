@@ -84,6 +84,12 @@
   // eslint-disable-next-line svelte/no-unnecessary-state-wrap
   let foldedNodes = $state(new SvelteSet<string>());
 
+  // Mirror the fold state to the host so keyboard actions (Alt+Left/Right
+  // same-ply cycling) can skip folded branches.
+  $effect(() => {
+    eventBus.emit("folded-changed", new Set(foldedNodes));
+  });
+
   // ---- List mode ----
   let _uiVer = $state(0);
   const onUiVer = () => {

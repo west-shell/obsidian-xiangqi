@@ -112,6 +112,18 @@ export class FileHost extends TextFileView {
       this.eventBus.emit("btn-click", { name: "nextAllBranches" });
       return false;
     });
+    // Alt+Left / Alt+Right: cycle through every visible branch's node at
+    // the current ply depth (short and folded branches are skipped, wraps).
+    this.scope.register(["Alt"], "ArrowLeft", () => {
+      if (isEditing()) return true;
+      this.eventBus.emit("btn-click", { name: "prevSamePly" });
+      return false;
+    });
+    this.scope.register(["Alt"], "ArrowRight", () => {
+      if (isEditing()) return true;
+      this.eventBus.emit("btn-click", { name: "nextSamePly" });
+      return false;
+    });
   }
 
   refresh() {

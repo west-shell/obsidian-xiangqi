@@ -135,6 +135,51 @@ export function enumerateVariations(node: ChessNode): number[][] {
 }
 
 /**
+ * All nodes at `depth` below `root`, in DFS pre-order (children in
+ * index order), skipping branches hidden by folding: a folded node
+ * keeps only its first child rendered, so the walk does not descend
+ * into its extra children. Depth is counted in plies from the root
+ * (root = 0).
+ */
+export function nodesAtDepth(
+  root: ChessNode,
+  depth: number,
+  folded: Set<string>,
+): ChessNode[] {
+  const hits: ChessNode[] = [];
+  const walk = (node: ChessNode, d: number): void => {
+    if (d === depth) {
+      hits.push(node);
+      return;
+    }
+    const children =
+      folded.size > 0 && folded.has(node.id)
+        ? node.children.slice(0, 1)
+        : node.children;
+    for (const child of children) walk(child, d + 1);
+  };
+  walk(root, 0);
+  return hits;
+}
+
+/**
+ * Same-depth visible nodes ordered for Alt+Left/Right cycling: by the
+ * last computed layout x when every node has one (visual left→right),
+ * otherwise the DFS pre-order above.
+ */
+export function samePlyNodes(
+  root: ChessNode,
+  depth: number,
+  folded: Set<string>,
+): ChessNode[] {
+  const nodes = nodesAtDepth(root, depth, folded);
+  if (nodes.every((n) => typeof n.x === "number" && Number.isFinite(n.x))) {
+    return [...nodes].sort((a, b) => a.x! - b.x!);
+  }
+  return nodes;
+}
+
+/**
  * The currently displayed variation below `node` (clamped child indices
  * following the per-fork choices), in the same shape as the entries of
  * `enumerateVariations`.
