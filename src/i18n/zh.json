@@ -302,5 +302,21 @@
   "confirm.switchGameTitle": "未保存的修改",
   "confirm.switchGameMsg": "当前对局有未保存的修改，是否切换？",
   "confirm.deleteGameTitle": "删除对局",
-  "confirm.deleteGameMsg": "删除当前对局？"
+  "confirm.deleteGameMsg": "删除当前对局？",
+  "command.back": "后退一步",
+  "command.next": "前进一步",
+  "command.toStart": "跳到棋局开头",
+  "command.toEnd": "跳到棋局结尾",
+  "command.prevFork": "跳转到上一个分叉点",
+  "command.nextFork": "跳转到下一个分叉点",
+  "command.prevPathBranch": "切换到上一条分支",
+  "command.nextPathBranch": "切换到下一条分支",
+  "command.prevAllBranches": "跳到上一条变着",
+  "command.nextAllBranches": "跳到下一条变着",
+  "command.prevSamePly": "跳到当前步数的上一分支",
+  "command.nextSamePly": "跳到当前步数的下一分支",
+  "command.prevBranchEnd": "跳到上一个分支结尾",
+  "command.nextBranchEnd": "跳到下一个分支结尾",
+  "command.prevBranchStart": "跳到上一个分支开头",
+  "command.nextBranchStart": "跳到下一个分支开头"
 }

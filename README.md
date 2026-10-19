@@ -69,7 +69,7 @@ Every branch is visualized as a tree graph — click any node to jump to that po
 | `Ctrl+Shift+←` / `Ctrl+Shift+→`  | Cycle between the first steps of all visible branches (wraps)                                      |
 | `↑` / `↓` / `←` / `→` (PGN view) | Step one move back / forward; jump to game start / end                                             |
 
-Branch navigation works in both the PGN file view and `xiangqi` code blocks (in code blocks, hover the block and keep focus out of text editors). On macOS, `Ctrl+↑`/`Ctrl+↓` may conflict with Mission Control. All branch-switching shortcuts skip branches hidden by folding.
+Branch navigation works in both the PGN file view and `xiangqi` code blocks (in code blocks, hover the block and keep focus out of text editors). On macOS, `Ctrl+↑`/`Ctrl+↓` may conflict with Mission Control. All branch-switching shortcuts skip branches hidden by folding. All PGN view navigation actions are also available as commands in the Command Palette (Settings → Hotkeys lets you bind custom keys; avoid the built-in combinations, which take precedence).
 
 ### Engine Analysis
 

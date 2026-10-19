@@ -301,5 +301,21 @@
   "confirm.switchGameTitle": "Unsaved Changes",
   "confirm.switchGameMsg": "Current game has unsaved changes. Switch anyway?",
   "confirm.deleteGameTitle": "Delete Game",
-  "confirm.deleteGameMsg": "Delete the current game?"
+  "confirm.deleteGameMsg": "Delete the current game?",
+  "command.back": "Step back one move",
+  "command.next": "Step forward one move",
+  "command.toStart": "Jump to game start",
+  "command.toEnd": "Jump to game end",
+  "command.prevFork": "Jump to previous fork",
+  "command.nextFork": "Jump to next fork",
+  "command.prevPathBranch": "Switch to previous branch",
+  "command.nextPathBranch": "Switch to next branch",
+  "command.prevAllBranches": "Go to previous variation",
+  "command.nextAllBranches": "Go to next variation",
+  "command.prevSamePly": "Go to previous branch at current ply",
+  "command.nextSamePly": "Go to next branch at current ply",
+  "command.prevBranchEnd": "Go to previous branch end",
+  "command.nextBranchEnd": "Go to next branch end",
+  "command.prevBranchStart": "Go to previous branch start",
+  "command.nextBranchStart": "Go to next branch start"
 }

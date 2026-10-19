@@ -5,6 +5,7 @@ import { addIcon, MarkdownView, Plugin, TFile } from "obsidian";
 import { initI18n, t } from "./i18n";
 import { BlockHost } from "./host/BlockHost";
 import { FileHost } from "./host/FileHost";
+import { registerNavCommands } from "./commands";
 import { ChessSettingTab, DEFAULT_SETTINGS } from "./settings";
 import { applyThemes, ensureBoardAssets } from "./style/themes";
 import { RIBBON_ICON_SVG } from "./utils/icon";
@@ -40,6 +41,7 @@ export default class ChessPlugin extends Plugin {
         this.settings.pgnFileExtensions,
         FileHost.VIEW_TYPE,
       );
+      registerNavCommands(this);
 
       this.addRibbonIcon(RIBBON_ICON, t("pgn.newFile"), async () => {
         let baseFileName = DEFAULT_FILENAME;
