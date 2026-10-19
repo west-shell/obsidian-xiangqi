@@ -78,78 +78,13 @@ export class FileHost extends TextFileView {
       this.eventBus.emit("btn-click", { name: "toEnd" });
       return false;
     });
-    // Ctrl+arrows: branch navigation (fork jumping / path branch
-    // switching) — handled in the actions module, same as above.
-    this.scope.register(["Ctrl"], "ArrowUp", () => {
-      if (isEditing()) return true;
-      this.eventBus.emit("btn-click", { name: "navPrevFork" });
-      return false;
-    });
-    this.scope.register(["Ctrl"], "ArrowDown", () => {
-      if (isEditing()) return true;
-      this.eventBus.emit("btn-click", { name: "navNextFork" });
-      return false;
-    });
-    this.scope.register(["Ctrl"], "ArrowLeft", () => {
-      if (isEditing()) return true;
-      this.eventBus.emit("btn-click", { name: "prevPathBranch" });
-      return false;
-    });
-    this.scope.register(["Ctrl"], "ArrowRight", () => {
-      if (isEditing()) return true;
-      this.eventBus.emit("btn-click", { name: "nextPathBranch" });
-      return false;
-    });
-    // Ctrl+Alt+Shift+Left / Ctrl+Alt+Shift+Right: cycle through all
-    // rendered variations below the current node (the node itself
-    // included; branches hidden by folding are skipped).
-    this.scope.register(["Ctrl", "Alt", "Shift"], "ArrowLeft", () => {
-      if (isEditing()) return true;
-      this.eventBus.emit("btn-click", { name: "prevAllBranches" });
-      return false;
-    });
-    this.scope.register(["Ctrl", "Alt", "Shift"], "ArrowRight", () => {
-      if (isEditing()) return true;
-      this.eventBus.emit("btn-click", { name: "nextAllBranches" });
-      return false;
-    });
-    // Alt+Left / Alt+Right: cycle through every visible branch's node at
-    // the current ply depth (short and folded branches are skipped, wraps).
-    this.scope.register(["Alt"], "ArrowLeft", () => {
-      if (isEditing()) return true;
-      this.eventBus.emit("btn-click", { name: "prevSamePly" });
-      return false;
-    });
-    this.scope.register(["Alt"], "ArrowRight", () => {
-      if (isEditing()) return true;
-      this.eventBus.emit("btn-click", { name: "nextSamePly" });
-      return false;
-    });
-    // Alt+Shift+Left / Alt+Shift+Right: jump between the ends of every
-    // visible branch (branch ends hidden by folding are skipped, wraps).
-    this.scope.register(["Alt", "Shift"], "ArrowLeft", () => {
-      if (isEditing()) return true;
-      this.eventBus.emit("btn-click", { name: "prevBranchEnd" });
-      return false;
-    });
-    this.scope.register(["Alt", "Shift"], "ArrowRight", () => {
-      if (isEditing()) return true;
-      this.eventBus.emit("btn-click", { name: "nextBranchEnd" });
-      return false;
-    });
-    // Ctrl+Shift+Left / Ctrl+Shift+Right: cycle between the first
-    // steps of every visible branch (branch starts hidden by folding
-    // are skipped, wraps).
-    this.scope.register(["Ctrl", "Shift"], "ArrowLeft", () => {
-      if (isEditing()) return true;
-      this.eventBus.emit("btn-click", { name: "prevBranchStart" });
-      return false;
-    });
-    this.scope.register(["Ctrl", "Shift"], "ArrowRight", () => {
-      if (isEditing()) return true;
-      this.eventBus.emit("btn-click", { name: "nextBranchStart" });
-      return false;
-    });
+    // The modifier-combo bindings (Ctrl / Ctrl+Alt+Shift / Alt /
+    // Alt+Shift / Ctrl+Shift + arrows) are intentionally NOT
+    // registered here: the PGN view handles them through the command
+    // default hotkeys (see src/commands.ts), so deleting or rebinding
+    // those in Settings → Hotkeys takes effect in the view. Plain
+    // arrow keys cannot ship as global command defaults (they would
+    // break arrow navigation elsewhere), so they stay on this Scope.
   }
 
   refresh() {

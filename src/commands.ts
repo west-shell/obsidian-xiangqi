@@ -14,9 +14,11 @@ export function registerNavCommands(plugin: ChessPlugin): void {
     plugin.addCommand({
       id,
       name: t(labelKey),
-      // The defaults deliberately mirror the PGN view's built-in Scope
-      // bindings (see eslint.config.mjs for the rule exception), so
-      // Settings → Hotkeys lists them as assigned.
+      // The defaults are the binding itself: the PGN view handles the
+      // modifier combos through these command hotkeys (its Scope only
+      // keeps the plain arrow keys, which must not become global
+      // defaults), so Settings → Hotkeys can rebind or delete them.
+      // See eslint.config.mjs for the rule exception.
       hotkeys,
       checkCallback: (checking: boolean) => {
         const view = plugin.app.workspace.getActiveViewOfType(FileHost);

@@ -1,15 +1,15 @@
 /**
- * Every scope-registered keyboard navigation action of the PGN view,
- * also exposed as a command (Command Palette entry + user-definable
- * hotkey in Settings → Hotkeys).
+ * Every keyboard navigation action of the PGN view, also exposed as a
+ * command (Command Palette entry + user-definable hotkey in Settings →
+ * Hotkeys).
  *
- * The 12 branch navigation commands carry a default hotkey mirroring
- * the view's built-in Scope binding, so Settings → Hotkeys lists them
- * as assigned. The four plain move-stepping commands deliberately
- * carry none: global arrow-key defaults would break arrow navigation
- * everywhere else in the app. Note the built-in Scope bindings keep
- * working regardless of what happens to the command bindings in
- * Settings.
+ * The 12 branch navigation commands carry a default hotkey that IS the
+ * binding: the PGN view handles these modifier combos through the
+ * command hotkeys, so deleting or rebinding them in Settings → Hotkeys
+ * takes effect in the view. The four plain move-stepping commands
+ * deliberately carry none: global arrow-key defaults would break arrow
+ * navigation everywhere else in the app (the view binds them via its
+ * own Scope instead).
  *
  * Pure data (no Obsidian imports) so it stays unit-testable.
  */
@@ -25,7 +25,7 @@ export interface NavAction {
   action: string;
   /** i18n key for the command name shown in the Command Palette. */
   labelKey: string;
-  /** Default hotkey(s) mirroring the view's built-in Scope binding. */
+  /** Default hotkey(s) — the in-view binding for the modifier combos. */
   hotkeys?: NavHotkey[];
 }
 
