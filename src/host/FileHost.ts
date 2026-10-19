@@ -83,8 +83,9 @@ export class FileHost extends TextFileView {
     // registered here: the PGN view handles them through the command
     // default hotkeys (see src/commands.ts), so deleting or rebinding
     // those in Settings → Hotkeys takes effect in the view. Plain
-    // arrow keys cannot ship as global command defaults (they would
-    // break arrow navigation elsewhere), so they stay on this Scope.
+    // arrow keys cannot ship as global command bindings (they would
+    // break arrow navigation elsewhere), so they stay on this Scope
+    // and are not exposed as commands at all.
   }
 
   refresh() {

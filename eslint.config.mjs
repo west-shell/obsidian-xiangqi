@@ -186,7 +186,7 @@ export default tseslint.config(
       // hotkeys — they ARE the PGN view's bindings for the modifier
       // combos (the view's Scope keeps only the plain arrow keys), so
       // Settings → Hotkeys can list, rebind, or delete them. The four
-      // plain move-stepping commands stay preset-free: global arrow
+      // plain arrow-key actions are not commands at all: global arrow
       // keys would break app navigation.
       "obsidianmd/commands/no-default-hotkeys": "off",
     },

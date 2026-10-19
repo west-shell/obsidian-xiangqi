@@ -1,15 +1,13 @@
 /**
- * Every keyboard navigation action of the PGN view, also exposed as a
- * command (Command Palette entry + user-definable hotkey in Settings →
- * Hotkeys).
+ * The 12 branch navigation actions of the PGN view, exposed as
+ * commands whose default hotkey IS the binding: the view handles these
+ * modifier combos through the command hotkeys, so deleting or
+ * rebinding them in Settings → Hotkeys takes effect in the view.
  *
- * The 12 branch navigation commands carry a default hotkey that IS the
- * binding: the PGN view handles these modifier combos through the
- * command hotkeys, so deleting or rebinding them in Settings → Hotkeys
- * takes effect in the view. The four plain move-stepping commands
- * deliberately carry none: global arrow-key defaults would break arrow
- * navigation everywhere else in the app (the view binds them via its
- * own Scope instead).
+ * The four plain arrow keys (move stepping) are deliberately NOT
+ * commands: they only work inside the PGN view via its own Scope, and
+ * global arrow-key bindings would break arrow navigation everywhere
+ * else in the app.
  *
  * Pure data (no Obsidian imports) so it stays unit-testable.
  */
@@ -30,10 +28,6 @@ export interface NavAction {
 }
 
 export const NAV_ACTIONS: NavAction[] = [
-  { id: "back", action: "back", labelKey: "command.back" },
-  { id: "next", action: "next", labelKey: "command.next" },
-  { id: "to-start", action: "toStart", labelKey: "command.toStart" },
-  { id: "to-end", action: "toEnd", labelKey: "command.toEnd" },
   {
     id: "prev-fork",
     action: "navPrevFork",
