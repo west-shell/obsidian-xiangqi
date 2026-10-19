@@ -180,6 +180,20 @@ export default tseslint.config(
   },
 
   {
+    files: ["src/commands.ts"],
+    rules: {
+      // The 12 branch navigation commands deliberately carry default
+      // hotkeys mirroring the PGN view's built-in Scope bindings, so
+      // Settings → Hotkeys lists them as assigned. Those combos are
+      // already claimed by the view's Scope either way — the defaults
+      // add no new conflict surface (the four plain move-stepping
+      // commands stay preset-free; global arrow keys would break app
+      // navigation).
+      "obsidianmd/commands/no-default-hotkeys": "off",
+    },
+  },
+
+  {
     files: ["src/settings.ts"],
     rules: {
       // Dual-path by design: display() stays as the fallback for users on

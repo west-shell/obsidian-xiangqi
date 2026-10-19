@@ -10,10 +10,14 @@ import { NAV_ACTIONS } from "./nav-actions";
  * text field (tag editing, global search) has focus.
  */
 export function registerNavCommands(plugin: ChessPlugin): void {
-  for (const { id, action, labelKey } of NAV_ACTIONS) {
+  for (const { id, action, labelKey, hotkeys } of NAV_ACTIONS) {
     plugin.addCommand({
       id,
       name: t(labelKey),
+      // The defaults deliberately mirror the PGN view's built-in Scope
+      // bindings (see eslint.config.mjs for the rule exception), so
+      // Settings → Hotkeys lists them as assigned.
+      hotkeys,
       checkCallback: (checking: boolean) => {
         const view = plugin.app.workspace.getActiveViewOfType(FileHost);
         if (!view) return false;
