@@ -8,7 +8,7 @@ const CTRL_ACTION_BY_KEY: Record<string, string> = {
   ArrowRight: "nextPathBranch",
 };
 
-const CTRL_ALT_ACTION_BY_KEY: Record<string, string> = {
+const CTRL_ALT_SHIFT_ACTION_BY_KEY: Record<string, string> = {
   ArrowLeft: "prevAllBranches",
   ArrowRight: "nextAllBranches",
 };
@@ -33,8 +33,8 @@ const CTRL_SHIFT_ACTION_BY_KEY: Record<string, string> = {
  * markdown. Blocks have no Obsidian Scope (unlike the PGN file view),
  * so each block listens on its own document and only reacts while the
  * pointer hovers the block and no editable element
- * (textarea/input/CodeMirror editor) has focus. Ctrl+Alt+Shift and
- * bare Shift combos have no action.
+ * (textarea/input/CodeMirror editor) has focus. Ctrl+Alt (without
+ * Shift) and bare Shift combos have no action.
  */
 const KeyboardNavModule = {
   init(host: IBlockHost) {
@@ -54,7 +54,7 @@ const KeyboardNavModule = {
       let table: Record<string, string> | undefined;
       if (e.ctrlKey) {
         if (e.altKey) {
-          if (!e.shiftKey) table = CTRL_ALT_ACTION_BY_KEY;
+          if (e.shiftKey) table = CTRL_ALT_SHIFT_ACTION_BY_KEY;
         } else {
           table = e.shiftKey ? CTRL_SHIFT_ACTION_BY_KEY : CTRL_ACTION_BY_KEY;
         }

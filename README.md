@@ -59,15 +59,15 @@ A `fen` code block opens a visual position editor — drag or click to place pie
 
 Every branch is visualized as a tree graph — click any node to jump to that position, and switch between icon and text label modes. Keyboard shortcuts keep your hands on the board:
 
-| Shortcut                         | Action                                                                                             |
-| -------------------------------- | -------------------------------------------------------------------------------------------------- |
-| `Ctrl+↑` / `Ctrl+↓`              | Jump to the previous / next fork (branching point) along the line                                  |
-| `Ctrl+←` / `Ctrl+→`              | Switch the displayed branch at the first unfolded fork below the current node (wraps)              |
-| `Ctrl+Alt+←` / `Ctrl+Alt+→`      | Cycle through every visible variation below the current node (wraps)                               |
-| `Alt+←` / `Alt+→`                | Cycle through every branch's node at the current ply (short or folded branches are skipped; wraps) |
-| `Alt+Shift+←` / `Alt+Shift+→`    | Jump between the ends of all visible branches (wraps)                                              |
-| `Ctrl+Shift+←` / `Ctrl+Shift+→`  | Cycle between the first steps of all visible branches (wraps)                                      |
-| `↑` / `↓` / `←` / `→` (PGN view) | Step one move back / forward; jump to game start / end                                             |
+| Shortcut                                | Action                                                                                             |
+| --------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| `Ctrl+↑` / `Ctrl+↓`                     | Jump to the previous / next fork (branching point) along the line                                  |
+| `Ctrl+←` / `Ctrl+→`                     | Switch the displayed branch at the first unfolded fork below the current node (wraps)              |
+| `Ctrl+Alt+Shift+←` / `Ctrl+Alt+Shift+→` | Cycle through every visible variation below the current node (wraps)                               |
+| `Alt+←` / `Alt+→`                       | Cycle through every branch's node at the current ply (short or folded branches are skipped; wraps) |
+| `Alt+Shift+←` / `Alt+Shift+→`           | Jump between the ends of all visible branches (wraps)                                              |
+| `Ctrl+Shift+←` / `Ctrl+Shift+→`         | Cycle between the first steps of all visible branches (wraps)                                      |
+| `↑` / `↓` / `←` / `→` (PGN view)        | Step one move back / forward; jump to game start / end                                             |
 
 Branch navigation works in both the PGN file view and `xiangqi` code blocks (in code blocks, hover the block and keep focus out of text editors). On macOS, `Ctrl+↑`/`Ctrl+↓` may conflict with Mission Control. All branch-switching shortcuts skip branches hidden by folding. All PGN view navigation actions are also available as commands in the Command Palette. Branch navigation commands ship with the built-in shortcuts as default hotkeys (rebindable in Settings → Hotkeys; the built-in view shortcuts keep working either way), while the four move-stepping commands carry no default since global arrow keys would clash with the app.
 

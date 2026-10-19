@@ -552,10 +552,10 @@ const ActionsModule = {
             eventBus.emit("updateMainPath");
             break;
           }
-          // Ctrl+Alt+Left / Ctrl+Alt+Right: cycle through every rendered
-          // variation below the current node (the node itself included),
-          // wrapping around at the ends. Branches hidden by folding are
-          // skipped.
+          // Ctrl+Alt+Shift+Left / Ctrl+Alt+Shift+Right: cycle through every
+          // rendered variation below the current node (the node itself
+          // included), wrapping around at the ends. Branches hidden by
+          // folding are skipped.
           case "prevAllBranches":
           case "nextAllBranches": {
             const variations = enumerateVariations(

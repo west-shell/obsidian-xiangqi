@@ -62,13 +62,13 @@ export const NAV_ACTIONS: NavAction[] = [
     id: "prev-variation",
     action: "prevAllBranches",
     labelKey: "command.prevAllBranches",
-    hotkeys: [{ modifiers: ["Ctrl", "Alt"], key: "ArrowLeft" }],
+    hotkeys: [{ modifiers: ["Ctrl", "Alt", "Shift"], key: "ArrowLeft" }],
   },
   {
     id: "next-variation",
     action: "nextAllBranches",
     labelKey: "command.nextAllBranches",
-    hotkeys: [{ modifiers: ["Ctrl", "Alt"], key: "ArrowRight" }],
+    hotkeys: [{ modifiers: ["Ctrl", "Alt", "Shift"], key: "ArrowRight" }],
   },
   {
     id: "prev-same-ply",
