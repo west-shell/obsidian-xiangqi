@@ -108,7 +108,7 @@
   "genfen.castling_long": "O-O-O",
   "genfen.castling_white": "White",
   "genfen.castling_black": "Black",
-  "genfen.enpassant": "En passant",
+  "genfen.enpassant": "EP:",
   "genfen.enpassant_off": "None",
   "genfen.preset": "Setup position",
   "genfen.start": "Start position",

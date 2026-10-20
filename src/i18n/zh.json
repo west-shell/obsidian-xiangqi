@@ -109,7 +109,7 @@
   "genfen.castling_long": "O-O-O",
   "genfen.castling_white": "白",
   "genfen.castling_black": "黑",
-  "genfen.enpassant": "吃过路兵",
+  "genfen.enpassant": "过路兵:",
   "genfen.enpassant_off": "无",
   "genfen.preset": "设置棋盘",
   "genfen.start": "起始局面",
