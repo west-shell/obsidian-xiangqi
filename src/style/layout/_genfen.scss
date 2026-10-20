@@ -185,6 +185,63 @@
   max-width: 100%;
 }
 
+// Variant picker row (dropdown + Chess960 number stepper).
+.#{$cls-prefix}-genfen__variant-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+}
+
+// Chess960 number stepper: classic spinner — the up/down buttons are
+// attached to the input's right edge, stacked and border-merged so the
+// whole thing reads as a single control.
+.#{$cls-prefix}-genfen__spn-group {
+  display: flex;
+  align-items: stretch;
+}
+
+.#{$cls-prefix}-genfen__spn {
+  width: 4.5em;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.#{$cls-prefix}-genfen__spn-step {
+  display: flex;
+  flex-direction: column;
+}
+
+.#{$cls-prefix}-genfen__spn-step button {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 6px;
+  border: 1px solid var(--background-modifier-border, #ccc);
+  background: var(--background-secondary, #f0f0f0);
+  color: var(--text-normal, #000);
+  font-size: 0.65em;
+  line-height: 1;
+  cursor: pointer;
+  user-select: none;
+}
+
+.#{$cls-prefix}-genfen__spn-step button:first-child {
+  border-left: none;
+  border-radius: 0 4px 0 0;
+}
+
+.#{$cls-prefix}-genfen__spn-step button:last-child {
+  border-left: none;
+  border-top: none;
+  border-radius: 0 0 4px 0;
+}
+
+.#{$cls-prefix}-genfen__spn-step button:hover {
+  background: var(--background-modifier-hover, #e0e0e0);
+}
+
 // Castling rights rows.
 .#{$cls-prefix}-genfen__rights {
   display: flex;

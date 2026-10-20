@@ -1,6 +1,7 @@
 import "./style/css-imports";
 
 import { addIcon, MarkdownView, Plugin, TFile } from "obsidian";
+import type { Editor } from "obsidian";
 
 import { initI18n, t } from "./i18n";
 import { BlockHost } from "./host/BlockHost";
@@ -13,6 +14,7 @@ import type { ISettings } from "./types";
 import {
   DEFAULT_FILENAME,
   LAYOUT_CHANGE_EVENT,
+  randomChess960Fen,
   RIBBON_ICON,
   ZOOM_CHANGE_EVENT,
 } from "./chess";
@@ -34,6 +36,23 @@ export default class ChessPlugin extends Plugin {
     applyThemes(this.settings, this.app);
 
     this.registerCodeBlocks();
+
+    // Chess960 only: the xiangqi adapter's randomChess960Fen() returns
+    // null, so the command is not registered there.
+    if (randomChess960Fen()) {
+      this.addCommand({
+        id: "generate-chess960",
+        name: t("command.generateChess960"),
+        editorCallback: (editor: Editor) => {
+          const fen = randomChess960Fen();
+          if (!fen) return;
+          const blockName = this.settings.treeBlockNames[0];
+          editor.replaceSelection(
+            `\`\`\`${blockName}\n[FEN "${fen}"]\n[SetUp "1"]\n\`\`\`\n`,
+          );
+        },
+      });
+    }
 
     if (this.settings.enableFileHost) {
       this.registerView(FileHost.VIEW_TYPE, (leaf) => new FileHost(leaf, this));

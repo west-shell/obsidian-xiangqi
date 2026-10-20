@@ -173,7 +173,9 @@ function initEngine(host: object) {
 
   eventBus.on<Move>("runmove", (move) => {
     if (!move || !lastResult || lastResult.bestmove === "(none)") return;
-    const moveUci = move.from + move.to;
+    // Castling must be compared king-takes-rook (moveToUci) to match
+    // bestmove under UCI_Chess960.
+    const moveUci = moveToUci(move).slice(0, 4);
     if (moveUci === lastResult.bestmove.slice(0, 4)) {
       if (lastResult.ponder) {
         const ponderMove = lastResult.ponder;

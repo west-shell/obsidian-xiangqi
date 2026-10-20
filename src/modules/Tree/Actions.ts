@@ -9,6 +9,7 @@ import {
   isMoveCheckmate,
   matchMove,
   PRIMARY_PLAYER_KEY,
+  randomChess960Fen,
 } from "../../chess";
 import { Notice } from "obsidian";
 import { validateFen } from "../../utils/chessEngine";
@@ -817,6 +818,18 @@ const ActionsModule = {
             if (!host.editing) break;
             host.fen = DEFAULT_FEN;
             host.selectedPiece = null;
+            break;
+          }
+          case "random960": {
+            if (!host.editing) break;
+            // Xiangqi's adapter returns null (no Chess960); guarded so
+            // the shared handler stays variant-agnostic. A payload FEN
+            // (the position chosen by number) wins over a fresh roll.
+            const fen960 = data || randomChess960Fen();
+            if (fen960) {
+              host.fen = fen960;
+              host.selectedPiece = null;
+            }
             break;
           }
           case "turn": {

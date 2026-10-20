@@ -2,6 +2,7 @@ import { Chess, type Move } from "../../chess";
 import {
   DEFAULT_FEN,
   EVAL_REGEX,
+  getPgnVariantTag,
   isMoveCheckmate,
   type MoveTokenType,
   parseMoveInGame,
@@ -420,11 +421,20 @@ export class PGNParser {
     for (const [key, value] of this.tags.entries()) {
       lines.push(`[${key} "${value}"]`);
     }
+    const fenIndex = lines.findIndex((line) => /^\[FEN "/.test(line));
     // A non-default start position pairs [FEN] with [SetUp "1"]
     // (lichess export style).
-    const fenIndex = lines.findIndex((line) => /^\[FEN "/.test(line));
     if (fenIndex !== -1 && !lines.some((line) => /^\[SetUp "/.test(line))) {
       lines.splice(fenIndex + 1, 0, `[SetUp "1"]`);
+    }
+    // Chess960 start positions carry [Variant "Chess960"] right before
+    // [FEN] unless the source already declares a variant.
+    if (
+      fenIndex !== -1 &&
+      !lines.some((line) => /^\[Variant "/.test(line)) &&
+      getPgnVariantTag(this.rootNode.fen)
+    ) {
+      lines.splice(fenIndex, 0, `[Variant "Chess960"]`);
     }
     return lines.join("\n");
   }
