@@ -202,9 +202,17 @@
 }
 
 .#{$cls-prefix}-genfen__spn {
-  width: 4.5em;
+  width: 3.2em;
+  appearance: textfield;
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
+}
+
+// Hide the native number spinners — the custom ▲▼ step buttons replace them.
+.#{$cls-prefix}-genfen__spn::-webkit-outer-spin-button,
+.#{$cls-prefix}-genfen__spn::-webkit-inner-spin-button {
+  appearance: none;
+  margin: 0;
 }
 
 .#{$cls-prefix}-genfen__spn-step {
