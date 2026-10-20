@@ -1,7 +1,7 @@
 import { FileHost } from "./host/FileHost";
 import { t } from "./i18n";
 import type ChessPlugin from "./main";
-import { NAV_ACTIONS } from "./nav-actions";
+import { NAV_ACTIONS } from "./utils/nav-actions";
 
 /**
  * Register the PGN view navigation commands. Each one only applies

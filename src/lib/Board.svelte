@@ -137,11 +137,19 @@
       const moves = chess.moves({ verbose: true }) as Move[];
       for (const move of moves) {
         const orig = move.from;
-        const dest = move.to;
         if (!dests.has(orig)) {
           dests.set(orig, []);
         }
-        dests.get(orig)!.push(dest);
+        const list = dests.get(orig)!;
+        if (!list.includes(move.to)) {
+          list.push(move.to);
+        }
+        // Chess960 castling: the king may already stand on its castling
+        // destination (g1/c1), making a drag to move.to a no-op. Also offer
+        // the king-takes-rook drop (onto the castling rook) like lichess.
+        if (move.rookFrom && !list.includes(move.rookFrom)) {
+          list.push(move.rookFrom);
+        }
       }
       return dests;
     } catch {
