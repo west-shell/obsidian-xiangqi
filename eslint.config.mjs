@@ -180,19 +180,6 @@ export default tseslint.config(
   },
 
   {
-    files: ["src/commands.ts"],
-    rules: {
-      // The 12 branch navigation commands deliberately carry default
-      // hotkeys — they ARE the PGN view's bindings for the modifier
-      // combos (the view's Scope keeps only the plain arrow keys), so
-      // Settings → Hotkeys can list, rebind, or delete them. The four
-      // plain arrow-key actions are not commands at all: global arrow
-      // keys would break app navigation.
-      "obsidianmd/commands/no-default-hotkeys": "off",
-    },
-  },
-
-  {
     files: ["src/settings.ts"],
     rules: {
       // Dual-path by design: display() stays as the fallback for users on

@@ -15,6 +15,7 @@ import {
 import type ChessPlugin from "../main";
 import { RIBBON_ICON } from "../chess";
 import type { ISettings } from "../types";
+import { NAV_ACTIONS } from "../utils/nav-actions";
 
 export class FileHost extends TextFileView {
   static readonly VIEW_TYPE = "PGN_VIEW";
@@ -78,14 +79,20 @@ export class FileHost extends TextFileView {
       this.eventBus.emit("btn-click", { name: "toEnd" });
       return false;
     });
-    // The modifier-combo bindings (Ctrl / Ctrl+Alt+Shift / Alt /
-    // Alt+Shift / Ctrl+Shift + arrows) are intentionally NOT
-    // registered here: the PGN view handles them through the command
-    // default hotkeys (see src/commands.ts), so deleting or rebinding
-    // those in Settings → Hotkeys takes effect in the view. Plain
-    // arrow keys cannot ship as global command bindings (they would
-    // break arrow navigation elsewhere), so they stay on this Scope
-    // and are not exposed as commands at all.
+    // The modifier-combo defaults (Ctrl / Ctrl+Alt+Shift / Alt /
+    // Alt+Shift / Ctrl+Shift + arrows) live on this Scope too — they
+    // only apply while the PGN view is active, so no global hotkey is
+    // preset (commands ship without defaults; users can still assign
+    // their own in Settings → Hotkeys).
+    for (const { action, hotkeys } of NAV_ACTIONS) {
+      for (const { modifiers, key } of hotkeys ?? []) {
+        this.scope.register(modifiers, key, () => {
+          if (isEditing()) return true;
+          this.eventBus.emit("btn-click", { name: action });
+          return false;
+        });
+      }
+    }
   }
 
   refresh() {

@@ -1,8 +1,10 @@
 /**
  * The 12 branch navigation actions of the PGN view, exposed as
- * commands whose default hotkey IS the binding: the view handles these
- * modifier combos through the command hotkeys, so deleting or
- * rebinding them in Settings → Hotkeys takes effect in the view.
+ * commands (no default hotkeys — presetting hotkeys risks conflicts
+ * with core and other plugins, per Obsidian community guidelines).
+ * The `hotkeys` entries are the in-view Scope defaults: the PGN view
+ * registers these modifier combos on its own Scope, so they only
+ * apply while that view is active.
  *
  * The four plain arrow keys (move stepping) are deliberately NOT
  * commands: they only work inside the PGN view via its own Scope, and
@@ -23,7 +25,7 @@ export interface NavAction {
   action: string;
   /** i18n key for the command name shown in the Command Palette. */
   labelKey: string;
-  /** Default hotkey(s) — the in-view binding for the modifier combos. */
+  /** In-view Scope default(s) — the modifier-combo binding the PGN view registers. */
   hotkeys?: NavHotkey[];
 }
 
