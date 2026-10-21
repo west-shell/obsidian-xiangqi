@@ -141,6 +141,11 @@ export function matchMove(existing: Move, incoming: Move): boolean {
   return existing.from === incoming.from && existing.to === incoming.to;
 }
 
+export function extraMoveDests(_move: Move): Square[] {
+  // Xiangqi has no castling, so no extra drag targets.
+  return [];
+}
+
 export function moveToUci(move: Move): string {
   return move.from + move.to;
 }

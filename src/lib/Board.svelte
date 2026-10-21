@@ -11,6 +11,7 @@
     CLS_PREFIX,
     type Config,
     type DrawShape,
+    extraMoveDests,
     GRID_SVG,
     HAS_PROMOTION,
     LAYOUT_CHANGE_EVENT,
@@ -144,11 +145,12 @@
         if (!list.includes(move.to)) {
           list.push(move.to);
         }
-        // Chess960 castling: the king may already stand on its castling
-        // destination (g1/c1), making a drag to move.to a no-op. Also offer
-        // the king-takes-rook drop (onto the castling rook) like lichess.
-        if (move.rookFrom && !list.includes(move.rookFrom)) {
-          list.push(move.rookFrom);
+        // Variant-specific extra drag targets (Chess960: king-takes-rook
+        // castling drop) come from the variant adapter.
+        for (const extra of extraMoveDests(move)) {
+          if (!list.includes(extra)) {
+            list.push(extra);
+          }
         }
       }
       return dests;
@@ -157,11 +159,14 @@
     }
   }
 
-  function computeVariationShapes(variations: Move[]): DrawShape[] {
+  function computeVariationShapes(
+    variations: Move[],
+    brush: string,
+  ): DrawShape[] {
     return variations.map((move) => ({
       orig: move.from,
       dest: move.to,
-      brush: "blue",
+      brush,
     }));
   }
 
@@ -177,10 +182,10 @@
     ...(!freeMode
       ? [
           ...(settings.showNextMove
-            ? computeVariationShapes(mainVariation ?? [])
+            ? computeVariationShapes(mainVariation ?? [], "blue")
             : []),
           ...(settings.showOtherVariations && settings.showNextMove
-            ? computeVariationShapes(otherVariations ?? [])
+            ? computeVariationShapes(otherVariations ?? [], "branchBlue")
             : []),
           ...engineShapes,
         ]
@@ -233,6 +238,19 @@
         visible: true,
         shapes: userShapes,
         autoShapes: shapes,
+        // Non-current branch arrows: same color and thickness as the
+        // current-branch (blue) arrow, at 50% opacity. DrawBrushes
+        // declares the default brushes as required fields, but both
+        // chessgrounds deep-merge config, so only the extra entry is
+        // provided here.
+        brushes: {
+          branchBlue: {
+            key: "ob",
+            color: "#003088",
+            opacity: 0.5,
+            lineWidth: 10,
+          },
+        } as unknown as NonNullable<Config["drawable"]>["brushes"],
         onChange: (s) => {
           eventBus.emit("user-shapes-changed", s);
         },
