@@ -201,7 +201,7 @@ function renderFolderSetting(
     },
   });
   const refresh = (): void => {
-    valueEl.setText(getValue() || t("export.rootFolder"));
+    valueEl.setText(getValue() || "/");
   };
   refresh();
   valueEl.addEventListener("click", () => {

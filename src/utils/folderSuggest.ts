@@ -25,7 +25,7 @@ export class FolderSuggestModal extends FuzzySuggestModal<TFolder> {
   }
 
   getItemText(item: TFolder): string {
-    return item.path === "" ? t("export.rootFolder") : item.path;
+    return item.path === "" ? "/" : item.path;
   }
 
   onChooseItem(item: TFolder): void {

@@ -599,7 +599,7 @@ export class SaveAsModal extends Modal {
       },
     });
     const refreshFolder = (): void => {
-      folderValue.setText(defaultFolder || t("export.rootFolder"));
+      folderValue.setText(defaultFolder || "/");
     };
     refreshFolder();
     folderValue.addEventListener("click", () => {

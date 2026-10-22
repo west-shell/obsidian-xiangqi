@@ -187,7 +187,6 @@
   "export.folder": "Folder",
   "export.fileName": "File name",
   "export.chooseFolder": "Choose folder…",
-  "export.rootFolder": "(vault root)",
   "export.fileExists": "A file with this name already exists. Overwrite it?",
   "export.invalidPath": "Invalid file path",
   "notice.fenImported": "FEN imported",

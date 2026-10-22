@@ -188,7 +188,6 @@
   "export.folder": "文件夹",
   "export.fileName": "文件名",
   "export.chooseFolder": "选择文件夹…",
-  "export.rootFolder": "（库根目录）",
   "export.fileExists": "同名文件已存在，是否覆盖？",
   "export.invalidPath": "路径无效",
   "notice.fenImported": "FEN 已导入",
