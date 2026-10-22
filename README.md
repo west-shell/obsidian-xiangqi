@@ -18,7 +18,7 @@ There are three ways to use the plugin — all of them end up on the same intera
 
 ### Open a PGN file
 
-Any `.pgn` file opens in a dedicated chess view: browse the variation tree, edit moves and comments, run engine analysis, and save back to the file with one click. Multiple games in one file are supported via the game navigation bar, and the ribbon button creates new PGN files instantly.
+Any `.pgn` file opens in a dedicated chess view: browse the variation tree, edit moves and comments, run engine analysis, and save back to the file with one click. Multiple games in one file are supported via the game navigation bar, and the ribbon button creates a new PGN file in your configured folder, opening the rename dialog so you can name it right away.
 
 ![PGN File](./IMAGE/PGN.png)
 
@@ -57,7 +57,7 @@ A `fen` code block opens a visual position editor — drag or click to place pie
 
 ### Variation Tree & Keyboard Navigation
 
-Every branch is visualized as a tree graph — click any node to jump to that position, and switch between icon and text label modes. Keyboard shortcuts keep your hands on the board:
+Every branch is visualized as a tree graph — click any node to jump to that position, and switch between icon and text label modes. The current branch's arrows render at full opacity while sibling branches fade to 50%, so the line you're on stands out. Keyboard shortcuts keep your hands on the board:
 
 | Shortcut                                | Action                                                                                             |
 | --------------------------------------- | -------------------------------------------------------------------------------------------------- |
@@ -94,6 +94,13 @@ Built-in Pikafish (WASM) — no external installation needed.
 
 Grid-aligned move columns with Chinese (炮二平五) or coordinate (h2e6) notation, adjustable font size, and per-move marks — eval bar, annotation badge, glyph and comment underline — each independently toggleable.
 
+### Export & Share
+
+- **PNG snapshot**: export the current board as a high-resolution image with your board style
+- **Animated GIF**: export the mainline, the current branch, or every game in the file as a compact GIF with a configurable frame interval (0.1–10 s)
+- **Save-as dialog**: pick the destination before saving — fuzzy folder picker (`/` = vault root) plus filename, with an overwrite confirmation; missing folders are created automatically
+- **Default export folder**: a settings field that prefills the save-as dialog (unset falls back to Obsidian's attachment-folder setting)
+
 ### Mobile
 
 The responsive layout automatically switches between single-column (portrait) and double-column (landscape) views. For best results, combine it with a fullscreen plugin (e.g. [obsidian-full-screen-cross-platform-plugin](https://github.com/donkeypacific/obsidian-full-screen-cross-platform-plugin)) and tune the top/bottom board margins in settings.
@@ -112,8 +119,8 @@ All options live in **Settings → Xiangqi**, grouped as follows:
 | Board Margins    | Top/bottom margin (0–100 px) for fullscreen layouts                             |
 | Code Block Names | Aliases for `xiangqi`/`tree` blocks, FEN save target                            |
 | Engine Analysis  | Depth, skill level, arrows, engine/board annotations                            |
-| Save             | Include eval on save, eval prompt                                               |
-| PGN File View    | Enable/disable the view, custom file extensions                                 |
+| Save             | Include eval on save, eval prompt, default export folder                        |
+| PGN File View    | Enable/disable the view, custom file extensions, new PGN file location          |
 
 Code block names, file extensions, and custom file types take effect after restarting the plugin or Obsidian.
 
