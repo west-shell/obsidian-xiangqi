@@ -183,8 +183,9 @@ export const DEFAULT_SETTINGS: ISettings = {
 };
 
 /**
- * Renders a folder picker onto a Setting (used by both settings rendering
- * paths): an editable text field plus a fuzzy folder picker button.
+ * Renders a folder setting onto a Setting (used by both settings rendering
+ * paths): a read-only "pill" showing the current folder — clicking it opens
+ * the fuzzy folder picker. Folders can only be picked, never typed.
  */
 function renderFolderSetting(
   app: App,
@@ -192,22 +193,22 @@ function renderFolderSetting(
   getValue: () => string,
   setValue: (folder: string) => void,
 ): void {
-  setting.addText((text) => {
-    text.setPlaceholder(t("export.rootFolder")).setValue(getValue());
-    text.onChange((value) => {
-      setValue(value);
-    });
-    setting.addButton((button) =>
-      button
-        .setIcon("folder")
-        .setTooltip(t("export.chooseFolder"))
-        .onClick(() => {
-          new FolderSuggestModal(app, (folder) => {
-            setValue(folder);
-            text.setValue(folder);
-          }).open();
-        }),
-    );
+  const valueEl = setting.controlEl.createSpan({
+    cls: `${CLS_PREFIX}-folder-value`,
+    attr: {
+      "aria-label": t("export.chooseFolder"),
+      title: t("export.chooseFolder"),
+    },
+  });
+  const refresh = (): void => {
+    valueEl.setText(getValue() || t("export.rootFolder"));
+  };
+  refresh();
+  valueEl.addEventListener("click", () => {
+    new FolderSuggestModal(app, (folder) => {
+      setValue(folder);
+      refresh();
+    }).open();
   });
 }
 

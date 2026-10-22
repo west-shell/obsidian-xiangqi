@@ -153,7 +153,7 @@
   }
 }
 
-// Rows of the export "save as" dialog (folder picker + filename).
+// Rows of the export "save as" dialog (folder pill + filename).
 .#{$cls-prefix}-export-path-row {
   display: flex;
   align-items: center;
@@ -167,6 +167,25 @@
   input {
     flex: 1;
     min-width: 0;
+  }
+}
+
+// Read-only folder "pill": shows the picked folder, click opens the picker.
+.#{$cls-prefix}-folder-value {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  padding: 4px 12px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s);
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text-normal);
+
+  &:hover {
+    background: var(--background-modifier-hover);
   }
 }
 

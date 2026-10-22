@@ -559,11 +559,12 @@ export class ImportModal extends Modal {
 }
 
 /**
- * Save-as dialog for a rendered export artifact. The save folder (editable
- * text plus a fuzzy folder picker) and the filename are separate fields;
- * both are prefilled from the default path derived from the configured
- * export folder (or, when unset, the attachment settings). Existing files
- * trigger an overwrite confirmation, missing folders are created on save.
+ * Save-as dialog for a rendered export artifact. The save folder (a
+ * read-only pill that opens the fuzzy folder picker) and the filename are
+ * separate fields; both are prefilled from the default path derived from
+ * the configured export folder (or, when unset, the attachment settings).
+ * Existing files trigger an overwrite confirmation; missing folders are
+ * created on save.
  */
 export class SaveAsModal extends Modal {
   private saving = false;
@@ -584,25 +585,27 @@ export class SaveAsModal extends Modal {
 
     // Split the default path into the two fields.
     const slash = this.defaultPath.lastIndexOf("/");
-    const defaultFolder = slash !== -1 ? this.defaultPath.slice(0, slash) : "";
+    let defaultFolder = slash !== -1 ? this.defaultPath.slice(0, slash) : "";
     const defaultName =
       slash !== -1 ? this.defaultPath.slice(slash + 1) : this.defaultPath;
 
     const folderRow = contentEl.createDiv(`${CLS_PREFIX}-export-path-row`);
     folderRow.createEl("label", { text: t("export.folder") });
-    const folderInput = folderRow.createEl("input", {
+    const folderValue = folderRow.createSpan({
+      cls: `${CLS_PREFIX}-folder-value`,
       attr: {
-        type: "text",
-        value: defaultFolder,
-        placeholder: t("export.rootFolder"),
+        "aria-label": t("export.chooseFolder"),
+        title: t("export.chooseFolder"),
       },
     });
-    const browseBtn = folderRow.createEl("button", {
-      text: t("export.chooseFolder"),
-    });
-    browseBtn.addEventListener("click", () => {
+    const refreshFolder = (): void => {
+      folderValue.setText(defaultFolder || t("export.rootFolder"));
+    };
+    refreshFolder();
+    folderValue.addEventListener("click", () => {
       new FolderSuggestModal(this.app, (folder) => {
-        folderInput.value = folder;
+        defaultFolder = folder;
+        refreshFolder();
       }).open();
     });
 
@@ -614,16 +617,14 @@ export class SaveAsModal extends Modal {
     nameInput.select();
 
     const submit = (): void => {
-      void this.handleSave(folderInput.value, nameInput.value);
+      void this.handleSave(defaultFolder, nameInput.value);
     };
-    for (const input of [folderInput, nameInput]) {
-      input.addEventListener("keydown", (event) => {
-        if (event.key === "Enter") {
-          event.preventDefault();
-          submit();
-        }
-      });
-    }
+    nameInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        submit();
+      }
+    });
 
     const btnContainer = contentEl.createDiv("modal-button-container");
     const saveBtn = btnContainer.createEl("button", {
