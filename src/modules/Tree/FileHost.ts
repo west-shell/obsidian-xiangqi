@@ -1,7 +1,7 @@
 import { registerFileModule } from "../../core/module-system";
 import type { IFileHost } from "../../types";
 import { activateGame, splitPGN } from "../../utils/parse";
-import { promptSaveEval } from "./saveEval";
+import { promptSaveEval } from "../../utils/saveEval";
 
 const FileHostModule = {
   init(host: IFileHost) {
