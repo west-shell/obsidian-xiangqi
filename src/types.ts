@@ -44,6 +44,11 @@ export interface ISettings {
   fenSaveBlockName: string;
   enableFileHost: boolean;
   pgnFileExtensions: string[];
+  /**
+   * Default vault folder for PGN files created via the ribbon action. Empty
+   * string = the vault root.
+   */
+  newPgnFolder: string;
   engineDepth: number;
   engineSkillLevel: number;
   showEngineBestMove: boolean;

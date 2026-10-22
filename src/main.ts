@@ -10,6 +10,7 @@ import { registerNavCommands } from "./commands";
 import { ChessSettingTab, DEFAULT_SETTINGS } from "./settings";
 import { applyThemes, ensureBoardAssets } from "./style/themes";
 import { RIBBON_ICON_SVG } from "./utils/icon";
+import { ensureFolders, normalizeFolderPath } from "./utils/folderSuggest";
 import type { ISettings } from "./types";
 import {
   DEFAULT_FILENAME,
@@ -63,12 +64,17 @@ export default class ChessPlugin extends Plugin {
       registerNavCommands(this);
 
       this.addRibbonIcon(RIBBON_ICON, t("pgn.newFile"), async () => {
-        let baseFileName = DEFAULT_FILENAME;
-        let fileExtension = `.${this.settings.pgnFileExtensions[0] ?? "pgn"}`;
+        const baseFileName = DEFAULT_FILENAME;
+        const fileExtension = `.${this.settings.pgnFileExtensions[0] ?? "pgn"}`;
+        const folder = normalizeFolderPath(this.settings.newPgnFolder);
         let fileName = baseFileName + fileExtension;
         let counter = 0;
 
-        while (await this.app.vault.adapter.exists(fileName)) {
+        while (
+          await this.app.vault.adapter.exists(
+            folder ? `${folder}/${fileName}` : fileName,
+          )
+        ) {
           counter++;
           fileName = `${baseFileName} ${counter}${fileExtension}`;
         }
@@ -76,7 +82,11 @@ export default class ChessPlugin extends Plugin {
         const fileContent = "";
 
         try {
-          const newFile = await this.app.vault.create(fileName, fileContent);
+          await ensureFolders(this.app, folder);
+          const newFile = await this.app.vault.create(
+            folder ? `${folder}/${fileName}` : fileName,
+            fileContent,
+          );
           void this.app.workspace.getLeaf(true).openFile(newFile);
           void this.app.fileManager.promptForFileRename(newFile);
         } catch (error) {

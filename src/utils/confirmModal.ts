@@ -14,7 +14,11 @@ import {
   exportBoardPng,
   exportGameGif,
 } from "./exportImage";
-import { FolderSuggestModal } from "./folderSuggest";
+import {
+  ensureFolders,
+  FolderSuggestModal,
+  normalizeFolderPath,
+} from "./folderSuggest";
 
 export type SaveConfirmResult = {
   action: "save" | "saveAll" | "cancel";
@@ -638,8 +642,7 @@ export class SaveAsModal extends Modal {
     nameValue: string,
   ): Promise<void> {
     if (this.saving) return;
-    let folder = normalizePath(folderValue.trim());
-    if (folder.startsWith("/")) folder = folder.slice(1);
+    const folder = normalizeFolderPath(folderValue);
     let name = normalizePath(nameValue.trim());
     if (!name || name.includes("/")) {
       new Notice(t("export.invalidPath"));
@@ -860,8 +863,7 @@ export class ExportModal extends Modal {
     savedMessage: string,
   ): Promise<void> {
     try {
-      let configured = normalizePath(this.host.settings.exportFolder.trim());
-      if (configured.startsWith("/")) configured = configured.slice(1);
+      const configured = normalizeFolderPath(this.host.settings.exportFolder);
       const defaultPath = configured
         ? `${configured}/${artifact.filename}`
         : await this.app.fileManager.getAvailablePathForAttachment(
@@ -1016,16 +1018,4 @@ function updateFenTag(tags: string, newFen: string): string {
     return tags.replace(/\[FEN "[^"]*"\]/, `[FEN "${newFen}"]`);
   }
   return `[FEN "${newFen}"]\n[SetUp "1"]\n${tags}`;
-}
-
-/** Creates each missing folder along a vault-relative directory path. */
-async function ensureFolders(app: App, dir: string): Promise<void> {
-  if (!dir || app.vault.getFolderByPath(dir)) return;
-  let current = "";
-  for (const part of dir.split("/")) {
-    current = current ? `${current}/${part}` : part;
-    if (!app.vault.getFolderByPath(current)) {
-      await app.vault.createFolder(current);
-    }
-  }
 }

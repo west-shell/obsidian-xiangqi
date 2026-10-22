@@ -281,6 +281,8 @@
   "pgn.enable.desc": "Register PGN file view for opening .pgn files",
   "pgn.extensions": "PGN file extensions",
   "pgn.extensions.desc": "Custom file extensions for PGN view. Type a name and press Enter to add.",
+  "pgn.newFileFolder": "New PGN file location",
+  "pgn.newFileFolder.desc": "Folder where PGN files created from the ribbon are saved. Leave empty to use the vault root.",
   "engine.title": "Engine",
   "engine.depth": "Search Depth",
   "engine.depth.desc": "Engine analysis search depth (1–30). Higher = stronger but slower.",

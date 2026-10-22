@@ -169,6 +169,7 @@ export const DEFAULT_SETTINGS: ISettings = {
   fenSaveBlockName: DEFAULT_TREE_BLOCK_NAMES[0],
   enableFileHost: true,
   pgnFileExtensions: ["pgn"],
+  newPgnFolder: "",
   engineDepth: 18,
   engineSkillLevel: 20,
   showEngineBestMove: true,
@@ -182,21 +183,19 @@ export const DEFAULT_SETTINGS: ISettings = {
 };
 
 /**
- * Renders the default export folder control onto a Setting (used by both
- * settings rendering paths): an editable text field plus a fuzzy folder
- * picker button.
+ * Renders a folder picker onto a Setting (used by both settings rendering
+ * paths): an editable text field plus a fuzzy folder picker button.
  */
-function renderExportFolderSetting(
+function renderFolderSetting(
   app: App,
   setting: Setting,
-  settings: ISettings,
-  save: () => void,
+  getValue: () => string,
+  setValue: (folder: string) => void,
 ): void {
   setting.addText((text) => {
-    text.setPlaceholder(t("export.rootFolder")).setValue(settings.exportFolder);
+    text.setPlaceholder(t("export.rootFolder")).setValue(getValue());
     text.onChange((value) => {
-      settings.exportFolder = value;
-      save();
+      setValue(value);
     });
     setting.addButton((button) =>
       button
@@ -204,9 +203,8 @@ function renderExportFolderSetting(
         .setTooltip(t("export.chooseFolder"))
         .onClick(() => {
           new FolderSuggestModal(app, (folder) => {
-            settings.exportFolder = folder;
+            setValue(folder);
             text.setValue(folder);
-            save();
           }).open();
         }),
     );
@@ -544,9 +542,15 @@ export class ChessSettingTab extends PluginSettingTab {
             name: t("save.exportFolder"),
             desc: t("save.exportFolder.desc"),
             render: (setting: Setting) => {
-              renderExportFolderSetting(this.app, setting, settings, () => {
-                void this.plugin.saveSettings();
-              });
+              renderFolderSetting(
+                this.app,
+                setting,
+                () => settings.exportFolder,
+                (folder) => {
+                  settings.exportFolder = folder;
+                  void this.plugin.saveSettings();
+                },
+              );
             },
           },
         ],
@@ -703,6 +707,21 @@ export class ChessSettingTab extends PluginSettingTab {
                   tags.refresh();
                   void this.plugin.saveSettings();
                 }),
+              );
+            },
+          },
+          {
+            name: t("pgn.newFileFolder"),
+            desc: t("pgn.newFileFolder.desc"),
+            render: (setting: Setting) => {
+              renderFolderSetting(
+                this.app,
+                setting,
+                () => settings.newPgnFolder,
+                (folder) => {
+                  settings.newPgnFolder = folder;
+                  void this.plugin.saveSettings();
+                },
               );
             },
           },
@@ -1131,9 +1150,15 @@ export class ChessSettingTab extends PluginSettingTab {
     const exportFolderSetting = new Setting(containerEl)
       .setName(t("save.exportFolder"))
       .setDesc(t("save.exportFolder.desc"));
-    renderExportFolderSetting(this.app, exportFolderSetting, settings, () => {
-      void this.plugin.saveSettings();
-    });
+    renderFolderSetting(
+      this.app,
+      exportFolderSetting,
+      () => settings.exportFolder,
+      (folder) => {
+        settings.exportFolder = folder;
+        void this.plugin.saveSettings();
+      },
+    );
 
     // ---- 边距 ----
     new Setting(containerEl).setName(t("margin.title")).setHeading();
@@ -1294,6 +1319,19 @@ export class ChessSettingTab extends PluginSettingTab {
         pgnExtTags.refresh();
         void this.plugin.saveSettings();
       }),
+    );
+
+    const newPgnFolderSetting = new Setting(containerEl)
+      .setName(t("pgn.newFileFolder"))
+      .setDesc(t("pgn.newFileFolder.desc"));
+    renderFolderSetting(
+      this.app,
+      newPgnFolderSetting,
+      () => settings.newPgnFolder,
+      (folder) => {
+        settings.newPgnFolder = folder;
+        void this.plugin.saveSettings();
+      },
     );
 
     containerEl.parentElement?.classList.add(`${CLS_PREFIX}-settings`);
