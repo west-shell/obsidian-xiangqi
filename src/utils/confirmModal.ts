@@ -1,4 +1,4 @@
-import { type App, Modal, Notice, Setting } from "obsidian";
+import { type App, Modal, normalizePath, Notice, Setting } from "obsidian";
 import { t } from "../i18n";
 import type { ChessNode, GameSlot, IHost } from "../types";
 import { PGNParser } from "../modules/Source/parser";
@@ -10,6 +10,7 @@ import {
   collectPathFens,
   EXPORT_GIF_SIZE,
   EXPORT_PNG_SIZE,
+  type ExportArtifact,
   exportBoardPng,
   exportGameGif,
 } from "./exportImage";
@@ -552,6 +553,112 @@ export class ImportModal extends Modal {
   }
 }
 
+/**
+ * Save-as dialog for a rendered export artifact: the user can edit the full
+ * vault-relative path (folder + filename) before anything is written. The
+ * input is prefilled with the default path from the attachment settings;
+ * existing files trigger an overwrite confirmation, missing folders are
+ * created on save.
+ */
+export class SaveAsModal extends Modal {
+  private saving = false;
+
+  constructor(
+    app: App,
+    private readonly artifact: ExportArtifact,
+    private readonly defaultPath: string,
+    private readonly savedMessage: string,
+  ) {
+    super(app);
+  }
+
+  onOpen() {
+    const { contentEl } = this;
+
+    new Setting(contentEl).setName(t("export.saveAs")).setHeading();
+
+    const input = contentEl.createEl("input", {
+      cls: `${CLS_PREFIX}-export-path-input`,
+      attr: { type: "text", value: this.defaultPath },
+    });
+    input.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        void this.handleSave(input);
+      }
+    });
+    input.select();
+
+    const btnContainer = contentEl.createDiv("modal-button-container");
+    const saveBtn = btnContainer.createEl("button", {
+      text: t("export.save"),
+      cls: "mod-cta",
+    });
+    saveBtn.addEventListener("click", () => {
+      void this.handleSave(input);
+    });
+    const cancelBtn = btnContainer.createEl("button", {
+      text: t("confirm.cancel"),
+    });
+    cancelBtn.addEventListener("click", () => this.close());
+  }
+
+  private async handleSave(input: HTMLInputElement): Promise<void> {
+    if (this.saving) return;
+    let path = normalizePath(input.value.trim());
+    if (path.startsWith("/")) path = path.slice(1);
+    if (!path) {
+      new Notice(t("export.invalidPath"));
+      return;
+    }
+    // Force the artifact's extension so the file type matches the content:
+    // append it when missing, replace it when a different one was typed.
+    const ext = this.artifact.filename.slice(
+      this.artifact.filename.lastIndexOf("."),
+    );
+    if (!path.toLowerCase().endsWith(ext)) {
+      const dot = path.lastIndexOf(".");
+      const slash = path.lastIndexOf("/");
+      path = (dot > slash ? path.slice(0, dot) : path) + ext;
+      path = normalizePath(path);
+    }
+
+    this.saving = true;
+    try {
+      const existing = this.app.vault.getFileByPath(path);
+      if (existing) {
+        const overwrite = await new ConfirmModal(
+          this.app,
+          t("export.saveAs"),
+          t("export.fileExists"),
+          t("confirm.saveBtn"),
+          t("confirm.cancel"),
+        ).promise;
+        if (!overwrite) return;
+        await this.app.vault.modifyBinary(existing, this.artifact.data);
+      } else {
+        const slash = path.lastIndexOf("/");
+        if (slash > 0) {
+          await ensureFolders(this.app, path.slice(0, slash));
+        }
+        await this.app.vault.createBinary(path, this.artifact.data);
+      }
+      new Notice(`${this.savedMessage}: ${path}`);
+      this.close();
+    } catch (error) {
+      console.error(error);
+      new Notice(t("export.exportFailed"));
+    } finally {
+      this.saving = false;
+    }
+  }
+
+  onClose() {
+    const { contentEl } = this;
+    contentEl.empty();
+  }
+}
+
 export class ExportModal extends Modal {
   private includeComments = true;
   private includeEval = true;
@@ -668,13 +775,12 @@ export class ExportModal extends Modal {
     button.disabled = true;
     button.textContent = t("export.exporting");
     try {
-      const path = await exportBoardPng({
-        app: this.app,
+      const artifact = await exportBoardPng({
         fen: this.buildFen(),
         size: EXPORT_PNG_SIZE,
         coordinates: this.host.settings.showCoordinateLabels,
       });
-      new Notice(`${t("export.imageSaved")}: ${path}`);
+      await this.promptSaveAs(artifact, t("export.imageSaved"));
     } catch (error) {
       console.error(error);
       new Notice(t("export.exportFailed"));
@@ -693,8 +799,7 @@ export class ExportModal extends Modal {
     const label = button.textContent;
     button.disabled = true;
     try {
-      const path = await exportGameGif({
-        app: this.app,
+      const artifact = await exportGameGif({
         fens,
         intervalMs: this.readGifIntervalMs(),
         size: EXPORT_GIF_SIZE,
@@ -703,13 +808,33 @@ export class ExportModal extends Modal {
           button.textContent = `${t("export.exporting")} ${done}/${total}`;
         },
       });
-      new Notice(`${t("export.gifSaved")}: ${path}`);
+      await this.promptSaveAs(artifact, t("export.gifSaved"));
     } catch (error) {
       console.error(error);
       new Notice(t("export.exportFailed"));
     } finally {
       button.disabled = false;
       button.textContent = label;
+    }
+  }
+
+  /**
+   * Opens the save-as dialog for a rendered artifact, prefilled with the
+   * default path from the user's attachment settings.
+   */
+  private async promptSaveAs(
+    artifact: ExportArtifact,
+    savedMessage: string,
+  ): Promise<void> {
+    try {
+      const defaultPath =
+        await this.app.fileManager.getAvailablePathForAttachment(
+          artifact.filename,
+        );
+      new SaveAsModal(this.app, artifact, defaultPath, savedMessage).open();
+    } catch (error) {
+      console.error(error);
+      new Notice(t("export.exportFailed"));
     }
   }
 
@@ -855,4 +980,16 @@ function updateFenTag(tags: string, newFen: string): string {
     return tags.replace(/\[FEN "[^"]*"\]/, `[FEN "${newFen}"]`);
   }
   return `[FEN "${newFen}"]\n[SetUp "1"]\n${tags}`;
+}
+
+/** Creates each missing folder along a vault-relative directory path. */
+async function ensureFolders(app: App, dir: string): Promise<void> {
+  if (!dir || app.vault.getFolderByPath(dir)) return;
+  let current = "";
+  for (const part of dir.split("/")) {
+    current = current ? `${current}/${part}` : part;
+    if (!app.vault.getFolderByPath(current)) {
+      await app.vault.createFolder(current);
+    }
+  }
 }

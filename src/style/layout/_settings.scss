@@ -153,6 +153,12 @@
   }
 }
 
+// Text input for the export "save as" dialog (vault-relative path).
+.#{$cls-prefix}-export-path-input {
+  width: 100%;
+  margin: 6px 0;
+}
+
 // Offscreen container used by image/GIF export: rendered (not display:none,
 // so chessground can measure bounds) but far outside the visible viewport.
 .#{$cls-prefix}-export-offscreen {

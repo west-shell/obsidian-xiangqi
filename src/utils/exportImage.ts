@@ -1,6 +1,5 @@
 import { toCanvas } from "html-to-image";
 import * as gifenc from "gifenc";
-import type { App } from "obsidian";
 import type { Api, Config } from "../chess";
 import { BOARD_ASPECT_RATIO, Chessground, CLS_PREFIX } from "../chess";
 import type { ChessNode, IHost } from "../types";
@@ -9,6 +8,15 @@ import type { ChessNode, IHost } from "../types";
 export const EXPORT_PNG_SIZE = 1024;
 /** Rendered pixel size (width) of exported GIF frames. */
 export const EXPORT_GIF_SIZE = 512;
+
+/**
+ * A rendered export ready to be saved: the binary file content plus a
+ * suggested basename (no folder) used to prefill the save-as dialog.
+ */
+export interface ExportArtifact {
+  data: ArrayBuffer;
+  filename: string;
+}
 
 const nextPaint = (): Promise<void> =>
   new Promise((resolve) => {
@@ -75,16 +83,6 @@ function timestampName(prefix: string, ext: string): string {
   return `${prefix}-${stamp}.${ext}`;
 }
 
-async function saveBinary(
-  app: App,
-  data: ArrayBuffer,
-  filename: string,
-): Promise<string> {
-  const path = await app.fileManager.getAvailablePathForAttachment(filename);
-  const file = await app.vault.createBinary(path, data);
-  return file.path;
-}
-
 function canvasToPngBlob(canvas: HTMLCanvasElement): Promise<Blob | null> {
   return new Promise((resolve) => {
     canvas.toBlob((blob) => resolve(blob), "image/png");
@@ -92,7 +90,6 @@ function canvasToPngBlob(canvas: HTMLCanvasElement): Promise<Blob | null> {
 }
 
 export interface PngExportOptions {
-  app: App;
   fen: string;
   /** Board width in pixels. */
   size: number;
@@ -100,30 +97,28 @@ export interface PngExportOptions {
 }
 
 /**
- * Renders the given FEN on an offscreen board and saves it as a PNG in the
- * vault (attachment folder rules apply). Returns the saved file path.
+ * Renders the given FEN on an offscreen board and encodes it as a PNG.
+ * The caller decides where to save the returned artifact.
  */
 export async function exportBoardPng(
   options: PngExportOptions,
-): Promise<string> {
+): Promise<ExportArtifact> {
   const board = new OffscreenBoard(options.size, options.coordinates);
   try {
     await board.setPosition(options.fen);
     const canvas = await board.toCanvas();
     const blob = await canvasToPngBlob(canvas);
     if (!blob) throw new Error("PNG encoding failed");
-    return await saveBinary(
-      options.app,
-      await blob.arrayBuffer(),
-      timestampName("board", "png"),
-    );
+    return {
+      data: await blob.arrayBuffer(),
+      filename: timestampName("board", "png"),
+    };
   } finally {
     board.destroy();
   }
 }
 
 export interface GifExportOptions {
-  app: App;
   /** One FEN per frame, in playback order (starting position first). */
   fens: string[];
   /** Delay between frames in milliseconds. */
@@ -136,11 +131,12 @@ export interface GifExportOptions {
 
 /**
  * Renders each FEN on an offscreen board and encodes them into an animated
- * GIF (one frame per position). Returns the saved file path.
+ * GIF (one frame per position). The caller decides where to save the
+ * returned artifact.
  */
 export async function exportGameGif(
   options: GifExportOptions,
-): Promise<string> {
+): Promise<ExportArtifact> {
   const fens = options.fens;
   if (fens.length === 0) throw new Error("No positions to export");
   const board = new OffscreenBoard(options.size, options.coordinates);
@@ -167,7 +163,7 @@ export async function exportGameGif(
   const bytes = gif.bytes();
   const buffer = new ArrayBuffer(bytes.byteLength);
   new Uint8Array(buffer).set(bytes);
-  return saveBinary(options.app, buffer, timestampName("game", "gif"));
+  return { data: buffer, filename: timestampName("game", "gif") };
 }
 
 /** FENs of the mainline (first-child chain) starting at `root`. */
