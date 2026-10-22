@@ -311,6 +311,8 @@
   "save.annotationFormat.suffix": "Symbol suffix (e4!?)",
   "save.annotationFormat.nag": "NAG ($1, $16)",
   "save.annotationFormat.comment": "Comment form ({[#a:!?]}, {[#a:±]})",
+  "save.exportFolder": "Default export folder",
+  "save.exportFolder.desc": "Folder used by default when exporting images or GIFs. Leave empty to follow Obsidian's attachment folder setting",
   "player.clock": "Remaining time",
   "game.prev": "Previous game",
   "game.next": "Next game",

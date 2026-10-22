@@ -23,6 +23,7 @@ import {
 } from "./style/themes";
 import type { ISettings } from "./types";
 import { playSound } from "./utils/sound";
+import { FolderSuggestModal } from "./utils/folderSuggest";
 
 const VALID_NAME_RE = /^[a-z0-9-]+$/;
 // Characters the tag input accepts as they are typed (committed to
@@ -177,7 +178,40 @@ export const DEFAULT_SETTINGS: ISettings = {
   saveEvalByDefault: false,
   saveEvalPrompt: true,
   annotationFormat: "suffix",
+  exportFolder: "",
 };
+
+/**
+ * Renders the default export folder control onto a Setting (used by both
+ * settings rendering paths): an editable text field plus a fuzzy folder
+ * picker button.
+ */
+function renderExportFolderSetting(
+  app: App,
+  setting: Setting,
+  settings: ISettings,
+  save: () => void,
+): void {
+  setting.addText((text) => {
+    text.setPlaceholder(t("export.rootFolder")).setValue(settings.exportFolder);
+    text.onChange((value) => {
+      settings.exportFolder = value;
+      save();
+    });
+    setting.addButton((button) =>
+      button
+        .setIcon("folder")
+        .setTooltip(t("export.chooseFolder"))
+        .onClick(() => {
+          new FolderSuggestModal(app, (folder) => {
+            settings.exportFolder = folder;
+            text.setValue(folder);
+            save();
+          }).open();
+        }),
+    );
+  });
+}
 
 function addSliderWithValue(
   containerEl: HTMLElement,
@@ -504,6 +538,15 @@ export class ChessSettingTab extends PluginSettingTab {
                 nag: t("save.annotationFormat.nag"),
                 comment: t("save.annotationFormat.comment"),
               },
+            },
+          },
+          {
+            name: t("save.exportFolder"),
+            desc: t("save.exportFolder.desc"),
+            render: (setting: Setting) => {
+              renderExportFolderSetting(this.app, setting, settings, () => {
+                void this.plugin.saveSettings();
+              });
             },
           },
         ],
@@ -1084,6 +1127,13 @@ export class ChessSettingTab extends PluginSettingTab {
             void this.plugin.saveSettings();
           });
       });
+
+    const exportFolderSetting = new Setting(containerEl)
+      .setName(t("save.exportFolder"))
+      .setDesc(t("save.exportFolder.desc"));
+    renderExportFolderSetting(this.app, exportFolderSetting, settings, () => {
+      void this.plugin.saveSettings();
+    });
 
     // ---- 边距 ----
     new Setting(containerEl).setName(t("margin.title")).setHeading();

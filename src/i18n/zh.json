@@ -312,6 +312,8 @@
   "save.annotationFormat.suffix": "符号后缀（e4!?）",
   "save.annotationFormat.nag": "NAG 编号（$1、$16）",
   "save.annotationFormat.comment": "注释形式（{[#a:!?]}、{[#a:±]}）",
+  "save.exportFolder": "默认导出文件夹",
+  "save.exportFolder.desc": "导出图片或 GIF 时默认使用的文件夹，留空则跟随 Obsidian 的附件文件夹设置",
   "player.clock": "剩余用时",
   "game.prev": "上一局",
   "game.next": "下一局",

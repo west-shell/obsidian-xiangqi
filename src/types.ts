@@ -53,6 +53,11 @@ export interface ISettings {
   saveEvalByDefault: boolean;
   saveEvalPrompt: boolean;
   annotationFormat: AnnotationFormat;
+  /**
+   * Default vault folder for image/GIF exports. Empty string = follow
+   * Obsidian's attachment folder setting.
+   */
+  exportFolder: string;
 }
 
 /**

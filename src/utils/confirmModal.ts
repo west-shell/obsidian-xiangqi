@@ -1,12 +1,4 @@
-import {
-  type App,
-  FuzzySuggestModal,
-  Modal,
-  normalizePath,
-  Notice,
-  Setting,
-  type TFolder,
-} from "obsidian";
+import { type App, Modal, normalizePath, Notice, Setting } from "obsidian";
 import { t } from "../i18n";
 import type { ChessNode, GameSlot, IHost } from "../types";
 import { PGNParser } from "../modules/Source/parser";
@@ -22,6 +14,7 @@ import {
   exportBoardPng,
   exportGameGif,
 } from "./exportImage";
+import { FolderSuggestModal } from "./folderSuggest";
 
 export type SaveConfirmResult = {
   action: "save" | "saveAll" | "cancel";
@@ -562,38 +555,11 @@ export class ImportModal extends Modal {
 }
 
 /**
- * Fuzzy folder picker over all vault folders — the same interaction as
- * Obsidian's native folder pickers. Resolves with the chosen vault-relative
- * folder path ("" for the vault root).
- */
-class FolderSuggestModal extends FuzzySuggestModal<TFolder> {
-  constructor(
-    app: App,
-    private readonly onChooseFolder: (folder: string) => void,
-  ) {
-    super(app);
-    this.setPlaceholder(t("export.chooseFolder"));
-  }
-
-  getItems(): TFolder[] {
-    return this.app.vault.getAllFolders(true);
-  }
-
-  getItemText(item: TFolder): string {
-    return item.path === "" ? t("export.rootFolder") : item.path;
-  }
-
-  onChooseItem(item: TFolder): void {
-    this.onChooseFolder(item.path);
-  }
-}
-
-/**
  * Save-as dialog for a rendered export artifact. The save folder (editable
  * text plus a fuzzy folder picker) and the filename are separate fields;
- * both are prefilled from the default path derived from the attachment
- * settings. Existing files trigger an overwrite confirmation, missing
- * folders are created on save.
+ * both are prefilled from the default path derived from the configured
+ * export folder (or, when unset, the attachment settings). Existing files
+ * trigger an overwrite confirmation, missing folders are created on save.
  */
 export class SaveAsModal extends Modal {
   private saving = false;
@@ -886,17 +852,21 @@ export class ExportModal extends Modal {
 
   /**
    * Opens the save-as dialog for a rendered artifact, prefilled with the
-   * default path from the user's attachment settings.
+   * configured export folder (or, when unset, the default path from the
+   * user's attachment settings).
    */
   private async promptSaveAs(
     artifact: ExportArtifact,
     savedMessage: string,
   ): Promise<void> {
     try {
-      const defaultPath =
-        await this.app.fileManager.getAvailablePathForAttachment(
-          artifact.filename,
-        );
+      let configured = normalizePath(this.host.settings.exportFolder.trim());
+      if (configured.startsWith("/")) configured = configured.slice(1);
+      const defaultPath = configured
+        ? `${configured}/${artifact.filename}`
+        : await this.app.fileManager.getAvailablePathForAttachment(
+            artifact.filename,
+          );
       new SaveAsModal(this.app, artifact, defaultPath, savedMessage).open();
     } catch (error) {
       console.error(error);
