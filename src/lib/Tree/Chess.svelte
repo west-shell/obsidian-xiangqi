@@ -32,7 +32,7 @@
   import { annotationShapes } from "./glyphs";
   import { GLYPH_BY_KEY } from "../../utils/annotation-glyphs";
   import { badgeBoardSvg, resultBadgeKeyOf } from "../../utils/icon";
-  import { parseOrientationTag } from "../../utils/parse";
+  import { parseOrientationTag } from "../../modules/Source/parse";
   import {
     clockForColor,
     formatClock,

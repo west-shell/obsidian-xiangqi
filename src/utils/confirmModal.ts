@@ -3,7 +3,7 @@ import { t } from "../i18n";
 import type { ChessNode, GameSlot, IHost } from "../types";
 import { PGNParser } from "../modules/Source/parser";
 import { validateFen } from "./chessEngine";
-import { activateGame } from "./parse";
+import { activateGame } from "../modules/Source/parse";
 import { CLS_PREFIX, DEFAULT_FEN, PGN_PLACEHOLDER } from "../chess";
 import {
   collectMainlineFens,

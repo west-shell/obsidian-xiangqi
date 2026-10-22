@@ -6,7 +6,7 @@ import {
   parseExternalUrl,
 } from "../../chess";
 import { type IBlockHost, type ParsedGame } from "../../types";
-import { extractHeaders, isDefaultStart, parseOption } from "../../utils/parse";
+import { extractHeaders, isDefaultStart, parseOption } from "./parse";
 
 import { PGNParser } from "./parser";
 

@@ -36,7 +36,7 @@ import {
   ExportModal,
   ImportModal,
 } from "../../../utils/confirmModal";
-import { activateGame, extractHeaders } from "../../../utils/parse";
+import { activateGame, extractHeaders } from "../../Source/parse";
 import {
   branchStepDirection,
   currentVariation,

@@ -1,13 +1,13 @@
-import { Chess, type Move } from "../chess";
-import { DEFAULT_FEN, FEN_REGEX, parseExternalUrl } from "../chess";
-import { PGNParser } from "../modules/Source/parser";
+import { Chess, type Move } from "../../chess";
+import { DEFAULT_FEN, FEN_REGEX, parseExternalUrl } from "../../chess";
+import { PGNParser } from "./parser";
 import {
   type GameSlot,
   type IHost,
   type IOptions,
   type ITurn,
   type ParsedGame,
-} from "../types";
+} from "../../types";
 
 // A game "starts from the default opening" when it has no FEN tag, the tag
 // is empty, or its position matches the variant default. Only the board
