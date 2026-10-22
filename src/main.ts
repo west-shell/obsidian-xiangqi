@@ -78,6 +78,7 @@ export default class ChessPlugin extends Plugin {
         try {
           const newFile = await this.app.vault.create(fileName, fileContent);
           void this.app.workspace.getLeaf(true).openFile(newFile);
+          void this.app.fileManager.promptForFileRename(newFile);
         } catch (error) {
           console.error(t("pgn.error"), error);
         }
