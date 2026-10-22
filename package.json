@@ -75,5 +75,9 @@
     "*.{css,scss,html,json,md}": [
       "prettier --write"
     ]
+  },
+  "dependencies": {
+    "gifenc": "^1.0.3",
+    "html-to-image": "^1.11.13"
   }
 }

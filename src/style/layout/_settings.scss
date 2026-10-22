@@ -138,7 +138,27 @@
 .#{$cls-prefix}-export-copy-row {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
+  gap: 6px;
   margin: 6px 0 0;
+}
+
+.#{$cls-prefix}-export-gif-interval {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+
+  input {
+    width: 3.5em;
+  }
+}
+
+// Offscreen container used by image/GIF export: rendered (not display:none,
+// so chessground can measure bounds) but far outside the visible viewport.
+.#{$cls-prefix}-export-offscreen {
+  position: fixed;
+  top: 0;
+  left: -10000px;
 }
 
 .#{$cls-prefix}-export-section-title {

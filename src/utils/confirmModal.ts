@@ -5,6 +5,14 @@ import { PGNParser } from "../modules/Source/parser";
 import { validateFen } from "./chessEngine";
 import { activateGame } from "./parse";
 import { CLS_PREFIX, DEFAULT_FEN, PGN_PLACEHOLDER } from "../chess";
+import {
+  collectMainlineFens,
+  collectPathFens,
+  EXPORT_GIF_SIZE,
+  EXPORT_PNG_SIZE,
+  exportBoardPng,
+  exportGameGif,
+} from "./exportImage";
 
 export type SaveConfirmResult = {
   action: "save" | "saveAll" | "cancel";
@@ -551,6 +559,7 @@ export class ExportModal extends Modal {
   private pgnMode: "branch" | "all" | "allGames" = "branch";
   private fenArea!: HTMLTextAreaElement;
   private pgnArea!: HTMLTextAreaElement;
+  private gifIntervalInput!: HTMLInputElement;
 
   constructor(
     app: App,
@@ -583,7 +592,14 @@ export class ExportModal extends Modal {
         this.setAreaValue(this.fenArea, this.buildFen());
       },
     );
-    this.fenArea = this.createExportArea(contentEl, this.buildFen());
+    this.fenArea = this.createExportArea(contentEl, this.buildFen(), (row) => {
+      const imageBtn = row.createEl("button", {
+        text: t("export.exportImage"),
+      });
+      imageBtn.addEventListener("click", () => {
+        void this.handleExportImage(imageBtn);
+      });
+    });
 
     contentEl.createDiv({
       text: t("export.pgn"),
@@ -620,13 +636,103 @@ export class ExportModal extends Modal {
       this.pgnMode = key as "branch" | "all" | "allGames";
       this.setAreaValue(this.pgnArea, this.buildPgn());
     });
-    this.pgnArea = this.createExportArea(contentEl, this.buildPgn());
+    this.pgnArea = this.createExportArea(contentEl, this.buildPgn(), (row) => {
+      const intervalLabel = row.createEl("label", {
+        cls: `${CLS_PREFIX}-export-gif-interval`,
+      });
+      this.gifIntervalInput = intervalLabel.createEl("input", {
+        attr: {
+          type: "number",
+          min: "0.1",
+          max: "10",
+          step: "0.1",
+          value: "1",
+        },
+      });
+      intervalLabel.appendText(t("export.gifIntervalUnit"));
+      const gifBtn = row.createEl("button", { text: t("export.exportGif") });
+      gifBtn.addEventListener("click", () => {
+        void this.handleExportGif(gifBtn);
+      });
+    });
 
     const btnContainer = contentEl.createDiv("modal-button-container");
     const closeBtn = btnContainer.createEl("button", {
       text: t("export.close"),
     });
     closeBtn.addEventListener("click", () => this.close());
+  }
+
+  private async handleExportImage(button: HTMLButtonElement): Promise<void> {
+    const label = button.textContent;
+    button.disabled = true;
+    button.textContent = t("export.exporting");
+    try {
+      const path = await exportBoardPng({
+        app: this.app,
+        fen: this.buildFen(),
+        size: EXPORT_PNG_SIZE,
+        coordinates: this.host.settings.showCoordinateLabels,
+      });
+      new Notice(`${t("export.imageSaved")}: ${path}`);
+    } catch (error) {
+      console.error(error);
+      new Notice(t("export.exportFailed"));
+    } finally {
+      button.disabled = false;
+      button.textContent = label;
+    }
+  }
+
+  private async handleExportGif(button: HTMLButtonElement): Promise<void> {
+    const fens = this.collectGifFens();
+    if (fens.length === 0) {
+      new Notice(t("export.exportFailed"));
+      return;
+    }
+    const label = button.textContent;
+    button.disabled = true;
+    try {
+      const path = await exportGameGif({
+        app: this.app,
+        fens,
+        intervalMs: this.readGifIntervalMs(),
+        size: EXPORT_GIF_SIZE,
+        coordinates: this.host.settings.showCoordinateLabels,
+        onProgress: (done, total) => {
+          button.textContent = `${t("export.exporting")} ${done}/${total}`;
+        },
+      });
+      new Notice(`${t("export.gifSaved")}: ${path}`);
+    } catch (error) {
+      console.error(error);
+      new Notice(t("export.exportFailed"));
+    } finally {
+      button.disabled = false;
+      button.textContent = label;
+    }
+  }
+
+  private readGifIntervalMs(): number {
+    const seconds = Number(this.gifIntervalInput.value);
+    const clamped = Number.isFinite(seconds)
+      ? Math.min(Math.max(seconds, 0.1), 10)
+      : 1;
+    return Math.round(clamped * 1000);
+  }
+
+  /** FENs to animate, following the selected PGN scope. */
+  private collectGifFens(): string[] {
+    const host = this.host;
+    if (this.pgnMode === "allGames") {
+      const fens: string[] = [];
+      for (const slot of host.games) {
+        if (slot.parsed) fens.push(...collectMainlineFens(slot.parsed.root));
+      }
+      return fens;
+    }
+    if (this.pgnMode === "branch") return collectPathFens(host);
+    return collectMainlineFens(host.root);
   }
 
   private createToggle(
@@ -709,6 +815,7 @@ export class ExportModal extends Modal {
   private createExportArea(
     container: HTMLElement,
     value: string,
+    addExtraButtons?: (row: HTMLElement) => void,
   ): HTMLTextAreaElement {
     const area = container.createEl("textarea", {
       cls: `${CLS_PREFIX}-modal-textarea ${CLS_PREFIX}-modal-textarea--fixed`,
@@ -733,6 +840,7 @@ export class ExportModal extends Modal {
         })
         .catch(() => {});
     });
+    addExtraButtons?.(copyRow);
     return area;
   }
 
