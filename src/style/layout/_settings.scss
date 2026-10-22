@@ -153,10 +153,21 @@
   }
 }
 
-// Text input for the export "save as" dialog (vault-relative path).
-.#{$cls-prefix}-export-path-input {
-  width: 100%;
+// Rows of the export "save as" dialog (folder picker + filename).
+.#{$cls-prefix}-export-path-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   margin: 6px 0;
+
+  label {
+    flex-shrink: 0;
+  }
+
+  input {
+    flex: 1;
+    min-width: 0;
+  }
 }
 
 // Offscreen container used by image/GIF export: rendered (not display:none,

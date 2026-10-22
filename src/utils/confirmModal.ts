@@ -1,4 +1,12 @@
-import { type App, Modal, normalizePath, Notice, Setting } from "obsidian";
+import {
+  type App,
+  FuzzySuggestModal,
+  Modal,
+  normalizePath,
+  Notice,
+  Setting,
+  type TFolder,
+} from "obsidian";
 import { t } from "../i18n";
 import type { ChessNode, GameSlot, IHost } from "../types";
 import { PGNParser } from "../modules/Source/parser";
@@ -554,11 +562,38 @@ export class ImportModal extends Modal {
 }
 
 /**
- * Save-as dialog for a rendered export artifact: the user can edit the full
- * vault-relative path (folder + filename) before anything is written. The
- * input is prefilled with the default path from the attachment settings;
- * existing files trigger an overwrite confirmation, missing folders are
- * created on save.
+ * Fuzzy folder picker over all vault folders — the same interaction as
+ * Obsidian's native folder pickers. Resolves with the chosen vault-relative
+ * folder path ("" for the vault root).
+ */
+class FolderSuggestModal extends FuzzySuggestModal<TFolder> {
+  constructor(
+    app: App,
+    private readonly onChooseFolder: (folder: string) => void,
+  ) {
+    super(app);
+    this.setPlaceholder(t("export.chooseFolder"));
+  }
+
+  getItems(): TFolder[] {
+    return this.app.vault.getAllFolders(true);
+  }
+
+  getItemText(item: TFolder): string {
+    return item.path === "" ? t("export.rootFolder") : item.path;
+  }
+
+  onChooseItem(item: TFolder): void {
+    this.onChooseFolder(item.path);
+  }
+}
+
+/**
+ * Save-as dialog for a rendered export artifact. The save folder (editable
+ * text plus a fuzzy folder picker) and the filename are separate fields;
+ * both are prefilled from the default path derived from the attachment
+ * settings. Existing files trigger an overwrite confirmation, missing
+ * folders are created on save.
  */
 export class SaveAsModal extends Modal {
   private saving = false;
@@ -577,37 +612,70 @@ export class SaveAsModal extends Modal {
 
     new Setting(contentEl).setName(t("export.saveAs")).setHeading();
 
-    const input = contentEl.createEl("input", {
-      cls: `${CLS_PREFIX}-export-path-input`,
-      attr: { type: "text", value: this.defaultPath },
+    // Split the default path into the two fields.
+    const slash = this.defaultPath.lastIndexOf("/");
+    const defaultFolder = slash !== -1 ? this.defaultPath.slice(0, slash) : "";
+    const defaultName =
+      slash !== -1 ? this.defaultPath.slice(slash + 1) : this.defaultPath;
+
+    const folderRow = contentEl.createDiv(`${CLS_PREFIX}-export-path-row`);
+    folderRow.createEl("label", { text: t("export.folder") });
+    const folderInput = folderRow.createEl("input", {
+      attr: {
+        type: "text",
+        value: defaultFolder,
+        placeholder: t("export.rootFolder"),
+      },
     });
-    input.addEventListener("keydown", (event) => {
-      if (event.key === "Enter") {
-        event.preventDefault();
-        void this.handleSave(input);
-      }
+    const browseBtn = folderRow.createEl("button", {
+      text: t("export.chooseFolder"),
     });
-    input.select();
+    browseBtn.addEventListener("click", () => {
+      new FolderSuggestModal(this.app, (folder) => {
+        folderInput.value = folder;
+      }).open();
+    });
+
+    const nameRow = contentEl.createDiv(`${CLS_PREFIX}-export-path-row`);
+    nameRow.createEl("label", { text: t("export.fileName") });
+    const nameInput = nameRow.createEl("input", {
+      attr: { type: "text", value: defaultName },
+    });
+    nameInput.select();
+
+    const submit = (): void => {
+      void this.handleSave(folderInput.value, nameInput.value);
+    };
+    for (const input of [folderInput, nameInput]) {
+      input.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          submit();
+        }
+      });
+    }
 
     const btnContainer = contentEl.createDiv("modal-button-container");
     const saveBtn = btnContainer.createEl("button", {
       text: t("export.save"),
       cls: "mod-cta",
     });
-    saveBtn.addEventListener("click", () => {
-      void this.handleSave(input);
-    });
+    saveBtn.addEventListener("click", submit);
     const cancelBtn = btnContainer.createEl("button", {
       text: t("confirm.cancel"),
     });
     cancelBtn.addEventListener("click", () => this.close());
   }
 
-  private async handleSave(input: HTMLInputElement): Promise<void> {
+  private async handleSave(
+    folderValue: string,
+    nameValue: string,
+  ): Promise<void> {
     if (this.saving) return;
-    let path = normalizePath(input.value.trim());
-    if (path.startsWith("/")) path = path.slice(1);
-    if (!path) {
+    let folder = normalizePath(folderValue.trim());
+    if (folder.startsWith("/")) folder = folder.slice(1);
+    let name = normalizePath(nameValue.trim());
+    if (!name || name.includes("/")) {
       new Notice(t("export.invalidPath"));
       return;
     }
@@ -616,12 +684,11 @@ export class SaveAsModal extends Modal {
     const ext = this.artifact.filename.slice(
       this.artifact.filename.lastIndexOf("."),
     );
-    if (!path.toLowerCase().endsWith(ext)) {
-      const dot = path.lastIndexOf(".");
-      const slash = path.lastIndexOf("/");
-      path = (dot > slash ? path.slice(0, dot) : path) + ext;
-      path = normalizePath(path);
+    if (!name.toLowerCase().endsWith(ext)) {
+      const dot = name.lastIndexOf(".");
+      name = (dot > 0 ? name.slice(0, dot) : name) + ext;
     }
+    const path = folder ? `${folder}/${name}` : name;
 
     this.saving = true;
     try {
@@ -637,9 +704,8 @@ export class SaveAsModal extends Modal {
         if (!overwrite) return;
         await this.app.vault.modifyBinary(existing, this.artifact.data);
       } else {
-        const slash = path.lastIndexOf("/");
-        if (slash > 0) {
-          await ensureFolders(this.app, path.slice(0, slash));
+        if (folder) {
+          await ensureFolders(this.app, folder);
         }
         await this.app.vault.createBinary(path, this.artifact.data);
       }
