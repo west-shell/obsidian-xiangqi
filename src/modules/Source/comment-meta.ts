@@ -1,5 +1,5 @@
-import { SQUARE_PATTERN } from "../chess";
-import type { NodeShape } from "../types";
+import { SQUARE_PATTERN } from "../../chess";
+import type { NodeShape } from "../../types";
 
 // Lichess comment shape blocks (lila modules/study/src/main/CommentParser.scala):
 //   { [%csl Gb4,Yd5,Rf6][%cal Ge2e4,Ye2d4,Re2g4] }

@@ -5,7 +5,7 @@ import { MarkdownView, Notice } from "obsidian";
 import { registerBlockModule } from "../../core/module-system";
 import type { IBlockHost } from "../../types";
 import { DEFAULT_FEN } from "../../types";
-import { promptSaveEval } from "../../utils/saveEval";
+import { promptSaveEval } from "./saveEval";
 import { t } from "../../i18n";
 
 const BlockHostModule = {

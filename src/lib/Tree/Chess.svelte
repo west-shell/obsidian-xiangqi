@@ -29,7 +29,7 @@
   import type ChessPlugin from "../../main";
   import { onDestroy, onMount, tick } from "svelte";
   import { onLangChange, t } from "../../i18n";
-  import { annotationShapes } from "../../utils/glyphs";
+  import { annotationShapes } from "./glyphs";
   import { GLYPH_BY_KEY } from "../../utils/annotation-glyphs";
   import { badgeBoardSvg, resultBadgeKeyOf } from "../../utils/icon";
   import { parseOrientationTag } from "../../utils/parse";
@@ -40,7 +40,7 @@
     getPlayerInfo,
     initialClockSeconds,
     type PlayerInfo,
-  } from "../../utils/player";
+  } from "./player";
 
   const BRUSH_MAP: Record<string, string> = {
     green: "g",

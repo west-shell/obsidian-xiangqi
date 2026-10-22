@@ -1,4 +1,4 @@
-import type { ChessNode } from "../types";
+import type { ChessNode } from "../../../types";
 
 // The tip of a branch: the last node of the line starting at `node`
 // (follow the first-child chain). Branch results only serialize from

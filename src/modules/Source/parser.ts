@@ -15,7 +15,7 @@ import {
   nagToAnnotationKey,
   pushAnnotation,
 } from "../../utils/annotation-glyphs";
-import { extractCommentMeta } from "../../utils/comment-meta";
+import { extractCommentMeta } from "./comment-meta";
 import {
   ANNOTATION_PREFIX,
   isAnnotationKey,

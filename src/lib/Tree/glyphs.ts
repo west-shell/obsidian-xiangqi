@@ -1,5 +1,5 @@
-import type { DrawShape } from "../chess";
-import type { MoveGlyph } from "../utils/winningChances";
+import type { DrawShape } from "../../chess";
+import type { MoveGlyph } from "../../utils/winningChances";
 
 const composeGlyph = (fill: string, path: string) =>
   `<g transform="matrix(.4 0 0 .4 71 -12)"><circle cx="50" cy="50" r="50" fill="${fill}"/>${path}</g>`;

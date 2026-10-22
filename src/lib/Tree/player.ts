@@ -1,5 +1,5 @@
-import { PRIMARY_PLAYER_KEY } from "../chess";
-import type { ChessNode, NodeMap } from "../types";
+import { PRIMARY_PLAYER_KEY } from "../../chess";
+import type { ChessNode, NodeMap } from "../../types";
 
 /**
  * Player bars (lichess study style): names / titles / ratings above and

@@ -3,8 +3,11 @@ import { describe, expect, test } from "vitest";
 import { getAutoResult } from "../src/chess";
 import { PGNParser } from "../src/modules/Source/parser";
 import type { ChessNode } from "../src/types";
-import { branchTip, migrateBranchResult } from "../src/utils/result";
-import { stringifyPGN } from "../src/utils/stringify-pgn";
+import {
+  branchTip,
+  migrateBranchResult,
+} from "../src/modules/Tree/Actions/result";
+import { stringifyPGN } from "../src/modules/Tree/Actions/stringify-pgn";
 
 function makeNode(id: string, result?: string): ChessNode {
   return {

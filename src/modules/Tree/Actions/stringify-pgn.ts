@@ -1,7 +1,10 @@
-import { getSaveNotation, getTurnFromFen } from "../chess";
-import type { AnnotationFormat, ChessNode, NodeEval } from "../types";
-import { GLYPH_BY_KEY, GLYPH_BY_SYMBOL } from "./annotation-glyphs";
-import { ANNOTATION_PREFIX } from "./icon";
+import { getSaveNotation, getTurnFromFen } from "../../../chess";
+import type { AnnotationFormat, ChessNode, NodeEval } from "../../../types";
+import {
+  GLYPH_BY_KEY,
+  GLYPH_BY_SYMBOL,
+} from "../../../utils/annotation-glyphs";
+import { ANNOTATION_PREFIX } from "../../../utils/icon";
 
 /** FEN fullmove number (field 6); defaults to 1 when absent/invalid. */
 export function getFullmoveFromFen(fen: string): number {

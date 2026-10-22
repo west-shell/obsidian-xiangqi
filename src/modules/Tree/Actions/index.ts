@@ -1,4 +1,4 @@
-import { type Move, type Piece } from "../../chess";
+import { type Move, type Piece } from "../../../chess";
 import {
   buildDefaultEditFen,
   CLS_PREFIX,
@@ -10,33 +10,33 @@ import {
   matchMove,
   PRIMARY_PLAYER_KEY,
   randomChess960Fen,
-} from "../../chess";
+} from "../../../chess";
 import { Notice } from "obsidian";
-import { validateFen } from "../../utils/chessEngine";
-import { applyAnnotationToggle } from "../../utils/annotation-glyphs";
+import { validateFen } from "../../../utils/chessEngine";
+import { applyAnnotationToggle } from "../../../utils/annotation-glyphs";
 import {
   getFullmoveFromFen,
   serializeNodeMeta,
   stringifyPGN,
-} from "../../utils/stringify-pgn";
+} from "./stringify-pgn";
 import {
   registerBlockModule,
   registerFileModule,
-} from "../../core/module-system";
-import { t } from "../../i18n";
+} from "../../../core/module-system";
+import { t } from "../../../i18n";
 import type {
   ChessNode,
   GameSlot,
   IBlockHost,
   IFileHost,
   IHost,
-} from "../../types";
+} from "../../../types";
 import {
   ConfirmModal,
   ExportModal,
   ImportModal,
-} from "../../utils/confirmModal";
-import { activateGame, extractHeaders } from "../../utils/parse";
+} from "../../../utils/confirmModal";
+import { activateGame, extractHeaders } from "../../../utils/parse";
 import {
   branchStepDirection,
   currentVariation,
@@ -51,11 +51,11 @@ import {
   pathChild,
   renderedTip,
   samePlyNodes,
-} from "../../utils/branch-nav";
-import { branchTip, migrateBranchResult } from "../../utils/result";
+} from "./branch-nav";
+import { branchTip, migrateBranchResult } from "./result";
 import { Modal, Setting } from "obsidian";
 import { mount, unmount } from "svelte";
-import Chess from "../../lib/Tree/Chess.svelte";
+import Chess from "../../../lib/Tree/Chess.svelte";
 
 const ActionsModule = {
   init(host: IHost) {

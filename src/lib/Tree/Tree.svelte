@@ -37,7 +37,7 @@
   import { badgeSvg, iconSvg, resultBadgeKeyOf } from "../../utils/icon";
   import { GLYPH_BY_KEY } from "../../utils/annotation-glyphs";
   import { evalBarIntensity } from "../../utils/winningChances";
-  import { scrollToBTN } from "../../utils/utils";
+  import { scrollToBTN } from "./scroll";
   import PreviewBoard from "./PreviewBoard.svelte";
   import * as d3 from "d3";
 

@@ -1,7 +1,7 @@
 import { Modal, Setting } from "obsidian";
 
-import type { ChessNode, IHost } from "../types";
-import { t } from "../i18n";
+import type { ChessNode, IHost } from "../../types";
+import { t } from "../../i18n";
 
 export function hasEvalInTree(root: ChessNode): boolean {
   const stack: ChessNode[] = [root];
