@@ -37,10 +37,12 @@
     return slot ? slot.headers.size > 0 : false;
   });
   function hasDisplayInfo(h: Map<string, string>): boolean {
-    if (h.get(PRIMARY_PLAYER_KEY) || h.get("Black")) return true;
-    if (h.get("Event") || h.get("Date")) return true;
-    const result = h.get("Result");
-    return !!result && result !== "*";
+    return !!(
+      h.get(PRIMARY_PLAYER_KEY) ||
+      h.get("Black") ||
+      h.get("Event") ||
+      h.get("Date")
+    );
   }
   function describeGame(h: Map<string, string>): string {
     const white = h.get(PRIMARY_PLAYER_KEY) || "";
@@ -63,7 +65,7 @@
     void _uiVer;
     if (!games || games.length === 0) return false;
     if (games.length === 1) {
-      return !isBlockMode || hasDisplayInfo(games[0].headers);
+      return hasDisplayInfo(games[0].headers);
     }
     return hasHeaders || !isBlockMode;
   });
