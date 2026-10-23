@@ -2,6 +2,14 @@ import "../core/event-bus";
 import "../modules/BoardClick";
 import "../modules/Tree/BlockHost";
 import "../modules/Tree/Actions";
+import "../modules/Tree/Navigate";
+import "../modules/Tree/BranchNav";
+import "../modules/Tree/TreeEdit";
+import "../modules/Tree/GameSlots";
+import "../modules/Tree/EditFen";
+import "../modules/Tree/EditTags";
+import "../modules/Tree/ImportExport";
+import "../modules/Tree/EngineSettings";
 import "../modules/KeyboardNav";
 import "../modules/Engine/EngineModule";
 
