@@ -231,7 +231,7 @@ $board-ratio: 0.9;
   .#{$cls-prefix}-layout__palette
   button.#{$cls-prefix}-palette__btn--white {
   background-color: var(--xq-piece-red);
-  @include contrast-text(var(--xq-piece-red), black);
+  @include contrast-text(var(--xq-piece-red), white);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
@@ -247,7 +247,7 @@ $board-ratio: 0.9;
   .#{$cls-prefix}-genfen
   button.#{$cls-prefix}-genfen__turn--white {
   background-color: var(--xq-piece-red);
-  @include contrast-text(var(--xq-piece-red), black);
+  @include contrast-text(var(--xq-piece-red), white);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
