@@ -318,6 +318,7 @@
   "game.prev": "Previous game",
   "game.next": "Next game",
   "game.label": "Game {current}/{total}",
+  "game.untitled": "Untitled game",
   "game.select": "Select game",
   "game.new": "New game",
   "game.delete": "Delete game",

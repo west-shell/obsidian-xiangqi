@@ -36,12 +36,34 @@
     const slot = games[currentGameIndex ?? 0];
     return slot ? slot.headers.size > 0 : false;
   });
+  function hasDisplayInfo(h: Map<string, string>): boolean {
+    if (h.get(PRIMARY_PLAYER_KEY) || h.get("Black")) return true;
+    if (h.get("Event") || h.get("Date")) return true;
+    const result = h.get("Result");
+    return !!result && result !== "*";
+  }
+  function describeGame(h: Map<string, string>): string {
+    const white = h.get(PRIMARY_PLAYER_KEY) || "";
+    const black = h.get("Black") || "";
+    const event = h.get("Event") || "";
+    const date = h.get("Date") || "";
+    const resultRaw = h.get("Result") || "";
+    const result = formatResult(resultRaw, _lv);
+    let label = "";
+    if (white || black) {
+      label = `${white || "?"} ${result} ${black || "?"}`;
+    } else if (resultRaw && resultRaw !== "*") {
+      label = result;
+    }
+    if (event) label += (label ? ", " : "") + event;
+    if (date) label += (label ? " " : "") + date;
+    return label || t("game.untitled", _lv);
+  }
   let showGameInfo = $derived.by(() => {
     void _uiVer;
     if (!games || games.length === 0) return false;
     if (games.length === 1) {
-      const h = games[0].headers;
-      if (!h.get(PRIMARY_PLAYER_KEY) && !h.get("Black")) return false;
+      return !isBlockMode || hasDisplayInfo(games[0].headers);
     }
     return hasHeaders || !isBlockMode;
   });
@@ -57,14 +79,7 @@
     if (!showGameInfo) return "";
     const slot = games![currentGameIndex ?? 0];
     if (!slot) return "";
-    const h = slot.headers;
-    const white = h.get(PRIMARY_PLAYER_KEY) || "?";
-    const black = h.get("Black") || "?";
-    const event = h.get("Event") || "";
-    const date = h.get("Date") || "";
-    const resultRaw = h.get("Result") || "";
-    const result = formatResult(resultRaw, _lv);
-    return `${white} ${result} ${black}${event ? ", " + event : ""}${date ? " " + date : ""}`;
+    return describeGame(slot.headers);
   });
 
   function prevGame() {
@@ -79,14 +94,7 @@
     if (!games) return;
     const menu = new Menu();
     games.forEach((slot, i) => {
-      const h = slot.headers;
-      const white = h.get(PRIMARY_PLAYER_KEY) || "?";
-      const black = h.get("Black") || "?";
-      const event = h.get("Event") || "";
-      const date = h.get("Date") || "";
-      const resultRaw = h.get("Result") || "";
-      const result = formatResult(resultRaw, _lv);
-      const label = `${i + 1}. ${white} ${result} ${black}${event ? ", " + event : ""}${date ? " " + date : ""}`;
+      const label = `${i + 1}. ${describeGame(slot.headers)}`;
       menu.addItem((mi) => {
         mi.setTitle(label)
           .setChecked(i === (currentGameIndex ?? 0))

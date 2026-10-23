@@ -319,6 +319,7 @@
   "game.prev": "上一局",
   "game.next": "下一局",
   "game.label": "第 {current}/{total} 局",
+  "game.untitled": "未命名对局",
   "game.select": "选择对局",
   "game.new": "新建对局",
   "game.delete": "删除对局",
