@@ -13,8 +13,8 @@ import {
   orderedTips,
   renderedTip,
   samePlyNodes,
-} from "./Actions/branch-nav";
-import { emitNodeEval } from "./Actions/shared";
+} from "../Actions/branch-nav";
+import { emitNodeEval } from "../Actions/shared";
 
 const BTN_NAMES = new Set(NAV_ACTIONS.map((a) => a.action));
 

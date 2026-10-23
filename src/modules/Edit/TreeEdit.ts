@@ -2,7 +2,7 @@ import { t } from "../../i18n";
 import type { ChessNode, IHost } from "../../types";
 import { applyAnnotationToggle } from "../../utils/annotation-glyphs";
 import { ConfirmModal } from "../../utils/confirmModal";
-import { emitNodeEval } from "./Actions/shared";
+import { emitNodeEval } from "../Actions/shared";
 
 const BTN_NAMES = new Set([
   "annotation",

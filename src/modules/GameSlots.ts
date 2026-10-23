@@ -1,7 +1,7 @@
-import { t } from "../../i18n";
-import type { GameSlot, IHost } from "../../types";
-import { ConfirmModal } from "../../utils/confirmModal";
-import { activateGame, extractHeaders } from "../Source/parse";
+import { t } from "../i18n";
+import type { GameSlot, IHost } from "../types";
+import { ConfirmModal } from "../utils/confirmModal";
+import { activateGame, extractHeaders } from "./Source/parse";
 import { isFileHost } from "./Actions/shared";
 
 export const GameSlotsModule = {

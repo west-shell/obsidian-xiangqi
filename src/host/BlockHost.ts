@@ -17,16 +17,16 @@ import { BoardClickModule } from "../modules/BoardClick";
 import { EngineModule } from "../modules/Engine/EngineModule";
 import { KeyboardNavModule } from "../modules/KeyboardNav";
 import { SourceModule } from "../modules/Source/Source";
-import { ActionsModule } from "../modules/Game/Actions";
-import { BlockHostModule } from "../modules/Game/BlockHost";
-import { BranchNavModule } from "../modules/Game/BranchNav";
-import { EditFenModule } from "../modules/Game/EditFen";
-import { EditTagsModule } from "../modules/Game/EditTags";
-import { EngineSettingsModule } from "../modules/Game/EngineSettings";
-import { GameSlotsModule } from "../modules/Game/GameSlots";
-import { ImportExportModule } from "../modules/Game/ImportExport";
-import { NavigateModule } from "../modules/Game/Navigate";
-import { TreeEditModule } from "../modules/Game/TreeEdit";
+import { ActionsModule } from "../modules/Actions";
+import { BlockHostModule } from "../modules/Hosts/BlockHost";
+import { BranchNavModule } from "../modules/Navigate/BranchNav";
+import { EditFenModule } from "../modules/Edit/EditFen";
+import { EditTagsModule } from "../modules/Edit/EditTags";
+import { EngineSettingsModule } from "../modules/Engine/EngineSettings";
+import { GameSlotsModule } from "../modules/GameSlots";
+import { ImportExportModule } from "../modules/ImportExport";
+import { NavigateModule } from "../modules/Navigate";
+import { TreeEditModule } from "../modules/Edit/TreeEdit";
 
 /**
  * Ordered module list for code-block views. The EventBus must come

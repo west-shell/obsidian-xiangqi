@@ -6,9 +6,9 @@ import {
 } from "../../chess";
 import type { ChessNode, IHost } from "../../types";
 import { extractHeaders } from "../Source/parse";
-import { pathChild } from "./Actions/branch-nav";
-import { branchTip, migrateBranchResult } from "./Actions/result";
-import { emitNodeEval } from "./Actions/shared";
+import { pathChild } from "../Actions/branch-nav";
+import { branchTip, migrateBranchResult } from "../Actions/result";
+import { emitNodeEval } from "../Actions/shared";
 
 const BTN_NAMES = new Set([
   "toStart",

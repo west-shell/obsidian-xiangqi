@@ -1,8 +1,8 @@
-import { getLang, t } from "../../i18n";
-import type { Move } from "../../chess";
-import { applySpeechSubstitutions, getMoveNotation } from "../../chess";
-import type { IHost } from "../../types";
-import { playMoveSound } from "../../utils/sound";
+import { getLang, t } from "../i18n";
+import type { Move } from "../chess";
+import { applySpeechSubstitutions, getMoveNotation } from "../chess";
+import type { IHost } from "../types";
+import { playMoveSound } from "../utils/sound";
 
 const PIECE_SPEECH_KEYS: Record<string, string> = {
   K: "speech.pieceK",

@@ -1,4 +1,4 @@
-import type { ChessNode, NodeMap } from "../../../types";
+import type { ChessNode, NodeMap } from "../../types";
 
 /**
  * Path branch navigation helpers.

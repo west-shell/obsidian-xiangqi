@@ -5,9 +5,9 @@ import {
   getFullmoveFromFen,
   serializeNodeMeta,
   stringifyPGN,
-} from "./Actions/stringify-pgn";
+} from "../Actions/stringify-pgn";
 import { ImportModal } from "./ImportModal";
-import { isFileHost } from "./Actions/shared";
+import { isFileHost } from "../Actions/shared";
 
 export const ImportExportModule = {
   init(host: IHost) {

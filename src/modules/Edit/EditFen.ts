@@ -10,7 +10,7 @@ import { t } from "../../i18n";
 import type { IHost } from "../../types";
 import { validateFen } from "../../utils/chessEngine";
 import { ConfirmModal } from "../../utils/confirmModal";
-import { emitNodeEval } from "./Actions/shared";
+import { emitNodeEval } from "../Actions/shared";
 
 const BTN_NAMES = new Set([
   "edit-board",

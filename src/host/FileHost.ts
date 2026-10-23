@@ -13,17 +13,17 @@ import type { ISettings } from "../types";
 import { NAV_ACTIONS } from "../utils/nav-actions";
 import { BoardClickModule } from "../modules/BoardClick";
 import { EngineModule } from "../modules/Engine/EngineModule";
-import { ActionsModule } from "../modules/Game/Actions";
-import { BranchNavModule } from "../modules/Game/BranchNav";
-import { EditFenModule } from "../modules/Game/EditFen";
-import { EditTagsModule } from "../modules/Game/EditTags";
-import { EngineSettingsModule } from "../modules/Game/EngineSettings";
-import { FileHostModule } from "../modules/Game/FileHost";
-import { GameSlotsModule } from "../modules/Game/GameSlots";
-import { ImportExportModule } from "../modules/Game/ImportExport";
-import { NavigateModule } from "../modules/Game/Navigate";
-import { SpeakerModule } from "../modules/Game/Speak";
-import { TreeEditModule } from "../modules/Game/TreeEdit";
+import { ActionsModule } from "../modules/Actions";
+import { BranchNavModule } from "../modules/Navigate/BranchNav";
+import { EditFenModule } from "../modules/Edit/EditFen";
+import { EditTagsModule } from "../modules/Edit/EditTags";
+import { EngineSettingsModule } from "../modules/Engine/EngineSettings";
+import { FileHostModule } from "../modules/Hosts/FileHost";
+import { GameSlotsModule } from "../modules/GameSlots";
+import { ImportExportModule } from "../modules/ImportExport";
+import { NavigateModule } from "../modules/Navigate";
+import { SpeakerModule } from "../modules/Speak";
+import { TreeEditModule } from "../modules/Edit/TreeEdit";
 
 /**
  * Ordered module list for the PGN file view. The EventBus must come

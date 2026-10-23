@@ -1,4 +1,4 @@
-import type { IFileHost, IHost } from "../../../types";
+import type { IFileHost, IHost } from "../../types";
 
 export function isFileHost(h: IHost): h is IFileHost {
   return "saveFile" in h && typeof (h as IFileHost).saveFile === "function";

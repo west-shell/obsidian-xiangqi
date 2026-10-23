@@ -3,7 +3,7 @@ import { Modal, Setting } from "obsidian";
 import { t } from "../../i18n";
 import type { IHost } from "../../types";
 import { extractHeaders } from "../Source/parse";
-import { emitNodeEval } from "./Actions/shared";
+import { emitNodeEval } from "../Actions/shared";
 
 export const EditTagsModule = {
   init(host: IHost) {
