@@ -6,8 +6,8 @@ import type { ChessNode } from "../src/types";
 import {
   branchTip,
   migrateBranchResult,
-} from "../src/modules/Tree/Actions/result";
-import { stringifyPGN } from "../src/modules/Tree/Actions/stringify-pgn";
+} from "../src/modules/Game/Actions/result";
+import { stringifyPGN } from "../src/modules/Game/Actions/stringify-pgn";
 
 function makeNode(id: string, result?: string): ChessNode {
   return {

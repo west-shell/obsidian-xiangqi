@@ -1,7 +1,7 @@
 import { CLS_PREFIX } from "../../../chess";
 import type { IBlockHost, IHost } from "../../../types";
 import { mount, unmount } from "svelte";
-import Chess from "../../../lib/Tree/Chess.svelte";
+import Chess from "../../../lib/Game/Chess.svelte";
 import { isFileHost } from "./shared";
 
 export const ActionsModule = {

@@ -8,7 +8,7 @@ import {
   formatSeconds,
   getPlayerInfo,
   initialClockSeconds,
-} from "../src/lib/Tree/player";
+} from "../src/lib/Game/player";
 
 function headersOf(entries: Record<string, string>): Map<string, string> {
   return new Map(Object.entries(entries));
