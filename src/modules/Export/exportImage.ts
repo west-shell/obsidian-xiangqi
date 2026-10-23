@@ -1,8 +1,8 @@
 import { toCanvas } from "html-to-image";
 import * as gifenc from "gifenc";
-import type { Api, Config } from "../chess";
-import { BOARD_ASPECT_RATIO, Chessground, CLS_PREFIX } from "../chess";
-import type { ChessNode, IHost } from "../types";
+import type { Api, Config } from "../../chess";
+import { BOARD_ASPECT_RATIO, Chessground, CLS_PREFIX } from "../../chess";
+import type { ChessNode, IHost } from "../../types";
 
 /** Rendered pixel size (width) of exported PNG images. */
 export const EXPORT_PNG_SIZE = 1024;

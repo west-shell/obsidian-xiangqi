@@ -1,7 +1,7 @@
-import { DownloadModal } from "../../utils/confirmModal";
 import { requestUrl } from "obsidian";
 import { t } from "../../i18n";
 import { BaseEngine, type EngineResult } from "./BaseEngine";
+import { DownloadModal } from "./DownloadModal";
 
 export type { EngineResult };
 

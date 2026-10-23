@@ -4,12 +4,13 @@ import {
   registerFileModule,
 } from "../../core/module-system";
 import type { ChessNode, IHost } from "../../types";
-import { ExportModal, ImportModal } from "../../utils/confirmModal";
+import { promptExport } from "../Export";
 import {
   getFullmoveFromFen,
   serializeNodeMeta,
   stringifyPGN,
 } from "./Actions/stringify-pgn";
+import { ImportModal } from "./ImportModal";
 import { isFileHost } from "./Actions/shared";
 
 const ImportExportModule = {
@@ -29,13 +30,9 @@ const ImportExportModule = {
     });
 
     eventBus.on("export", () => {
-      const modal = new ExportModal(
-        host.plugin.app,
-        host,
-        (inclComments, inclEval) =>
-          stringifyCurrentBranchPGN(host, inclComments, inclEval),
+      promptExport(host, (inclComments, inclEval) =>
+        stringifyCurrentBranchPGN(host, inclComments, inclEval),
       );
-      modal.open();
     });
   },
 };
