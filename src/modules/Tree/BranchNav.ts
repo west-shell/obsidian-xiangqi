@@ -1,7 +1,3 @@
-import {
-  registerBlockModule,
-  registerFileModule,
-} from "../../core/module-system";
 import type { ChessNode, IHost } from "../../types";
 import { NAV_ACTIONS } from "../../utils/nav-actions";
 import {
@@ -22,7 +18,7 @@ import { emitNodeEval } from "./Actions/shared";
 
 const BTN_NAMES = new Set(NAV_ACTIONS.map((a) => a.action));
 
-const BranchNavModule = {
+export const BranchNavModule = {
   init(host: IHost) {
     const eventBus = host.eventBus;
 
@@ -191,6 +187,3 @@ const BranchNavModule = {
     });
   },
 };
-
-registerFileModule("branchNav", BranchNavModule);
-registerBlockModule("branchNav", BranchNavModule);

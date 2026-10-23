@@ -1,14 +1,10 @@
 import { CLS_PREFIX } from "../../../chess";
-import {
-  registerBlockModule,
-  registerFileModule,
-} from "../../../core/module-system";
 import type { IBlockHost, IHost } from "../../../types";
 import { mount, unmount } from "svelte";
 import Chess from "../../../lib/Tree/Chess.svelte";
 import { isFileHost } from "./shared";
 
-const ActionsModule = {
+export const ActionsModule = {
   init(host: IHost) {
     const eventBus = host.eventBus;
 
@@ -86,6 +82,3 @@ const ActionsModule = {
     });
   },
 };
-
-registerFileModule("actions", ActionsModule);
-registerBlockModule("actions", ActionsModule);

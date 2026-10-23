@@ -1,4 +1,3 @@
-import { registerBlockModule } from "../../core/module-system";
 import {
   DEFAULT_FEN,
   FEN_REGEX,
@@ -45,7 +44,7 @@ function extractFEN(source: string): string {
   return fen ?? DEFAULT_FEN;
 }
 
-const SourceModule = {
+export const SourceModule = {
   init(host: IBlockHost) {
     const eventBus = host.eventBus;
     eventBus.on<string>("load", (renderChild) => {
@@ -115,5 +114,3 @@ const SourceModule = {
     });
   },
 };
-
-registerBlockModule("source", SourceModule);

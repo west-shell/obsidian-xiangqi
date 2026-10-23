@@ -1,5 +1,3 @@
-import { registerBlockModule, registerFileModule } from "./module-system";
-
 type EventType = string | symbol;
 type Handler<T = unknown> = (payload?: T) => void | Promise<void>;
 
@@ -92,7 +90,3 @@ export class EventBus {
     return this.handlers.get(event)?.size ?? 0;
   }
 }
-
-// 注册模块
-registerFileModule("eventBus", EventBus);
-registerBlockModule("eventBus", EventBus);

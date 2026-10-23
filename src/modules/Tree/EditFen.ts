@@ -6,10 +6,6 @@ import {
   randomChess960Fen,
 } from "../../chess";
 import { Notice } from "obsidian";
-import {
-  registerBlockModule,
-  registerFileModule,
-} from "../../core/module-system";
 import { t } from "../../i18n";
 import type { IHost } from "../../types";
 import { validateFen } from "../../utils/chessEngine";
@@ -28,7 +24,7 @@ const BTN_NAMES = new Set([
   "flip",
 ]);
 
-const EditFenModule = {
+export const EditFenModule = {
   init(host: IHost) {
     const eventBus = host.eventBus;
 
@@ -164,9 +160,6 @@ const EditFenModule = {
     });
   },
 };
-
-registerFileModule("editFen", EditFenModule);
-registerBlockModule("editFen", EditFenModule);
 
 function updateFenTag(tags: string, newFen: string): string {
   if (tags.includes('[FEN "')) {

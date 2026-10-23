@@ -1,9 +1,8 @@
-import { registerFileModule } from "../../core/module-system";
 import type { IFileHost } from "../../types";
 import { activateGame, splitPGN } from "../Source/parse";
 import { promptSaveEval } from "../../utils/saveEval";
 
-const FileHostModule = {
+export const FileHostModule = {
   init(host: IFileHost) {
     const eventBus = host.eventBus;
 
@@ -51,5 +50,3 @@ const FileHostModule = {
     });
   },
 };
-
-registerFileModule("fileHost", FileHostModule);

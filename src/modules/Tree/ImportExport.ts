@@ -1,8 +1,4 @@
 import { DEFAULT_FEN, getSaveNotation } from "../../chess";
-import {
-  registerBlockModule,
-  registerFileModule,
-} from "../../core/module-system";
 import type { ChessNode, IHost } from "../../types";
 import { promptExport } from "../Export";
 import {
@@ -13,7 +9,7 @@ import {
 import { ImportModal } from "./ImportModal";
 import { isFileHost } from "./Actions/shared";
 
-const ImportExportModule = {
+export const ImportExportModule = {
   init(host: IHost) {
     const eventBus = host.eventBus;
 
@@ -36,9 +32,6 @@ const ImportExportModule = {
     });
   },
 };
-
-registerFileModule("importExport", ImportExportModule);
-registerBlockModule("importExport", ImportExportModule);
 
 function stringifyCurrentBranchPGN(
   host: IHost,

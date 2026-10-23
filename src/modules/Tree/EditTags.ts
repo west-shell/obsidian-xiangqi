@@ -1,15 +1,11 @@
 import { PRIMARY_PLAYER_KEY } from "../../chess";
 import { Modal, Setting } from "obsidian";
-import {
-  registerBlockModule,
-  registerFileModule,
-} from "../../core/module-system";
 import { t } from "../../i18n";
 import type { IHost } from "../../types";
 import { extractHeaders } from "../Source/parse";
 import { emitNodeEval } from "./Actions/shared";
 
-const EditTagsModule = {
+export const EditTagsModule = {
   init(host: IHost) {
     const eventBus = host.eventBus;
 
@@ -104,6 +100,3 @@ const EditTagsModule = {
     );
   },
 };
-
-registerFileModule("editTags", EditTagsModule);
-registerBlockModule("editTags", EditTagsModule);

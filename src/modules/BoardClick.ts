@@ -1,5 +1,4 @@
 import { Chess, HAS_PROMOTION, isPromotionRank, type Square } from "../chess";
-import { registerBlockModule, registerFileModule } from "../core/module-system";
 import type { IHost } from "../types";
 
 type TryMovePayload = { from: Square; to: Square };
@@ -73,7 +72,7 @@ function handleEditClick(host: IHost, clickedKey: Square): void {
   }
 }
 
-const BoardClickModule = {
+export const BoardClickModule = {
   init(host: IHost) {
     const eventBus = host.eventBus;
     const chess = new Chess();
@@ -98,6 +97,3 @@ const BoardClickModule = {
     });
   },
 };
-
-registerFileModule("BoardClick", BoardClickModule);
-registerBlockModule("BoardClick", BoardClickModule);

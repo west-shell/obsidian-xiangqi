@@ -1,4 +1,3 @@
-import { registerBlockModule } from "../core/module-system";
 import type { IBlockHost } from "../types";
 
 const CTRL_ACTION_BY_KEY: Record<string, string> = {
@@ -36,7 +35,7 @@ const CTRL_SHIFT_ACTION_BY_KEY: Record<string, string> = {
  * (textarea/input/CodeMirror editor) has focus. Ctrl+Alt (without
  * Shift) and bare Shift combos have no action.
  */
-const KeyboardNavModule = {
+export const KeyboardNavModule = {
   init(host: IBlockHost) {
     const container = host.containerEl;
     const doc = container.ownerDocument;
@@ -75,5 +74,3 @@ const KeyboardNavModule = {
     });
   },
 };
-
-registerBlockModule("keyboardNav", KeyboardNavModule);

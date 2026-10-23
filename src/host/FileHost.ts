@@ -1,29 +1,50 @@
-import "../core/event-bus";
-import "../modules/BoardClick";
-import "../modules/Tree/FileHost";
-import "../modules/Tree/Actions";
-import "../modules/Tree/Navigate";
-import "../modules/Tree/BranchNav";
-import "../modules/Tree/TreeEdit";
-import "../modules/Tree/GameSlots";
-import "../modules/Tree/EditFen";
-import "../modules/Tree/EditTags";
-import "../modules/Tree/ImportExport";
-import "../modules/Tree/EngineSettings";
-import "../modules/Tree/Speak";
-import "../modules/Engine/EngineModule";
-
 import { Scope, TextFileView, type WorkspaceLeaf } from "obsidian";
 
-import { type EventBus } from "../core/event-bus";
+import { EventBus } from "../core/event-bus";
 import {
-  createFileModuleRegistry,
-  destroyFileModuleRegistry,
+  type ChessModule,
+  destroyModules,
+  initModules,
+  type ModuleInstance,
 } from "../core/module-system";
 import type ChessPlugin from "../main";
 import { RIBBON_ICON } from "../chess";
 import type { ISettings } from "../types";
 import { NAV_ACTIONS } from "../utils/nav-actions";
+import { BoardClickModule } from "../modules/BoardClick";
+import { EngineModule } from "../modules/Engine/EngineModule";
+import { ActionsModule } from "../modules/Tree/Actions";
+import { BranchNavModule } from "../modules/Tree/BranchNav";
+import { EditFenModule } from "../modules/Tree/EditFen";
+import { EditTagsModule } from "../modules/Tree/EditTags";
+import { EngineSettingsModule } from "../modules/Tree/EngineSettings";
+import { FileHostModule } from "../modules/Tree/FileHost";
+import { GameSlotsModule } from "../modules/Tree/GameSlots";
+import { ImportExportModule } from "../modules/Tree/ImportExport";
+import { NavigateModule } from "../modules/Tree/Navigate";
+import { SpeakerModule } from "../modules/Tree/Speak";
+import { TreeEditModule } from "../modules/Tree/TreeEdit";
+
+/**
+ * Ordered module list for the PGN file view. The EventBus must come
+ * first — every other module reads `host.eventBus` in its init.
+ */
+const FILE_MODULES: ChessModule[] = [
+  EventBus,
+  BoardClickModule,
+  FileHostModule,
+  ActionsModule,
+  NavigateModule,
+  BranchNavModule,
+  TreeEditModule,
+  GameSlotsModule,
+  EditFenModule,
+  EditTagsModule,
+  ImportExportModule,
+  EngineSettingsModule,
+  SpeakerModule,
+  EngineModule,
+];
 
 export class FileHost extends TextFileView {
   static readonly VIEW_TYPE = "PGN_VIEW";
@@ -31,6 +52,7 @@ export class FileHost extends TextFileView {
   eventBus!: EventBus;
   generation = 0;
   pathChoices = new Map<string, number>();
+  private moduleInstances: ModuleInstance[] = [];
   constructor(
     leaf: WorkspaceLeaf,
     public plugin: ChessPlugin,
@@ -38,7 +60,7 @@ export class FileHost extends TextFileView {
     super(leaf);
     this.settings = this.plugin.settings;
     this.data = "";
-    createFileModuleRegistry(this);
+    this.moduleInstances = initModules(this, FILE_MODULES);
   }
 
   setViewData(data: string, clear: boolean = true): void {
@@ -119,7 +141,7 @@ export class FileHost extends TextFileView {
     return this.data;
   }
 
-  getDisplayText() {
+  getDisplayText(): string {
     if (this.file) {
       return this.file.basename;
     }
@@ -131,6 +153,7 @@ export class FileHost extends TextFileView {
   }
 
   clear(): void {
-    destroyFileModuleRegistry(this);
+    destroyModules(this.moduleInstances);
+    this.moduleInstances = [];
   }
 }

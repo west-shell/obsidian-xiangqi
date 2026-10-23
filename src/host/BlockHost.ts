@@ -1,34 +1,61 @@
-import "../core/event-bus";
-import "../modules/BoardClick";
-import "../modules/Tree/BlockHost";
-import "../modules/Tree/Actions";
-import "../modules/Tree/Navigate";
-import "../modules/Tree/BranchNav";
-import "../modules/Tree/TreeEdit";
-import "../modules/Tree/GameSlots";
-import "../modules/Tree/EditFen";
-import "../modules/Tree/EditTags";
-import "../modules/Tree/ImportExport";
-import "../modules/Tree/EngineSettings";
-import "../modules/KeyboardNav";
-import "../modules/Engine/EngineModule";
-
 import {
   type MarkdownPostProcessorContext,
   MarkdownRenderChild,
 } from "obsidian";
 
-import type { EventBus } from "../core/event-bus";
-import { createBlockModuleRegistry } from "../core/module-system";
+import { EventBus } from "../core/event-bus";
+import {
+  type ChessModule,
+  destroyModules,
+  initModules,
+  type ModuleInstance,
+} from "../core/module-system";
 import { CLS_PREFIX } from "../chess";
 import type ChessPlugin from "../main";
 import type { ISettings } from "../types";
+import { BoardClickModule } from "../modules/BoardClick";
+import { EngineModule } from "../modules/Engine/EngineModule";
+import { KeyboardNavModule } from "../modules/KeyboardNav";
+import { SourceModule } from "../modules/Source/Source";
+import { ActionsModule } from "../modules/Tree/Actions";
+import { BlockHostModule } from "../modules/Tree/BlockHost";
+import { BranchNavModule } from "../modules/Tree/BranchNav";
+import { EditFenModule } from "../modules/Tree/EditFen";
+import { EditTagsModule } from "../modules/Tree/EditTags";
+import { EngineSettingsModule } from "../modules/Tree/EngineSettings";
+import { GameSlotsModule } from "../modules/Tree/GameSlots";
+import { ImportExportModule } from "../modules/Tree/ImportExport";
+import { NavigateModule } from "../modules/Tree/Navigate";
+import { TreeEditModule } from "../modules/Tree/TreeEdit";
+
+/**
+ * Ordered module list for code-block views. The EventBus must come
+ * first — every other module reads `host.eventBus` in its init.
+ */
+const BLOCK_MODULES: ChessModule[] = [
+  EventBus,
+  BoardClickModule,
+  SourceModule,
+  BlockHostModule,
+  ActionsModule,
+  NavigateModule,
+  BranchNavModule,
+  TreeEditModule,
+  GameSlotsModule,
+  EditFenModule,
+  EditTagsModule,
+  ImportExportModule,
+  EngineSettingsModule,
+  KeyboardNavModule,
+  EngineModule,
+];
 
 export class BlockHost extends MarkdownRenderChild {
   settings: ISettings;
   eventBus!: EventBus;
   generation = 0;
   pathChoices = new Map<string, number>();
+  private moduleInstances: ModuleInstance[] = [];
   constructor(
     public containerEl: HTMLElement,
     public ctx: MarkdownPostProcessorContext,
@@ -38,7 +65,7 @@ export class BlockHost extends MarkdownRenderChild {
     super(containerEl);
     this.settings = this.plugin.settings;
     containerEl.classList.add(`${CLS_PREFIX}-block`);
-    createBlockModuleRegistry(this);
+    this.moduleInstances = initModules(this, BLOCK_MODULES);
   }
 
   onload(): void {
@@ -63,5 +90,7 @@ export class BlockHost extends MarkdownRenderChild {
   onunload(): void {
     this.plugin.instances.delete(this);
     this.eventBus.emit("unload");
+    destroyModules(this.moduleInstances);
+    this.moduleInstances = [];
   }
 }

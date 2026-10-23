@@ -1,7 +1,3 @@
-import {
-  registerBlockModule,
-  registerFileModule,
-} from "../../core/module-system";
 import { getLang, t } from "../../i18n";
 import type { Move } from "../../chess";
 import { applySpeechSubstitutions, getMoveNotation } from "../../chess";
@@ -92,7 +88,7 @@ function speak(move: Move) {
   window.speechSynthesis.speak(utter);
 }
 
-const SpeakerModule = {
+export const SpeakerModule = {
   init(host: IHost) {
     const eventBus = host.eventBus;
     let lastSpokenNodeId: string | null = null;
@@ -118,6 +114,3 @@ const SpeakerModule = {
     });
   },
 };
-
-registerFileModule("speech", SpeakerModule);
-registerBlockModule("speech", SpeakerModule);

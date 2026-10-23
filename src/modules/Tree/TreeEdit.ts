@@ -1,7 +1,3 @@
-import {
-  registerBlockModule,
-  registerFileModule,
-} from "../../core/module-system";
 import { t } from "../../i18n";
 import type { ChessNode, IHost } from "../../types";
 import { applyAnnotationToggle } from "../../utils/annotation-glyphs";
@@ -17,7 +13,7 @@ const BTN_NAMES = new Set([
   "moveDown",
 ]);
 
-const TreeEditModule = {
+export const TreeEditModule = {
   init(host: IHost) {
     const eventBus = host.eventBus;
 
@@ -175,6 +171,3 @@ const TreeEditModule = {
     );
   },
 };
-
-registerFileModule("treeEdit", TreeEditModule);
-registerBlockModule("treeEdit", TreeEditModule);

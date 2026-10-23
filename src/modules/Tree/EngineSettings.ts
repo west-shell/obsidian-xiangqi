@@ -1,13 +1,9 @@
 import { CLS_PREFIX } from "../../chess";
 import { Modal } from "obsidian";
-import {
-  registerBlockModule,
-  registerFileModule,
-} from "../../core/module-system";
 import { t } from "../../i18n";
 import type { IHost } from "../../types";
 
-const EngineSettingsModule = {
+export const EngineSettingsModule = {
   init(host: IHost) {
     const eventBus = host.eventBus;
 
@@ -118,6 +114,3 @@ const EngineSettingsModule = {
     });
   },
 };
-
-registerFileModule("engineSettings", EngineSettingsModule);
-registerBlockModule("engineSettings", EngineSettingsModule);

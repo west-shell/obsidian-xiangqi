@@ -4,10 +4,6 @@ import {
   matchMove,
   type Move,
 } from "../../chess";
-import {
-  registerBlockModule,
-  registerFileModule,
-} from "../../core/module-system";
 import type { ChessNode, IHost } from "../../types";
 import { extractHeaders } from "../Source/parse";
 import { pathChild } from "./Actions/branch-nav";
@@ -22,7 +18,7 @@ const BTN_NAMES = new Set([
   "open-analysis",
 ]);
 
-const NavigateModule = {
+export const NavigateModule = {
   init(host: IHost) {
     const eventBus = host.eventBus;
 
@@ -204,9 +200,6 @@ const NavigateModule = {
     });
   },
 };
-
-registerFileModule("navigate", NavigateModule);
-registerBlockModule("navigate", NavigateModule);
 
 // Rewrite the [Result] header tag to match the mainline's result. The
 // tag is display/export metadata only — results are set per branch

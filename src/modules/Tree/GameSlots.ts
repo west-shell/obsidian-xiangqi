@@ -1,14 +1,10 @@
-import {
-  registerBlockModule,
-  registerFileModule,
-} from "../../core/module-system";
 import { t } from "../../i18n";
 import type { GameSlot, IHost } from "../../types";
 import { ConfirmModal } from "../../utils/confirmModal";
 import { activateGame, extractHeaders } from "../Source/parse";
 import { isFileHost } from "./Actions/shared";
 
-const GameSlotsModule = {
+export const GameSlotsModule = {
   init(host: IHost) {
     const eventBus = host.eventBus;
 
@@ -80,6 +76,3 @@ const GameSlotsModule = {
     });
   },
 };
-
-registerFileModule("gameSlots", GameSlotsModule);
-registerBlockModule("gameSlots", GameSlotsModule);

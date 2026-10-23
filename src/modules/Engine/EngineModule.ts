@@ -1,10 +1,6 @@
 import type { ChessNode, IHost, NodeEval, PvLine } from "../../types";
 import type { Move } from "../../chess";
 import { moveToUci } from "../../chess";
-import {
-  registerBlockModule,
-  registerFileModule,
-} from "../../core/module-system";
 import { engine } from "./Engine";
 import { computeGlyph } from "../../utils/winningChances";
 
@@ -450,5 +446,4 @@ function initEngine(host: object) {
   };
 }
 
-registerBlockModule("engine", { init: initEngine });
-registerFileModule("engine", { init: initEngine });
+export const EngineModule = { init: initEngine };

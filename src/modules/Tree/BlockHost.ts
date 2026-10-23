@@ -1,14 +1,11 @@
-import "../Source/Source";
-
 import { MarkdownView, Notice } from "obsidian";
 
-import { registerBlockModule } from "../../core/module-system";
 import type { IBlockHost } from "../../types";
 import { DEFAULT_FEN } from "../../types";
 import { promptSaveEval } from "../../utils/saveEval";
 import { t } from "../../i18n";
 
-const BlockHostModule = {
+export const BlockHostModule = {
   init(host: IBlockHost) {
     const eventBus = host.eventBus;
 
@@ -92,5 +89,3 @@ const BlockHostModule = {
     });
   },
 };
-
-registerBlockModule("blockHost", BlockHostModule);
