@@ -38,7 +38,7 @@ export const ActionsModule = {
         isFenMode: host.isFenMode,
         selectedPiece: host.selectedPiece,
         plugin: host.plugin,
-        games: host.games,
+        games: [...host.games],
         currentGameIndex: host.currentGameIndex,
         isBlockMode: !isFileHost(host),
       };
