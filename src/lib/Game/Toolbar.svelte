@@ -16,6 +16,7 @@
     settings?: ISettings;
     plugin?: ChessPlugin;
     rotated?: boolean;
+    isBlockMode?: boolean;
     /** Current tree node, for the annotation menu's checked state. */
     getCurrentNode?: () => ChessNode | null;
   }
@@ -25,6 +26,7 @@
     settings,
     plugin,
     rotated = false,
+    isBlockMode = false,
     getCurrentNode,
   }: Props = $props();
 
@@ -233,6 +235,14 @@
     });
 
     menu.addSeparator();
+
+    if (!isBlockMode) {
+      menu.addItem((mi) => {
+        mi.setTitle(t("game.new", _lv))
+          .setIcon("plus")
+          .onClick(() => eventBus.emit("create-game"));
+      });
+    }
 
     menu.addItem((mi) => {
       mi.setTitle(t("toolbar.import", _lv))

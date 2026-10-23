@@ -485,6 +485,7 @@
       {settings}
       {plugin}
       {rotated}
+      {isBlockMode}
       getCurrentNode={() => currentNode}
     />
     <Panel
