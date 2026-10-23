@@ -201,7 +201,8 @@ export interface IHost {
   pathChoices: Map<string, number>;
   /**
    * Ids of nodes whose extra children are folded away in the tree graph
-   * (mirrored from Tree.svelte via the "folded-changed" event). Absent
+   * (mirrored from panel/TreeGraph.svelte via the "folded-changed"
+   * event). Absent
    * until the first mirror arrives; treat as "nothing folded".
    */
   foldedNodes?: Set<string>;

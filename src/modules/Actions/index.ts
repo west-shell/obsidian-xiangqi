@@ -76,7 +76,8 @@ export const ActionsModule = {
       }
     });
 
-    // Mirror of Tree.svelte's fold state (pure data, no UI update).
+    // Mirror of panel/TreeGraph.svelte's fold state (pure data, no UI
+    // update).
     eventBus.on<Set<string>>("folded-changed", (folded) => {
       host.foldedNodes = folded;
     });

@@ -9,7 +9,7 @@
     GRID_SVG,
     type Square,
     WRAP_CLASS,
-  } from "../../chess";
+  } from "../../../chess";
 
   interface Props {
     fen: string;

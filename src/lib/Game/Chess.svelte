@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Tree from "./Tree.svelte";
+  import Panel from "./panel/Panel.svelte";
   import Board from "../Board.svelte";
   import Toolbar from "./Toolbar.svelte";
   import PieceBTNs from "../GenFEN/PieceBTNs.svelte";
@@ -487,7 +487,7 @@
       {rotated}
       getCurrentNode={() => currentNode}
     />
-    <Tree
+    <Panel
       {nodeMap}
       {eventBus}
       {currentNode}

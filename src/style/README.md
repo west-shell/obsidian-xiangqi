@@ -39,26 +39,26 @@ FileHost   contentEl  ─── .view-content.ct-file-view
           │    └─ .ct-player-bar[--bottom]
           ├─ Toolbar.svelte ─── .ct-toolbar
           │    └─ button.ct-btn [--saved/--unsaved/--engine/--busy]
-          ├─ Tree.svelte ─── .ct-layout__panel
-          │    ├─ .ct-gamenav
-          │    │    ├─ .ct-gamenav__info > .ct-gamenav__title + .ct-gamenav__index
-          │    │    └─ .ct-gamenav__arrows > button.ct-btn.ct-gamenav__arrow
-          │    ├─ .ct-panel__row
-          │    │    ├─ .ct-panel__canvas
-          │    │    │    ├─ .ct-eval > .ct-eval__bar > .ct-eval__fill
-          │    │    │    │                    + .ct-eval__center + .ct-eval__label
-          │    │    │    ├─ svg.ct-panel__svg > g.ct-panel__node
-          │    │    │    ├─ .ct-panel__toolbar.ct-btn-group > button.ct-btn
-          │    │    │    └─ .ct-slider [--eval/--dragging]
-          │    │    │         ├─ button.ct-slider__btn [--start/--prev/--next/--end]
-          │    │    │         └─ .ct-slider__track > svg.ct-slider__chart
-          │    │    │                       + .ct-slider__thumb + .ct-slider__label
-          │    │    └─ .ct-moves > li.ct-moves__row [--start]
-          │    │              > span.ct-moves__num + span.ct-moves__move
-          │    │                [--white/--black/--active/--start]
-          │    └─ .ct-panel__comment
-          │         ├─ textarea.ct-comment__input [--auto]
-          │         └─ button.ct-btn.ct-comment__toggle
+           ├─ panel/Panel.svelte ─── .ct-layout__panel
+           │    ├─ panel/GameNav.svelte ─── .ct-gamenav
+           │    │    ├─ .ct-gamenav__info > .ct-gamenav__title + .ct-gamenav__index
+           │    │    └─ .ct-gamenav__arrows > button.ct-btn.ct-gamenav__arrow
+           │    ├─ .ct-panel__row
+           │    │    ├─ .ct-panel__canvas
+           │    │    │    ├─ .ct-eval > .ct-eval__bar > .ct-eval__fill
+           │    │    │    │                    + .ct-eval__center + .ct-eval__label
+           │    │    │    ├─ panel/TreeGraph.svelte ─── svg.ct-panel__svg > g.ct-panel__node
+           │    │    │    ├─ .ct-panel__toolbar.ct-btn-group > button.ct-btn
+           │    │    │    ├─ panel/NavSlider.svelte ─── .ct-slider [--eval/--dragging]
+           │    │    │         ├─ button.ct-slider__btn [--start/--prev/--next/--end]
+           │    │    │         └─ .ct-slider__track > svg.ct-slider__chart
+           │    │    │                       + .ct-slider__thumb + .ct-slider__label
+           │    │    └─ panel/MoveList.svelte ─── .ct-moves > li.ct-moves__row [--start]
+           │    │              > span.ct-moves__num + span.ct-moves__move
+           │    │                [--white/--black/--active/--start]
+           │    └─ panel/CommentBox.svelte ─── .ct-panel__comment
+           │         ├─ textarea.ct-comment__input [--auto]
+           │         └─ button.ct-btn.ct-comment__toggle
           └─ FEN 编辑模式 (.ct-layout--edit)
                ├─ .ct-layout__palette
                │    └─ button.ct-palette__btn [--white/--black/--active/--empty]

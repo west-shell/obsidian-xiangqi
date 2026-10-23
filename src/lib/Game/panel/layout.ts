@@ -7,7 +7,7 @@
  *   - 用轮廓行走消除重叠
  */
 
-import type { ChessNode, NodeMap } from "../../types";
+import type { ChessNode, NodeMap } from "../../../types";
 
 // ─── 内部节点 ───────────────────────
 
