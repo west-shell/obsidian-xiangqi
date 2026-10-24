@@ -26,6 +26,11 @@ export interface AnnotationGlyph {
   category: AnnotationCategory;
   /** i18n key under "annotation.". */
   nameKey: string;
+  /**
+   * Which side's name fills the "{side}" placeholder in the i18n label
+   * ("first" = White/Red, "second" = Black). Absent for side-neutral glyphs.
+   */
+  side?: "first" | "second";
   /** Badge background colour. */
   color: string;
   /** Lucide icon name (custom annotations only). */
@@ -38,6 +43,7 @@ const entry = (
   category: AnnotationCategory,
   nameKey: string,
   color: string,
+  side?: "first" | "second",
 ): AnnotationGlyph => ({
   key: String(nag),
   nag,
@@ -45,6 +51,7 @@ const entry = (
   category,
   nameKey,
   color,
+  side,
 });
 
 /**
@@ -66,8 +73,8 @@ export const STUDY_GLYPHS: AnnotationGlyph[] = [
   // (src/utils/icon.ts BADGE_DEFS); $13 keeps lila's badge colour.
   entry(10, "=", "position", "annotation.equal", "#82c2ef"),
   entry(13, "∞", "position", "annotation.unclear", "#f5918f"),
-  entry(16, "±", "position", "annotation.wBetter", "#22ac38"),
-  entry(17, "∓", "position", "annotation.bBetter", "#df5353"),
+  entry(16, "±", "position", "annotation.sideBetter", "#22ac38", "first"),
+  entry(17, "∓", "position", "annotation.sideBetter", "#df5353", "second"),
   // -- legacy custom annotations (kept verbatim, private #a: format) --
   {
     key: "bm",

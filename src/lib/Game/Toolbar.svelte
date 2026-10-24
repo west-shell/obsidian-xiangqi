@@ -1,7 +1,12 @@
 <script lang="ts">
   import { addIcon, Menu, setIcon } from "obsidian";
   import { onDestroy } from "svelte";
-  import { ANALYSIS_SITES, CLS_PREFIX } from "../../chess";
+  import {
+    ANALYSIS_SITES,
+    CLS_PREFIX,
+    FIRST_SIDE_KEY,
+    SECOND_SIDE_KEY,
+  } from "../../chess";
   import { BOARD_THEME_PICKER, PIECE_SET_PICKER } from "../../style/themes";
   import type { EventBus } from "../../core/event-bus";
   import type { ChessNode, IOptions, ISettings } from "../../types";
@@ -179,7 +184,12 @@
     (["move", "position", "custom"] as const).map((category) => ({
       category,
       items: STUDY_GLYPHS.filter((g) => g.category === category).map((g) => ({
-        title: t(g.nameKey, v),
+        title: g.side
+          ? t(g.nameKey, v).replace(
+              "{side}",
+              t(g.side === "first" ? FIRST_SIDE_KEY : SECOND_SIDE_KEY, v),
+            )
+          : t(g.nameKey, v),
         symbol: g.symbol,
         key: g.key,
       })),
@@ -510,15 +520,19 @@
     menu.addSeparator();
 
     menu.addItem((mi) => {
-      mi.setTitle(t("toolbar.simWhite", _lv))
-        .setIcon("sun")
+      mi.setTitle(
+        t("toolbar.simSide", _lv).replace("{side}", t(FIRST_SIDE_KEY, _lv)),
+      )
+        .setIcon("bot")
         .setChecked(simWhite)
         .onClick(() => eventBus.emit("engine-sim-toggle", "white"));
     });
 
     menu.addItem((mi) => {
-      mi.setTitle(t("toolbar.simBlack", _lv))
-        .setIcon("moon")
+      mi.setTitle(
+        t("toolbar.simSide", _lv).replace("{side}", t(SECOND_SIDE_KEY, _lv)),
+      )
+        .setIcon("bot")
         .setChecked(simBlack)
         .onClick(() => eventBus.emit("engine-sim-toggle", "black"));
     });
