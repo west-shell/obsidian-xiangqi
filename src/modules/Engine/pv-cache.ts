@@ -17,6 +17,10 @@ export function evalFromPvLine(pv: PvLine, depth: number): NodeEval {
     score: pv.score,
     scoreType: pv.scoreType,
     depth,
+    // Flag the eval as attributed (line horizon shrinks per move), so a
+    // consumer needing a full-depth search of this exact position can
+    // tell it apart from one actually searched here.
+    derived: true,
     bestmove: rest.length > 0 ? rest[0] : undefined,
     ponder: rest.length > 1 ? rest[1] : undefined,
     pvs:

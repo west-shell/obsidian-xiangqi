@@ -95,6 +95,14 @@ export type NodeEval = {
   bestmove?: string;
   ponder?: string;
   pvs?: PvLine[];
+  /**
+   * True when this eval was attributed from an ancestor's search PV line
+   * instead of a search run at this node. The nominal depth is the
+   * ancestor search's, but the line's horizon shrinks one ply per move
+   * along it, so a consumer needing a full-depth analysis of THIS
+   * position (e.g. engine simulation) must re-search.
+   */
+  derived?: boolean;
 };
 
 export type MoveGlyph =

@@ -2,7 +2,7 @@ import type { ChessNode, IHost, NodeEval, PvLine } from "../../types";
 import type { Move } from "../../chess";
 import { Chess, getAutoResult, moveToUci } from "../../chess";
 import { engine, type EngineResult } from "./Engine";
-import { deriveChildEval, fillChildrenFromEval } from "./pv-cache";
+import { fillChildrenFromEval } from "./pv-cache";
 import { computeGlyph } from "../../utils/winningChances";
 
 /** Number of candidate lines requested from the engine (MultiPV). */
@@ -36,15 +36,38 @@ function initEngine(host: object) {
     scoreType?: "cp" | "mate";
   } | null = null;
 
+  let appliedOptionsGen = -1;
+  let appliedSkill = -1;
+  let appliedFixedOptions = false;
+
   function applyOptions() {
-    engine.postCommand(
-      `setoption name Skill Level value ${settings.engineSkillLevel}`,
-    );
-    engine.postCommand(`setoption name Ponder value false`);
-    // A larger transposition table keeps prior searches reusable when
-    // positions are revisited or re-searched deeper.
-    engine.postCommand(`setoption name Hash value 64`);
-    engine.postCommand(`setoption name MultiPV value ${MULTI_PV}`);
+    // Posting while not ready would silently drop the commands but still
+    // mark them applied — skip and retry on the next call.
+    if (!engine.isReady()) return;
+    // Options reset to defaults whenever the worker restarts (new
+    // generation): re-apply everything once.
+    if (engine.generation !== appliedOptionsGen) {
+      appliedOptionsGen = engine.generation;
+      appliedSkill = -1;
+      appliedFixedOptions = false;
+    }
+    if (appliedSkill !== settings.engineSkillLevel) {
+      engine.postCommand(
+        `setoption name Skill Level value ${settings.engineSkillLevel}`,
+      );
+      appliedSkill = settings.engineSkillLevel;
+    }
+    if (!appliedFixedOptions) {
+      engine.postCommand(`setoption name Ponder value false`);
+      // A larger transposition table keeps prior searches reusable when
+      // positions are revisited or re-searched deeper. Posted once per
+      // worker lifetime: re-posting "Hash" with an unchanged value can
+      // reallocate and clear the TT in some Stockfish builds, which
+      // would break cross-search cache reuse.
+      engine.postCommand(`setoption name Hash value 64`);
+      engine.postCommand(`setoption name MultiPV value ${MULTI_PV}`);
+      appliedFixedOptions = true;
+    }
   }
 
   function toWhiteView(
@@ -119,18 +142,6 @@ function initEngine(host: object) {
         ? computeGlyph(node.eval, played.ev, child.color, played.sameSearch)
         : null;
     }
-  }
-
-  /**
-   * The parent's eval when it can serve as an analysis cache for its
-   * children: deep enough for the requested depth, with its PV lines
-   * covering the positions one ply down.
-   */
-  function parentEvalFor(node: ChessNode): NodeEval | undefined {
-    if (!node.parentID) return undefined;
-    const parent = h.nodeMap.get(node.parentID);
-    const ev = parent?.eval;
-    return ev && ev.depth >= settings.engineDepth ? ev : undefined;
   }
 
   /**
@@ -293,7 +304,16 @@ function initEngine(host: object) {
     }
     const node = h.nodeMap.get(nodeId);
     if (!node) return;
-    if (node.eval && node.eval.depth >= settings.engineDepth) {
+    // Only a real search of THIS node is a cache hit. Derived evals ride
+    // an ancestor's PV line whose horizon shrinks one ply per move, so
+    // they never substitute for a full-depth analysis here: re-search
+    // instead — the transposition table already holds the previous
+    // search, so each search only extends the tree by one ply.
+    if (
+      node.eval &&
+      node.eval.depth >= settings.engineDepth &&
+      !node.eval.derived
+    ) {
       if (skipExisting) return;
       eventBus.emit("engine-busy");
       eventBus.emit("engine-result", {
@@ -304,36 +324,6 @@ function initEngine(host: object) {
         scoreType: node.eval.scoreType,
       });
       return;
-    }
-    // Cache hit from the parent's own search: when the played move
-    // starts one of the parent's PV lines, this position was already
-    // evaluated by that search — reuse its result instead of searching
-    // again from scratch.
-    if (!node.eval || node.eval.depth < settings.engineDepth) {
-      const derived = deriveChildEval(
-        parentEvalFor(node),
-        node.move ? moveToUci(node.move) : "",
-      );
-      if (derived) {
-        node.eval = derived;
-        setNodeGlyph(node);
-        if (h.currentNode.id === nodeId) {
-          h.currentNode = node;
-        }
-        eventBus.emit("engine-busy");
-        eventBus.emit("engine-result", {
-          bestmove: derived.bestmove,
-          ponder: derived.ponder,
-          score: derived.score,
-          depth: derived.depth,
-          scoreType: derived.scoreType,
-        });
-        if (settings.saveEvalPrompt || settings.saveEvalByDefault) {
-          h.eventBus.emit("modified", null);
-        }
-        h.eventBus.emit("updateUI");
-        return;
-      }
     }
     // A simulation search owns the engine right now; skip so we never
     // cancel its in-flight search. Auto-analyze re-fires on the next
@@ -398,7 +388,13 @@ function initEngine(host: object) {
         const pathQueue: string[] = [];
         const restQueue: string[] = [];
         for (const [, node] of nodeMap) {
-          if (!node.eval || node.eval.depth < settings.engineDepth) {
+          // Derived evals (attributed from an ancestor's PV line) have a
+          // shrinking horizon — queue them for a real full-depth search.
+          if (
+            !node.eval ||
+            node.eval.depth < settings.engineDepth ||
+            node.eval.derived
+          ) {
             if (pathSet.has(node.id)) {
               pathQueue.push(node.id);
             } else {
@@ -415,7 +411,15 @@ function initEngine(host: object) {
         const nodeId = batchQueue[i];
         const node = nodeMap.get(nodeId);
         if (!node) continue;
-        if (node.eval && node.eval.depth >= settings.engineDepth) continue;
+        // Mid-batch, fillChildrenFromEval may have written a derived
+        // eval onto this node after it was queued — still re-search it.
+        if (
+          node.eval &&
+          node.eval.depth >= settings.engineDepth &&
+          !node.eval.derived
+        ) {
+          continue;
+        }
         try {
           const result = await engine.analyze(node.fen, settings.engineDepth);
           if (stopped || batchCancelled) break;
@@ -586,8 +590,15 @@ function initEngine(host: object) {
       scheduleSim(500);
       return;
     }
+    // Only trust an eval that was searched AT this node. Derived evals
+    // ride an ancestor's PV line whose horizon shrinks one ply per move:
+    // playing them for free makes the sim burst through several moves
+    // and then stall on one full re-search. Re-searching each move at
+    // full depth keeps the think time uniform — the engine's
+    // transposition table already holds the previous search, so each
+    // search only extends the tree by one ply.
     let bestmove: string | undefined =
-      node.eval && node.eval.depth >= settings.engineDepth
+      node.eval && node.eval.depth >= settings.engineDepth && !node.eval.derived
         ? node.eval.bestmove
         : undefined;
     if (!bestmove) {

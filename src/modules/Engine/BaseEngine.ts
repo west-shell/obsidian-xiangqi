@@ -19,6 +19,7 @@ type UciHandler = (msg: string) => void;
 export abstract class BaseEngine {
   protected worker: Worker | null = null;
   protected ready = false;
+  private generationCounter = 0;
   protected plugin: ChessPlugin | null = null;
   protected msgHandler: UciHandler | null = null;
   protected initResolve: ((value: void) => void) | null = null;
@@ -32,6 +33,11 @@ export abstract class BaseEngine {
 
   isReady(): boolean {
     return this.worker !== null && this.ready;
+  }
+
+  /** Monotonic worker lifetime counter; bumped on every "uciok". */
+  get generation(): number {
+    return this.generationCounter;
   }
 
   async ensureReady(): Promise<void> {
@@ -67,6 +73,7 @@ export abstract class BaseEngine {
 
       if (trimmed === "uciok") {
         this.ready = true;
+        this.generationCounter++;
         this.initResolve?.();
         this.initResolve = null;
         this.initReject = null;
