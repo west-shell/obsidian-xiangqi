@@ -1,23 +1,40 @@
+import ar from "./ar.json";
+import de from "./de.json";
 import en from "./en.json";
+import fr from "./fr.json";
+import ja from "./ja.json";
+import ko from "./ko.json";
+import ru from "./ru.json";
 import zh from "./zh.json";
 
-const messages: Record<string, Record<string, string>> = { en, zh };
+const messages: Record<string, Record<string, string>> = {
+  en,
+  zh,
+  ja,
+  ko,
+  ru,
+  de,
+  fr,
+  ar,
+};
 
 let lang = "en";
 let _sysLang: string | null = null;
 let _ver = 0;
 const listeners = new Set<() => void>();
 
+/** Map a raw locale string (e.g. "ja-JP", "zh_TW") to a supported language key. */
+function match(raw: string): string | null {
+  if (!raw) return null;
+  if (raw.toLowerCase().startsWith("zh")) return "zh";
+  if (messages[raw]) return raw;
+  const base = raw.toLowerCase().split(/[-_]/)[0];
+  return Object.keys(messages).find((k) => k.toLowerCase() === base) ?? null;
+}
+
 function detect(): string {
   const docLang = document.documentElement.lang;
-  if (docLang) {
-    if (docLang.toLowerCase().startsWith("zh")) return "zh";
-    if (messages[docLang]) return docLang;
-  }
-  const raw = navigator.language;
-  if (messages[raw]) return raw;
-  if (raw.toLowerCase().startsWith("zh")) return "zh";
-  return "en";
+  return match(docLang) ?? match(navigator.language) ?? "en";
 }
 
 export function t(key: string, _ver?: number): string {
@@ -52,7 +69,5 @@ export function initI18n(locale: string) {
 }
 
 function resolve(raw: string): string {
-  if (messages[raw]) return raw;
-  if (raw?.toLowerCase().startsWith("zh")) return "zh";
-  return "en";
+  return match(raw) ?? "en";
 }

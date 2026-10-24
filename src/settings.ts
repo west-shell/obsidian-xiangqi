@@ -26,6 +26,19 @@ import { playSound } from "./utils/sound";
 import { FolderSuggestModal } from "./utils/folderSuggest";
 
 const VALID_NAME_RE = /^[a-z0-9-]+$/;
+// Language dropdown options; labels use each language's native name so the
+// setting stays findable regardless of the active UI language.
+const LANG_OPTIONS: Record<string, string> = {
+  auto: "Auto/跟随软件",
+  en: "English",
+  zh: "中文",
+  ja: "日本語",
+  ko: "한국어",
+  ru: "Русский",
+  de: "Deutsch",
+  fr: "Français",
+  ar: "العربية",
+};
 // Characters the tag input accepts as they are typed (committed to
 // lowercase); anything else is rejected with a notice, never auto-removed.
 const TYPABLE_NAME_RE = /[a-zA-Z0-9-]/;
@@ -295,7 +308,7 @@ export class ChessSettingTab extends PluginSettingTab {
         control: {
           type: "dropdown",
           key: "lang",
-          options: { auto: "Auto/跟随软件", en: "English", zh: "中文" },
+          options: LANG_OPTIONS,
         },
       },
       {
@@ -785,7 +798,7 @@ export class ChessSettingTab extends PluginSettingTab {
 
     new Setting(containerEl).setName("Language / 语言").addDropdown((d) =>
       d
-        .addOptions({ auto: "Auto/跟随软件", en: "English", zh: "中文" })
+        .addOptions(LANG_OPTIONS)
         .setValue(settings.lang)
         .onChange((v) => {
           settings.lang = v as ISettings["lang"];

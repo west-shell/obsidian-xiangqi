@@ -14,7 +14,7 @@ import type { ThemeName } from "./style/themes";
 export { DEFAULT_FEN };
 
 export interface ISettings {
-  lang: "auto" | "en" | "zh";
+  lang: "auto" | "en" | "zh" | "ja" | "ko" | "ru" | "de" | "fr" | "ar";
   theme: ThemeName;
   pieceSet: string;
   zoom: number;
