@@ -62,6 +62,8 @@
   let autoAnalyze = $state(false);
   let engineBusy = $state(false);
   let batchAnalyzing = $state(false);
+  let simWhite = $state(false);
+  let simBlack = $state(false);
 
   $effect(() => {
     const onBusy = () => {
@@ -91,6 +93,11 @@
     const onBatchStop = () => {
       batchAnalyzing = false;
     };
+    const onSimState = (state?: { white: boolean; black: boolean }) => {
+      if (!state) return;
+      simWhite = state.white;
+      simBlack = state.black;
+    };
     eventBus.on("engine-busy", onBusy);
     eventBus.on("engine-result", onResult);
     eventBus.on("engine-batch-start", onBatchStart);
@@ -99,6 +106,7 @@
     eventBus.on("engine-auto-off", onAutoOff);
     eventBus.on("engine-stop", onStop);
     eventBus.on("engine-batch-stop", onBatchStop);
+    eventBus.on("engine-sim-state", onSimState);
     eventBus.emit("request-engine-state");
     return () => {
       eventBus.off("engine-busy", onBusy);
@@ -109,6 +117,7 @@
       eventBus.off("engine-auto-off", onAutoOff);
       eventBus.off("engine-stop", onStop);
       eventBus.off("engine-batch-stop", onBatchStop);
+      eventBus.off("engine-sim-state", onSimState);
     };
   });
 
@@ -496,6 +505,22 @@
             eventBus.emit("analyze-btn-click", "batch");
           }
         });
+    });
+
+    menu.addSeparator();
+
+    menu.addItem((mi) => {
+      mi.setTitle(t("toolbar.simWhite", _lv))
+        .setIcon("sun")
+        .setChecked(simWhite)
+        .onClick(() => eventBus.emit("engine-sim-toggle", "white"));
+    });
+
+    menu.addItem((mi) => {
+      mi.setTitle(t("toolbar.simBlack", _lv))
+        .setIcon("moon")
+        .setChecked(simBlack)
+        .onClick(() => eventBus.emit("engine-sim-toggle", "black"));
     });
 
     if (ANALYSIS_SITES.length > 0) {

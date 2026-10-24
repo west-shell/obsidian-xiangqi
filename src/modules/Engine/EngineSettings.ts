@@ -11,6 +11,7 @@ export const EngineSettingsModule = {
       const engineModal = new Modal(host.plugin.app);
       let depthValue = host.settings.engineDepth;
       let skillValue = host.settings.engineSkillLevel;
+      let intervalValue = host.settings.engineSimInterval;
       let showBestMove = host.settings.showEngineBestMove;
       let showPonder = host.settings.showEnginePonder;
       let showEngineAnn = host.settings.showEngineAnnotations;
@@ -47,6 +48,21 @@ export const EngineSettingsModule = {
         skillSlider.addEventListener("input", () => {
           skillValue = Number.parseInt(skillSlider.value) || 20;
           skillLabel.textContent = String(skillValue);
+        });
+
+        contentEl.createEl("label", { text: t("engine.simInterval") });
+        const intervalSlider = contentEl.createEl("input", { type: "range" });
+        intervalSlider.setAttribute("min", "0.1");
+        intervalSlider.setAttribute("max", "10");
+        intervalSlider.setAttribute("step", "0.1");
+        intervalSlider.value = String(intervalValue);
+        const intervalLabel = contentEl.createDiv({
+          text: `${intervalValue}s`,
+          cls: `${CLS_PREFIX}-range-value`,
+        });
+        intervalSlider.addEventListener("input", () => {
+          intervalValue = Number.parseFloat(intervalSlider.value) || 1;
+          intervalLabel.textContent = `${intervalValue}s`;
         });
 
         const bmContainer = contentEl.createDiv(`${CLS_PREFIX}-engine-toggle`);
@@ -94,6 +110,9 @@ export const EngineSettingsModule = {
           }
           if (skillValue >= 0 && skillValue <= 20) {
             host.settings.engineSkillLevel = skillValue;
+          }
+          if (intervalValue >= 0.1 && intervalValue <= 10) {
+            host.settings.engineSimInterval = intervalValue;
           }
           host.settings.showEngineBestMove = showBestMove;
           host.settings.showEnginePonder = showPonder;

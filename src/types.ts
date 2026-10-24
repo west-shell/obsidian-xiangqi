@@ -51,6 +51,8 @@ export interface ISettings {
   newPgnFolder: string;
   engineDepth: number;
   engineSkillLevel: number;
+  /** Seconds between moves in engine simulation (self-play / engine vs you). */
+  engineSimInterval: number;
   showEngineBestMove: boolean;
   showEnginePonder: boolean;
   showEngineAnnotations: boolean;

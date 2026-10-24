@@ -172,6 +172,7 @@ export const DEFAULT_SETTINGS: ISettings = {
   newPgnFolder: "",
   engineDepth: 18,
   engineSkillLevel: 20,
+  engineSimInterval: 1,
   showEngineBestMove: true,
   showEnginePonder: true,
   showEngineAnnotations: true,
@@ -493,6 +494,17 @@ export class ChessSettingTab extends PluginSettingTab {
               min: 0,
               max: 20,
               step: 1,
+            },
+          },
+          {
+            name: t("engine.simInterval"),
+            desc: t("engine.simInterval.desc"),
+            control: {
+              type: "slider",
+              key: "engineSimInterval",
+              min: 0.1,
+              max: 10,
+              step: 0.1,
             },
           },
           {
@@ -1074,6 +1086,19 @@ export class ChessSettingTab extends PluginSettingTab {
       "",
       (v) => {
         settings.engineSkillLevel = v;
+        void this.plugin.saveSettings();
+      },
+    );
+
+    addSliderWithValue(
+      containerEl,
+      t("engine.simInterval"),
+      t("engine.simInterval.desc"),
+      settings.engineSimInterval,
+      { min: 0.1, max: 10, step: 0.1 },
+      "s",
+      (v) => {
+        settings.engineSimInterval = v;
         void this.plugin.saveSettings();
       },
     );
