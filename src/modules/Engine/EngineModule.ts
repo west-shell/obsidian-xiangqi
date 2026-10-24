@@ -2,6 +2,7 @@ import type { ChessNode, IHost, NodeEval, PvLine } from "../../types";
 import type { Move } from "../../chess";
 import { moveToUci } from "../../chess";
 import { engine } from "./Engine";
+import { deriveChildEval, fillChildrenFromEval } from "./pv-cache";
 import { computeGlyph } from "../../utils/winningChances";
 
 /** Number of candidate lines requested from the engine (MultiPV). */
@@ -35,7 +36,9 @@ function initEngine(host: object) {
       `setoption name Skill Level value ${settings.engineSkillLevel}`,
     );
     engine.postCommand(`setoption name Ponder value false`);
-    engine.postCommand(`setoption name Hash value 16`);
+    // A larger transposition table keeps prior searches reusable when
+    // positions are revisited or re-searched deeper.
+    engine.postCommand(`setoption name Hash value 64`);
     engine.postCommand(`setoption name MultiPV value ${MULTI_PV}`);
   }
 
@@ -111,6 +114,18 @@ function initEngine(host: object) {
         ? computeGlyph(node.eval, played.ev, child.color, played.sameSearch)
         : null;
     }
+  }
+
+  /**
+   * The parent's eval when it can serve as an analysis cache for its
+   * children: deep enough for the requested depth, with its PV lines
+   * covering the positions one ply down.
+   */
+  function parentEvalFor(node: ChessNode): NodeEval | undefined {
+    if (!node.parentID) return undefined;
+    const parent = h.nodeMap.get(node.parentID);
+    const ev = parent?.eval;
+    return ev && ev.depth >= settings.engineDepth ? ev : undefined;
   }
 
   function dispatchMode(mode: string) {
@@ -255,6 +270,36 @@ function initEngine(host: object) {
       });
       return;
     }
+    // Cache hit from the parent's own search: when the played move
+    // starts one of the parent's PV lines, this position was already
+    // evaluated by that search — reuse its result instead of searching
+    // again from scratch.
+    if (!node.eval || node.eval.depth < settings.engineDepth) {
+      const derived = deriveChildEval(
+        parentEvalFor(node),
+        node.move ? moveToUci(node.move) : "",
+      );
+      if (derived) {
+        node.eval = derived;
+        setNodeGlyph(node);
+        if (h.currentNode.id === nodeId) {
+          h.currentNode = node;
+        }
+        eventBus.emit("engine-busy");
+        eventBus.emit("engine-result", {
+          bestmove: derived.bestmove,
+          ponder: derived.ponder,
+          score: derived.score,
+          depth: derived.depth,
+          scoreType: derived.scoreType,
+        });
+        if (settings.saveEvalPrompt || settings.saveEvalByDefault) {
+          h.eventBus.emit("modified", null);
+        }
+        h.eventBus.emit("updateUI");
+        return;
+      }
+    }
     analyzing = true;
     stopped = false;
     const gen = h.generation;
@@ -275,6 +320,10 @@ function initEngine(host: object) {
         };
         node.eval = nodeEval;
         setNodeGlyph(node);
+        // Attribute the finished search to existing children (their
+        // positions were covered by its PV lines), so stepping through
+        // them hits the cache instead of re-searching.
+        fillChildrenFromEval(node);
         if (h.currentNode.id === nodeId) {
           h.currentNode = node;
         }
@@ -357,6 +406,7 @@ function initEngine(host: object) {
               pvs: toWhiteViewPvs(result.pvs, node.fen),
             };
             setNodeGlyph(node);
+            fillChildrenFromEval(node);
             if (h.currentNode.id === nodeId) {
               h.currentNode = node;
               h.eventBus.emit("engine-result", {
