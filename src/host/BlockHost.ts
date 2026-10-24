@@ -26,6 +26,7 @@ import { EngineSettingsModule } from "../modules/Engine/EngineSettings";
 import { GameSlotsModule } from "../modules/GameSlots";
 import { ImportExportModule } from "../modules/ImportExport";
 import { NavigateModule } from "../modules/Navigate";
+import { SpeakerModule } from "../modules/Speak";
 import { TreeEditModule } from "../modules/Edit/TreeEdit";
 
 /**
@@ -46,6 +47,7 @@ const BLOCK_MODULES: ChessModule[] = [
   EditTagsModule,
   ImportExportModule,
   EngineSettingsModule,
+  SpeakerModule,
   KeyboardNavModule,
   EngineModule,
 ];
