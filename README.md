@@ -79,8 +79,10 @@ Built-in Pikafish (WASM) — no external installation needed.
 - **Best-move & ponder arrows**: green for best move, yellow for the ponder move
 - **Eval bar**: live evaluation beside the board (green = red advantage, red = black advantage)
 - **Eval trend chart & node color bars**: see the whole game's evaluation at a glance
+- **Instant eval attribution**: eval bars light up along a searched line without re-running the engine — display only, every position still gets its own full-depth search
 - **Persistence**: evaluations are stored as `%e:` comments in PGN
 - **Engine play**: play against the engine with configurable depth (1–30) and skill level (0–20)
+- **Engine simulation**: let the engine play Red, Black, or both sides (self-play) from the analysis menu, with a configurable move interval (0.1–10 s); it stops by itself on game end, threefold repetition, or when the halfmove clock runs out
 
 ### Board & Pieces
 
@@ -118,7 +120,7 @@ All options live in **Settings → Xiangqi**, grouped as follows:
 | Move List        | Visibility, text size, notation, per-move marks                                 |
 | Board Margins    | Top/bottom margin (0–100 px) for fullscreen layouts                             |
 | Code Block Names | Aliases for `xiangqi`/`tree` blocks, FEN save target                            |
-| Engine Analysis  | Depth, skill level, arrows, engine/board annotations                            |
+| Engine Analysis  | Depth, skill level, simulation interval, arrows, engine/board annotations       |
 | Save             | Include eval on save, eval prompt, default export folder                        |
 | PGN File View    | Enable/disable the view, custom file extensions, new PGN file location          |
 
