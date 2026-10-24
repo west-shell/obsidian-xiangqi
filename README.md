@@ -69,7 +69,7 @@ Every branch is visualized as a tree graph — click any node to jump to that po
 | `Ctrl+Shift+←` / `Ctrl+Shift+→`         | Cycle between the first steps of all visible branches (wraps)                                      |
 | `↑` / `↓` / `←` / `→` (PGN view)        | Step one move back / forward; jump to game start / end                                             |
 
-Branch navigation works in both the PGN file view and `xiangqi` code blocks (in code blocks, hover the block and keep focus out of text editors). On macOS, `Ctrl+↑`/`Ctrl+↓` may conflict with Mission Control. All branch-switching shortcuts skip branches hidden by folding. All PGN view navigation actions are also available as commands in the Command Palette. In the PGN view the modifier-combo shortcuts are the command hotkeys themselves — deleting or rebinding them in Settings → Hotkeys takes effect in the view. The four plain arrow-key shortcuts are built into the PGN view only and are not exposed as commands, since global arrow keys would clash with the app. Code block shortcuts are built-in and hover-gated.
+Branch navigation works in both the PGN file view and `xiangqi` code blocks (in code blocks, hover the block and keep focus out of text editors). On macOS, `Ctrl+↑`/`Ctrl+↓` may conflict with Mission Control. All branch-switching shortcuts skip branches hidden by folding. All PGN view navigation actions are also available as commands in the Command Palette — without preset hotkeys, to avoid conflicts with core and other plugins; assign your own in Settings → Hotkeys if you want global bindings. All PGN view shortcuts are built into the view and only active while it is focused. Code block shortcuts are built-in and hover-gated.
 
 ### Engine Analysis
 
