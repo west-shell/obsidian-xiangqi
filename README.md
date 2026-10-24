@@ -18,7 +18,7 @@ There are three ways to use the plugin — all of them end up on the same intera
 
 ### Open a PGN file
 
-Any `.pgn` file opens in a dedicated chess view: browse the variation tree, edit moves and comments, run engine analysis, and save back to the file with one click. Multiple games in one file are supported via the game navigation bar, and the ribbon button creates a new PGN file in your configured folder, opening the rename dialog so you can name it right away.
+Any `.pgn` file opens in a dedicated chess view: browse the variation tree, edit moves and comments, run engine analysis, and save back to the file with one click. Multiple games in one file are managed via the game navigation bar — switch, add, reorder, or delete them — and the ribbon button creates a new PGN file in your configured folder, opening the rename dialog so you can name it right away.
 
 ![PGN File](./IMAGE/PGN.png)
 
