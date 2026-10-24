@@ -639,6 +639,15 @@ function initEngine(host: object) {
       return;
     }
     eventBus.emit("runmove", move);
+    // The played node was created after applyResultToNode filled the
+    // searched node's earlier children, so it has no eval yet and the
+    // current-node eval bar stays blank until the next tick. Derive one
+    // from the same search (the played move is the PV's first move) for
+    // immediate display. Display-only: the derived flag makes the next
+    // sim step re-search this node at full depth and replace it.
+    if (fillChildrenFromEval(node)) {
+      h.eventBus.emit("updateUI");
+    }
     scheduleSim();
   }
 
