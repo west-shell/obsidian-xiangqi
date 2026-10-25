@@ -44,8 +44,15 @@ export const FileHostModule = {
     });
 
     eventBus.on("reset", () => {
-      const slot = host.games[host.currentGameIndex];
-      if (slot) slot.parsed = undefined;
+      // Revert the whole games list to the on-disk content, not just the
+      // current slot: create/delete/move-game changes live in host.games
+      // and must be undone too, otherwise the save button turns green
+      // while memory still differs from disk.
+      host.games = splitPGN(host.data);
+      host.currentGameIndex = Math.min(
+        host.currentGameIndex,
+        host.games.length - 1,
+      );
       activateGame(host, host.currentGameIndex);
     });
   },
