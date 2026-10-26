@@ -27,6 +27,17 @@
   }
 }
 
+// Side-by-side layout driven by the embedded frame instead of the window.
+// Used with a named size container on the file view (utils/viewFrame.ts sets
+// data-cg-frame and the counter-scale); normal hosts have no such container,
+// so these rules stay inert there.
+@mixin frame-col2($name) {
+  $min: at-least($breakpoint);
+  @container #{$name} (min-width: #{$min}) or (orientation: landscape) {
+    @content;
+  }
+}
+
 // Text colour for a themed background. Auto black/white via CSS relative
 // colour syntax was removed: mobile WebViews don't support it — a var()
 // substituted `rgb(from …)` is invalid at computed-value time, silently

@@ -23,6 +23,7 @@
     ZOOM_CHANGE_EVENT,
   } from "../chess";
   import type { EventBus } from "../core/event-bus";
+  import { type BoardScaleHandle, trackBoardScale } from "../utils/boardScale";
   import { iconSvg } from "../utils/icon";
   import type { ISettings } from "../types";
 
@@ -77,6 +78,8 @@
   let boardElement!: HTMLDivElement;
   let api: Api | null = $state(null);
   let layoutChangeHandler: (() => void) | null = null;
+  let boundsResyncHandler: (() => void) | null = null;
+  let boardScale: BoardScaleHandle | null = null;
   let boardResizeRo: ResizeObserver | null = null;
   let resizeTimer: ReturnType<typeof setTimeout> | null = null;
   let promoteHandler:
@@ -275,6 +278,7 @@
       if (destroyed) return;
     }
     api = Chessground(boardElement, config);
+    boardScale = trackBoardScale(boardElement, api);
     injectGridSVG(boardElement);
 
     boardResizeRo = new ResizeObserver(() => {
@@ -285,6 +289,8 @@
         if (api && boardElement.offsetWidth) {
           api.state.dom.bounds.clear();
           api.state.dom.redraw();
+          // Hosts may have changed both the box and the ancestor scale.
+          boardScale?.refresh();
         }
       }, 100);
     });
@@ -312,10 +318,25 @@
       LAYOUT_CHANGE_EVENT,
       layoutChangeHandler,
     );
+
+    // Chessground caches the board's bounding rect. Hosts such as Excalidraw can
+    // move the board without resizing it (canvas pan, CSS transform), so a
+    // layout-event or ResizeObserver alone leaves the cached rect stale and the
+    // next click lands on the wrong square. Drop the cache before every press;
+    // chessground re-reads it when resolving the square. This is a no-op when
+    // the board has not moved.
+    boundsResyncHandler = () => {
+      api?.state.dom.bounds.clear();
+    };
+    activeDocument.addEventListener("pointerdown", boundsResyncHandler, true);
   });
 
   onDestroy(() => {
     destroyed = true;
+    if (boardScale) {
+      boardScale.destroy();
+      boardScale = null;
+    }
     if (boardResizeRo) {
       boardResizeRo.disconnect();
       boardResizeRo = null;
@@ -332,6 +353,13 @@
       activeDocument.body.removeEventListener(
         LAYOUT_CHANGE_EVENT,
         layoutChangeHandler,
+      );
+    }
+    if (boundsResyncHandler) {
+      activeDocument.removeEventListener(
+        "pointerdown",
+        boundsResyncHandler,
+        true,
       );
     }
     if (api) {

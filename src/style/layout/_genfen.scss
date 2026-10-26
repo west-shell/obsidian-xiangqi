@@ -13,6 +13,37 @@
 @use "mixins" as *;
 @use "variant" as *;
 
+// Side-by-side editor layout, shared by the window media query (normal tabs and
+// code blocks) and the frame container query (scaled file views).
+@mixin edit-col2 {
+  flex-direction: row;
+  align-items: flex-start;
+
+  .#{$cls-prefix}-genfen {
+    flex-direction: column;
+    flex-wrap: #{$genfen-toolbar-wrap};
+    align-items: center;
+
+    @if $genfen-toolbar-align {
+      align-content: #{$genfen-toolbar-align};
+    }
+  }
+}
+
+// Vertical piece palette, used once the editor is laid out as a row.
+@mixin palette-col2 {
+  container-type: size;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(#{$palette-cols}, 1fr);
+  width: 56px;
+  height: 100%;
+
+  .#{$cls-prefix}-palette__btn {
+    width: 28px;
+    height: #{$palette-col-cqh};
+  }
+}
+
 // ---- Edit-mode layout -----------------------------------------------------------
 
 .#{$cls-prefix}-layout--edit {
@@ -25,18 +56,16 @@
   }
 
   @include col2 {
-    flex-direction: row;
-    align-items: flex-start;
-
-    .#{$cls-prefix}-genfen {
-      flex-direction: column;
-      flex-wrap: #{$genfen-toolbar-wrap};
-      align-items: center;
-
-      @if $genfen-toolbar-align {
-        align-content: #{$genfen-toolbar-align};
-      }
+    // A scaled file view picks its layout from the frame container below.
+    &:where(:not(.#{$cls-prefix}-file-view[data-cg-frame] *)) {
+      @include edit-col2;
     }
+  }
+}
+
+@include frame-col2("#{$cls-prefix}-file") {
+  .#{$cls-prefix}-file-view[data-cg-frame] .#{$cls-prefix}-layout--edit {
+    @include edit-col2;
   }
 }
 
@@ -72,15 +101,8 @@
   }
 
   @include col2 {
-    container-type: size;
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(#{$palette-cols}, 1fr);
-    width: 56px;
-    height: 100%;
-
-    .#{$cls-prefix}-palette__btn {
-      width: 28px;
-      height: #{$palette-col-cqh};
+    &:where(:not(.#{$cls-prefix}-file-view[data-cg-frame] *)) {
+      @include palette-col2;
     }
   }
 
@@ -110,6 +132,12 @@
   button.#{$cls-prefix}-palette__btn--empty {
     pointer-events: none;
     opacity: 0.35;
+  }
+}
+
+@include frame-col2("#{$cls-prefix}-file") {
+  .#{$cls-prefix}-file-view[data-cg-frame] .#{$cls-prefix}-layout__palette {
+    @include palette-col2;
   }
 }
 

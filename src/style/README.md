@@ -81,6 +81,32 @@ FileHost   contentEl  ─── .view-content.ct-file-view
 | PGN 文件视图                | `.ct-file-view` | `Actions.ts` 加在 `contentEl` 上 |
 | 拖拽棋盘时的 `<body>`       | `.ct-resizing`  | 抑制文本选中                     |
 
+### 缩放宿主（Excalidraw 嵌入）
+
+Excalidraw 这类宿主把嵌入的 leaf 放在 `transform: scale(s)` 的祖先里，leaf
+内部仍按虚拟尺寸布局。文件视图用 `src/utils/viewFrame.ts` 适配（共享代码，
+两种变体通用）：
+
+- Svelte action `viewFrame` 挂在 `.ct-layout` 根上；只有直接父元素带
+  `.ct-file-view` 才生效，代码块宿主不参与（Markdown 正文整体反缩放会和
+  代码块字号/行高冲突）。
+- 以 leaf content（父元素）的**屏幕像素**框为可见 frame：按轴用
+  `getBoundingClientRect / offsetWidth` 求有效缩放 `sx/sy`；≈1 时不介入，
+  普通标签页行为完全不变。
+- 生效时给 `.ct-file-view` 加 `data-cg-frame`，内联 `width/height`（frame
+  可见尺寸）与 `transform: scale(1/sx, 1/sy)`；`transform-origin`、
+  `flex: none`、左上角定位和 `container-type: size` 都在 `_layout.scss`。
+- 于是 frame 内的布局尺寸 = 屏幕像素：`cqw/cqh` 等于可见像素，文字保持设计
+  字号；棋盘、面板、工具栏都按 frame 大小排版。
+- 文件视图的 col2 在 frame 模式下由 `@container <prefix>-file` 决定
+  （`_mixins.scss` 的 `frame-col2`），普通标签页仍用窗口 media query；代码块
+  的窗口 col2 规则用 `:where(:not(...[data-cg-frame] *))` 排除 frame 视图。
+- frame 模式下棋盘上下边距从 `.ct-file-view` 的 `padding` 移到 `.ct-layout`
+  的 `margin`：容器查询量的是内容框，方形 frame 不能因为 20px 上下边距被
+  判成横屏。
+- 限制：不支持旋转/斜切后的宿主变换（`rect/offset` 只还原轴对齐缩放）；
+  代码块嵌入仍保留宿主缩放，由棋盘级反缩放单独处理。
+
 ## 3. 文件结构
 
 ```

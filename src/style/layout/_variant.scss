@@ -64,9 +64,16 @@ $board-ratio: 0.9;
 // Coordinate labels (simple on/off via shared custom property). Fully
 // opaque — the library dims the container to 0.8 (xiangqiground.base.css);
 // this rule loads after it and wins by source order.
+//
+// Scaled hosts (Excalidraw embeds, see utils/boardScale.ts) counter-scale
+// cg-container, so a local pixel there is a screen pixel while cqw still
+// resolves against the wrap's *layout* width. Multiplying the library's
+// designed size by --cg-host-scale (1 everywhere else) keeps the labels
+// proportional to the board the host actually paints.
 .xq-wrap coords {
   display: var(--#{$cls-prefix}-coords-display, flex);
   opacity: 1;
+  font-size: calc(clamp(7px, 2.7cqw, 18px) * var(--cg-host-scale, 1));
 }
 
 // Coordinate label color: follow the grid line color instead of the
@@ -212,13 +219,15 @@ $board-ratio: 0.9;
 // through as a sub-pixel sliver whose width changes with the board scale.
 // Thickness scales with the board (cqw resolves against the wrap, the
 // inline-size container declared in _board.scss): ~2px at 500px, clamped
-// to 1–3px.
+// to 1–3px. --cg-host-scale compensates scaled hosts, see coords above.
 .#{$cls-prefix}-layout__board--turn-white xq-board {
-  box-shadow: 0 0 0 clamp(1px, 0.4cqw, 3px) var(--xq-piece-red);
+  box-shadow: 0 0 0 calc(clamp(1px, 0.4cqw, 3px) * var(--cg-host-scale, 1))
+    var(--xq-piece-red);
 }
 
 .#{$cls-prefix}-layout__board--turn-black xq-board {
-  box-shadow: 0 0 0 clamp(1px, 0.4cqw, 3px) var(--xq-piece-black);
+  box-shadow: 0 0 0 calc(clamp(1px, 0.4cqw, 3px) * var(--cg-host-scale, 1))
+    var(--xq-piece-black);
 }
 
 // ---- FEN editor piece colors (theme-driven) -----------------------------------

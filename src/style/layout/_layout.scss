@@ -13,6 +13,58 @@
 @use "mixins" as *;
 @use "variant" as *;
 
+// Side-by-side rules for the PGN file view. Shared by the window media query
+// (normal tabs) and the frame container query (scaled hosts), so both choose
+// the same layout for the same box.
+@mixin file-view-col2 {
+  .#{$cls-prefix}-layout {
+    flex-direction: row;
+
+    @if $pgn-col2-override-width {
+      --#{$cls-prefix}-col2-width: 100cqh;
+    }
+
+    &__board {
+      --board-width: min(60cqw, #{$pgn-col2-board-height});
+      align-self: center;
+    }
+
+    // Toolbar rail spans the view height; buttons shrink to pack one column
+    // and wrap into a second one at the minimum size.
+    .#{$cls-prefix}-toolbar {
+      flex-direction: column;
+      flex-wrap: wrap;
+      --#{$cls-prefix}-rail: 100cqh;
+      width: auto;
+      height: auto;
+      min-height: 0;
+      align-self: stretch;
+      align-items: center;
+      align-content: flex-start;
+      justify-content: flex-start;
+      column-gap: 0;
+
+      .#{$cls-prefix}-btn-sep {
+        width: auto;
+        height: 1px;
+        margin: 1px 3px;
+      }
+    }
+
+    // FEN editor toolbar fills the view height.
+    &.#{$cls-prefix}-layout--edit .#{$cls-prefix}-genfen {
+      align-self: stretch;
+    }
+
+    &__panel {
+      height: 100%;
+      // Inherited from the grid col2 rules in normal hosts; restated here
+      // because frame-sized file views opt out of those.
+      min-width: 160px;
+    }
+  }
+}
+
 .#{$cls-prefix}-layout {
   display: grid;
   gap: $layout-gap;
@@ -74,46 +126,61 @@
   &__panel {
     min-height: 45vh;
   }
+}
 
-  // ---- col2: side-by-side ---------------------------------------------------
-  @include col2 {
+// ---- col2 for grid hosts (code blocks) -------------------------------------
+//
+// A file view laid out by its visible frame (data-cg-frame, see
+// utils/viewFrame.ts) opts out: it picks col1/col2 from the container query at
+// the end of this file instead of the Obsidian window.
+@include col2 {
+  .#{$cls-prefix}-layout:where(
+    :not(.#{$cls-prefix}-file-view[data-cg-frame] *)
+  ) {
     height: var(--#{$cls-prefix}-col2-size);
     grid-template-columns: var(--#{$cls-prefix}-col2-width) auto $uniboard-table;
     grid-template-rows: var(--#{$cls-prefix}-col2-size) 1fr;
     grid-template-areas:
       "board toolbar panel"
       "board toolbar panel";
+  }
 
-    &__board {
-      .#{$cls-prefix}-board-resize {
-        display: block;
-      }
+  .#{$cls-prefix}-layout__board:where(
+    :not(.#{$cls-prefix}-file-view[data-cg-frame] *)
+  ) {
+    .#{$cls-prefix}-board-resize {
+      display: block;
     }
+  }
 
-    .#{$cls-prefix}-toolbar {
-      flex-direction: column;
-      flex-wrap: wrap;
-      --#{$cls-prefix}-rail: var(--#{$cls-prefix}-col2-size);
-      height: var(--#{$cls-prefix}-col2-size);
-      align-items: center;
-      align-content: flex-start;
-      column-gap: 0;
-      grid-row: 1;
-      justify-content: flex-start;
+  .#{$cls-prefix}-layout
+    .#{$cls-prefix}-toolbar:where(
+      :not(.#{$cls-prefix}-file-view[data-cg-frame] *)
+    ) {
+    flex-direction: column;
+    flex-wrap: wrap;
+    --#{$cls-prefix}-rail: var(--#{$cls-prefix}-col2-size);
+    height: var(--#{$cls-prefix}-col2-size);
+    align-items: center;
+    align-content: flex-start;
+    column-gap: 0;
+    grid-row: 1;
+    justify-content: flex-start;
+    width: auto;
+
+    .#{$cls-prefix}-btn-sep {
       width: auto;
-
-      .#{$cls-prefix}-btn-sep {
-        width: auto;
-        height: 1px;
-        margin: 1px 3px;
-      }
+      height: 1px;
+      margin: 1px 3px;
     }
+  }
 
-    &__panel {
-      max-height: var(--#{$cls-prefix}-col2-size);
-      min-width: 160px;
-      min-height: 0;
-    }
+  .#{$cls-prefix}-layout__panel:where(
+    :not(.#{$cls-prefix}-file-view[data-cg-frame] *)
+  ) {
+    max-height: var(--#{$cls-prefix}-col2-size);
+    min-width: 160px;
+    min-height: 0;
   }
 }
 
@@ -121,11 +188,51 @@
 // PGN file view context — fills the leaf, container queries for the board.
 // ============================================================================
 
+// Frame-sized host (Excalidraw embeddable, see utils/viewFrame.ts): the view
+// is pinned to the visible frame and counter-scaled there, so its layout box
+// and its painted box are both the frame. Use that box for the layout
+// breakpoints; normal tabs keep the window media queries below.
+.#{$cls-prefix}-file-view[data-cg-frame] {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  // viewFrame.ts pins the leaf box here: layout size = painted size.
+  box-sizing: border-box !important;
+  flex: none !important;
+  align-self: flex-start !important;
+  margin: 0 auto auto 0 !important;
+  transform-origin: 0 0;
+  container-type: size;
+  container-name: #{$cls-prefix}-file;
+
+  // Container queries measure the content box. Keep the user's board margins
+  // out of it (a square frame must stay portrait, not turn landscape because
+  // of 20px padding above and below); they move to the layout as margins.
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.#{$cls-prefix}-file-view[data-cg-frame] .#{$cls-prefix}-layout {
+  margin-top: var(--#{$cls-prefix}-board-margin-top, 0px);
+  margin-bottom: var(--#{$cls-prefix}-board-margin-bottom, 0px);
+}
+
 .#{$cls-prefix}-file-view .#{$cls-prefix}-layout {
   container-type: size;
   display: flex;
   flex-direction: column;
   height: 100%;
+
+  // Hosts that render the view inside a flex container — Excalidraw's
+  // embeddable sets `display:flex; align-items:center` on .view-content —
+  // size this item by its content. `container-type: size` (size containment)
+  // makes that intrinsic size zero, which collapsed the board to 0px, so
+  // claim the whole box explicitly instead of relying on block flow.
+  width: 100%;
+  min-height: 0;
+  flex: 1 1 auto;
+  align-self: stretch;
 
   &__board {
     --board-width: min(100cqw, #{$pgn-col1-board-height});
@@ -161,49 +268,20 @@
     min-height: 0;
     max-height: none;
   }
+}
 
-  @include col2 {
-    flex-direction: row;
+// Normal tabs: follow the window.
+@include col2 {
+  .#{$cls-prefix}-file-view:where(:not([data-cg-frame])) {
+    @include file-view-col2;
+  }
+}
 
-    @if $pgn-col2-override-width {
-      --#{$cls-prefix}-col2-width: 100cqh;
-    }
-
-    &__board {
-      --board-width: min(60cqw, #{$pgn-col2-board-height});
-      align-self: center;
-    }
-
-    // Toolbar rail spans the view height; buttons shrink to pack one column
-    // and wrap into a second one at the minimum size (overrides the
-    // block-host col2 rule, which sizes the rail at --{prefix}-col2-size).
-    .#{$cls-prefix}-toolbar {
-      flex-direction: column;
-      flex-wrap: wrap;
-      --#{$cls-prefix}-rail: 100cqh;
-      width: auto;
-      height: auto;
-      min-height: 0;
-      align-self: stretch;
-      align-items: center;
-      align-content: flex-start;
-      justify-content: flex-start;
-
-      .#{$cls-prefix}-btn-sep {
-        width: auto;
-        height: 1px;
-        margin: 1px 3px;
-      }
-    }
-
-    // FEN editor toolbar fills the view height.
-    .#{$cls-prefix}-layout--edit .#{$cls-prefix}-genfen {
-      align-self: stretch;
-    }
-
-    &__panel {
-      height: 100%;
-    }
+// Scaled hosts: follow the visible frame. `orientation` is evaluated on the
+// frame box (a square frame is portrait, exactly like a square window).
+@include frame-col2("#{$cls-prefix}-file") {
+  .#{$cls-prefix}-file-view[data-cg-frame] {
+    @include file-view-col2;
   }
 }
 

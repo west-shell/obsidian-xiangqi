@@ -51,6 +51,31 @@ cg-container {
   margin: auto;
 }
 
+// ---- Scaled hosts (Excalidraw embeds) ---------------------------------------
+//
+// When an ancestor applies transform: scale(s) (Excalidraw canvas zoom ×
+// embeddable scale), chessground's getBoundingClientRect() numbers are screen
+// pixels while the values it writes are layout pixels — every piece lands s×
+// too close to the top-left corner. utils/boardScale.ts marks the wrap and
+// counter-scales the container back to net scale 1, so one container pixel is
+// one screen pixel again.
+//
+// The container is absolutely positioned, so nothing outside the board moves.
+// It must also be pinned to the wrap's top-left: margin:auto centering is
+// computed from the *layout* widths, which no longer match once the container
+// is sized for its on-screen box. The leftover from chessground's device-pixel
+// rounding is centred through --cg-inset-* (set alongside the counter-scale).
+.cg-wrap[data-cg-scaled] cg-container,
+.xq-wrap[data-cg-scaled] cg-container {
+  top: calc(var(--cg-inset-y, 0) * 100%);
+  left: calc(var(--cg-inset-x, 0) * 100%);
+  right: auto;
+  bottom: auto;
+  margin: 0;
+  transform: scale(var(--cg-inverse-scale, 1));
+  transform-origin: 0 0;
+}
+
 .cg-wrap piece,
 .xq-wrap piece {
   touch-action: none;

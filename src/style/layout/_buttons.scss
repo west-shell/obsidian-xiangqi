@@ -126,3 +126,16 @@ button.#{$cls-prefix}-btn--busy {
     opacity: 0.4;
   }
 }
+
+// Excalidraw's own stylesheet sets `.excalidraw button { justify-content:
+// normal }`. That selector has the same specificity as `button.ct-btn`, and
+// when the host stylesheet wins it strips the centring from every icon button
+// in an embedded view (toolbar, tree zoom, list toggle, result menu). Re-assert
+// centring with a host-scoped selector that outranks the host rule; normal
+// Obsidian tabs never have the `.excalidraw` ancestor, so they are unaffected.
+.excalidraw .#{$cls-prefix}-file-view button,
+.excalidraw .#{$cls-prefix}-layout button {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
