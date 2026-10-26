@@ -27,18 +27,21 @@ import { FolderSuggestModal } from "./utils/folderSuggest";
 
 const VALID_NAME_RE = /^[a-z0-9-]+$/;
 // Language dropdown options; labels use each language's native name so the
-// setting stays findable regardless of the active UI language.
-const LANG_OPTIONS: Record<string, string> = {
-  auto: "Auto/跟随软件",
-  en: "English",
-  zh: "中文",
-  ja: "日本語",
-  ko: "한국어",
-  ru: "Русский",
-  de: "Deutsch",
-  fr: "Français",
-  ar: "العربية",
-};
+// setting stays findable regardless of the active UI language. Only the
+// "auto" entry is translated — it follows the active UI language.
+function langOptions(): Record<string, string> {
+  return {
+    auto: t("settings.language.auto"),
+    en: "English",
+    zh: "中文",
+    ja: "日本語",
+    ko: "한국어",
+    ru: "Русский",
+    de: "Deutsch",
+    fr: "Français",
+    ar: "العربية",
+  };
+}
 // Characters the tag input accepts as they are typed (committed to
 // lowercase); anything else is rejected with a notice, never auto-removed.
 const TYPABLE_NAME_RE = /[a-zA-Z0-9-]/;
@@ -304,11 +307,11 @@ export class ChessSettingTab extends PluginSettingTab {
     this.containerEl.parentElement?.classList.add(`${CLS_PREFIX}-settings`);
     return [
       {
-        name: "Language / 语言",
+        name: t("settings.language"),
         control: {
           type: "dropdown",
           key: "lang",
-          options: LANG_OPTIONS,
+          options: langOptions(),
         },
       },
       {
@@ -796,9 +799,9 @@ export class ChessSettingTab extends PluginSettingTab {
     const { containerEl } = this;
     containerEl.empty();
 
-    new Setting(containerEl).setName("Language / 语言").addDropdown((d) =>
+    new Setting(containerEl).setName(t("settings.language")).addDropdown((d) =>
       d
-        .addOptions(LANG_OPTIONS)
+        .addOptions(langOptions())
         .setValue(settings.lang)
         .onChange((v) => {
           settings.lang = v as ISettings["lang"];

@@ -275,6 +275,8 @@
   "codeblock.lastName": "أبقِ اسمًا واحدًا على الأقل.",
   "codeblock.removeName": "إزالة «{name}»",
   "codeblock.tagPlaceholder": "اكتب واضغط Enter",
+  "settings.language": "اللغة",
+  "settings.language.auto": "تلقائي (حسب التطبيق)",
   "settings.restartRequired.title": "الإعدادات التالية تتطلب إعادة التشغيل",
   "settings.restartRequired.desc": "الإعدادات التالية تتطلب إعادة تشغيل الإضافة أو Obsidian لتدخل حيز التنفيذ.",
   "settings.defaultSuffix": "(الافتراضي: {names})",

@@ -276,6 +276,8 @@
   "codeblock.lastName": "至少保留一个名称",
   "codeblock.removeName": "删除 \"{name}\"",
   "codeblock.tagPlaceholder": "输入后回车添加",
+  "settings.language": "语言",
+  "settings.language.auto": "自动（跟随软件）",
   "settings.restartRequired.title": "以下设置重启后生效",
   "settings.restartRequired.desc": "以下设置需要重启插件或软件才能生效",
   "settings.defaultSuffix": "(默认: {names})",

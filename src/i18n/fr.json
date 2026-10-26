@@ -275,6 +275,8 @@
   "codeblock.lastName": "Conservez au moins un nom.",
   "codeblock.removeName": "Retirer « {name} »",
   "codeblock.tagPlaceholder": "Saisir et appuyer sur Entrée",
+  "settings.language": "Langue",
+  "settings.language.auto": "Auto (suivre l'application)",
   "settings.restartRequired.title": "Les paramètres suivants nécessitent un redémarrage",
   "settings.restartRequired.desc": "Les paramètres suivants nécessitent un redémarrage du plugin ou d'Obsidian.",
   "settings.defaultSuffix": "(par défaut : {names})",

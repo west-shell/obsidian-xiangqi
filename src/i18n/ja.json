@@ -275,6 +275,8 @@
   "codeblock.lastName": "少なくとも1つの名前を残してください。",
   "codeblock.removeName": "\"{name}\" を削除",
   "codeblock.tagPlaceholder": "入力してEnter",
+  "settings.language": "言語",
+  "settings.language.auto": "自動（アプリに従う）",
   "settings.restartRequired.title": "以下の設定には再起動が必要です",
   "settings.restartRequired.desc": "以下の設定の反映には、プラグインまたはObsidianの再起動が必要です。",
   "settings.defaultSuffix": "（既定値: {names}）",

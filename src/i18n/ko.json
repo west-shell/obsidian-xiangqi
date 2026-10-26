@@ -275,6 +275,8 @@
   "codeblock.lastName": "이름을 하나 이상 남겨 두세요.",
   "codeblock.removeName": "\"{name}\" 삭제",
   "codeblock.tagPlaceholder": "입력 후 Enter",
+  "settings.language": "언어",
+  "settings.language.auto": "자동 (앱 따르기)",
   "settings.restartRequired.title": "다음 설정에는 다시 시작이 필요합니다",
   "settings.restartRequired.desc": "다음 설정을 적용하려면 플러그인 또는 Obsidian을 다시 시작해야 합니다.",
   "settings.defaultSuffix": "(기본값: {names})",

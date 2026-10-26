@@ -275,6 +275,8 @@
   "codeblock.lastName": "Оставьте хотя бы одно имя.",
   "codeblock.removeName": "Удалить \"{name}\"",
   "codeblock.tagPlaceholder": "Введите и нажмите Enter",
+  "settings.language": "Язык",
+  "settings.language.auto": "Авто (как в приложении)",
   "settings.restartRequired.title": "Следующие настройки требуют перезапуска",
   "settings.restartRequired.desc": "Для применения следующих настроек требуется перезапуск плагина или Obsidian.",
   "settings.defaultSuffix": "(по умолчанию: {names})",
