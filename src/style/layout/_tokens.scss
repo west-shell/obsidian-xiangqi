@@ -5,8 +5,10 @@
 // (--{prefix}-gap / -header-h / -board-scale) live in _base.scss instead.
 // ============================================================================
 
-// Breakpoint between the stacked (col1) and side-by-side (col2) layouts.
-$breakpoint: 800px;
+// Breakpoint between the stacked (col1) and side-by-side (col2) layouts:
+// the box must leave a usable board (~380px) after the col2 chrome below.
+// Keep in sync with BREAKPOINT in utils/blockLayout.ts.
+$breakpoint: 680px;
 
 // Viewport allowances.
 $scrollbar-width: 20px;
@@ -21,3 +23,8 @@ $layout-gap: 2px;
 
 $uniboard-table-min: 240px;
 $uniboard-table: minmax(#{$uniboard-table-min}, 1fr);
+
+// Fixed width the side-by-side grid spends on everything but the board: the
+// panel's minimum track ($uniboard-table-min), the vertical toolbar (~48px)
+// and the gaps (~8px). Used to cap the col2 rail to the block column.
+$col2-chrome: calc(#{$uniboard-table-min} + 48px + 8px);

@@ -120,7 +120,7 @@ cg-container {
   border-color: var(--color-accent);
 }
 
-// ---- Resize handle (col2 only, shown via _layout.scss) -----------------------
+// ---- Resize handle (col2 + stacked blocks, shown via _layout.scss) ------------
 
 .#{$cls-prefix}-board-resize {
   position: absolute;

@@ -128,39 +128,32 @@
   }
 }
 
-// ---- col2 for grid hosts (code blocks) -------------------------------------
+// ---- col2 side-by-side grid ---------------------------------------------------
 //
-// A file view laid out by its visible frame (data-cg-frame, see
-// utils/viewFrame.ts) opts out: it picks col1/col2 from the container query at
-// the end of this file instead of the Obsidian window.
-@include col2 {
-  .#{$cls-prefix}-layout:where(
-    :not(.#{$cls-prefix}-file-view[data-cg-frame] *)
-  ) {
-    height: var(--#{$cls-prefix}-col2-size);
-    grid-template-columns: var(--#{$cls-prefix}-col2-width) auto $uniboard-table;
-    grid-template-rows: var(--#{$cls-prefix}-col2-size) 1fr;
-    grid-template-areas:
-      "board toolbar panel"
-      "board toolbar panel";
+// Shared by every grid host: the attr-driven code blocks below and the
+// window-driven hosts in the media query (FEN editor blocks, normal-tab file
+// views). $size/$width name the custom properties holding the rail size and
+// the board column width, so the attr-driven section can substitute its
+// block-capped fit vars. Child selectors spell out full class names on
+// purpose: the window-media caller ends in :where(...), where &__-style
+// concatenation would be invalid.
+@mixin col2-grid($size, $width) {
+  height: var(#{$size});
+  grid-template-columns: var(#{$width}) auto $uniboard-table;
+  grid-template-rows: var(#{$size}) 1fr;
+  grid-template-areas:
+    "board toolbar panel"
+    "board toolbar panel";
+
+  .#{$cls-prefix}-layout__board .#{$cls-prefix}-board-resize {
+    display: block;
   }
 
-  .#{$cls-prefix}-layout__board:where(
-    :not(.#{$cls-prefix}-file-view[data-cg-frame] *)
-  ) {
-    .#{$cls-prefix}-board-resize {
-      display: block;
-    }
-  }
-
-  .#{$cls-prefix}-layout
-    .#{$cls-prefix}-toolbar:where(
-      :not(.#{$cls-prefix}-file-view[data-cg-frame] *)
-    ) {
+  .#{$cls-prefix}-toolbar {
     flex-direction: column;
     flex-wrap: wrap;
-    --#{$cls-prefix}-rail: var(--#{$cls-prefix}-col2-size);
-    height: var(--#{$cls-prefix}-col2-size);
+    --#{$cls-prefix}-rail: var(#{$size});
+    height: var(#{$size});
     align-items: center;
     align-content: flex-start;
     column-gap: 0;
@@ -175,13 +168,112 @@
     }
   }
 
-  .#{$cls-prefix}-layout__panel:where(
-    :not(.#{$cls-prefix}-file-view[data-cg-frame] *)
-  ) {
-    max-height: var(--#{$cls-prefix}-col2-size);
+  .#{$cls-prefix}-layout__panel {
+    max-height: var(#{$size});
     min-width: 160px;
     min-height: 0;
   }
+}
+
+// ---- col2 for window-driven hosts -------------------------------------------
+//
+// Serves the hosts that still follow the Obsidian window: FEN editor blocks
+// and normal-tab file views. A file view laid out by its visible frame
+// (data-cg-frame, see utils/viewFrame.ts) opts out — it picks col1/col2 from
+// the container query at the end of this file. Layouts carrying a data-cg-vis
+// decision (utils/blockLayout.ts) opt out too: code blocks are laid out by
+// the attr-driven section below whatever the window width, so a wide block
+// stays side-by-side in a narrower window and a narrow one stays stacked in
+// a wide one.
+@include col2 {
+  .#{$cls-prefix}-layout:where(
+    :not(.#{$cls-prefix}-file-view[data-cg-frame] *):not([data-cg-vis])
+  ) {
+    @include col2-grid(
+      "--#{$cls-prefix}-col2-size",
+      "--#{$cls-prefix}-col2-width"
+    );
+  }
+}
+
+// ---- stacked code blocks: bound the tree to the board ----------------------
+//
+// In a stacked (col1) code block the branch diagram used to grow with the
+// move list — several times the board height. Bound the panel row (tree
+// canvas + move list) to the board box instead: the move list scrolls inside,
+// the tree stays pannable at a sane size. --cg-block-width is the block's
+// measured layout width (utils/blockLayout.ts; 100vw when JS has not run),
+// matching the `100%` term of the board width in _board.scss. The 45vh floor
+// keeps short games as roomy as before, but never beyond the cap. Scoped to
+// the decided-col1 layouts so a col2 panel keeps sizing from its grid rows.
+//
+// The base rules above force --{prefix}-board-scale to the variant's
+// col1-board-scale, which pins the stacked board to its column and would make
+// the resize handle a no-op. Inherit the body-level zoom instead (set from
+// the saved setting by the variant adapter, live by the drag in Board.svelte)
+// so the handle sizes the board here like it does in col2. The width formula
+// keeps its 100% cap: a block narrower than board-max × scale still fills its
+// column at the default zoom.
+.#{$cls-prefix}-block .#{$cls-prefix}-layout[data-cg-vis="col1"] {
+  --#{$cls-prefix}-board-scale: inherit;
+  --#{$cls-prefix}-row-cap: calc(
+    min(
+        var(--board-max, 100vh) * var(--#{$cls-prefix}-board-scale, 0.85),
+        var(--cg-block-width, 100vw)
+      ) /
+      #{$board-ratio}
+  );
+}
+
+// Stacked blocks keep the board resize handle: the drag adjusts the zoom,
+// which drives the board, the toolbar rail and the row cap together, so the
+// tree follows the board. File views keep it hidden — their board sizes from
+// the container, not the scale.
+.#{$cls-prefix}-block
+  .#{$cls-prefix}-layout[data-cg-vis="col1"]
+  .#{$cls-prefix}-layout__board
+  .#{$cls-prefix}-board-resize {
+  display: block;
+}
+
+.#{$cls-prefix}-block
+  .#{$cls-prefix}-layout[data-cg-vis="col1"]
+  .#{$cls-prefix}-layout__panel {
+  min-height: 0;
+}
+
+.#{$cls-prefix}-block
+  .#{$cls-prefix}-layout[data-cg-vis="col1"]
+  .#{$cls-prefix}-panel__row {
+  min-height: min(45vh, var(--#{$cls-prefix}-row-cap));
+  max-height: var(--#{$cls-prefix}-row-cap);
+}
+
+// ---- wide code blocks: side-by-side follows the JS decision ------------------
+//
+// data-cg-vis="col2" (utils/blockLayout.ts) puts a code block side-by-side
+// whatever the window width: the block's own box decides. The body-level rail
+// vars still follow the window, so cap the rail to the block column —
+// min(window target, block width − col2 chrome) — or the board column
+// overflows a readable-line block (~700px) with its window-derived size.
+// Reading --{prefix}-col2-size here is cycle-free: this element never
+// redefines it, the value keeps coming from body.
+.#{$cls-prefix}-block .#{$cls-prefix}-layout[data-cg-vis="col2"] {
+  --#{$cls-prefix}-col2-fit: min(
+    var(--#{$cls-prefix}-col2-size),
+    max(0px, calc(var(--cg-block-width, 100vw) - #{$col2-chrome}))
+  );
+  @if $col2-size-dimension == "width" {
+    --#{$cls-prefix}-col2-fit-width: var(--#{$cls-prefix}-col2-fit);
+  } @else {
+    --#{$cls-prefix}-col2-fit-width: calc(
+      var(--#{$cls-prefix}-col2-fit) * #{$board-ratio}
+    );
+  }
+  @include col2-grid(
+    "--#{$cls-prefix}-col2-fit",
+    "--#{$cls-prefix}-col2-fit-width"
+  );
 }
 
 // ============================================================================

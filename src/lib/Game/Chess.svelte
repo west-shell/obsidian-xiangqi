@@ -32,6 +32,7 @@
   import { annotationShapes } from "./glyphs";
   import { GLYPH_BY_KEY } from "../../utils/annotation-glyphs";
   import { badgeBoardSvg, resultBadgeKeyOf } from "../../utils/icon";
+  import { blockLayout } from "../../utils/blockLayout";
   import { viewFrame } from "../../utils/viewFrame";
   import { parseOrientationTag } from "../../modules/Source/parse";
   import {
@@ -464,6 +465,7 @@
       ? ` ${CLS_PREFIX}-layout--bars`
       : ''}"
     use:viewFrame
+    use:blockLayout
   >
     <Board
       {settings}
