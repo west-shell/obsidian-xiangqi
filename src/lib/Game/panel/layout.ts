@@ -7,7 +7,7 @@
  *   - 用轮廓行走消除重叠
  */
 
-import type { ChessNode, NodeMap } from "../../../types";
+import type { ChessNode, GhostLine, NodeMap } from "../../../types";
 
 // ─── 内部节点 ───────────────────────
 
@@ -45,6 +45,7 @@ function buildWNode(
   node: ChessNode,
   parent: WNode | null,
   foldedNodes: Set<string>,
+  ghostByParent: Map<string, ChessNode[]>,
 ): WNode {
   const wn: WNode = {
     node,
@@ -70,7 +71,15 @@ function buildWNode(
   for (let i = 0; i < node.children.length; i++) {
     const child = node.children[i];
     if (i > 0 && foldedNodes.has(node.id)) continue;
-    wn.children.push(buildWNode(child, wn, foldedNodes));
+    wn.children.push(buildWNode(child, wn, foldedNodes, ghostByParent));
+  }
+  // Ghost chains append AFTER real children (never mutate node.children):
+  // they occupy the outer slot so real branch positions stay as stable as
+  // the algorithm allows. Folding the attachment node hides them, same as
+  // real branches.
+  if (foldedNodes.has(node.id)) return wn;
+  for (const head of ghostByParent.get(node.id) ?? []) {
+    wn.children.push(buildWNode(head, wn, foldedNodes, ghostByParent));
   }
   return wn;
 }
@@ -285,19 +294,40 @@ function resolveX(w: WNode, prevSum?: number, parentX?: number): void {
 /**
  * 使用 Walker 算法计算棋谱树的布局。
  *
- * 输出：ChessNode 数组，每个节点有 x（水平位置）、y（深度）。
+ * 输出：真实节点数组 + 幽灵节点数组，每个节点有 x（水平位置）、y（深度）。
  * 渲染时用 x * spacingX、y * spacingY 转为像素坐标。
+ * `ghosts` 里的幽灵链附加到 attachId 节点的真实子节点之后参与布局，
+ * 但绝不写回真实树（node.children 不变）。
  */
 export function calculateTreeLayout(
   nodeMap: NodeMap,
   foldedNodes: Set<string>,
   spacing: number = 0.3,
-): ChessNode[] {
+  ghosts: GhostLine[] = [],
+): { nodes: ChessNode[]; ghostNodes: ChessNode[] } {
   const root = nodeMap.get("node-root");
-  if (!root) return [];
+  if (!root) return { nodes: [], ghostNodes: [] };
+
+  // Ghost chain heads grouped by their real attachment node.
+  const ghostByParent = new Map<string, ChessNode[]>();
+  const ghostIdSet = new Set<string>();
+  for (const line of ghosts) {
+    if (!line.head) continue;
+    let heads = ghostByParent.get(line.attachId);
+    if (!heads) {
+      heads = [];
+      ghostByParent.set(line.attachId, heads);
+    }
+    heads.push(line.head);
+    let g: ChessNode | null = line.head;
+    while (g) {
+      ghostIdSet.add(g.id);
+      g = g.children[0] ?? null;
+    }
+  }
 
   // 1) 建树
-  const wRoot = buildWNode(root, null, foldedNodes);
+  const wRoot = buildWNode(root, null, foldedNodes, ghostByParent);
 
   // 2) 布局
   layoutChildren(wRoot, 0, () => spacing);
@@ -306,16 +336,18 @@ export function calculateTreeLayout(
   resolveX(wRoot);
 
   // 4) 把结果写回 ChessNode
-  const result: ChessNode[] = [];
+  const nodes: ChessNode[] = [];
+  const ghostNodes: ChessNode[] = [];
   function collect(wn: WNode): void {
     wn.node.x = Math.round(wn.x * 10) / 10;
     wn.node.y = wn.depth;
-    result.push(wn.node);
+    if (ghostIdSet.has(wn.node.id)) ghostNodes.push(wn.node);
+    else nodes.push(wn.node);
     for (const child of wn.children) {
       collect(child);
     }
   }
   collect(wRoot);
 
-  return result;
+  return { nodes, ghostNodes };
 }

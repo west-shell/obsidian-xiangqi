@@ -234,6 +234,7 @@
   "tree.hideList": "Masquer la liste des coups",
   "tree.showList": "Afficher la liste des coups",
   "tree.togglePreview": "Basculer l'aperçu de position",
+  "tree.ghostInsert": "Insérer la ligne du moteur",
   "tree.draw": "Nulle",
   "tree.whiteWins": "Les Blancs gagnent",
   "tree.redWins": "Les Rouges gagnent",

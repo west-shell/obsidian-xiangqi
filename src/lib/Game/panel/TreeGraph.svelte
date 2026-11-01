@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy, onMount, tick } from "svelte";
-  import { SvelteSet } from "svelte/reactivity";
+  import { SvelteMap, SvelteSet } from "svelte/reactivity";
   import * as d3 from "d3";
   import {
     CLS_PREFIX,
@@ -16,7 +16,12 @@
   } from "../../../chess";
   import type { EventBus } from "../../../core/event-bus";
   import { onLangChange, t } from "../../../i18n";
-  import type { ChessNode, ISettings, NodeMap } from "../../../types";
+  import type {
+    ChessNode,
+    GhostLines,
+    ISettings,
+    NodeMap,
+  } from "../../../types";
   import { GLYPH_BY_KEY } from "../../../utils/annotation-glyphs";
   import { badgeSvg, iconSvg, resultBadgeKeyOf } from "../../../utils/icon";
   import { evalBarIntensity } from "../../../utils/winningChances";
@@ -48,6 +53,89 @@
   };
   let svgEl: SVGSVGElement | undefined = $state();
   let renderedNodes: ChessNode[] = $state([]);
+  let renderedGhostNodes: ChessNode[] = $state([]);
+
+  // ---- Engine PV ghost lines (live-only preview, see EngineModule) ----
+  let ghostLines: GhostLines | null = $state(null);
+  interface GhostInfo {
+    rank: number;
+    score: number;
+    scoreType: "cp" | "mate";
+    isHead: boolean;
+  }
+  let ghostInfoById = $derived.by(() => {
+    const map = new SvelteMap<string, GhostInfo>();
+    if (ghostLines) {
+      for (const line of ghostLines.lines) {
+        let g = line.head;
+        let isHead = true;
+        while (g) {
+          map.set(g.id, {
+            rank: line.rank,
+            score: line.score,
+            scoreType: line.scoreType,
+            isHead,
+          });
+          isHead = false;
+          g = g.children[0] ?? null;
+        }
+      }
+    }
+    return map;
+  });
+  // Parent node (ghost or real attachment) of every rendered ghost.
+  let ghostParentById = $derived.by(() => {
+    const map = new SvelteMap<string, ChessNode>();
+    if (ghostLines) {
+      for (const line of ghostLines.lines) {
+        const attach = nodeMap.get(line.attachId);
+        let prev: ChessNode | null = attach ?? null;
+        let g = line.head;
+        while (g) {
+          if (prev) map.set(g.id, prev);
+          prev = g;
+          g = g.children[0] ?? null;
+        }
+      }
+    }
+    return map;
+  });
+  // Ring color for real nodes matched by a PV line, keyed by node id.
+  let matchedColorById = $derived.by(() => {
+    const map = new SvelteMap<string, string>();
+    if (ghostLines) {
+      for (const line of ghostLines.lines) {
+        const color = ghostScoreColor(line.score, line.scoreType);
+        for (const id of line.matchedIds) {
+          if (!map.has(id)) map.set(id, color);
+        }
+      }
+    }
+    return map;
+  });
+
+  function ghostScoreColor(score: number, scoreType: string): string {
+    if (score > 0 || (scoreType === "mate" && score >= 0)) {
+      return "var(--eval-plus)";
+    }
+    if (score < 0 || (scoreType === "mate" && score < 0)) {
+      return "var(--eval-minus)";
+    }
+    return "var(--text-muted)";
+  }
+
+  function ghostScoreText(score: number, scoreType: string): string {
+    if (scoreType === "mate") {
+      return `#${score >= 0 ? "+" : "-"}${Math.abs(score)}`;
+    }
+    return `${score > 0 ? "+" : ""}${(score / 100).toFixed(2)}`;
+  }
+
+  function onGhostLines(data?: GhostLines | null) {
+    ghostLines = data ?? null;
+    updateTreeLayout();
+  }
+
   let sortedRenderedNodes = $derived.by(() => {
     if (!currentNode) return renderedNodes;
     const cur = currentNode.id;
@@ -97,6 +185,7 @@
     destroyed = true;
     unsubLang();
     eventBus.off("updateUI", onUiVer);
+    eventBus.off("tree-ghost-lines", onGhostLines);
     if (layoutChangeHandler) {
       activeDocument.body.removeEventListener(
         LAYOUT_CHANGE_EVENT,
@@ -111,11 +200,14 @@
   });
 
   function updateTreeLayout() {
-    renderedNodes = calculateTreeLayout(
+    const res = calculateTreeLayout(
       nodeMap,
       foldedNodes,
       TREE_LAYOUT_SPACING,
+      ghostLines?.lines ?? [],
     );
+    renderedNodes = res.nodes;
+    renderedGhostNodes = res.ghostNodes;
   }
 
   function updateZoomExtent() {
@@ -151,7 +243,7 @@
       maxX = -Infinity,
       minY = Infinity,
       maxY = -Infinity;
-    for (const n of renderedNodes) {
+    for (const n of [...renderedNodes, ...renderedGhostNodes]) {
       if (n.x === undefined || n.y === undefined) continue;
       minX = Math.min(minX, n.x);
       maxX = Math.max(maxX, n.x);
@@ -300,6 +392,7 @@
 
   onMount(() => {
     eventBus.on("updateUI", onUiVer);
+    eventBus.on("tree-ghost-lines", onGhostLines);
     if (!svgEl) return;
     updateTreeLayout();
     zoomBehavior = d3.zoom<SVGSVGElement, unknown>().on("zoom", (event) => {
@@ -446,6 +539,27 @@
       {/each}
     {/each}
 
+    {#each renderedGhostNodes as g (g.id)}
+      {@const gInfo = ghostInfoById.get(g.id)}
+      {@const gParent = ghostParentById.get(g.id)}
+      {#if gInfo && gParent && g.x !== undefined && g.y !== undefined && gParent.x !== undefined && gParent.y !== undefined}
+        <path
+          d={`
+        M ${gParent.x * spacingX} ${gParent.y * spacingY}
+        L ${(g.x - 0.3 * Math.sign(g.x - gParent.x)) * spacingX} ${gParent.y * spacingY}
+        L ${g.x * spacingX} ${g.y * spacingY}
+        `}
+          stroke="var(--tree-line)"
+          stroke-linejoin="round"
+          stroke-width="1"
+          stroke-dasharray="2 1.2"
+          opacity={gInfo.rank === 0 ? 0.9 : 0.45}
+          fill="none"
+          style="pointer-events: none"
+        />
+      {/if}
+    {/each}
+
     {#each renderedNodes as node (node.id)}
       {#if node.children.length > 1}
         {@const isLeft = (node.y ?? 0) % 2 === 0}
@@ -515,6 +629,21 @@
             ? "var(--background-modifier-border-focus)"
             : "var(--tree-line)"}
         />
+        {#if matchedColorById.get(node.id)}
+          <rect
+            x={-nw / 2 - 1.5}
+            y={-nodeHeight / 2 - 1.5}
+            width={nw + 3}
+            height={nodeHeight + 3}
+            rx="4"
+            ry="4"
+            fill="none"
+            stroke={matchedColorById.get(node.id)}
+            stroke-width="1"
+            opacity="0.8"
+            style="pointer-events: none"
+          />
+        {/if}
         {#if nodeMode === 0 && !node.move}
           <g
             transform="translate(-4, -4)"
@@ -627,6 +756,56 @@
           </g>
         {/if}
       </g>
+    {/each}
+
+    {#each renderedGhostNodes as g (g.id)}
+      {@const gInfo = ghostInfoById.get(g.id)}
+      {@const gw = localGetNodeWidth(g)}
+      {#if gInfo && g.x !== undefined && g.y !== undefined}
+        <!-- svelte-ignore a11y_click_events_have_key_events -->
+        <!-- svelte-ignore a11y_no_static_element_interactions -->
+        <g
+          class="{CLS_PREFIX}-panel__node"
+          transform="translate({g.x * spacingX} {g.y * spacingY})"
+          opacity={gInfo.rank === 0 ? 1 : 0.6}
+          style="cursor: pointer"
+          onclick={() => eventBus.emit("tree-ghost-materialize", g.id)}
+          onmouseenter={(e) => preview?.showNode(g, e)}
+          onmouseleave={() => preview?.hideNode(g)}
+        >
+          <title>{t("tree.ghostInsert", _lv)}</title>
+          <rect
+            x={-gw / 2}
+            y={-nodeHeight / 2}
+            width={gw}
+            height={nodeHeight}
+            rx="2.5"
+            ry="2.5"
+            fill={getNodeFill(g.color)}
+            fill-opacity="0.4"
+            stroke="var(--tree-line)"
+            stroke-width="0.8"
+            stroke-dasharray="2 1.2"
+          />
+          <text
+            dominant-baseline="central"
+            text-anchor="middle"
+            fill={getNodeTextColor(g.color)}
+            font-size={nodeFontSize()}>{nodeLabel(g)}</text
+          >
+          {#if gInfo.isHead}
+            <text
+              y={-nodeHeight / 2 - 2.5}
+              text-anchor="middle"
+              font-size="6.5px"
+              fill={ghostScoreColor(gInfo.score, gInfo.scoreType)}
+              style="pointer-events: none"
+            >
+              {ghostScoreText(gInfo.score, gInfo.scoreType)}
+            </text>
+          {/if}
+        </g>
+      {/if}
     {/each}
   </g>
 </svg>

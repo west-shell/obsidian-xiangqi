@@ -1,7 +1,14 @@
-import type { ChessNode, IHost, NodeEval, PvLine } from "../../types";
+import type {
+  ChessNode,
+  GhostLines,
+  IHost,
+  NodeEval,
+  PvLine,
+} from "../../types";
 import type { Move } from "../../chess";
 import { Chess, getAutoResult, moveToUci } from "../../chess";
 import { engine, type EngineResult } from "./Engine";
+import { buildGhostLines } from "./ghost-lines";
 import { fillChildrenFromEval } from "./pv-cache";
 import { computeGlyph } from "../../utils/winningChances";
 
@@ -175,6 +182,58 @@ function initEngine(host: object) {
     }
   }
 
+  // ---- Engine PV ghost lines on the tree graph ----
+  // Live-only preview (xiangqiai discardLiveInfo pattern): the lines of
+  // the CURRENT node's last engine search render as ghost chains; they
+  // are discarded on position change, engine stop and game switch.
+  let ghostLines: GhostLines | null = null;
+
+  function emitGhosts() {
+    const node = h.currentNode;
+    if (!node || !node.eval?.pvs) {
+      clearGhosts();
+      return;
+    }
+    ghostLines = buildGhostLines(node);
+    eventBus.emit("tree-ghost-lines", ghostLines);
+  }
+
+  function clearGhosts() {
+    if (!ghostLines) return;
+    ghostLines = null;
+    eventBus.emit("tree-ghost-lines", null);
+  }
+
+  // Clicking a ghost materializes the line: navigate to the attachment
+  // node, then replay the chain move by move — existing moves merge
+  // (runmove matches children), missing ones are created as a variation.
+  eventBus.on<string>("tree-ghost-materialize", (ghostId) => {
+    if (!ghostId || !ghostLines) return;
+    for (const line of ghostLines.lines) {
+      if (!line.head) continue;
+      const moves: Move[] = [];
+      let g: ChessNode | null = line.head;
+      let found = false;
+      while (g) {
+        if (!g.move) break;
+        moves.push(g.move);
+        if (g.id === ghostId) {
+          found = true;
+          break;
+        }
+        g = g.children[0] ?? null;
+      }
+      if (!found) continue;
+      const attach = h.nodeMap.get(line.attachId);
+      if (!attach) return;
+      eventBus.emit("node-click", attach.id);
+      for (const mv of moves) {
+        eventBus.emit("runmove", mv);
+      }
+      return;
+    }
+  });
+
   eventBus.on<string>("analyze-btn-click", async (mode) => {
     if (!mode) return;
     if (engine.isReady()) {
@@ -273,9 +332,15 @@ function initEngine(host: object) {
       lastResult = null;
       batchCancelled = true;
       simFenCounts.clear();
+      clearGhosts();
       if (analyzing) {
         engine.stop();
       }
+    }
+    // Ghost lines are live-only: navigating away from the analyzed node
+    // discards them (a new search repopulates on arrival under auto).
+    if (ghostLines && ghostLines.nodeId !== h.currentNode.id) {
+      clearGhosts();
     }
     if (!autoAnalyze) return;
     const nodeId = h.currentNode.id;
@@ -323,6 +388,7 @@ function initEngine(host: object) {
         depth: node.eval.depth,
         scoreType: node.eval.scoreType,
       });
+      emitGhosts();
       return;
     }
     // A simulation search owns the engine right now; skip so we never
@@ -341,6 +407,7 @@ function initEngine(host: object) {
         applyResultToNode(node, result);
         if (h.currentNode.id === nodeId) {
           h.currentNode = node;
+          emitGhosts();
         }
         lastResult = result;
         eventBus.emit("engine-result", result);
@@ -427,6 +494,7 @@ function initEngine(host: object) {
             const nodeEval = applyResultToNode(node, result);
             if (h.currentNode.id === nodeId) {
               h.currentNode = node;
+              emitGhosts();
               h.eventBus.emit("engine-result", {
                 bestmove: result.bestmove,
                 ponder: result.ponder,
@@ -482,6 +550,7 @@ function initEngine(host: object) {
     analyzing = false;
     pendingNodeId = null;
     lastResult = null;
+    clearGhosts();
     if (autoAnalyze) {
       autoAnalyze = false;
       eventBus.emit("engine-auto-off");
@@ -615,6 +684,7 @@ function initEngine(host: object) {
           applyResultToNode(node, result);
           if (h.currentNode.id === node.id) {
             h.currentNode = node;
+            emitGhosts();
           }
           if (settings.saveEvalPrompt || settings.saveEvalByDefault) {
             h.eventBus.emit("modified", null);

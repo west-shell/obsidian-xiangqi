@@ -155,6 +155,32 @@ export type ChessNode = {
 
 export type NodeMap = Map<string, ChessNode>;
 
+/**
+ * One engine preview ("ghost") line for the tree graph: the MultiPV rank,
+ * the real tree nodes the line matches before diverging, and the ghost
+ * chain (plain ChessNode objects with ghost ids, never in the nodeMap)
+ * hanging from `attachId` via the `head` node.
+ */
+export type GhostLine = {
+  /** MultiPV rank: 0 = best line. */
+  rank: number;
+  /** White-view score of the line. */
+  score: number;
+  scoreType: "cp" | "mate";
+  /** Real node ids matched along the line before the divergence. */
+  matchedIds: string[];
+  /** Real node the ghost chain hangs from (last matched node, or the analyzed node). */
+  attachId: string;
+  /** First ghost node; the chain continues via `children`. Null when the whole line already exists in the tree. */
+  head: ChessNode | null;
+};
+
+export type GhostLines = {
+  /** Id of the node whose search produced the lines. */
+  nodeId: string;
+  lines: GhostLine[];
+};
+
 export type ParsedGame = {
   root: ChessNode;
   nodeMap: NodeMap;

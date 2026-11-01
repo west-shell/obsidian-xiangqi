@@ -235,6 +235,7 @@
   "tree.hideList": "隐藏着法列表",
   "tree.showList": "显示着法列表",
   "tree.togglePreview": "切换预览",
+  "tree.ghostInsert": "插入引擎着法",
   "tree.draw": "平局",
   "tree.whiteWins": "白方获胜",
   "tree.redWins": "红方获胜",
