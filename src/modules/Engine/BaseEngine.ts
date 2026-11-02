@@ -12,6 +12,20 @@ export interface EngineResult {
   pvs?: PvLine[];
 }
 
+/**
+ * Depth-iteration snapshot streamed while a search runs (engine POV,
+ * side to move). Emitted once per completed depth iteration so the UI
+ * can update live instead of waiting for the final result.
+ */
+export interface EngineProgress {
+  score: number;
+  scoreType: "cp" | "mate";
+  depth: number;
+  /** Candidate lines known so far; later MultiPV entries may lag one
+   * iteration behind the mpv-1 line. */
+  pvs: PvLine[];
+}
+
 import type ChessPlugin from "../../main";
 
 type UciHandler = (msg: string) => void;
@@ -83,7 +97,11 @@ export abstract class BaseEngine {
     }
   }
 
-  analyze(fen: string, depth = 15): Promise<EngineResult> {
+  analyze(
+    fen: string,
+    depth = 15,
+    onProgress?: (progress: EngineProgress) => void,
+  ): Promise<EngineResult> {
     if (this.analyzeReject) {
       this.analyzeReject(new Error("Analysis cancelled: new analysis started"));
     }
@@ -102,6 +120,7 @@ export abstract class BaseEngine {
       let lastScore: number | undefined;
       let lastDepth: number | undefined;
       let lastScoreType: "cp" | "mate" | undefined;
+      let expectedPvs = 1;
       const pvMap = new Map<number, PvLine>();
 
       this.analyzeTimeout = window.setTimeout(() => {
@@ -132,20 +151,47 @@ export abstract class BaseEngine {
             }
           }
           const pvMatch = msg.match(/ pv (.+)$/);
+          const depthMatch = msg.match(/depth (\d+)/);
           if (!isBound && score !== undefined && scoreType && pvMatch) {
             pvMap.set(mpv, {
               score,
               scoreType,
               moves: pvMatch[1].trim().split(/\s+/),
             });
+            // Track the widest MultiPV index seen: a depth iteration is
+            // complete when its last line arrives, so every pv in a
+            // streamed snapshot belongs to the same iteration.
+            if (mpv > expectedPvs) expectedPvs = mpv;
           }
           if (mpv === 1 && !isBound) {
             if (score !== undefined && scoreType) {
               lastScore = score;
               lastScoreType = scoreType;
             }
-            const depthMatch = msg.match(/depth (\d+)/);
             if (depthMatch) lastDepth = Number.parseInt(depthMatch[1]);
+          }
+          // Stream one snapshot per completed depth iteration (lichess
+          // protocol.ts): emit once the iteration's last MultiPV line
+          // arrived; the primary score is the tracked mpv-1 score, not
+          // the emitting line's.
+          if (
+            onProgress &&
+            mpv === expectedPvs &&
+            !isBound &&
+            lastScore !== undefined &&
+            lastScoreType &&
+            pvMatch
+          ) {
+            onProgress({
+              score: lastScore,
+              scoreType: lastScoreType,
+              depth: depthMatch
+                ? Number.parseInt(depthMatch[1])
+                : (lastDepth ?? 0),
+              pvs: [...pvMap.entries()]
+                .sort((a, b) => a[0] - b[0])
+                .map(([, pv]) => pv),
+            });
           }
         } else if (msg.startsWith("bestmove")) {
           const parts = msg.split(/\s+/);

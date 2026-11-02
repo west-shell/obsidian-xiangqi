@@ -8,6 +8,7 @@ import type {
 import type { Move } from "../../chess";
 import { Chess, getAutoResult, moveToUci } from "../../chess";
 import { engine, type EngineResult } from "./Engine";
+import type { EngineProgress } from "./BaseEngine";
 import { buildGhostLines, GHOST_MAX_PLIES } from "./ghost-lines";
 import { fillChildrenFromEval } from "./pv-cache";
 import { computeGlyph } from "../../utils/winningChances";
@@ -18,6 +19,46 @@ import { computeGlyph } from "../../utils/winningChances";
  * setting below this keeps the search breadth for child attribution.
  */
 const MULTI_PV_MIN = 3;
+
+/**
+ * Trailing-edge throttle (lichess ceval's throttleWithFlush pattern):
+ * the first call runs immediately; calls within `interval` are queued
+ * and the latest one runs once the interval elapses — intermediate
+ * updates are delayed, never dropped. `cancel` discards a pending
+ * queued call, e.g. when the search finished with a final result.
+ */
+function throttleProgress(
+  interval: number,
+  fn: (progress: EngineProgress) => void,
+): { throttled: (progress: EngineProgress) => void; cancel: () => void } {
+  let timerId: number | null = null;
+  let queued: EngineProgress | null = null;
+  const runNext = (): void => {
+    timerId = null;
+    if (!queued) return;
+    const progress = queued;
+    queued = null;
+    fn(progress);
+    timerId = window.setTimeout(runNext, interval);
+  };
+  return {
+    throttled: (progress: EngineProgress) => {
+      if (timerId !== null) {
+        queued = progress;
+        return;
+      }
+      fn(progress);
+      timerId = window.setTimeout(runNext, interval);
+    },
+    cancel: () => {
+      if (timerId !== null) {
+        window.clearTimeout(timerId);
+        timerId = null;
+      }
+      queued = null;
+    },
+  };
+}
 
 function initEngine(host: object) {
   const h = host as IHost;
@@ -184,6 +225,41 @@ function initEngine(host: object) {
     setNodeGlyph(node);
     fillChildrenFromEval(node);
     return nodeEval;
+  }
+
+  /**
+   * Live depth-iteration update while a search runs (lichess-style):
+   * writes the intermediate eval in white view so the best-move arrow,
+   * eval displays and ghost lines refresh per depth instead of only on
+   * completion. Glyphs and child attribution stay untouched here —
+   * they are computed once from the final result.
+   */
+  function applySearchProgress(node: ChessNode, progress: EngineProgress) {
+    const score = toWhiteView(progress.score, progress.scoreType, node.fen);
+    const pvs = toWhiteViewPvs(progress.pvs, node.fen) ?? [];
+    node.eval = {
+      score,
+      scoreType: progress.scoreType,
+      depth: progress.depth,
+      bestmove: pvs[0]?.moves[0],
+      ponder: pvs[0]?.moves[1],
+      pvs,
+    };
+    const best = pvs[0]?.moves[0];
+    if (best) {
+      eventBus.emit("engine-result", {
+        bestmove: best,
+        ponder: pvs[0]?.moves[1],
+        score,
+        depth: progress.depth,
+        scoreType: progress.scoreType,
+      });
+      // The progress result flips the toolbar's busy flag off; restore
+      // it so the spinner keeps running until the search completes.
+      eventBus.emit("engine-busy");
+    }
+    emitGhosts();
+    eventBus.emit("updateUI");
   }
 
   function dispatchMode(mode: string) {
@@ -356,9 +432,18 @@ function initEngine(host: object) {
       }
     }
     // Ghost lines are live-only: navigating away from the analyzed node
-    // discards them (a new search repopulates on arrival under auto).
+    // discards them, then rebuilds from the visited node's stored eval
+    // so already-analyzed nodes show their candidate lines on revisit.
+    // Derived evals ride an ancestor's PV line; only a real search of
+    // the node itself yields ghost lines here.
     if (ghostLines && ghostLines.nodeId !== h.currentNode.id) {
       clearGhosts();
+    }
+    if (!ghostLines) {
+      const node = h.currentNode;
+      if (node?.eval?.pvs && !node.eval.derived) {
+        emitGhosts();
+      }
     }
     if (!autoAnalyze) return;
     const nodeId = h.currentNode.id;
@@ -397,6 +482,10 @@ function initEngine(host: object) {
       node.eval.depth >= settings.engineDepth &&
       !node.eval.derived
     ) {
+      // Repopulate before the skipExisting early-return: auto-analyze
+      // revisits an analyzed node with skipExisting=true and would
+      // otherwise leave it without ghost lines.
+      emitGhosts();
       if (skipExisting) return;
       eventBus.emit("engine-busy");
       eventBus.emit("engine-result", {
@@ -406,7 +495,6 @@ function initEngine(host: object) {
         depth: node.eval.depth,
         scoreType: node.eval.scoreType,
       });
-      emitGhosts();
       return;
     }
     // A simulation search owns the engine right now; skip so we never
@@ -418,8 +506,19 @@ function initEngine(host: object) {
     const gen = h.generation;
     applyOptions();
     eventBus.emit("engine-busy");
+    // Depth iterations can arrive in bursts; throttle the live updates
+    // (trailing edge: delayed, never dropped).
+    const progress = throttleProgress(125, (p) => {
+      if (stopped || gen !== h.generation) return;
+      if (h.currentNode.id !== nodeId) return;
+      applySearchProgress(node, p);
+    });
     try {
-      const result = await engine.analyze(node.fen, settings.engineDepth);
+      const result = await engine.analyze(
+        node.fen,
+        settings.engineDepth,
+        progress.throttled,
+      );
       if (stopped || gen !== h.generation) return;
       if (result && result.score != null) {
         applyResultToNode(node, result);
@@ -442,6 +541,7 @@ function initEngine(host: object) {
       eventBus.emit("engine-result", null);
       return;
     } finally {
+      progress.cancel();
       analyzing = false;
       if (!stopped && pendingNodeId) {
         pendingNodeId = null;
@@ -506,7 +606,23 @@ function initEngine(host: object) {
           continue;
         }
         try {
-          const result = await engine.analyze(node.fen, settings.engineDepth);
+          // Only the viewed node streams live updates; the rest of the
+          // batch is processed silently.
+          const progress = throttleProgress(125, (p) => {
+            if (stopped || batchCancelled) return;
+            if (h.currentNode.id !== nodeId) return;
+            applySearchProgress(node, p);
+          });
+          let result: EngineResult;
+          try {
+            result = await engine.analyze(
+              node.fen,
+              settings.engineDepth,
+              progress.throttled,
+            );
+          } finally {
+            progress.cancel();
+          }
           if (stopped || batchCancelled) break;
           if (result && result.score != null) {
             const nodeEval = applyResultToNode(node, result);
