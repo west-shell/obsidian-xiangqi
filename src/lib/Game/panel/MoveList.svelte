@@ -14,7 +14,10 @@
   import { onLangChange, t } from "../../../i18n";
   import type { ChessNode, ISettings, NodeEval, NodeMap } from "../../../types";
   import { badgeSvg } from "../../../utils/icon";
-  import { evalBarIntensity } from "../../../utils/winningChances";
+  import {
+    evalBarColor,
+    evalBarIntensity,
+  } from "../../../utils/winningChances";
   import { formatResult } from "./format";
   import type HoverPreview from "./HoverPreview.svelte";
   import { scrollToBTN } from "./scroll";
@@ -126,16 +129,9 @@
   }
 
   function evalBarStyle(ev: NodeEval): string {
-    // Same intensity/colour logic as the tree graph node eval bar
     const intensity = evalBarIntensity(ev);
-    const color =
-      ev.score > 0 || (ev.scoreType === "mate" && ev.score >= 0)
-        ? `color-mix(in srgb, var(--eval-plus) ${60 + intensity * 40}%, transparent)`
-        : ev.score < 0 || (ev.scoreType === "mate" && ev.score < 0)
-          ? `color-mix(in srgb, var(--eval-minus) ${60 + intensity * 40}%, transparent)`
-          : `color-mix(in srgb, var(--text-muted) 60%, transparent)`;
     const width = Math.round(20 + intensity * 60);
-    return `width:${width}%;background-color:${color}`;
+    return `width:${width}%;background-color:${evalBarColor(ev)}`;
   }
 
   // ---- Result toolbar ----

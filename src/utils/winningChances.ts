@@ -76,6 +76,22 @@ export function evalBarIntensity(ev: {
   return Math.abs(winningChances(ev.score));
 }
 
+/**
+ * Solid colour for the eval indicator bars (movelist, tree nodes):
+ * eval-plus / eval-minus / text-muted. No alpha mixing — bar length
+ * (evalBarIntensity) alone encodes the magnitude.
+ */
+export function evalBarColor(ev: {
+  score: number;
+  scoreType: "cp" | "mate";
+}): string {
+  if (ev.score > 0 || (ev.scoreType === "mate" && ev.score >= 0))
+    return "var(--eval-plus)";
+  if (ev.score < 0 || (ev.scoreType === "mate" && ev.score < 0))
+    return "var(--eval-minus)";
+  return "var(--text-muted)";
+}
+
 function winningChancesFromEval(ev: {
   score: number;
   scoreType: "cp" | "mate";

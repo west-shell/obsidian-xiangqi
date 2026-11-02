@@ -24,7 +24,10 @@
   } from "../../../types";
   import { GLYPH_BY_KEY } from "../../../utils/annotation-glyphs";
   import { badgeSvg, iconSvg, resultBadgeKeyOf } from "../../../utils/icon";
-  import { evalBarIntensity } from "../../../utils/winningChances";
+  import {
+    evalBarColor,
+    evalBarIntensity,
+  } from "../../../utils/winningChances";
   import type HoverPreview from "./HoverPreview.svelte";
   import { calculateTreeLayout } from "./layout";
   import { useSetIcon } from "./set-icon";
@@ -694,14 +697,6 @@
         {/if}
         {#if node.eval}
           {@const intensity = evalBarIntensity(node.eval)}
-          {@const color =
-            node.eval.score > 0 ||
-            (node.eval.scoreType === "mate" && node.eval.score >= 0)
-              ? `color-mix(in srgb, var(--eval-plus) ${60 + intensity * 40}%, transparent)`
-              : node.eval.score < 0 ||
-                  (node.eval.scoreType === "mate" && node.eval.score < 0)
-                ? `color-mix(in srgb, var(--eval-minus) ${60 + intensity * 40}%, transparent)`
-                : `color-mix(in srgb, var(--text-muted) 60%, transparent)`}
           {@const barWidth = 2 + intensity * (nw - 4)}
           <rect
             x={-barWidth / 2}
@@ -709,7 +704,7 @@
             width={barWidth}
             height="1.5"
             rx="0.5"
-            fill={color}
+            fill={evalBarColor(node.eval)}
             style="pointer-events: none"
           />
         {/if}
