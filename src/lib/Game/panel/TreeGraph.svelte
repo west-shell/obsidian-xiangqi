@@ -782,12 +782,45 @@
             stroke-width="0.8"
             stroke-dasharray="2 1.2"
           />
-          <text
-            dominant-baseline="central"
-            text-anchor="middle"
-            fill={getNodeTextColor(g.color)}
-            font-size={nodeFontSize()}>{nodeLabel(g)}</text
-          >
+          {#if nodeMode === 0 && !g.move}
+            <g transform="translate(-4, -4)" color="#fff">
+              <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+              {@html iconSvg("house", 8, 1.5)}
+            </g>
+          {:else if nodeMode === 0 && g.move}
+            {@const gDisplay = getNodeDisplay(g.move)}
+            {#if gDisplay && gDisplay.type === "icon"}
+              <g
+                transform="translate(-4, -4)"
+                color={getNodeTextColor(g.color)}
+              >
+                <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+                {@html iconSvg(gDisplay.value, 8, 1.5)}
+              </g>
+            {:else if gDisplay && gDisplay.type === "char"}
+              <text
+                dominant-baseline="central"
+                text-anchor="middle"
+                fill="white"
+                font-size="9px"
+                dy={NODE_CHAR_DY}>{gDisplay.value}</text
+              >
+            {:else}
+              <text
+                dominant-baseline="central"
+                text-anchor="middle"
+                fill={getNodeTextColor(g.color)}
+                font-size={nodeFontSize()}>{nodeLabel(g)}</text
+              >
+            {/if}
+          {:else}
+            <text
+              dominant-baseline="central"
+              text-anchor="middle"
+              fill={getNodeTextColor(g.color)}
+              font-size={nodeFontSize()}>{nodeLabel(g)}</text
+            >
+          {/if}
           {#if gInfo.isHead}
             <text
               y={-nodeHeight / 2 - 2.5}
