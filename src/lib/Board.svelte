@@ -81,6 +81,7 @@
   let boundsResyncHandler: (() => void) | null = null;
   let boardScale: BoardScaleHandle | null = null;
   let boardResizeRo: ResizeObserver | null = null;
+  let mountResizeRo: ResizeObserver | null = null;
   let resizeTimer: ReturnType<typeof setTimeout> | null = null;
   let promoteHandler:
     | ((payload?: { from: Square; to: Square; color: "w" | "b" }) => void)
@@ -268,11 +269,21 @@
     if (!boardElement.offsetWidth) {
       await new Promise<void>((resolve) => {
         const ro = new ResizeObserver(() => {
+          // Hosts such as Excalidraw markdown embeds can tear the board down
+          // mid-mount: Svelte then nulls the `boardElement` binding while this
+          // observer is still attached and detach fires it with a 0x0 box.
+          // Stop observing instead of reading offsetWidth off null.
+          if (destroyed || !boardElement) {
+            ro.disconnect();
+            resolve();
+            return;
+          }
           if (boardElement.offsetWidth) {
             ro.disconnect();
             resolve();
           }
         });
+        mountResizeRo = ro;
         ro.observe(boardElement);
       });
       if (destroyed) return;
@@ -282,7 +293,7 @@
     injectGridSVG(boardElement);
 
     boardResizeRo = new ResizeObserver(() => {
-      if (!api || !boardElement.offsetWidth) return;
+      if (!api || !boardElement || !boardElement.offsetWidth) return;
       if (resizeTimer) clearTimeout(resizeTimer);
       resizeTimer = setTimeout(() => {
         resizeTimer = null;
@@ -333,6 +344,10 @@
 
   onDestroy(() => {
     destroyed = true;
+    if (mountResizeRo) {
+      mountResizeRo.disconnect();
+      mountResizeRo = null;
+    }
     if (boardScale) {
       boardScale.destroy();
       boardScale = null;
