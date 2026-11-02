@@ -88,6 +88,20 @@ function winningChancesFromEval(ev: {
 }
 
 /**
+ * Signed winning-chance value (-1..1) for the eval trend chart, so the
+ * slider strip shares the exact scale of the eval indicator bars (same
+ * winningChances curve, same fixed absolute scale, mate always pinned
+ * to the edge like evalBarIntensity fills the bar).
+ */
+export function evalTrendValue(ev: {
+  score: number;
+  scoreType: "cp" | "mate";
+}): number {
+  if (ev.scoreType === "mate") return ev.score >= 0 ? 1 : -1;
+  return winningChances(ev.score);
+}
+
+/**
  * Compute the glyph for a played move.
  *
  * `prevEval` is the evaluation of the position BEFORE the move,

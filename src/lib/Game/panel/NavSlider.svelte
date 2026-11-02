@@ -3,6 +3,7 @@
   import { CLS_PREFIX } from "../../../chess";
   import type { EventBus } from "../../../core/event-bus";
   import type { ChessNode, NodeMap } from "../../../types";
+  import { evalTrendValue } from "../../../utils/winningChances";
   import { useSetIcon } from "./set-icon";
 
   interface Props {
@@ -61,20 +62,10 @@
     return currentPath.map((id) => {
       const n = nodeMap.get(id);
       if (!n?.eval) return null;
-      if (n.eval.scoreType === "mate")
-        return n.eval.score >= 0 ? Infinity : -Infinity;
-      const s = n.eval.score;
-      return Number.isFinite(s) ? s : null;
+      // Same winning-chances scale as the eval indicator bars — a fixed
+      // absolute mapping instead of the old per-path linear normalization.
+      return evalTrendValue(n.eval);
     });
-  });
-
-  let evalChartMax = $derived.by(() => {
-    let max = 0;
-    for (const v of evalChartData) {
-      if (v !== null && Number.isFinite(v) && Math.abs(v) > max)
-        max = Math.abs(v);
-    }
-    return max || 1;
   });
 
   let evalChartSegments = $derived.by(() => {
@@ -83,11 +74,8 @@
     if (!hasAny || currentPath.length <= 1) return null;
     const w = 20;
     const midX = w / 2;
-    const maxAbs = evalChartMax;
-    if (!Number.isFinite(maxAbs) || maxAbs === 0) return null;
-    const scaleX = (w - 2) / 2 / maxAbs;
-    const edgeR = w - 1;
-    const edgeL = 1;
+    // Fixed scale: -1..1 winning chances map to the full track width.
+    const scaleX = (w - 2) / 2;
     const segments: {
       x1: number;
       y1: number;
@@ -105,18 +93,10 @@
       const i2 = validIndices[j + 1];
       const v1 = data[i1]!;
       const v2 = data[i2]!;
-      const x1 =
-        v1 === Infinity ? edgeR : v1 === -Infinity ? edgeL : midX + v1 * scaleX;
-      const x2 =
-        v2 === Infinity ? edgeR : v2 === -Infinity ? edgeL : midX + v2 * scaleX;
-      const color =
-        v2 === Infinity || (Number.isFinite(v2) && v2 >= 0)
-          ? "var(--eval-plus)"
-          : "var(--eval-minus)";
-      const color1 =
-        v1 === Infinity || (Number.isFinite(v1) && v1 >= 0)
-          ? "var(--eval-plus)"
-          : "var(--eval-minus)";
+      const x1 = midX + v1 * scaleX;
+      const x2 = midX + v2 * scaleX;
+      const color = v2 >= 0 ? "var(--eval-plus)" : "var(--eval-minus)";
+      const color1 = v1 >= 0 ? "var(--eval-plus)" : "var(--eval-minus)";
       if (color1 !== color) {
         segments.push({
           x1,
