@@ -8,12 +8,16 @@ import type {
 import type { Move } from "../../chess";
 import { Chess, getAutoResult, moveToUci } from "../../chess";
 import { engine, type EngineResult } from "./Engine";
-import { buildGhostLines } from "./ghost-lines";
+import { buildGhostLines, GHOST_MAX_PLIES } from "./ghost-lines";
 import { fillChildrenFromEval } from "./pv-cache";
 import { computeGlyph } from "../../utils/winningChances";
 
-/** Number of candidate lines requested from the engine (MultiPV). */
-const MULTI_PV = 3;
+/**
+ * Lower bound for the MultiPV option. The pv-cache attribution uses all
+ * returned ranks to give existing children an eval, so even a ghost-line
+ * setting below this keeps the search breadth for child attribution.
+ */
+const MULTI_PV_MIN = 3;
 
 function initEngine(host: object) {
   const h = host as IHost;
@@ -45,6 +49,7 @@ function initEngine(host: object) {
 
   let appliedOptionsGen = -1;
   let appliedSkill = -1;
+  let appliedMultiPv = -1;
   let appliedFixedOptions = false;
 
   function applyOptions() {
@@ -56,6 +61,7 @@ function initEngine(host: object) {
     if (engine.generation !== appliedOptionsGen) {
       appliedOptionsGen = engine.generation;
       appliedSkill = -1;
+      appliedMultiPv = -1;
       appliedFixedOptions = false;
     }
     if (appliedSkill !== settings.engineSkillLevel) {
@@ -72,8 +78,16 @@ function initEngine(host: object) {
       // reallocate and clear the TT in some Stockfish builds, which
       // would break cross-search cache reuse.
       engine.postCommand(`setoption name Hash value 64`);
-      engine.postCommand(`setoption name MultiPV value ${MULTI_PV}`);
       appliedFixedOptions = true;
+    }
+    // MultiPV follows the ghost-line setting: the engine searches (and
+    // the tree renders) the requested number of candidate lines, with a
+    // floor of MULTI_PV_MIN for pv-cache child attribution. Unlike
+    // "Hash", re-sending MultiPV is safe — it never clears the TT.
+    const multiPv = Math.max(MULTI_PV_MIN, settings.engineGhostLines);
+    if (appliedMultiPv !== multiPv) {
+      engine.postCommand(`setoption name MultiPV value ${multiPv}`);
+      appliedMultiPv = multiPv;
     }
   }
 
@@ -190,11 +204,15 @@ function initEngine(host: object) {
 
   function emitGhosts() {
     const node = h.currentNode;
-    if (!node || !node.eval?.pvs) {
+    if (!settings.showEngineGhosts || !node || !node.eval?.pvs) {
       clearGhosts();
       return;
     }
-    ghostLines = buildGhostLines(node);
+    ghostLines = buildGhostLines(
+      node,
+      GHOST_MAX_PLIES,
+      settings.engineGhostLines,
+    );
     eventBus.emit("tree-ghost-lines", ghostLines);
   }
 

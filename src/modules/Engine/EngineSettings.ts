@@ -15,6 +15,8 @@ export const EngineSettingsModule = {
       let showBestMove = host.settings.showEngineBestMove;
       let showPonder = host.settings.showEnginePonder;
       let showEngineAnn = host.settings.showEngineAnnotations;
+      let showGhosts = host.settings.showEngineGhosts;
+      let ghostLinesValue = host.settings.engineGhostLines;
 
       engineModal.onOpen = () => {
         const { contentEl } = engineModal;
@@ -99,6 +101,35 @@ export const EngineSettingsModule = {
           showEngineAnn = engineAnnToggle.checked;
         });
 
+        const ghostContainer = contentEl.createDiv(
+          `${CLS_PREFIX}-engine-toggle`,
+        );
+        const ghostToggle = ghostContainer.createEl("input", {
+          type: "checkbox",
+        });
+        ghostToggle.checked = showGhosts;
+        ghostContainer.createEl("label", { text: t("engine.showGhosts") });
+        ghostToggle.addEventListener("change", () => {
+          showGhosts = ghostToggle.checked;
+        });
+
+        contentEl.createEl("label", { text: t("engine.ghostLines") });
+        const ghostLinesSlider = contentEl.createEl("input", {
+          type: "range",
+        });
+        ghostLinesSlider.setAttribute("min", "1");
+        ghostLinesSlider.setAttribute("max", "5");
+        ghostLinesSlider.setAttribute("step", "1");
+        ghostLinesSlider.value = String(ghostLinesValue);
+        const ghostLinesLabel = contentEl.createDiv({
+          text: String(ghostLinesValue),
+          cls: `${CLS_PREFIX}-range-value`,
+        });
+        ghostLinesSlider.addEventListener("input", () => {
+          ghostLinesValue = Number.parseInt(ghostLinesSlider.value) || 3;
+          ghostLinesLabel.textContent = String(ghostLinesValue);
+        });
+
         const btnContainer = contentEl.createDiv("modal-button-container");
         const okBtn = btnContainer.createEl("button", {
           text: t("confirm.yes"),
@@ -117,6 +148,10 @@ export const EngineSettingsModule = {
           host.settings.showEngineBestMove = showBestMove;
           host.settings.showEnginePonder = showPonder;
           host.settings.showEngineAnnotations = showEngineAnn;
+          host.settings.showEngineGhosts = showGhosts;
+          if (ghostLinesValue >= 1 && ghostLinesValue <= 5) {
+            host.settings.engineGhostLines = ghostLinesValue;
+          }
           void host.plugin.saveSettings();
           host.plugin.refresh();
           engineModal.close();

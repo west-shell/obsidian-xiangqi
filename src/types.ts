@@ -56,6 +56,10 @@ export interface ISettings {
   showEngineBestMove: boolean;
   showEnginePonder: boolean;
   showEngineAnnotations: boolean;
+  /** Render the engine's candidate lines as ghost branches on the tree graph. */
+  showEngineGhosts: boolean;
+  /** How many engine candidate lines (1–5) to render as ghost branches. */
+  engineGhostLines: number;
   showBoardAnnotations: boolean;
   saveEvalByDefault: boolean;
   saveEvalPrompt: boolean;

@@ -31,18 +31,23 @@ function ghostFromMove(move: Move, id: string, parentID: string): ChessNode {
  * from the last matched node. Lines that fully match the tree keep only
  * their matchedIds (real-node highlight), with a null head.
  *
+ * `maxLines` caps how many PV lines (by rank) are rendered; the rest are
+ * skipped entirely.
+ *
  * Pure with respect to the tree: `node` and its descendants are read,
  * never written.
  */
 export function buildGhostLines(
   node: ChessNode,
   maxPlies: number = GHOST_MAX_PLIES,
+  maxLines: number = Number.POSITIVE_INFINITY,
 ): GhostLines | null {
   const pvs = node.eval?.pvs;
   if (!pvs || pvs.length === 0) return null;
+  const lineCount = Math.min(pvs.length, maxLines);
   const chess = new Chess();
   const lines: GhostLine[] = [];
-  for (let rank = 0; rank < pvs.length; rank++) {
+  for (let rank = 0; rank < lineCount; rank++) {
     const pv = pvs[rank];
     const moves = pv.moves.slice(0, maxPlies);
     if (moves.length === 0) continue;

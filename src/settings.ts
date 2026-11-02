@@ -192,6 +192,8 @@ export const DEFAULT_SETTINGS: ISettings = {
   showEngineBestMove: true,
   showEnginePonder: true,
   showEngineAnnotations: true,
+  showEngineGhosts: true,
+  engineGhostLines: 3,
   showBoardAnnotations: true,
   saveEvalByDefault: false,
   saveEvalPrompt: true,
@@ -288,6 +290,8 @@ const REFRESH_KEYS = new Set<string>([
   "showEngineBestMove",
   "showEnginePonder",
   "showEngineAnnotations",
+  "showEngineGhosts",
+  "engineGhostLines",
   "boardMarginTop",
   "boardMarginBottom",
 ]);
@@ -537,6 +541,22 @@ export class ChessSettingTab extends PluginSettingTab {
             name: t("engine.showEngineAnnotations"),
             desc: t("engine.showEngineAnnotations.desc"),
             control: { type: "toggle", key: "showEngineAnnotations" },
+          },
+          {
+            name: t("engine.showGhosts"),
+            desc: t("engine.showGhosts.desc"),
+            control: { type: "toggle", key: "showEngineGhosts" },
+          },
+          {
+            name: t("engine.ghostLines"),
+            desc: t("engine.ghostLines.desc"),
+            control: {
+              type: "slider",
+              key: "engineGhostLines",
+              min: 1,
+              max: 5,
+              step: 1,
+            },
           },
         ],
       },
@@ -1148,6 +1168,31 @@ export class ChessSettingTab extends PluginSettingTab {
           this.plugin.refresh();
         }),
       );
+
+    new Setting(containerEl)
+      .setName(t("engine.showGhosts"))
+      .setDesc(t("engine.showGhosts.desc"))
+      .addToggle((toggle) =>
+        toggle.setValue(settings.showEngineGhosts).onChange((value) => {
+          settings.showEngineGhosts = value;
+          void this.plugin.saveSettings();
+          this.plugin.refresh();
+        }),
+      );
+
+    addSliderWithValue(
+      containerEl,
+      t("engine.ghostLines"),
+      t("engine.ghostLines.desc"),
+      settings.engineGhostLines,
+      { min: 1, max: 5, step: 1 },
+      "",
+      (v) => {
+        settings.engineGhostLines = v;
+        void this.plugin.saveSettings();
+        this.plugin.refresh();
+      },
+    );
 
     // ---- 保存 ----
     new Setting(containerEl).setName(t("save.title")).setHeading();
