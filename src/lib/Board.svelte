@@ -24,7 +24,6 @@
   } from "../chess";
   import type { EventBus } from "../core/event-bus";
   import { bridgeForeignEvents } from "../utils/boardEventBridge";
-  import { type BoardScaleHandle, trackBoardScale } from "../utils/boardScale";
   import { iconSvg } from "../utils/icon";
   import type { ISettings } from "../types";
 
@@ -80,7 +79,6 @@
   let api: Api | null = $state(null);
   let layoutChangeHandler: (() => void) | null = null;
   let boundsResyncHandler: (() => void) | null = null;
-  let boardScale: BoardScaleHandle | null = null;
   let boardResizeRo: ResizeObserver | null = null;
   /** Disconnects the foreign-document event bridge, once adopted. */
   let boardBridge: (() => void) | null = null;
@@ -96,8 +94,6 @@
       if (api && boardElement.offsetWidth) {
         api.state.dom.bounds.clear();
         api.state.dom.redraw();
-        // Hosts may have changed both the box and the ancestor scale.
-        boardScale?.refresh();
       }
     }, 100);
   };
@@ -316,7 +312,6 @@
     const foreignDoc = boardElement.ownerDocument !== document;
     if (foreignDoc) config.trustAllEvents = true;
     api = Chessground(boardElement, config);
-    boardScale = trackBoardScale(boardElement, api);
     injectGridSVG(boardElement);
     if (foreignDoc) adoptForeignDocument();
 
@@ -397,10 +392,6 @@
     if (mountResizeRo) {
       mountResizeRo.disconnect();
       mountResizeRo = null;
-    }
-    if (boardScale) {
-      boardScale.destroy();
-      boardScale = null;
     }
     if (boardResizeRo) {
       boardResizeRo.disconnect();

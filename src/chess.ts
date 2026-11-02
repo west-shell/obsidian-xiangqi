@@ -1,6 +1,5 @@
 // ========== Library Re-exports ==========
 export { Chessground } from "@weshell/xiangqiground";
-export { renderResized, updateBounds } from "@weshell/xiangqiground/render";
 export type { Api } from "@weshell/xiangqiground/api";
 export type { Config } from "@weshell/xiangqiground/config";
 export type { DrawShape } from "@weshell/xiangqiground/draw";
