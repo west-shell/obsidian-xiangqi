@@ -541,10 +541,13 @@ function initEngine(host: object) {
       eventBus.emit("engine-result", result);
     } catch (err) {
       if (stopped) return;
-      // Superseded by a newer search: not a failure.
+      // Superseded by a newer search, or rejected by an engine
+      // teardown/unload (FileHost switch, generation change): not a
+      // failure worth reporting.
       if (
         err instanceof Error &&
-        err.message.startsWith("Analysis cancelled")
+        (err.message.startsWith("Analysis cancelled") ||
+          err.message.startsWith("Engine terminated"))
       ) {
         return;
       }
