@@ -28,18 +28,48 @@ export interface EngineProgress {
 
 import type ChessPlugin from "../../main";
 
-type UciHandler = (msg: string) => void;
+/**
+ * One queued analysis (lila ceval Protocol.Work): the promise endpoints,
+ * the per-work parse state, and the stop disposition.
+ */
+interface EngineWork {
+  fen: string;
+  depth: number;
+  onProgress?: (progress: EngineProgress) => void;
+  resolve: (result: EngineResult) => void;
+  reject: (reason: Error) => void;
+  /** "stop" posted; settle with the partial result when bestmove arrives. */
+  stopRequested: boolean;
+  /** Analysis watchdog (replaces the promise-scoped timeout). */
+  watchdog: number | null;
+  lastScore: number | undefined;
+  lastDepth: number | undefined;
+  lastScoreType: "cp" | "mate" | undefined;
+  expectedPvs: number;
+  pvMap: Map<number, PvLine>;
+}
 
 export abstract class BaseEngine {
   protected worker: Worker | null = null;
   protected ready = false;
   private generationCounter = 0;
   protected plugin: ChessPlugin | null = null;
-  protected msgHandler: UciHandler | null = null;
   protected initResolve: ((value: void) => void) | null = null;
   protected initReject: ((reason: Error) => void) | null = null;
-  protected analyzeReject: ((reason: Error) => void) | null = null;
-  protected analyzeTimeout: number | null = null;
+
+  /**
+   * lila ceval Protocol state machine: at most one search in flight
+   * (`work`), one queued search (`nextWork`, latest wins), and a
+   * `draining` flag that swallows the late bestmove of a
+   * watchdog-aborted search so it can never settle the next one. The
+   * next "position"/"go" is only posted after the previous bestmove was
+   * RECEIVED, so worker-message ordering serializes searches: a stale
+   * bestmove can never be attributed to a successor.
+   */
+  private work: EngineWork | null = null;
+  private nextWork: EngineWork | null = null;
+  private draining = false;
+  private drainTimer: number | null = null;
 
   setPlugin(plugin: ChessPlugin): void {
     this.plugin = plugin;
@@ -92,7 +122,7 @@ export abstract class BaseEngine {
         this.initResolve = null;
         this.initReject = null;
       } else {
-        this.msgHandler?.(trimmed);
+        this.handleUciLine(trimmed);
       }
     }
   }
@@ -102,132 +132,47 @@ export abstract class BaseEngine {
     depth = 15,
     onProgress?: (progress: EngineProgress) => void,
   ): Promise<EngineResult> {
-    if (this.analyzeReject) {
-      this.analyzeReject(new Error("Analysis cancelled: new analysis started"));
-    }
-    if (this.analyzeTimeout !== null) {
-      window.clearTimeout(this.analyzeTimeout);
-    }
-
     return new Promise((resolve, reject) => {
       if (!this.worker || !this.ready) {
         reject(new Error("Engine not ready"));
         return;
       }
-
-      this.analyzeReject = reject;
-
-      let lastScore: number | undefined;
-      let lastDepth: number | undefined;
-      let lastScoreType: "cp" | "mate" | undefined;
-      let expectedPvs = 1;
-      const pvMap = new Map<number, PvLine>();
-
-      this.analyzeTimeout = window.setTimeout(() => {
-        this.analyzeTimeout = null;
-        this.msgHandler = null;
-        this.analyzeReject = null;
-        this.stop();
-        reject(new Error("Analysis timeout"));
-      }, 300_000);
-
-      this.msgHandler = (msg: string) => {
-        if (msg.startsWith("info")) {
-          // Skip bound-flagged lines: their scores are not exact
-          const isBound = / (lowerbound|upperbound) /.test(msg);
-          const mpvMatch = msg.match(/ multipv (\d+)/);
-          const mpv = mpvMatch ? Number.parseInt(mpvMatch[1]) : 1;
-          let score: number | undefined;
-          let scoreType: "cp" | "mate" | undefined;
-          const mateMatch = msg.match(/score mate (-?\d+)/);
-          if (mateMatch) {
-            scoreType = "mate";
-            score = Number.parseInt(mateMatch[1]);
-          } else {
-            const cpMatch = msg.match(/score cp (-?\d+)/);
-            if (cpMatch) {
-              scoreType = "cp";
-              score = Number.parseInt(cpMatch[1]);
-            }
-          }
-          const pvMatch = msg.match(/ pv (.+)$/);
-          const depthMatch = msg.match(/depth (\d+)/);
-          if (!isBound && score !== undefined && scoreType && pvMatch) {
-            pvMap.set(mpv, {
-              score,
-              scoreType,
-              moves: pvMatch[1].trim().split(/\s+/),
-            });
-            // Track the widest MultiPV index seen: a depth iteration is
-            // complete when its last line arrives, so every pv in a
-            // streamed snapshot belongs to the same iteration.
-            if (mpv > expectedPvs) expectedPvs = mpv;
-          }
-          if (mpv === 1 && !isBound) {
-            if (score !== undefined && scoreType) {
-              lastScore = score;
-              lastScoreType = scoreType;
-            }
-            if (depthMatch) lastDepth = Number.parseInt(depthMatch[1]);
-          }
-          // Stream one snapshot per completed depth iteration (lichess
-          // protocol.ts): emit once the iteration's last MultiPV line
-          // arrived; the primary score is the tracked mpv-1 score, not
-          // the emitting line's.
-          if (
-            onProgress &&
-            mpv === expectedPvs &&
-            !isBound &&
-            lastScore !== undefined &&
-            lastScoreType &&
-            pvMatch
-          ) {
-            onProgress({
-              score: lastScore,
-              scoreType: lastScoreType,
-              depth: depthMatch
-                ? Number.parseInt(depthMatch[1])
-                : (lastDepth ?? 0),
-              pvs: [...pvMap.entries()]
-                .sort((a, b) => a[0] - b[0])
-                .map(([, pv]) => pv),
-            });
-          }
-        } else if (msg.startsWith("bestmove")) {
-          const parts = msg.split(/\s+/);
-          const bestmove = parts[1];
-          const ponderIdx = parts.indexOf("ponder");
-          const ponder =
-            ponderIdx !== -1 && parts[ponderIdx + 1]
-              ? parts[ponderIdx + 1]
-              : undefined;
-          this.msgHandler = null;
-          this.analyzeReject = null;
-          if (this.analyzeTimeout !== null) {
-            window.clearTimeout(this.analyzeTimeout);
-            this.analyzeTimeout = null;
-          }
-          if (bestmove) {
-            const pvs = [...pvMap.entries()]
-              .sort((a, b) => a[0] - b[0])
-              .map(([, pv]) => pv);
-            resolve({
-              bestmove,
-              ponder,
-              score: lastScore,
-              depth: lastDepth,
-              scoreType: lastScoreType,
-              pvs: pvs.length > 0 ? pvs : undefined,
-            });
-          } else {
-            reject(new Error("No move found"));
-          }
-        }
-      };
-
-      this.worker.postMessage(`position fen ${fen}`);
-      this.worker.postMessage(`go depth ${depth}`);
+      this.enqueue({
+        fen,
+        depth,
+        onProgress,
+        resolve,
+        reject,
+        stopRequested: false,
+        watchdog: null,
+        lastScore: undefined,
+        lastDepth: undefined,
+        lastScoreType: undefined,
+        expectedPvs: 1,
+        pvMap: new Map(),
+      });
     });
+  }
+
+  /**
+   * lila Protocol.compute(): park `next` in the single pending slot
+   * (latest wins — a superseded queued work is rejected so its caller
+   * never dangles), request a stop of the running search, then try to
+   * swap. The successor's "position"/"go" only goes out once the
+   * running search's bestmove arrived.
+   */
+  private enqueue(next: EngineWork): void {
+    if (this.nextWork) {
+      const stale = this.nextWork;
+      this.nextWork = null;
+      if (stale.watchdog !== null) {
+        window.clearTimeout(stale.watchdog);
+      }
+      stale.reject(new Error("Analysis cancelled: new analysis started"));
+    }
+    this.nextWork = next;
+    this.stopWork();
+    this.swapWork();
   }
 
   postCommand(cmd: string): void {
@@ -236,20 +181,193 @@ export abstract class BaseEngine {
     }
   }
 
+  /**
+   * lila Protocol.stop()/compute(undefined): drop the queued search and
+   * stop the running one. The running search still resolves with its
+   * partial result when the engine answers "stop" with "bestmove".
+   */
   stop(): void {
-    if (this.worker && this.ready) {
-      this.worker.postMessage("stop");
+    if (this.nextWork) {
+      const stale = this.nextWork;
+      this.nextWork = null;
+      if (stale.watchdog !== null) {
+        window.clearTimeout(stale.watchdog);
+      }
+      stale.reject(new Error("Analysis cancelled: engine stopped"));
+    }
+    this.stopWork();
+  }
+
+  /** lila Protocol.stop(): idempotent — one "stop" per running search. */
+  private stopWork(): void {
+    if (this.work && !this.work.stopRequested) {
+      this.work.stopRequested = true;
+      this.worker?.postMessage("stop");
+    }
+  }
+
+  /** lila Protocol.swapWork(): start the queued search only when the engine is free. */
+  private swapWork(): void {
+    if (!this.worker || !this.ready) return;
+    if (this.work || this.draining) return;
+    this.work = this.nextWork;
+    this.nextWork = null;
+    if (!this.work) return;
+    const work = this.work;
+    work.watchdog = window.setTimeout(() => {
+      work.watchdog = null;
+      if (this.work !== work) return;
+      // Unblock the caller now; the engine's late bestmove is swallowed
+      // via `draining` so it can never settle the next search.
+      this.work = null;
+      this.draining = true;
+      this.worker?.postMessage("stop");
+      this.drainTimer = window.setTimeout(() => {
+        this.drainTimer = null;
+        // Engine presumed dead: stop waiting for its bestmove.
+        if (this.draining) {
+          this.draining = false;
+          this.swapWork();
+        }
+      }, 5000);
+      work.reject(new Error("Analysis timeout"));
+    }, 300_000);
+    this.worker.postMessage(`position fen ${work.fen}`);
+    this.worker.postMessage(`go depth ${work.depth}`);
+  }
+
+  private handleUciLine(line: string): void {
+    if (line.startsWith("bestmove")) {
+      if (this.draining) {
+        // Bestmove of a watchdog-aborted search: swallow it, then let a
+        // queued successor start.
+        this.draining = false;
+        if (this.drainTimer !== null) {
+          window.clearTimeout(this.drainTimer);
+          this.drainTimer = null;
+        }
+        this.swapWork();
+        return;
+      }
+      const work = this.work;
+      if (!work) return;
+      this.work = null;
+      if (work.watchdog !== null) {
+        window.clearTimeout(work.watchdog);
+        work.watchdog = null;
+      }
+      const parts = line.split(/\s+/);
+      const bestmove = parts[1];
+      const ponderIdx = parts.indexOf("ponder");
+      const ponder =
+        ponderIdx !== -1 && parts[ponderIdx + 1]
+          ? parts[ponderIdx + 1]
+          : undefined;
+      if (bestmove) {
+        const pvs = [...work.pvMap.entries()]
+          .sort((a, b) => a[0] - b[0])
+          .map(([, pv]) => pv);
+        work.resolve({
+          bestmove,
+          ponder,
+          score: work.lastScore,
+          depth: work.lastDepth,
+          scoreType: work.lastScoreType,
+          pvs: pvs.length > 0 ? pvs : undefined,
+        });
+      } else {
+        work.reject(new Error("No move found"));
+      }
+      // lila Protocol: a queued successor starts right after bestmove.
+      this.swapWork();
+      return;
+    }
+
+    const work = this.work;
+    if (!work || !line.startsWith("info")) return;
+    // Skip bound-flagged lines: their scores are not exact
+    const isBound = / (lowerbound|upperbound) /.test(line);
+    const mpvMatch = line.match(/ multipv (\d+)/);
+    const mpv = mpvMatch ? Number.parseInt(mpvMatch[1]) : 1;
+    let score: number | undefined;
+    let scoreType: "cp" | "mate" | undefined;
+    const mateMatch = line.match(/score mate (-?\d+)/);
+    if (mateMatch) {
+      scoreType = "mate";
+      score = Number.parseInt(mateMatch[1]);
+    } else {
+      const cpMatch = line.match(/score cp (-?\d+)/);
+      if (cpMatch) {
+        scoreType = "cp";
+        score = Number.parseInt(cpMatch[1]);
+      }
+    }
+    const pvMatch = line.match(/ pv (.+)$/);
+    const depthMatch = line.match(/depth (\d+)/);
+    if (!isBound && score !== undefined && scoreType && pvMatch) {
+      work.pvMap.set(mpv, {
+        score,
+        scoreType,
+        moves: pvMatch[1].trim().split(/\s+/),
+      });
+      // Track the widest MultiPV index seen: a depth iteration is
+      // complete when its last line arrives, so every pv in a
+      // streamed snapshot belongs to the same iteration.
+      if (mpv > work.expectedPvs) work.expectedPvs = mpv;
+    }
+    if (mpv === 1 && !isBound) {
+      if (score !== undefined && scoreType) {
+        work.lastScore = score;
+        work.lastScoreType = scoreType;
+      }
+      if (depthMatch) work.lastDepth = Number.parseInt(depthMatch[1]);
+    }
+    // Stream one snapshot per completed depth iteration (lichess
+    // protocol.ts): emit once the iteration's last MultiPV line
+    // arrived; the primary score is the tracked mpv-1 score, not
+    // the emitting line's.
+    if (
+      work.onProgress &&
+      mpv === work.expectedPvs &&
+      !isBound &&
+      work.lastScore !== undefined &&
+      work.lastScoreType &&
+      pvMatch
+    ) {
+      work.onProgress({
+        score: work.lastScore,
+        scoreType: work.lastScoreType,
+        depth: depthMatch
+          ? Number.parseInt(depthMatch[1])
+          : (work.lastDepth ?? 0),
+        pvs: [...work.pvMap.entries()]
+          .sort((a, b) => a[0] - b[0])
+          .map(([, pv]) => pv),
+      });
     }
   }
 
   terminate(): void {
-    if (this.analyzeReject) {
-      this.analyzeReject(new Error("Engine terminated"));
-      this.analyzeReject = null;
+    const work = this.work;
+    const next = this.nextWork;
+    this.work = null;
+    this.nextWork = null;
+    this.draining = false;
+    if (this.drainTimer !== null) {
+      window.clearTimeout(this.drainTimer);
+      this.drainTimer = null;
     }
-    if (this.analyzeTimeout !== null) {
-      window.clearTimeout(this.analyzeTimeout);
-      this.analyzeTimeout = null;
+    if (work) {
+      if (work.watchdog !== null) {
+        window.clearTimeout(work.watchdog);
+      }
+      work.reject(new Error("Engine terminated"));
+    }
+    if (next) {
+      if (next.watchdog !== null) {
+        window.clearTimeout(next.watchdog);
+      }
+      next.reject(new Error("Engine terminated"));
     }
     if (this.worker) {
       try {
@@ -261,7 +379,6 @@ export abstract class BaseEngine {
       this.worker = null;
     }
     this.ready = false;
-    this.msgHandler = null;
     this.initResolve = null;
     this.initReject = null;
   }

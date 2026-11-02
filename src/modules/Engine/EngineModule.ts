@@ -467,6 +467,10 @@ function initEngine(host: object) {
     const nodeId = h.currentNode.id;
     if (analyzing) {
       pendingNodeId = nodeId;
+      // A fresh request also revives a search draining after engine-stop:
+      // the draining search's partial result applies normally, then the
+      // pending node is analyzed via the pendingNodeId re-emit.
+      stopped = false;
       engine.stop();
       return;
     }
@@ -537,6 +541,13 @@ function initEngine(host: object) {
       eventBus.emit("engine-result", result);
     } catch (err) {
       if (stopped) return;
+      // Superseded by a newer search: not a failure.
+      if (
+        err instanceof Error &&
+        err.message.startsWith("Analysis cancelled")
+      ) {
+        return;
+      }
       console.error("[Engine] analyze failed:", err);
       eventBus.emit("engine-result", null);
       return;
@@ -674,6 +685,12 @@ function initEngine(host: object) {
     } finally {
       analyzing = false;
       batchAnalyzing = false;
+      // Honor a single-analysis request that arrived while the batch
+      // held `analyzing` (same re-emit as the single handler's finally).
+      if (!stopped && pendingNodeId) {
+        pendingNodeId = null;
+        eventBus.emit("engine-analyze", true);
+      }
     }
   });
 
@@ -681,7 +698,13 @@ function initEngine(host: object) {
     stopped = true;
     batchCancelled = true;
     engine.stop();
-    analyzing = false;
+    // `analyzing` is deliberately NOT cleared here: the in-flight
+    // search's promise is still draining until the worker answers
+    // "stop" with "bestmove". Clearing it early let a second
+    // engine.analyze() start while the first was pending, which
+    // rejected the old promise ("Analysis cancelled") and clobbered
+    // the new run's flags in the old handler's finally. The owner's
+    // finally clears it when the promise settles.
     pendingNodeId = null;
     lastResult = null;
     clearGhosts();
