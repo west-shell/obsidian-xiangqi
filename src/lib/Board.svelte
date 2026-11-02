@@ -23,6 +23,7 @@
     ZOOM_CHANGE_EVENT,
   } from "../chess";
   import type { EventBus } from "../core/event-bus";
+  import { bridgeForeignEvents } from "../utils/boardEventBridge";
   import { type BoardScaleHandle, trackBoardScale } from "../utils/boardScale";
   import { iconSvg } from "../utils/icon";
   import type { ISettings } from "../types";
@@ -81,6 +82,25 @@
   let boundsResyncHandler: (() => void) | null = null;
   let boardScale: BoardScaleHandle | null = null;
   let boardResizeRo: ResizeObserver | null = null;
+  /** Disconnects the foreign-document event bridge, once adopted. */
+  let boardBridge: (() => void) | null = null;
+  /** Resize observer created in the board's (foreign) document window. */
+  let foreignResizeRo: ResizeObserver | null = null;
+  let adoptTimer: ReturnType<typeof setInterval> | null = null;
+  /** Stale bounds rescheduler shared by both resize observers. */
+  const scheduleBoardRefresh = (): void => {
+    if (!api || !boardElement || !boardElement.offsetWidth) return;
+    if (resizeTimer) clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      resizeTimer = null;
+      if (api && boardElement.offsetWidth) {
+        api.state.dom.bounds.clear();
+        api.state.dom.redraw();
+        // Hosts may have changed both the box and the ancestor scale.
+        boardScale?.refresh();
+      }
+    }, 100);
+  };
   let mountResizeRo: ResizeObserver | null = null;
   let resizeTimer: ReturnType<typeof setTimeout> | null = null;
   let promoteHandler:
@@ -288,23 +308,19 @@
       });
       if (destroyed) return;
     }
+    // Obsidian's canvas FileNotes (Excalidraw markdown embeds) render the
+    // block in the main document and then transplant it into an embed iframe;
+    // chessground binds its document-level listeners there. A board found in a
+    // foreign document gets synthetic events enabled and the document bridge
+    // right away; a late transplant is caught by the poll below.
+    const foreignDoc = boardElement.ownerDocument !== document;
+    if (foreignDoc) config.trustAllEvents = true;
     api = Chessground(boardElement, config);
     boardScale = trackBoardScale(boardElement, api);
     injectGridSVG(boardElement);
+    if (foreignDoc) adoptForeignDocument();
 
-    boardResizeRo = new ResizeObserver(() => {
-      if (!api || !boardElement || !boardElement.offsetWidth) return;
-      if (resizeTimer) clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(() => {
-        resizeTimer = null;
-        if (api && boardElement.offsetWidth) {
-          api.state.dom.bounds.clear();
-          api.state.dom.redraw();
-          // Hosts may have changed both the box and the ancestor scale.
-          boardScale?.refresh();
-        }
-      }, 100);
-    });
+    boardResizeRo = new ResizeObserver(scheduleBoardRefresh);
     boardResizeRo.observe(boardElement);
 
     if (HAS_PROMOTION) {
@@ -340,7 +356,41 @@
       api?.state.dom.bounds.clear();
     };
     activeDocument.addEventListener("pointerdown", boundsResyncHandler, true);
+
+    // The transplant into an embed iframe happens after the first paint
+    // (Excalidraw may still be materializing the canvas node), so keep an eye
+    // on the board's owner document until the bridge is in place.
+    adoptTimer = setInterval(() => {
+      if (destroyed || boardBridge || !boardElement) {
+        if (adoptTimer) {
+          clearInterval(adoptTimer);
+          adoptTimer = null;
+        }
+        return;
+      }
+      if (boardElement.ownerDocument !== document) adoptForeignDocument();
+    }, 400);
   });
+
+  /**
+   * The board now lives in another document (canvas FileNote iframe).
+   * chessground's document listeners stayed on the main document, so forward
+   * the frame's input to it (utils/boardEventBridge.ts), let chessground
+   * accept the synthetic events, and re-measure from the new document's own
+   * resize watch — a main-window ResizeObserver may not fire for a node that
+   * moved into another document.
+   */
+  function adoptForeignDocument(): void {
+    if (!api || boardBridge || !boardElement) return;
+    boardBridge = bridgeForeignEvents(boardElement);
+    api.set({ trustAllEvents: true });
+    api.state.dom.bounds.clear();
+    const win = boardElement.ownerDocument.defaultView;
+    if (win && win !== window && typeof win.ResizeObserver !== "undefined") {
+      foreignResizeRo = new win.ResizeObserver(scheduleBoardRefresh);
+      foreignResizeRo.observe(boardElement);
+    }
+  }
 
   onDestroy(() => {
     destroyed = true;
@@ -376,6 +426,18 @@
         boundsResyncHandler,
         true,
       );
+    }
+    if (adoptTimer) {
+      clearInterval(adoptTimer);
+      adoptTimer = null;
+    }
+    if (boardBridge) {
+      boardBridge();
+      boardBridge = null;
+    }
+    if (foreignResizeRo) {
+      foreignResizeRo.disconnect();
+      foreignResizeRo = null;
     }
     if (api) {
       api.destroy();
