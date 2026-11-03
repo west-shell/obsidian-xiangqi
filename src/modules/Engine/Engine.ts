@@ -6,7 +6,7 @@ import { DownloadModal } from "./DownloadModal";
 export type { EngineResult };
 
 const BASE_GITHUB =
-  "https://raw.githubusercontent.com/west-shell/obsidian-xiangqi/main/assets/pikafish";
+  "https://github.com/west-shell/obsidian-xiangqi/releases/download/pikafish";
 const BASE_GITEE_RELEASE =
   "https://gitee.com/wesnell/obsidian-xiangqi/releases/download/pikafish";
 const ENGINE_FILES = ["pikafish.js", "pikafish.wasm", "pikafish.data"] as const;
