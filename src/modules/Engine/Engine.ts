@@ -16,11 +16,13 @@ const BASE_GITHUB = `https://github.com/west-shell/obsidian-xiangqi/releases/dow
 const BASE_GITEE_RELEASE = `https://gitee.com/wesnell/obsidian-xiangqi/releases/download/pikafish-${ENGINE_VERSION}`;
 const ENGINE_FILES = ["pikafish.js", "pikafish.wasm", "pikafish.data"] as const;
 /**
- * Identifies the current single-threaded Asyncify pikafish build. Older
- * synchronous builds lack the marker and are incompatible with this
- * module's ccall glue, so they must be re-downloaded as a full set.
+ * Written next to the engine files after a successful download. Its
+ * content must match ENGINE_VERSION: assets from a different engine
+ * release (or from before release versioning) only work as a matched
+ * set with this module's glue, so a missing or mismatched version file
+ * triggers a full-set re-download.
  */
-const JS_MARKER = "Asyncify";
+const VERSION_FILE = "pikafish.version";
 
 interface DownloadSource {
   key: string;
@@ -50,8 +52,11 @@ export class XiangqiEngine extends BaseEngine {
     const baseDir = `${plugin.app.vault.configDir}/plugins/xiangqi`;
     const jsPath = `${baseDir}/pikafish.js`;
     if (!(await adapter.exists(jsPath))) return [...ENGINE_FILES];
-    // Stale pre-Asyncify build: js/wasm/data only work as a matched set.
-    if (!(await adapter.read(jsPath)).includes(JS_MARKER)) {
+    // Assets from before release versioning or from a different engine
+    // release: js/wasm/data only work as a matched set, re-download all.
+    const versionPath = `${baseDir}/${VERSION_FILE}`;
+    if (!(await adapter.exists(versionPath))) return [...ENGINE_FILES];
+    if ((await adapter.read(versionPath)).trim() !== ENGINE_VERSION) {
       return [...ENGINE_FILES];
     }
     const missing: string[] = [];
@@ -110,6 +115,12 @@ export class XiangqiEngine extends BaseEngine {
               modal.error(i, t("engine.downloadFailed", 0));
               return;
             }
+          }
+          // Mark the set as the version this module's glue expects.
+          try {
+            await adapter.write(`${baseDir}/${VERSION_FILE}`, ENGINE_VERSION);
+          } catch {
+            /* next check re-downloads the full set */
           }
         })();
       },
