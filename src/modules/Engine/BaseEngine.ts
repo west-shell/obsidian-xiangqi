@@ -29,18 +29,6 @@ export interface EngineProgress {
 import type ChessPlugin from "../../main";
 
 /**
- * Iterative-deepening chunks (lila wasm-ceval pattern): instead of one
- * unbounded "go depth N" — which a synchronous wasm worker (pikafish)
- * cannot interrupt, wedging every queued stop/position/go behind it —
- * the search runs in "go movetime" slices. A slice that reaches a new
- * deepest depth resets to the start length; one without depth progress
- * doubles, up to the ceiling. "position" is never re-posted between
- * slices, so the transposition table survives and each slice resumes
- * where the previous ended.
- */
-const CHUNK_START_MS = 300;
-const CHUNK_MAX_MS = 2000;
-/**
  * Idle watchdog: a search whose engine produced no output at all for
  * this long is presumed dead (wedged worker) and rejected. Replaces the
  * previous 300s total-time limit, which killed legitimate long searches
@@ -67,12 +55,6 @@ interface EngineWork {
   lastScoreType: "cp" | "mate" | undefined;
   expectedPvs: number;
   pvMap: Map<number, PvLine>;
-  /** Current iterative-deepening slice length (ms). */
-  chunkMs: number;
-  /** Deepest depth reported within the current slice (any info line). */
-  chunkDepth: number;
-  /** Deepest slice depth seen in any completed slice of this work. */
-  bestChunkDepth: number;
   /** Deepest completed iteration ever seen (mpv-1, exact lines only). */
   maxDepth: number | undefined;
 }
@@ -178,9 +160,6 @@ export abstract class BaseEngine {
         lastScoreType: undefined,
         expectedPvs: 1,
         pvMap: new Map(),
-        chunkMs: CHUNK_START_MS,
-        chunkDepth: 0,
-        bestChunkDepth: 0,
         maxDepth: undefined,
       });
     });
@@ -248,7 +227,11 @@ export abstract class BaseEngine {
     const work = this.work;
     this.armWatchdog(work);
     this.worker.postMessage(`position fen ${work.fen}`);
-    this.worker.postMessage(`go movetime ${work.chunkMs}`);
+    // Both engine workers are asyncify builds: a running search
+    // suspends its wasm stack and a later "stop" interrupts it within
+    // ~1ms, so one unbounded "go depth N" runs to the target (or the
+    // first stop) — no movetime slicing needed.
+    this.worker.postMessage(`go depth ${work.depth}`);
   }
 
   /**
@@ -317,26 +300,6 @@ export abstract class BaseEngine {
         ponderIdx !== -1 && parts[ponderIdx + 1]
           ? parts[ponderIdx + 1]
           : undefined;
-      // Slice end, work not settled: keep deepening in the next slice —
-      // unless a stop was requested, the position is terminal ("(none)"),
-      // or the target depth / a proven mate is already in. "position" is
-      // deliberately NOT re-posted so the transposition table survives.
-      if (
-        bestmove &&
-        bestmove !== "(none)" &&
-        !work.stopRequested &&
-        !this.searchComplete(work)
-      ) {
-        const progressed = work.chunkDepth > work.bestChunkDepth;
-        work.bestChunkDepth = Math.max(work.bestChunkDepth, work.chunkDepth);
-        work.chunkMs = progressed
-          ? CHUNK_START_MS
-          : Math.min(work.chunkMs * 2, CHUNK_MAX_MS);
-        work.chunkDepth = 0;
-        this.armWatchdog(work);
-        this.worker?.postMessage(`go movetime ${work.chunkMs}`);
-        return;
-      }
       this.work = null;
       if (work.watchdog !== null) {
         window.clearTimeout(work.watchdog);
@@ -364,9 +327,8 @@ export abstract class BaseEngine {
 
     const work = this.work;
     if (!work || !line.startsWith("info")) return;
-    // Any engine output proves the worker is alive: restart the idle
-    // watchdog (currmove lines keep it fed even while a synchronous
-    // wasm search cannot process messages).
+    // Any engine output — including currmove lines — proves the worker
+    // is alive: restart the idle watchdog.
     this.armWatchdog(work);
     // Skip bound-flagged lines: their scores are not exact
     const isBound = / (lowerbound|upperbound) /.test(line);
@@ -387,10 +349,6 @@ export abstract class BaseEngine {
     }
     const pvMatch = line.match(/ pv (.+)$/);
     const depthMatch = line.match(/depth (\d+)/);
-    if (depthMatch) {
-      const d = Number.parseInt(depthMatch[1]);
-      if (d > work.chunkDepth) work.chunkDepth = d;
-    }
     if (!isBound && score !== undefined && scoreType && pvMatch) {
       work.pvMap.set(mpv, {
         score,
@@ -417,9 +375,8 @@ export abstract class BaseEngine {
     // Stream one snapshot per completed depth iteration (lichess
     // protocol.ts): emit once the iteration's last MultiPV line
     // arrived; the primary score is the tracked mpv-1 score, not
-    // the emitting line's. Snapshots from a slice's TT-warm ramp-up
-    // (depths already covered by an earlier slice) are suppressed so
-    // the live eval never walks backwards.
+    // the emitting line's. Out-of-order snapshots (a depth already
+    // superseded) are suppressed so the live eval never walks backwards.
     const snapshotDepth = depthMatch
       ? Number.parseInt(depthMatch[1])
       : (work.lastDepth ?? 0);
@@ -441,10 +398,9 @@ export abstract class BaseEngine {
       });
     }
     // Early stop once the target depth or a proven mate is in and the
-    // full iteration was received: posting "stop" now (instead of
-    // letting the slice's movetime expire or further slices run) makes
-    // an interruptible engine finish immediately; a synchronous wasm
-    // worker executes the queued stop when the slice ends.
+    // full iteration was received: posting "stop" now interrupts the
+    // search within ~1ms instead of letting it run on to the requested
+    // depth (essential when a mate is proven far below the target).
     if (iterationDone && !work.stopRequested && this.searchComplete(work)) {
       this.stopWork();
     }
