@@ -5,10 +5,15 @@ import { DownloadModal } from "./DownloadModal";
 
 export type { EngineResult };
 
-const BASE_GITHUB =
-  "https://github.com/west-shell/obsidian-xiangqi/releases/download/pikafish";
-const BASE_GITEE_RELEASE =
-  "https://gitee.com/wesnell/obsidian-xiangqi/releases/download/pikafish";
+/**
+ * Versioned engine asset release. Bump on every engine rebuild and
+ * publish a matching release tag (`pikafish-<version>`) on both GitHub
+ * and Gitee; older plugin versions keep downloading their own assets
+ * from the older, untouched releases.
+ */
+const ENGINE_VERSION = "1.0.0";
+const BASE_GITHUB = `https://github.com/west-shell/obsidian-xiangqi/releases/download/pikafish-${ENGINE_VERSION}`;
+const BASE_GITEE_RELEASE = `https://gitee.com/wesnell/obsidian-xiangqi/releases/download/pikafish-${ENGINE_VERSION}`;
 const ENGINE_FILES = ["pikafish.js", "pikafish.wasm", "pikafish.data"] as const;
 /**
  * Identifies the current single-threaded Asyncify pikafish build. Older
