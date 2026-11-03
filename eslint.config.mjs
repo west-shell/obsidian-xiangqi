@@ -39,6 +39,7 @@ export default tseslint.config(
       "test-vault/**",
       "node_modules/**",
       "scripts/**",
+      "assets/**",
       "*.js",
       "*.mjs",
       "*.cjs",

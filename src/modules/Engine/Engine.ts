@@ -10,6 +10,12 @@ const BASE_GITHUB =
 const BASE_GITEE_RELEASE =
   "https://gitee.com/wesnell/obsidian-xiangqi/releases/download/pikafish";
 const ENGINE_FILES = ["pikafish.js", "pikafish.wasm", "pikafish.data"] as const;
+/**
+ * Identifies the current single-threaded Asyncify pikafish build. Older
+ * synchronous builds lack the marker and are incompatible with this
+ * module's ccall glue, so they must be re-downloaded as a full set.
+ */
+const JS_MARKER = "Asyncify";
 
 interface DownloadSource {
   key: string;
@@ -37,8 +43,15 @@ export class XiangqiEngine extends BaseEngine {
     const plugin = this.plugin!;
     const adapter = plugin.app.vault.adapter;
     const baseDir = `${plugin.app.vault.configDir}/plugins/xiangqi`;
+    const jsPath = `${baseDir}/pikafish.js`;
+    if (!(await adapter.exists(jsPath))) return [...ENGINE_FILES];
+    // Stale pre-Asyncify build: js/wasm/data only work as a matched set.
+    if (!(await adapter.read(jsPath)).includes(JS_MARKER)) {
+      return [...ENGINE_FILES];
+    }
     const missing: string[] = [];
     for (const file of ENGINE_FILES) {
+      if (file === "pikafish.js") continue;
       if (!(await adapter.exists(`${baseDir}/${file}`))) {
         missing.push(file);
       }
@@ -147,12 +160,13 @@ self.onmessage = function(e) {
     try {
       var Module = {};
       Module.wasmBinary = _PF_WB_;
-      Module.locateFile = function(path, prefix) {
-        if (path.endsWith('.wasm')) return path;
-        return prefix + path;
-      };
       if (_PF_DATA_) {
-        Module.getPreloadedPackage = function(remotePackageSize) {
+        // Hand the preloaded .data (embedded pikafish.nnue) to the
+        // emscripten file packager without a fetch.
+        Module.getPreloadedPackage = function(name, size) {
+          if (_PF_DATA_.byteLength !== size) {
+            throw new Error('data size mismatch: expected ' + size + ' but got ' + _PF_DATA_.byteLength);
+          }
           return _PF_DATA_.buffer;
         };
       }
@@ -164,15 +178,18 @@ self.onmessage = function(e) {
       ${pikafishSource}
       Pikafish(Module).then(function(pf) {
         _pf = pf;
-        _pf.read_stdout = function(text) {
-          self.postMessage(text);
-        };
         self.onmessage = function(e) {
-          if (typeof e.data === 'string') {
-            _pf.send_command(e.data);
+          if (typeof e.data !== 'string') return;
+          if (e.data.indexOf('go ') === 0) {
+            // Search: async ccall suspends the wasm stack inside
+            // check_time so the worker stays responsive; a re-entrant
+            // sync "stop" finishes the search in ~1ms.
+            _pf.ccall('command', null, ['string'], [e.data], { async: true });
+          } else {
+            _pf.ccall('command', null, ['string'], [e.data]);
           }
         };
-        _pf.send_command('uci');
+        _pf.ccall('command', null, ['string'], ['uci']);
       });
     } catch(e) {
       self.postMessage({type:'error', data:'PF_LOAD:' + e.message + '|' + (e.stack||'')});
