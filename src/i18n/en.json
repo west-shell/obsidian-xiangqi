@@ -238,6 +238,8 @@
   "tree.ghostHint": "Click to insert engine line",
   "tree.pinComment": "Pin comment",
   "tree.unpinComment": "Unpin comment",
+  "tree.pinBoard": "Pin board preview",
+  "tree.unpinBoard": "Unpin board preview",
   "tree.draw": "Draw",
   "tree.whiteWins": "White wins",
   "tree.redWins": "Red wins",

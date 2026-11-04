@@ -41,6 +41,11 @@ export interface LayoutOptions {
    * 测量，经 sizeFn 提供。
    */
   pinnedCommentIds?: string[];
+  /**
+   * 需要固定棋盘预览的节点 id 列表。每个节点挂一个 "pinboard:" 虚拟
+   * 叶子参与布局（不写回真实树）；固定尺寸由渲染层经 sizeFn 提供。
+   */
+  pinnedBoardIds?: string[];
 }
 
 /**
@@ -48,6 +53,12 @@ export interface LayoutOptions {
  * 渲染层用它反查所属节点（评论内容、实测高度）。
  */
 export const PINNED_COMMENT_PREFIX = "pincomment:";
+
+/**
+ * 固定棋盘预览虚拟节点的 id 前缀：`PINNED_BOARD_PREFIX + 真实节点 id`。
+ * 渲染层用它反查所属节点（FEN、棋盘图片缓存键）。
+ */
+export const PINNED_BOARD_PREFIX = "pinboard:";
 
 const DEFAULT_NODE_SIZE: NodeSize = { width: 13, height: 11 };
 const DEFAULT_GAP_X = 6;
@@ -100,6 +111,7 @@ function buildWNode(
   foldedNodes: Set<string>,
   ghostByParent: Map<string, ChessNode[]>,
   commentByParent: Map<string, ChessNode>,
+  boardByParent: Map<string, ChessNode>,
   sizeFn: NodeSizeFn,
 ): WNode {
   const size = sizeFn(node);
@@ -136,6 +148,7 @@ function buildWNode(
         foldedNodes,
         ghostByParent,
         commentByParent,
+        boardByParent,
         sizeFn,
       ),
     );
@@ -154,6 +167,24 @@ function buildWNode(
         foldedNodes,
         ghostByParent,
         commentByParent,
+        boardByParent,
+        sizeFn,
+      ),
+    );
+  }
+  // Pinned board preview: another virtual leaf, appended after the
+  // comment block — same row, same rules (never mutates the real tree,
+  // stays visible when the node is folded).
+  const boardBlock = boardByParent.get(node.id);
+  if (boardBlock) {
+    wn.children.push(
+      buildWNode(
+        boardBlock,
+        wn,
+        foldedNodes,
+        ghostByParent,
+        commentByParent,
+        boardByParent,
         sizeFn,
       ),
     );
@@ -165,7 +196,15 @@ function buildWNode(
   if (foldedNodes.has(node.id)) return wn;
   for (const head of ghostByParent.get(node.id) ?? []) {
     wn.children.push(
-      buildWNode(head, wn, foldedNodes, ghostByParent, commentByParent, sizeFn),
+      buildWNode(
+        head,
+        wn,
+        foldedNodes,
+        ghostByParent,
+        commentByParent,
+        boardByParent,
+        sizeFn,
+      ),
     );
   }
   return wn;
@@ -405,7 +444,8 @@ function resolveX(w: WNode, prevSum?: number, parentX?: number): void {
  * 插入分支等任意尺寸元素只需给出自己的尺寸即可参与布局。
  * `ghosts` 里的幽灵链附加到 attachId 节点的真实子节点之后参与布局，
  * 但绝不写回真实树（node.children 不变）。`options.pinnedCommentIds`
- * 里的节点各挂一个 "pincomment:" 虚拟叶子（同样不写回真实树）。
+ * 里的节点各挂一个 "pincomment:" 虚拟叶子（同样不写回真实树），
+ * `options.pinnedBoardIds` 里的节点各挂一个 "pinboard:" 虚拟叶子。
  */
 export function calculateTreeLayout(
   nodeMap: NodeMap,
@@ -416,10 +456,16 @@ export function calculateTreeLayout(
   nodes: ChessNode[];
   ghostNodes: ChessNode[];
   pinnedCommentNodes: ChessNode[];
+  pinnedBoardNodes: ChessNode[];
 } {
   const root = nodeMap.get("node-root");
   if (!root) {
-    return { nodes: [], ghostNodes: [], pinnedCommentNodes: [] };
+    return {
+      nodes: [],
+      ghostNodes: [],
+      pinnedCommentNodes: [],
+      pinnedBoardNodes: [],
+    };
   }
 
   const sizeFn = options.sizeFn ?? (() => DEFAULT_NODE_SIZE);
@@ -466,6 +512,25 @@ export function calculateTreeLayout(
     commentIdSet.add(block.id);
   }
 
+  // Pinned board previews: one virtual leaf per pinned node — no comment
+  // requirement, any node's position can be pinned. The board image itself
+  // is rendered by the presentation layer from the owner's FEN.
+  const boardByParent = new Map<string, ChessNode>();
+  const boardIdSet = new Set<string>();
+  for (const id of options.pinnedBoardIds ?? []) {
+    const owner = nodeMap.get(id);
+    if (!owner) continue;
+    const board: ChessNode = {
+      id: PINNED_BOARD_PREFIX + id,
+      fen: "",
+      move: null,
+      color: null,
+      children: [],
+    };
+    boardByParent.set(id, board);
+    boardIdSet.add(board.id);
+  }
+
   // 1) 建树
   const wRoot = buildWNode(
     root,
@@ -473,6 +538,7 @@ export function calculateTreeLayout(
     foldedNodes,
     ghostByParent,
     commentByParent,
+    boardByParent,
     sizeFn,
   );
 
@@ -486,11 +552,13 @@ export function calculateTreeLayout(
   const nodes: ChessNode[] = [];
   const ghostNodes: ChessNode[] = [];
   const pinnedCommentNodes: ChessNode[] = [];
+  const pinnedBoardNodes: ChessNode[] = [];
   function collect(wn: WNode): void {
     wn.node.x = Math.round(wn.x * 10) / 10;
     wn.node.y = Math.round(wn.y * 10) / 10;
     wn.node.depth = wn.depth;
     if (commentIdSet.has(wn.node.id)) pinnedCommentNodes.push(wn.node);
+    else if (boardIdSet.has(wn.node.id)) pinnedBoardNodes.push(wn.node);
     else if (ghostIdSet.has(wn.node.id)) ghostNodes.push(wn.node);
     else nodes.push(wn.node);
     for (const child of wn.children) {
@@ -499,5 +567,5 @@ export function calculateTreeLayout(
   }
   collect(wRoot);
 
-  return { nodes, ghostNodes, pinnedCommentNodes };
+  return { nodes, ghostNodes, pinnedCommentNodes, pinnedBoardNodes };
 }

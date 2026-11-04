@@ -238,6 +238,8 @@
   "tree.ghostHint": "Нажмите, чтобы вставить вариант движка",
   "tree.pinComment": "Закрепить комментарий",
   "tree.unpinComment": "Открепить комментарий",
+  "tree.pinBoard": "Закрепить предпросмотр",
+  "tree.unpinBoard": "Открепить предпросмотр",
   "tree.draw": "Ничья",
   "tree.whiteWins": "Победа белых",
   "tree.redWins": "Победа красных",

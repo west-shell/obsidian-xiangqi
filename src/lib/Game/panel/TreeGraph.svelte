@@ -1,8 +1,10 @@
 <script lang="ts">
+  import { Menu } from "obsidian";
   import { onDestroy, onMount, tick } from "svelte";
   import { SvelteMap, SvelteSet } from "svelte/reactivity";
   import * as d3 from "d3";
   import {
+    BOARD_ASPECT_RATIO,
     CLS_PREFIX,
     getNodeDisplay,
     getNodeFill,
@@ -27,7 +29,12 @@
     evalBarIntensity,
   } from "../../../utils/winningChances";
   import type HoverPreview from "./HoverPreview.svelte";
-  import { calculateTreeLayout, PINNED_COMMENT_PREFIX } from "./layout";
+  import {
+    calculateTreeLayout,
+    PINNED_BOARD_PREFIX,
+    PINNED_COMMENT_PREFIX,
+  } from "./layout";
+  import { renderBoardDataUrl } from "../../../modules/Export/exportImage";
   import { useSetIcon } from "./set-icon";
 
   interface Props {
@@ -168,6 +175,9 @@
     for (const id of [...pinnedCommentIds]) {
       if (!nodeMap.has(id)) pinnedCommentIds.delete(id);
     }
+    for (const id of [...pinnedBoardIds]) {
+      if (!nodeMap.has(id)) pinnedBoardIds.delete(id);
+    }
   });
   // The comment box's pin button toggles this state over the event bus
   // (sibling component).
@@ -203,6 +213,83 @@
   // Max content width (px) before wrapping; the box width follows the
   // longest wrapped line.
   const COMMENT_MAX_CONTENT_WIDTH = 180;
+
+  // ---- Pinned board previews (node hover button / context menu) ----
+  // Any node's position can be pinned as a board preview block. Session
+  // state, same lifetime as pinnedCommentIds. Blocks are virtual
+  // "pinboard:" leaves laid out beside the children row; the board image
+  // is rendered offscreen (same pipeline as image export) per FEN and
+  // cached, so two nodes with the same position share one raster.
+  let pinnedBoardIds = new SvelteSet<string>();
+  function togglePinBoard(id: string): void {
+    if (pinnedBoardIds.has(id)) pinnedBoardIds.delete(id);
+    else pinnedBoardIds.add(id);
+  }
+  let pinnedBoardNodes: ChessNode[] = $state([]);
+  // Block size on the canvas (px); rendered at 2x for crispness.
+  // Height follows the board aspect ratio (chess = square, the xiangqi
+  // sibling repo keeps this code but ships a taller ratio).
+  const PIN_BOARD_WIDTH = 140;
+  const PIN_BOARD_HEIGHT = Math.round(PIN_BOARD_WIDTH / BOARD_ASPECT_RATIO);
+  const PIN_BOARD_RENDER_WIDTH = PIN_BOARD_WIDTH * 2;
+  // FEN → PNG dataUrl cache. Cleared when theme-relevant settings change;
+  // in-flight renders are fenced by a generation counter so a stale
+  // promise never overwrites a fresh image (or re-adds a cleared entry).
+  let boardImages = new SvelteMap<string, string>();
+  // Deliberately a plain (non-reactive) Set: it only dedupes in-flight
+  // renders; clearing it with the generation counter is enough.
+  // eslint-disable-next-line svelte/prefer-svelte-reactivity
+  const pendingBoardRenders = new Set<string>();
+  let boardStyleKey = "";
+  let boardRenderGen = 0;
+  $effect(() => {
+    const key = `${settings?.theme}/${settings?.pieceSet}`;
+    if (key !== boardStyleKey) {
+      boardStyleKey = key;
+      boardRenderGen++;
+      boardImages.clear();
+      pendingBoardRenders.clear();
+    }
+    const gen = boardRenderGen;
+    for (const bn of pinnedBoardNodes) {
+      const owner = nodeMap.get(bn.id.slice(PINNED_BOARD_PREFIX.length));
+      if (!owner) continue;
+      const fen = owner.fen;
+      if (boardImages.has(fen) || pendingBoardRenders.has(fen)) continue;
+      pendingBoardRenders.add(fen);
+      void renderBoardDataUrl({
+        fen,
+        size: PIN_BOARD_RENDER_WIDTH,
+        coordinates: false,
+      })
+        .then((url) => {
+          if (gen === boardRenderGen) {
+            boardImages.set(fen, url);
+          }
+          return undefined;
+        })
+        .catch(() => undefined)
+        .finally(() => {
+          if (gen === boardRenderGen) pendingBoardRenders.delete(fen);
+        });
+    }
+  });
+  // 节点悬停状态：悬停时在节点右上角显示 pin 按钮（固定/取消固定该
+  // 节点的棋盘预览）。离开 svg 一并清零，防布局位移下按钮滞留。
+  let hoveredNodeId = $state<string | null>(null);
+  function onNodeContextMenu(e: MouseEvent, node: ChessNode): void {
+    e.preventDefault();
+    e.stopPropagation();
+    const pinned = pinnedBoardIds.has(node.id);
+    const menu = new Menu();
+    menu.addItem((item) =>
+      item
+        .setTitle(pinned ? t("tree.unpinBoard", _lv) : t("tree.pinBoard", _lv))
+        .setIcon(pinned ? "pin-off" : "pin")
+        .onClick(() => togglePinBoard(node.id)),
+    );
+    menu.showAtMouseEvent(e);
+  }
 
   // Greedy wrap of one paragraph; breaks at the last space when possible,
   // otherwise hard-breaks by character (CJK has no spaces).
@@ -333,6 +420,10 @@
               return commentBlockSize(lines);
             }
           }
+          // 固定盘预览块：固定尺寸（宽随棋盘比例）。
+          if (node.id.startsWith(PINNED_BOARD_PREFIX)) {
+            return { width: PIN_BOARD_WIDTH, height: PIN_BOARD_HEIGHT };
+          }
           return {
             width: localGetNodeWidth(node),
             height: nodeHeight,
@@ -341,11 +432,13 @@
         gapX: NODE_GAP_X,
         gapY: ROW_GAP_Y,
         pinnedCommentIds: [...pinnedCommentIds],
+        pinnedBoardIds: [...pinnedBoardIds],
       },
     );
     renderedNodes = res.nodes;
     renderedGhostNodes = res.ghostNodes;
     pinnedCommentNodes = res.pinnedCommentNodes;
+    pinnedBoardNodes = res.pinnedBoardNodes;
   }
 
   function updateZoomExtent() {
@@ -397,6 +490,14 @@
       maxX = Math.max(maxX, cn.x + size.width / 2);
       minY = Math.min(minY, cn.y - size.height / 2);
       maxY = Math.max(maxY, cn.y + size.height / 2);
+    }
+    // 固定盘预览块同理（尺寸固定，直接按半宽/半高计入）。
+    for (const bn of pinnedBoardNodes) {
+      if (bn.x === undefined || bn.y === undefined) continue;
+      minX = Math.min(minX, bn.x - PIN_BOARD_WIDTH / 2);
+      maxX = Math.max(maxX, bn.x + PIN_BOARD_WIDTH / 2);
+      minY = Math.min(minY, bn.y - PIN_BOARD_HEIGHT / 2);
+      maxY = Math.max(maxY, bn.y + PIN_BOARD_HEIGHT / 2);
     }
     if (
       !Number.isFinite(minX) ||
@@ -618,7 +719,7 @@
 
   $effect(() => {
     // eslint-disable-next-line no-unused-expressions, @typescript-eslint/no-unused-expressions
-    (nodeMap.size, nodeMode, pinnedCommentIds.size); // nodeMode 改宽度；pin/取消 pin 增删评论块需重排
+    (nodeMap.size, nodeMode, pinnedCommentIds.size, pinnedBoardIds.size); // nodeMode 改宽度；pin/取消 pin 增删评论块/棋盘块需重排
     updateTreeLayout();
   });
 </script>
@@ -664,7 +765,10 @@
   width="100%"
   height="100%"
   class="{CLS_PREFIX}-panel__svg"
-  onmouseleave={() => preview?.hideAll()}
+  onmouseleave={() => {
+    preview?.hideAll();
+    hoveredNodeId = null;
+  }}
 >
   <g transform={TRANSFORM_SAFE}>
     {#each renderedNodes as node (node.id)}
@@ -734,6 +838,29 @@
       {/if}
     {/each}
 
+    {#each pinnedBoardNodes as bn (bn.id)}
+      {@const realId = bn.id.slice(PINNED_BOARD_PREFIX.length)}
+      {@const owner = nodeMap.get(realId)}
+      {#if owner && owner.x !== undefined && owner.y !== undefined && bn.x !== undefined && bn.y !== undefined}
+        <!-- 固定盘块的连线：与评论块连线同款（从所属节点沿本行走水平
+             段再斜接到块顶边）。 -->
+        <path
+          d={`
+        M ${owner.x} ${owner.y}
+        L ${bn.x - EDGE_ELBOW * Math.sign(bn.x - owner.x)} ${owner.y}
+        L ${bn.x} ${bn.y - PIN_BOARD_HEIGHT / 2}
+        `}
+          stroke="var(--tree-line)"
+          stroke-linejoin="round"
+          stroke-width="1"
+          stroke-dasharray="2 1.2"
+          opacity="0.5"
+          fill="none"
+          style="pointer-events: none"
+        />
+      {/if}
+    {/each}
+
     {#each renderedNodes as node (node.id)}
       {#if node.children.length > 1}
         {@const isLeft = (node.depth ?? 0) % 2 === 0}
@@ -787,11 +914,15 @@
           : ''}"
         opacity={currentPath.includes(node.id) ? 1 : 0.55}
         stroke-width={isCurrent ? 1 : 0.5}
+        style="cursor: pointer"
         onclick={() => eventBus.emit("node-click", node.id)}
+        oncontextmenu={(e) => onNodeContextMenu(e, node)}
         onmouseenter={(e) => {
-          preview?.showNode(node, e);
+          hoveredNodeId = node.id;
+          preview?.showNode(node, e, "block");
         }}
         onmouseleave={() => {
+          if (hoveredNodeId === node.id) hoveredNodeId = null;
           preview?.hideNode(node);
         }}
       >
@@ -925,6 +1056,33 @@
             {@html iconSvg("message_square_text", 7, 1.5, "var(--color-blue)")}
           </g>
         {/if}
+        {#if hoveredNodeId === node.id}
+          <!-- 悬停 pin 按钮：固定/取消固定该节点的棋盘预览。 -->
+          <!-- svelte-ignore a11y_click_events_have_key_events -->
+          <!-- svelte-ignore a11y_no_static_element_interactions -->
+          <g
+            class="{CLS_PREFIX}-panel__pinbtn"
+            transform="translate({nw / 2 + 1} {-nodeHeight / 2 - 8})"
+            style="cursor: pointer"
+            aria-label={pinnedBoardIds.has(node.id)
+              ? t("tree.unpinBoard", _lv)
+              : t("tree.pinBoard", _lv)}
+            onclick={(e) => {
+              e.stopPropagation();
+              togglePinBoard(node.id);
+            }}
+          >
+            <circle r="7" />
+            <g transform="translate(-4.5, -4.5)">
+              <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+              {@html iconSvg(
+                pinnedBoardIds.has(node.id) ? "pin_off" : "pin",
+                9,
+                1.8,
+              )}
+            </g>
+          </g>
+        {/if}
       </g>
     {/each}
 
@@ -973,6 +1131,47 @@
       {/if}
     {/each}
 
+    {#each pinnedBoardNodes as bn (bn.id)}
+      {@const realId = bn.id.slice(PINNED_BOARD_PREFIX.length)}
+      {@const owner = nodeMap.get(realId)}
+      {#if owner && bn.x !== undefined && bn.y !== undefined}
+        <!-- 固定盘预览块：SVG 方框 + 离屏渲染的棋盘图片（按 FEN 缓存，
+             2x 渲染按显示尺寸缩小，清晰度与主题棋子皮肤自动继承导出
+             管线）。图片未就绪时先显示空框。 -->
+        <!-- svelte-ignore a11y_click_events_have_key_events -->
+        <!-- svelte-ignore a11y_no_static_element_interactions -->
+        <g
+          class="{CLS_PREFIX}-panel__node"
+          transform="translate({bn.x} {bn.y})"
+          style="cursor: pointer"
+          onclick={() => eventBus.emit("node-click", realId)}
+          onmouseenter={(e) => preview?.showNode(owner, e, "block")}
+          onmouseleave={() => preview?.hideNode(owner)}
+        >
+          <rect
+            x={-PIN_BOARD_WIDTH / 2}
+            y={-PIN_BOARD_HEIGHT / 2}
+            width={PIN_BOARD_WIDTH}
+            height={PIN_BOARD_HEIGHT}
+            rx="2.5"
+            ry="2.5"
+            fill="var(--background-primary)"
+            stroke="var(--tree-line)"
+          />
+          {#if boardImages.get(owner.fen)}
+            <image
+              href={boardImages.get(owner.fen)}
+              x={-PIN_BOARD_WIDTH / 2 + 1}
+              y={-PIN_BOARD_HEIGHT / 2 + 1}
+              width={PIN_BOARD_WIDTH - 2}
+              height={PIN_BOARD_HEIGHT - 2}
+              style="pointer-events: none"
+            />
+          {/if}
+        </g>
+      {/if}
+    {/each}
+
     {#each renderedGhostNodes as g (g.id)}
       {@const gInfo = ghostInfoById.get(g.id)}
       {@const gw = localGetNodeWidth(g)}
@@ -985,7 +1184,7 @@
           opacity={gInfo.rank === 0 ? 1 : 0.6}
           style="cursor: pointer"
           onclick={() => eventBus.emit("tree-ghost-materialize", g.id)}
-          onmouseenter={(e) => preview?.showNode(g, e)}
+          onmouseenter={(e) => preview?.showNode(g, e, "block")}
           onmouseleave={() => preview?.hideNode(g)}
         >
           <rect

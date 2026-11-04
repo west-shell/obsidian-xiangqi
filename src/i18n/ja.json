@@ -238,6 +238,8 @@
   "tree.ghostHint": "クリックしてエンジンの指し手を挿入",
   "tree.pinComment": "コメントをピン留め",
   "tree.unpinComment": "ピン留めを解除",
+  "tree.pinBoard": "盤面プレビューを固定",
+  "tree.unpinBoard": "盤面プレビューの固定を解除",
   "tree.draw": "引き分け",
   "tree.whiteWins": "白の勝ち",
   "tree.redWins": "紅の勝ち",

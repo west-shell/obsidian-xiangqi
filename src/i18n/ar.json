@@ -238,6 +238,8 @@
   "tree.ghostHint": "انقر لإدراج خط المحرك",
   "tree.pinComment": "تثبيت التعليق",
   "tree.unpinComment": "إلغاء تثبيت التعليق",
+  "tree.pinBoard": "تثبيت المعاينة",
+  "tree.unpinBoard": "إلغاء تثبيت المعاينة",
   "tree.draw": "تعادل",
   "tree.whiteWins": "فوز الأبيض",
   "tree.redWins": "فوز الأحمر",

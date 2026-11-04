@@ -187,6 +187,33 @@ button.#{$cls-prefix}-gamenav__arrow svg {
 // language as move labels, no dedicated CSS needed. The pin toggle lives
 // in the comment box (CommentBox.svelte), not in the tree SVG.
 
+// ---- Pinned board previews ---------------------------------------------------------
+
+// Pinned board previews render as SVG frames + <image> inside the tree
+// graph (virtual "pinboard:" leaf nodes in panel/layout.ts). The node's
+// hover pin button (and its context-menu entry) toggles them.
+
+// Hover pin button in the tree SVG: small disc at the node's top-right
+// corner, visible while hovering a node. Click toggles the pinned board
+// preview block.
+.#{$cls-prefix}-panel__pinbtn {
+  color: var(--text-muted);
+
+  circle {
+    fill: var(--background-primary);
+    stroke: var(--background-modifier-border);
+    stroke-width: 1;
+  }
+
+  &:hover {
+    color: var(--text-normal);
+
+    circle {
+      fill: var(--background-modifier-hover);
+    }
+  }
+}
+
 // ---- Eval bar --------------------------------------------------------------------
 
 .#{$cls-prefix}-eval {

@@ -238,6 +238,8 @@
   "tree.ghostHint": "Klicken, um die Engine-Variante einzufügen",
   "tree.pinComment": "Kommentar anheften",
   "tree.unpinComment": "Kommentar lösen",
+  "tree.pinBoard": "Vorschau anheften",
+  "tree.unpinBoard": "Vorschau lösen",
   "tree.draw": "Remis",
   "tree.whiteWins": "Weiß gewinnt",
   "tree.redWins": "Rot gewinnt",
