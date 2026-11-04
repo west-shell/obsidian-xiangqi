@@ -180,6 +180,19 @@ button.#{$cls-prefix}-gamenav__arrow svg {
   }
 }
 
+// ---- Pinned comment blocks ---------------------------------------------------------
+
+// Pinned comments render as SVG boxes + text inside the tree graph itself
+// (virtual "pincomment:" leaf nodes in panel/layout.ts) — the same visual
+// language as move labels, no dedicated CSS needed. The pin toggle lives
+// in the comment box (CommentBox.svelte), not in the tree SVG.
+
+// ---- Pinned board previews ---------------------------------------------------------
+
+// Pinned board previews render as SVG frames + <image> inside the tree
+// graph (virtual "pinboard:" leaf nodes in panel/layout.ts). The node's
+// hover pin button (and its context-menu entry) toggles them.
+
 // ---- Eval bar --------------------------------------------------------------------
 
 .#{$cls-prefix}-eval {
@@ -710,7 +723,10 @@ button.#{$cls-prefix}-resultbar__btn:hover {
   color: var(--text-muted);
 }
 
-button.#{$cls-prefix}-comment__toggle {
+// Pin button: pins the current node's comment as a card on the tree
+// canvas. Same flat shape as the list toggle button next to it.
+button.#{$cls-prefix}-comment__toggle,
+button.#{$cls-prefix}-comment__pin {
   width: 28px;
   height: auto;
   padding: 0;
@@ -719,4 +735,38 @@ button.#{$cls-prefix}-comment__toggle {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+}
+
+// Pin/toggle button strip. In horizontal mode (short comment box) the
+// buttons sit side by side and stretch to the full comment height, as
+// before. Once the box is tall enough to fit both in one column, the
+// strip flips to a 28px-wide vertical stack (CommentBox toggles the
+// --stacked modifier via a ResizeObserver on the comment row).
+.#{$cls-prefix}-comment__actions {
+  display: flex;
+  flex-direction: row;
+  align-self: stretch;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.#{$cls-prefix}-comment__actions--stacked {
+  flex-direction: column;
+  justify-content: center;
+
+  // List toggle sits above the pin button in the stacked column.
+  button.#{$cls-prefix}-comment__toggle {
+    order: -1;
+  }
+
+  > button {
+    height: 28px;
+  }
+
+  // A lone button (no comment to pin) keeps the full-height stretch of
+  // the horizontal mode.
+  > button:only-child {
+    flex: 1 1 auto;
+    height: auto;
+  }
 }

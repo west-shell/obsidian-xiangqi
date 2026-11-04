@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onDestroy } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import type { ChessNode, ISettings } from "../../../types";
   import { CLS_PREFIX, DEFAULT_FEN, type Square } from "../../../chess";
   import { onLangChange, t } from "../../../i18n";
@@ -27,6 +27,12 @@
   let previewEverShown = $state(false);
   let previewNode = $state<ChessNode | null>(null);
   let previewPos = $state({ x: 8, y: 8 });
+  // Element the preview was opened from (tree node / comment block /
+  // move-list item). The document-level mouseover safety net below uses
+  // it to detect "the pointer is no longer over the source" even when
+  // the source's own mouseleave never fired (SVG elements moving or
+  // re-rendering under a stationary pointer don't trigger it).
+  let previewAnchor: Element | null = null;
   let previewFen = $derived(previewNode?.fen ?? DEFAULT_FEN);
   let previewAnimateFrom = $derived(previewNode?.move?.before ?? null);
   let previewLastMove = $derived.by(() => {
@@ -46,11 +52,28 @@
 
   onDestroy(() => {
     unsubLang();
+    activeDocument.removeEventListener("mouseover", onDocMouseOver);
   });
 
   function supportsHover(): boolean {
     return activeWindow.matchMedia?.("(hover: hover)").matches ?? true;
   }
+
+  // Safety net for missed mouseleaves: mouseleave is the only thing that
+  // hides the preview, but it never fires when the hovered element moves
+  // away or unmounts under a stationary pointer (SVG re-layouts do this).
+  // Any mouseover landing outside the anchor element hides the preview;
+  // normal mouseleave handlers simply run first in the common case.
+  function onDocMouseOver(e: MouseEvent): void {
+    if (!previewNode || !previewAnchor) return;
+    const target = e.target as Node | null;
+    if (target && previewAnchor.contains(target)) return;
+    previewNode = null;
+  }
+
+  onMount(() => {
+    activeDocument.addEventListener("mouseover", onDocMouseOver);
+  });
 
   // Portals the preview overlay out of the panel into <body> so it floats
   // above the whole window instead of being clipped by the tree canvas.
@@ -64,16 +87,19 @@
     };
   }
 
-  // One shared switch covers both hover previews; the side only
-  // decides the positioning origin ("left" = move list, "right" = tree).
+  // One shared switch covers all hover previews; the side only decides
+  // the positioning origin ("left" = move list, "right" = tree nodes,
+  // "block" = pinned comment block, anchored beside the block's rect so
+  // the preview never covers it).
   export function showNode(
     node: ChessNode,
     evt: MouseEvent,
-    side: "left" | "right" = "right",
+    side: "left" | "right" | "block" = "right",
   ) {
     if (settings?.showPreview === false) return;
     if (!supportsHover()) return;
     previewNode = node;
+    previewAnchor = (evt.currentTarget as Element | null) ?? null;
     previewEverShown = true;
     updatePreviewPos(evt, side);
   }
@@ -92,7 +118,10 @@
     previewNode = null;
   }
 
-  function updatePreviewPos(evt: MouseEvent, side: "left" | "right" = "right") {
+  function updatePreviewPos(
+    evt: MouseEvent,
+    side: "left" | "right" | "block" = "right",
+  ) {
     // Viewport (fixed-position) coordinates: the preview follows the cursor
     // anywhere in the window, dodging it on both axes — horizontally flip
     // right→left when the right side overflows, vertically fall back to
@@ -101,7 +130,29 @@
     const view = evt.view ?? activeWindow;
     const maxX = Math.max(4, view.innerWidth - TREE_PREVIEW_SIZE - 8);
     const maxY = Math.max(4, view.innerHeight - TREE_PREVIEW_SIZE - 8);
+    const half = TREE_PREVIEW_SIZE / 2;
     let x: number;
+    if (side === "block") {
+      // Comment-block hovers: anchor to the block's own bounding rect —
+      // beside the WHOLE block (flip on overflow), vertically centered on
+      // it — so the preview never covers the block and holds still while
+      // the pointer moves within it.
+      const rect = (
+        evt.currentTarget as Element | null
+      )?.getBoundingClientRect();
+      const r = rect ?? new DOMRect(evt.clientX, evt.clientY, 0, 0);
+      const rightX = r.right + 14;
+      x = Math.min(
+        rightX <= maxX ? rightX : Math.max(r.left - TREE_PREVIEW_SIZE - 14, 4),
+        maxX,
+      );
+      const cy = r.top + r.height / 2;
+      previewPos = {
+        x,
+        y: Math.min(Math.max(cy - half, 4), maxY),
+      };
+      return;
+    }
     if (side === "left") {
       // Move-list hovers: anchor to the hovered element's left edge so
       // the preview clears the whole list column instead of covering
@@ -122,7 +173,6 @@
       );
     }
     const cy = evt.clientY;
-    const half = TREE_PREVIEW_SIZE / 2;
     const y =
       cy - half >= 4 && cy + half <= view.innerHeight - 8
         ? cy - half

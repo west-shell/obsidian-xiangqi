@@ -118,6 +118,31 @@ export async function exportBoardPng(
   }
 }
 
+export interface BoardDataUrlOptions {
+  fen: string;
+  /** Board width in pixels. */
+  size: number;
+  coordinates: boolean;
+}
+
+/**
+ * Renders the given FEN on an offscreen board and returns it as an
+ * in-memory PNG data URL — the same pipeline as exportBoardPng, but
+ * nothing touches the disk. Used for pinned board previews in the tree.
+ */
+export async function renderBoardDataUrl(
+  options: BoardDataUrlOptions,
+): Promise<string> {
+  const board = new OffscreenBoard(options.size, options.coordinates);
+  try {
+    await board.setPosition(options.fen);
+    const canvas = await board.toCanvas();
+    return canvas.toDataURL("image/png");
+  } finally {
+    board.destroy();
+  }
+}
+
 export interface GifExportOptions {
   /** One FEN per frame, in playback order (starting position first). */
   fens: string[];

@@ -363,6 +363,7 @@ export class PGNParser {
       eval: evalMeta,
       clock,
       annotator,
+      pin,
       text,
     } = extractCommentMeta(raw);
     if (shapes.length > 0) {
@@ -376,6 +377,9 @@ export class PGNParser {
     if (clock) {
       // Lichess [%clk]; later blocks win (same rule as %e: comments).
       this.currentNode.clock = clock;
+    }
+    if (pin && (pin.comment || pin.board)) {
+      this.currentNode.pin = pin;
     }
     if (text) {
       this.currentNode.comments ??= [];

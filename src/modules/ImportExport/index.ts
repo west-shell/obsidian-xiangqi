@@ -13,11 +13,17 @@ export const ImportExportModule = {
   init(host: IHost) {
     const eventBus = host.eventBus;
 
-    host.stringifyPGN = (root: ChessNode, includeEval = true) =>
+    host.stringifyPGN = (
+      root: ChessNode,
+      includeEval = true,
+      annotationFormat,
+      includePins = true,
+    ) =>
       stringifyPGN(
         root,
         includeEval,
-        host.settings.annotationFormat ?? "suffix",
+        annotationFormat ?? host.settings.annotationFormat ?? "suffix",
+        includePins,
       );
 
     eventBus.on("import", () => {

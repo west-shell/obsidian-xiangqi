@@ -2,7 +2,7 @@ import { MarkdownView, Notice } from "obsidian";
 
 import type { IBlockHost } from "../../types";
 import { DEFAULT_FEN } from "../../types";
-import { promptSaveEval } from "../../utils/saveEval";
+import { promptSaveInclusions } from "../../utils/saveEval";
 import { t } from "../../i18n";
 
 export const BlockHostModule = {
@@ -51,12 +51,17 @@ export const BlockHostModule = {
         return;
       }
 
-      const includeEval = await promptSaveEval(host);
-      if (includeEval === null) return;
+      const inclusions = await promptSaveInclusions(host);
+      if (inclusions === null) return;
 
       const view = host.plugin.app.workspace.getActiveViewOfType(MarkdownView);
       if (!view?.file) return;
-      const pgn = host.stringifyPGN(host.root, includeEval);
+      const pgn = host.stringifyPGN(
+        host.root,
+        inclusions.eval,
+        undefined,
+        inclusions.pins,
+      );
       const newContent = [host.tags?.trim(), pgn].filter(Boolean).join("\n");
 
       void host.plugin.app.vault.process(view.file, (fileContent) => {

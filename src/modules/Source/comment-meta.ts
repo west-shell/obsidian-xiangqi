@@ -24,6 +24,11 @@ const CLK_REGEX = /\[\s*%clk\s+(\d+(?::\d{1,2}){1,2})\]/g;
 const ANNO_REGEX =
   /\[\s*%anno\s+(?:"([^"]*)"|([^\],]+))\s*(?:,\s*([^\]\s]+))?\s*\]/g;
 
+// Plugin-private pinned-block marker: { [%pin c,b] } — c = pinned comment
+// card, b = pinned board preview (either may appear alone). Survives
+// lichess round-trips as an unrecognized block.
+const PIN_REGEX = /\[\s*%pin\s+([cb](?:\s*,\s*[cb])*)\s*\]/g;
+
 const BRUSH_BY_COLOR: Record<string, string> = {
   G: "g",
   R: "r",
@@ -64,6 +69,8 @@ export interface CommentMeta {
   clock?: string;
   /** Annotation author from [%anno] — belongs to THIS comment's text. */
   annotator?: { name: string; user: string };
+  /** Pinned-block flags from [%pin c,b] — the plugin's own marker. */
+  pin?: { comment: boolean; board: boolean };
   /** Comment text with all recognized metadata stripped; empty when pure. */
   text: string;
 }
@@ -135,9 +142,19 @@ export function extractCommentMeta(raw: string): CommentMeta {
     },
   );
 
+  let pin: CommentMeta["pin"];
+  text = text.replace(PIN_REGEX, (_match, flags: string) => {
+    stripped = true;
+    pin = {
+      comment: flags.includes("c"),
+      board: flags.includes("b"),
+    };
+    return "";
+  });
+
   if (stripped) {
     // Collapse the whitespace left behind by stripped blocks.
     text = text.replace(/\s+/g, " ").trim();
   }
-  return { shapes, eval: evalMeta, clock, annotator, text };
+  return { shapes, eval: evalMeta, clock, annotator, pin, text };
 }

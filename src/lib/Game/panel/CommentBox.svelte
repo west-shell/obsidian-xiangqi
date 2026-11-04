@@ -22,6 +22,13 @@
   let commentsText = $state("");
   let textareaEl: HTMLTextAreaElement | undefined = $state();
 
+  // Pin-button visibility. saveComments() mutates currentNode.comments in
+  // place — a plain-object write Svelte cannot observe — so the pin
+  // button's {#if} would go stale (button missing after adding a comment,
+  // still shown after deleting it). Track the flag explicitly and sync it
+  // at both mutation sites: the save handler and the node-switch effect.
+  let hasComments = $state(false);
+
   // ---- 自动保存逻辑 ----
   let saveTimeout: number | undefined;
 
@@ -58,6 +65,27 @@
   let _lv = $state(0);
   const unsubLang = onLangChange(() => _lv++);
   let destroyed = false;
+
+  // ---- Pin/toggle button strip ----
+  // Once the comment box is tall enough to fit both buttons in one
+  // column (28px each + gap), stack them vertically to save horizontal
+  // space; below that they sit side by side as before.
+  let commentRowEl: HTMLDivElement | undefined = $state();
+  let actionsStacked = $state(false);
+  let rowResizeObserver: ResizeObserver | undefined;
+  const ACTION_BTN_SIZE = 28;
+  const ACTIONS_STACK_MIN = ACTION_BTN_SIZE * 2 + 2;
+
+  // ---- Pinned comment cards (tree canvas) ----
+  // Mirrors the tree graph's pin state so this button's icon matches the
+  // hover pin button on tree nodes; toggling goes through the event bus.
+  let pinnedIds = $state(new Set<string>());
+  const onPinnedChanged = (ids: unknown) => {
+    pinnedIds = ids instanceof Set ? new Set(ids as Set<string>) : new Set();
+  };
+  let commentPinned = $derived(
+    currentNode ? pinnedIds.has(currentNode.id) : false,
+  );
 
   $effect(() => {
     void _uiVer;
@@ -133,6 +161,18 @@
 
   onMount(() => {
     eventBus.on("updateUI", onUiVer);
+    eventBus.on("pinned-comments-changed", onPinnedChanged);
+    // Pin/toggle strip: track the comment row's height and stack the two
+    // buttons vertically once there is room for both (28px each + gap).
+    // The row never grows from stacking (the comment box dominates its
+    // height), so this cannot oscillate at the threshold.
+    if (commentRowEl) {
+      rowResizeObserver = new ResizeObserver(() => {
+        if (destroyed || !commentRowEl) return;
+        actionsStacked = commentRowEl.clientHeight >= ACTIONS_STACK_MIN;
+      });
+      rowResizeObserver.observe(commentRowEl);
+    }
     // Panel-mounted-while-hidden path (mirrors the tree graph's initial
     // reset): the commentsText effect measured the textarea while it was
     // display:none (scrollHeight 0), so re-adjust once the box becomes
@@ -150,6 +190,9 @@
   onDestroy(() => {
     destroyed = true;
     unsubLang();
+    eventBus.off("updateUI", onUiVer);
+    eventBus.off("pinned-comments-changed", onPinnedChanged);
+    rowResizeObserver?.disconnect();
     if (saveTimeout) {
       clearTimeout(saveTimeout);
       saveTimeout = undefined;
@@ -175,6 +218,7 @@
       regularComments.length !== oldComments.length ||
       regularComments.some((c, i) => c !== oldComments[i]);
     currentNode.comments = regularComments;
+    hasComments = regularComments.length > 0;
     if (changed) {
       // Rewritten lines no longer map to their original [%anno] authors.
       currentNode.commentAuthors = undefined;
@@ -197,9 +241,11 @@
     if (!currentNode) {
       commentsText = "";
       commentEditing = false;
+      hasComments = false;
       return;
     }
     commentsText = (currentNode.comments ?? []).join("\n");
+    hasComments = (currentNode.comments ?? []).length > 0;
     commentEditing = false;
     tick().then(() => {
       if (destroyed) return;
@@ -209,7 +255,7 @@
   });
 </script>
 
-<div class="{CLS_PREFIX}-panel__comment">
+<div class="{CLS_PREFIX}-panel__comment" bind:this={commentRowEl}>
   {#if plugin && !commentEditing && commentsText}
     <!-- svelte-ignore a11y_click_events_have_key_events -->
     <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -226,14 +272,38 @@
       placeholder={t("tree.placeholder")}
       bind:this={textareaEl}
       oninput={handleCommentsInput}
+      onfocus={() => {
+        // Entering the textarea is editing mode: keeps the {#if} above
+        // from flipping to the rendered view on the first typed
+        // character (which destroyed the textarea and stole focus).
+        commentEditing = true;
+      }}
       onblur={handleCommentsBlur}
       onkeydown={handleCommentsKeydown}
       rows="1"></textarea>
   {/if}
-  <button
-    class="{CLS_PREFIX}-btn {CLS_PREFIX}-comment__toggle"
-    aria-label={listVisible ? t("tree.hideList", _lv) : t("tree.showList", _lv)}
-    use:useSetIcon={listVisible ? "panel-right-close" : "panel-right-open"}
-    onclick={onToggleList}
-  ></button>
+  <div
+    class="{CLS_PREFIX}-comment__actions{actionsStacked
+      ? ` ${CLS_PREFIX}-comment__actions--stacked`
+      : ``}"
+  >
+    {#if currentNode && hasComments}
+      <button
+        class="{CLS_PREFIX}-btn {CLS_PREFIX}-comment__pin"
+        aria-label={commentPinned
+          ? t("tree.unpinComment", _lv)
+          : t("tree.pinComment", _lv)}
+        use:useSetIcon={commentPinned ? "pin-off" : "pin"}
+        onclick={() => eventBus.emit("tree-pin-comment", currentNode!.id)}
+      ></button>
+    {/if}
+    <button
+      class="{CLS_PREFIX}-btn {CLS_PREFIX}-comment__toggle"
+      aria-label={listVisible
+        ? t("tree.hideList", _lv)
+        : t("tree.showList", _lv)}
+      use:useSetIcon={listVisible ? "panel-right-close" : "panel-right-open"}
+      onclick={onToggleList}
+    ></button>
+  </div>
 </div>

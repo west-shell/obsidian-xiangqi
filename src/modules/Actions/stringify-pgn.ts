@@ -53,6 +53,7 @@ function formatPrivateEval(ev: NodeEval): string {
 export interface NodeMetaOptions {
   includeComments?: boolean;
   includeEval?: boolean;
+  includePins?: boolean;
   annotationFormat?: AnnotationFormat;
 }
 
@@ -68,6 +69,7 @@ export function serializeNodeMeta(
 ): string {
   const includeComments = options.includeComments ?? true;
   const includeEval = options.includeEval ?? true;
+  const includePins = options.includePins ?? true;
   const annotationFormat = options.annotationFormat ?? "suffix";
   let meta = "";
 
@@ -140,6 +142,14 @@ export function serializeNodeMeta(
     }
   }
 
+  if (includePins && node.pin && (node.pin.comment || node.pin.board)) {
+    // Plugin-private pinned-block marker; unknown tools skip the block.
+    const flags = [node.pin.comment ? "c" : "", node.pin.board ? "b" : ""]
+      .filter(Boolean)
+      .join(",");
+    meta += ` {[%pin ${flags}]}`;
+  }
+
   return meta;
 }
 
@@ -147,6 +157,7 @@ export function stringifyPGN(
   root: ChessNode,
   includeEval = true,
   annotationFormat: AnnotationFormat = "suffix",
+  includePins = true,
 ): string {
   const nodeBrothers = genNodeBrothers(root);
 
@@ -179,7 +190,11 @@ export function stringifyPGN(
         result += lineStart ? `${stepNum}... ${notation}` : notation;
       }
     }
-    const meta = serializeNodeMeta(node, { includeEval, annotationFormat });
+    const meta = serializeNodeMeta(node, {
+      includeEval,
+      includePins,
+      annotationFormat,
+    });
     result += meta;
     const brothers = nodeBrothers.get(node);
     if (brothers?.length) {
