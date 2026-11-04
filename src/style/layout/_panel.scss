@@ -754,6 +754,11 @@ button.#{$cls-prefix}-comment__pin {
   flex-direction: column;
   justify-content: center;
 
+  // List toggle sits above the pin button in the stacked column.
+  button.#{$cls-prefix}-comment__toggle {
+    order: -1;
+  }
+
   > button {
     height: 28px;
   }
