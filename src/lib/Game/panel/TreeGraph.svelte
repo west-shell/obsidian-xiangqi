@@ -943,7 +943,7 @@
           class="{CLS_PREFIX}-panel__node"
           transform="translate({cn.x} {cn.y})"
           onclick={() => eventBus.emit("node-click", realId)}
-          onmouseenter={(e) => preview?.showNode(owner, e)}
+          onmouseenter={(e) => preview?.showNode(owner, e, "block")}
           onmouseleave={() => preview?.hideNode(owner)}
         >
           <rect
