@@ -736,3 +736,32 @@ button.#{$cls-prefix}-comment__pin {
   justify-content: center;
   flex-shrink: 0;
 }
+
+// Pin/toggle button strip. In horizontal mode (short comment box) the
+// buttons sit side by side and stretch to the full comment height, as
+// before. Once the box is tall enough to fit both in one column, the
+// strip flips to a 28px-wide vertical stack (CommentBox toggles the
+// --stacked modifier via a ResizeObserver on the comment row).
+.#{$cls-prefix}-comment__actions {
+  display: flex;
+  flex-direction: row;
+  align-self: stretch;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.#{$cls-prefix}-comment__actions--stacked {
+  flex-direction: column;
+  justify-content: center;
+
+  > button {
+    height: 28px;
+  }
+
+  // A lone button (no comment to pin) keeps the full-height stretch of
+  // the horizontal mode.
+  > button:only-child {
+    flex: 1 1 auto;
+    height: auto;
+  }
+}
