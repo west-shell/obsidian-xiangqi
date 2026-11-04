@@ -242,11 +242,10 @@
     return lines;
   }
 
-  function commentBlockSize(owner: ChessNode): {
+  function commentBlockSize(lines: string[]): {
     width: number;
     height: number;
   } {
-    const lines = commentLines(owner);
     let maxW = 0;
     for (const line of lines) {
       maxW = Math.max(maxW, measureTextWidth(line, COMMENT_FONT_SIZE));
@@ -324,7 +323,17 @@
             const owner = nodeMap.get(
               node.id.slice(PINNED_COMMENT_PREFIX.length),
             );
-            if (owner) return commentBlockSize(owner);
+            if (owner) {
+              // Wrap once and STASH the lines on the virtual node: the
+              // block rendering reads them from the node (a fresh object
+              // every layout run) instead of the owner. Comment edits
+              // mutate the owner in place, so an owner-derived render
+              // chain short-circuits on Svelte's === checks and would
+              // keep showing the stale text.
+              const lines = commentLines(owner);
+              node.comments = lines;
+              return commentBlockSize(lines);
+            }
           }
           return {
             width: localGetNodeWidth(node),
@@ -385,7 +394,7 @@
     for (const cn of pinnedCommentNodes) {
       const owner = nodeMap.get(cn.id.slice(PINNED_COMMENT_PREFIX.length));
       if (!owner || cn.x === undefined || cn.y === undefined) continue;
-      const size = commentBlockSize(owner);
+      const size = commentBlockSize(cn.comments ?? commentLines(owner));
       minX = Math.min(minX, cn.x - size.width / 2);
       maxX = Math.max(maxX, cn.x + size.width / 2);
       minY = Math.min(minY, cn.y - size.height / 2);
@@ -706,7 +715,7 @@
       {@const realId = cn.id.slice(PINNED_COMMENT_PREFIX.length)}
       {@const owner = nodeMap.get(realId)}
       {#if owner && owner.x !== undefined && owner.y !== undefined && cn.x !== undefined && cn.y !== undefined}
-        {@const size = commentBlockSize(owner)}
+        {@const size = commentBlockSize(cn.comments ?? [])}
         <!-- 侧挂评论块的连线：与招法边同款，从所属节点中心沿本行走
              水平段再斜接到块顶边——不从子行顶边走，避免看起来像从
              下方的子节点发出。 -->
@@ -953,8 +962,11 @@
       {@const realId = cn.id.slice(PINNED_COMMENT_PREFIX.length)}
       {@const owner = nodeMap.get(realId)}
       {#if owner && cn.x !== undefined && cn.y !== undefined}
-        {@const lines = commentLines(owner)}
-        {@const size = commentBlockSize(owner)}
+        <!-- lines/size read from the stashed node fields (fresh every
+             layout run) — NOT from the owner, whose in-place comment
+             mutations Svelte's derived === checks would ignore. -->
+        {@const lines = cn.comments ?? []}
+        {@const size = commentBlockSize(lines)}
         <!-- svelte-ignore a11y_click_events_have_key_events -->
         <!-- svelte-ignore a11y_no_static_element_interactions -->
         <g
