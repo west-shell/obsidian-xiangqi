@@ -176,6 +176,13 @@
   function onPinComment(id: unknown): void {
     if (typeof id === "string") togglePinComment(id);
   }
+  // Comment edits mutate node.comments in place — nodeMap.size and pin
+  // count don't change, so the layout effect never fires. Re-layout on
+  // "modified" to refresh pinned comment blocks (text + measured size)
+  // and whatever shifts the new size causes.
+  function onModified(): void {
+    updateTreeLayout();
+  }
   // Broadcast pin state so the comment box button icon stays in sync.
   $effect(() => {
     eventBus.emit("pinned-comments-changed", new Set(pinnedCommentIds));
@@ -291,6 +298,7 @@
     eventBus.off("updateUI", onUiVer);
     eventBus.off("tree-ghost-lines", onGhostLines);
     eventBus.off("tree-pin-comment", onPinComment);
+    eventBus.off("modified", onModified);
     if (layoutChangeHandler) {
       activeDocument.body.removeEventListener(
         LAYOUT_CHANGE_EVENT,
@@ -526,6 +534,7 @@
     eventBus.on("updateUI", onUiVer);
     eventBus.on("tree-ghost-lines", onGhostLines);
     eventBus.on("tree-pin-comment", onPinComment);
+    eventBus.on("modified", onModified);
     if (!svgEl) return;
     updateTreeLayout();
     zoomBehavior = d3.zoom<SVGSVGElement, unknown>().on("zoom", (event) => {
