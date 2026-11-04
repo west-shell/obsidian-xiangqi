@@ -236,14 +236,14 @@
     if (event === "toggle-edit-menu") {
       handleEditMenu(evt);
     } else if (event === "toggle-node-menu") {
-      handleNodeMenu(evt);
+      handleNodeMenu(evt, getCurrentNode?.() ?? null);
     } else if (event === "toggle-board-menu") {
       handleBoardMenu(evt);
     }
   }
 
-  function emitEvent(name: string, payload: unknown = null) {
-    eventBus.emit("btn-click", { name, payload });
+  function emitEvent(name: string, payload: unknown = null, nodeId?: string) {
+    eventBus.emit("btn-click", { name, payload, nodeId });
   }
 
   function useSetIcon(el: HTMLElement, icon: string) {
@@ -299,19 +299,24 @@
     menu.showAtMouseEvent(evt);
   }
 
-  function handleNodeMenu(evt: MouseEvent) {
+  // The node menu acts on a target node: the toolbar button passes the
+  // current node, the tree's right-click passes the clicked node (which
+  // need not be current). Every action carries the target's id so the
+  // edit handlers operate on it without moving the current node.
+  function handleNodeMenu(evt: MouseEvent, target: ChessNode | null) {
     const menu = new Menu();
+    const nodeId = target?.id;
 
     menu.addItem((mi) => {
       mi.setTitle(t("toolbar.delete", _lv))
         .setIcon("circle-x")
-        .onClick(() => emitEvent("remove"));
+        .onClick(() => emitEvent("remove", null, nodeId));
     });
 
     menu.addItem((mi) => {
       mi.setTitle(t("toolbar.removeOtherVariations", _lv))
         .setIcon("scissors")
-        .onClick(() => emitEvent("removeOtherVariations"));
+        .onClick(() => emitEvent("removeOtherVariations", null, nodeId));
     });
 
     menu.addSeparator();
@@ -319,38 +324,37 @@
     menu.addItem((mi) => {
       mi.setTitle(t("toolbar.promote", _lv))
         .setIcon("arrow-up-wide-narrow")
-        .onClick(() => emitEvent("promote"));
+        .onClick(() => emitEvent("promote", null, nodeId));
     });
 
     menu.addItem((mi) => {
       mi.setTitle(t("toolbar.moveUp", _lv))
         .setIcon("arrow-up")
-        .onClick(() => emitEvent("moveUp"));
+        .onClick(() => emitEvent("moveUp", null, nodeId));
     });
 
     menu.addItem((mi) => {
       mi.setTitle(t("toolbar.moveDown", _lv))
         .setIcon("arrow-down")
-        .onClick(() => emitEvent("moveDown"));
+        .onClick(() => emitEvent("moveDown", null, nodeId));
     });
 
     menu.addSeparator();
 
-    // Pin board preview / pin comment for the current node (before the
+    // Pin board preview / pin comment for the target node (before the
     // annotate entry). The tree graph owns the pin sets and broadcasts
     // them over the event bus; toggling goes through the same bus.
-    const node = getCurrentNode?.() ?? null;
-    if (node) {
-      const boardPinned = pinnedBoardIds.has(node.id);
+    if (target) {
+      const boardPinned = pinnedBoardIds.has(target.id);
       menu.addItem((mi) => {
         mi.setTitle(
           boardPinned ? t("tree.unpinBoard", _lv) : t("tree.pinBoard", _lv),
         )
           .setIcon(boardPinned ? "pin-off" : "pin")
-          .onClick(() => eventBus.emit("tree-pin-board", node.id));
+          .onClick(() => eventBus.emit("tree-pin-board", target.id));
       });
-      if ((node.comments ?? []).length > 0) {
-        const commentPinned = pinnedCommentIds.has(node.id);
+      if ((target.comments ?? []).length > 0) {
+        const commentPinned = pinnedCommentIds.has(target.id);
         menu.addItem((mi) => {
           mi.setTitle(
             commentPinned
@@ -358,7 +362,7 @@
               : t("tree.pinComment", _lv),
           )
             .setIcon(commentPinned ? "pin-off" : "pin")
-            .onClick(() => eventBus.emit("tree-pin-comment", node.id));
+            .onClick(() => eventBus.emit("tree-pin-comment", target.id));
         });
       }
     }
@@ -367,7 +371,6 @@
       mi.setTitle(t("toolbar.annotate", _lv)).setIcon("tag");
       mi.onClick(() => {
         const sub = new Menu();
-        const node = getCurrentNode?.() ?? null;
         for (const [sectionIdx, section] of annotationSections.entries()) {
           if (sectionIdx > 0) sub.addSeparator();
           for (const item of section.items) {
@@ -375,8 +378,8 @@
             sub.addItem((si) => {
               si.setTitle(item.title);
               if (iconName) si.setIcon(iconName);
-              if (node) si.setChecked(hasAnnotation(node, item.key));
-              si.onClick(() => emitEvent("annotation", item.key));
+              if (target) si.setChecked(hasAnnotation(target, item.key));
+              si.onClick(() => emitEvent("annotation", item.key, nodeId));
             });
           }
         }
@@ -386,6 +389,22 @@
 
     menu.showAtMouseEvent(evt);
   }
+
+  // Right-clicking a tree node opens the same node menu targeting the
+  // clicked node: the tree graph sends the contextmenu event + node
+  // over the bus (no navigation happens).
+  $effect(() => {
+    const onNodeMenu = (payload: unknown) => {
+      if (!payload || typeof payload !== "object") return;
+      const data = payload as { event?: unknown; node?: unknown };
+      if (!(data.event instanceof MouseEvent) || !data.node) return;
+      handleNodeMenu(data.event, data.node as ChessNode);
+    };
+    eventBus.on("node-menu", onNodeMenu);
+    return () => {
+      eventBus.off("node-menu", onNodeMenu);
+    };
+  });
 
   function handleBoardMenu(evt: MouseEvent) {
     const menu = new Menu();

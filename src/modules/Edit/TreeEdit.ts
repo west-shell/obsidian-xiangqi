@@ -13,26 +13,42 @@ const BTN_NAMES = new Set([
   "moveDown",
 ]);
 
+/** Whether `id` is `root` itself or lives anywhere in its subtree. */
+function isInSubtree(root: ChessNode, id: string): boolean {
+  if (root.id === id) return true;
+  for (const child of root.children) {
+    if (isInSubtree(child, id)) return true;
+  }
+  return false;
+}
+
 export const TreeEditModule = {
   init(host: IHost) {
     const eventBus = host.eventBus;
 
-    eventBus.on<{ name: string; payload: unknown }>(
+    eventBus.on<{ name: string; payload: unknown; nodeId?: string }>(
       "btn-click",
       async (payload) => {
         if (!payload || !BTN_NAMES.has(payload.name)) return;
-        host.markedPos = null;
         const { name } = payload;
         const data = payload.payload as string;
+        // Menu entries may target a specific node (the tree's
+        // right-click menu passes the clicked node's id); an absent id
+        // falls back to the current node (toolbar menu, commands,
+        // keyboard scope).
+        const target = payload.nodeId
+          ? host.nodeMap.get(payload.nodeId)
+          : host.currentNode;
+        if (!target) return;
+        host.markedPos = null;
         switch (name) {
           case "annotation": {
-            if (!host.currentNode) break;
-            applyAnnotationToggle(host.currentNode, data);
+            applyAnnotationToggle(target, data);
             eventBus.emit("modified", null);
             break;
           }
           case "remove": {
-            if (host.currentNode.id === "node-root") {
+            if (target.id === "node-root") {
               const modal = new ConfirmModal(
                 host.plugin.app,
                 t("confirm.deleteTitle"),
@@ -42,20 +58,27 @@ export const TreeEditModule = {
               );
               modal.open();
               if (await modal.promise) {
-                host.currentNode.children = [];
+                target.children = [];
                 host.nodeMap.clear();
                 host.pathChoices.clear();
-                host.currentNode = { ...host.currentNode };
-                host.nodeMap.set(host.currentNode.id, host.currentNode);
+                const newRoot: ChessNode = { ...target };
+                host.currentNode = newRoot;
+                host.nodeMap.set(newRoot.id, newRoot);
                 eventBus.emit("updateMainPath");
-                eventBus.emit("node-click", host.currentNode.id);
+                eventBus.emit("node-click", newRoot.id);
                 eventBus.emit("modified", null);
               }
               break;
             }
-            const removeNode = host.currentNode;
+            const removeNode = target;
             const parentNode = host.nodeMap.get(removeNode.parentID!);
-            host.currentNode = parentNode!;
+            // Deleting a subtree can take the current node with it
+            // (the right-clicked node need not be current) — fall back
+            // to the removed node's parent when the current node lived
+            // inside the subtree.
+            if (isInSubtree(removeNode, host.currentNode.id)) {
+              host.currentNode = parentNode!;
+            }
             if (parentNode) {
               const idx = parentNode.children.indexOf(removeNode);
               if (idx !== -1) parentNode.children.splice(idx, 1);
@@ -72,14 +95,15 @@ export const TreeEditModule = {
             break;
           }
           case "removeOtherVariations": {
-            const node = host.currentNode;
-            if (node.id === "node-root" || !node.parentID) break;
+            if (target.id === "node-root" || !target.parentID) break;
             function pruneSubtree(n: ChessNode) {
               for (const child of n.children) pruneSubtree(child);
               host.nodeMap.delete(n.id);
             }
-            let child: ChessNode = node;
-            let parent: ChessNode | undefined = host.nodeMap.get(node.parentID);
+            let child: ChessNode = target;
+            let parent: ChessNode | undefined = host.nodeMap.get(
+              target.parentID,
+            );
             while (parent) {
               const keepId = child.id;
               const removed = parent.children.filter(
@@ -96,6 +120,11 @@ export const TreeEditModule = {
                 ? host.nodeMap.get(parent.parentID)
                 : undefined;
             }
+            // The current node may have lived in a pruned sibling
+            // branch — fall back to the kept line's node.
+            if (!host.nodeMap.has(host.currentNode.id)) {
+              host.currentNode = target;
+            }
             host.pathChoices.clear();
             eventBus.emit("updateMainPath");
             eventBus.emit("node-click", host.currentNode.id);
@@ -103,13 +132,9 @@ export const TreeEditModule = {
             break;
           }
           case "promote": {
-            if (
-              !host.currentNode.parentID ||
-              host.currentNode.id === "node-root"
-            )
-              break;
-            let nodeToPromote = host.currentNode;
-            let parent = host.nodeMap.get(nodeToPromote.parentID!);
+            if (!target.parentID || target.id === "node-root") break;
+            let nodeToPromote = target;
+            let parent = host.nodeMap.get(target.parentID);
             if (!parent) break;
             while (
               parent.children.length > 0 &&
@@ -121,7 +146,7 @@ export const TreeEditModule = {
               if (!parent) break;
             }
             const idx = parent!.children.findIndex(
-              (c: ChessNode) => c.id === nodeToPromote.id,
+              (c) => c.id === nodeToPromote.id,
             );
             if (idx > 0) {
               const item = parent!.children[idx];
@@ -139,19 +164,17 @@ export const TreeEditModule = {
           case "moveUp":
           case "moveDown": {
             const up = name === "moveUp";
-            const node = host.currentNode;
+            const node = target;
             if (!node.parentID || node.id === "node-root") break;
             let child: ChessNode = node;
             let parent: ChessNode | undefined = host.nodeMap.get(node.parentID);
             while (parent) {
-              const idx = parent.children.findIndex(
-                (c: ChessNode) => c.id === child.id,
-              );
+              const idx = parent.children.findIndex((c) => c.id === child.id);
               if (idx === -1) break;
-              const target = up ? idx - 1 : idx + 1;
-              if (target >= 0 && target < parent.children.length) {
+              const targetIdx = up ? idx - 1 : idx + 1;
+              if (targetIdx >= 0 && targetIdx < parent.children.length) {
                 const [item] = parent.children.splice(idx, 1);
-                parent.children.splice(target, 0, item);
+                parent.children.splice(targetIdx, 0, item);
                 host.pathChoices.clear();
                 eventBus.emit("modified", null);
                 break;

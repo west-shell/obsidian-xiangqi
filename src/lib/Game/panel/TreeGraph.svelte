@@ -195,6 +195,15 @@
   function onModified(): void {
     updateTreeLayout();
   }
+  // Right-click opens the toolbar's node menu targeting the clicked
+  // node — it may not be the current one, and it must not become it.
+  // The menu actions carry the node id explicitly, so no navigation
+  // happens here; just forward the event + node over the bus.
+  function onNodeContextMenu(e: MouseEvent, node: ChessNode): void {
+    e.preventDefault();
+    e.stopPropagation();
+    eventBus.emit("node-menu", { event: e, node });
+  }
   // Broadcast pin state so the comment box button icon stays in sync.
   $effect(() => {
     eventBus.emit("pinned-comments-changed", new Set(pinnedCommentIds));
@@ -918,6 +927,7 @@
         stroke-width={isCurrent ? 1 : 0.5}
         style="cursor: pointer"
         onclick={() => eventBus.emit("node-click", node.id)}
+        oncontextmenu={(e) => onNodeContextMenu(e, node)}
         onmouseenter={(e) => {
           hoveredNodeId = node.id;
           preview?.showNode(node, e, "block");
