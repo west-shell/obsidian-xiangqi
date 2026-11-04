@@ -167,10 +167,12 @@
   // (SvelteSet is reactive on its own — no $state wrap needed.)
   let pinnedCommentIds = new SvelteSet<string>();
   // Pin toggles only dirty the file when the flags will actually be
-  // written on save ("save by default" or "ask first" enabled).
+  // written on save ("save by default" or the shared "ask first" prompt
+  // enabled); with both off pins stay session-only and never mark the
+  // file modified.
   function pinPersistenceOn(): boolean {
     return Boolean(
-      settings && (settings.savePinsByDefault || settings.savePinsPrompt),
+      settings && (settings.savePinsByDefault || settings.saveEvalPrompt),
     );
   }
   // Mirror a toggle onto the node's durable pin flags.

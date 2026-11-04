@@ -32,22 +32,22 @@ export interface SaveInclusions {
 
 /**
  * Decide what to include when saving: evaluation scores and pinned-block
- * markers, each gated by its own "save by default" / "ask first" settings
- * pair. A single confirmation modal shows every undecided question; null
- * means the user cancelled the save.
+ * markers, each gated by its own "save by default" setting. One shared
+ * "ask before saving" setting controls the confirmation modal, which
+ * shows a toggle per item that exists in the tree; null means the user
+ * cancelled the save.
  */
 export async function promptSaveInclusions(
   host: IHost,
 ): Promise<SaveInclusions | null> {
   const hasEval = hasEvalInTree(host.root);
   const hasPins = hasPinsInTree(host.root);
-  const askEval = hasEval && host.settings.saveEvalPrompt;
-  const askPins = hasPins && host.settings.savePinsPrompt;
+  const ask = host.settings.saveEvalPrompt && (hasEval || hasPins);
 
   let includeEval = hasEval && host.settings.saveEvalByDefault;
   let includePins = hasPins && host.settings.savePinsByDefault;
 
-  if (!askEval && !askPins) {
+  if (!ask) {
     return { eval: includeEval, pins: includePins };
   }
 
@@ -60,7 +60,7 @@ export async function promptSaveInclusions(
   modal.onOpen = () => {
     const { contentEl } = modal;
     new Setting(contentEl).setName(t("confirm.saveTitle")).setHeading();
-    if (askEval) {
+    if (hasEval) {
       new Setting(contentEl)
         .setName(t("confirm.saveEval"))
         .addToggle((toggle) => {
@@ -69,7 +69,7 @@ export async function promptSaveInclusions(
           });
         });
     }
-    if (askPins) {
+    if (hasPins) {
       new Setting(contentEl)
         .setName(t("confirm.savePins"))
         .addToggle((toggle) => {

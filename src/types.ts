@@ -66,7 +66,6 @@ export interface ISettings {
   saveEvalByDefault: boolean;
   saveEvalPrompt: boolean;
   savePinsByDefault: boolean;
-  savePinsPrompt: boolean;
   annotationFormat: AnnotationFormat;
   /**
    * Default vault folder for image/GIF exports. Empty string = follow

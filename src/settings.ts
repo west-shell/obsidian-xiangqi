@@ -199,7 +199,6 @@ export const DEFAULT_SETTINGS: ISettings = {
   saveEvalByDefault: false,
   saveEvalPrompt: true,
   savePinsByDefault: true,
-  savePinsPrompt: false,
   annotationFormat: "suffix",
   exportFolder: "",
 };
@@ -593,11 +592,6 @@ export class ChessSettingTab extends PluginSettingTab {
             name: t("save.savePins"),
             desc: t("save.savePins.desc"),
             control: { type: "toggle", key: "savePinsByDefault" },
-          },
-          {
-            name: t("save.savePinsPrompt"),
-            desc: t("save.savePinsPrompt.desc"),
-            control: { type: "toggle", key: "savePinsPrompt" },
           },
           {
             name: t("save.annotationFormat"),
@@ -1262,16 +1256,6 @@ export class ChessSettingTab extends PluginSettingTab {
       .addToggle((toggle) =>
         toggle.setValue(settings.savePinsByDefault).onChange((value) => {
           settings.savePinsByDefault = value;
-          void this.plugin.saveSettings();
-        }),
-      );
-
-    new Setting(containerEl)
-      .setName(t("save.savePinsPrompt"))
-      .setDesc(t("save.savePinsPrompt.desc"))
-      .addToggle((toggle) =>
-        toggle.setValue(settings.savePinsPrompt).onChange((value) => {
-          settings.savePinsPrompt = value;
           void this.plugin.saveSettings();
         }),
       );
