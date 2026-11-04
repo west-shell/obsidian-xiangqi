@@ -183,6 +183,10 @@ export default class ChessPlugin extends Plugin {
   async loadSettings() {
     const savedData = (await this.loadData()) as Record<string, unknown> | null;
     if (savedData) {
+      // Legacy key migration: the prompt setting used to cover evals only.
+      if (!("savePrompt" in savedData) && "saveEvalPrompt" in savedData) {
+        savedData.savePrompt = savedData.saveEvalPrompt;
+      }
       const picked: Record<string, unknown> = {};
       for (const key of Object.keys(DEFAULT_SETTINGS)) {
         if (key in savedData) {

@@ -532,7 +532,7 @@ function initEngine(host: object) {
         }
         lastResult = result;
         eventBus.emit("engine-result", result);
-        if (settings.saveEvalPrompt || settings.saveEvalByDefault) {
+        if (settings.savePrompt || settings.saveEvalByDefault) {
           h.eventBus.emit("modified", null);
         }
         h.eventBus.emit("updateUI");
@@ -675,7 +675,7 @@ function initEngine(host: object) {
       } else {
         h.eventBus.emit("clear-engine-bestmove");
       }
-      if (settings.saveEvalPrompt || settings.saveEvalByDefault) {
+      if (settings.savePrompt || settings.saveEvalByDefault) {
         h.eventBus.emit("modified", null);
       }
       h.eventBus.emit("updateUI");
@@ -846,7 +846,7 @@ function initEngine(host: object) {
             h.currentNode = node;
             emitGhosts();
           }
-          if (settings.saveEvalPrompt || settings.saveEvalByDefault) {
+          if (settings.savePrompt || settings.saveEvalByDefault) {
             h.eventBus.emit("modified", null);
           }
           h.eventBus.emit("updateUI");

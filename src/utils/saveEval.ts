@@ -42,7 +42,7 @@ export async function promptSaveInclusions(
 ): Promise<SaveInclusions | null> {
   const hasEval = hasEvalInTree(host.root);
   const hasPins = hasPinsInTree(host.root);
-  const ask = host.settings.saveEvalPrompt && (hasEval || hasPins);
+  const ask = host.settings.savePrompt && (hasEval || hasPins);
 
   let includeEval = hasEval && host.settings.saveEvalByDefault;
   let includePins = hasPins && host.settings.savePinsByDefault;

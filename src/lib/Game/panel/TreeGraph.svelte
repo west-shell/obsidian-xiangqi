@@ -172,7 +172,7 @@
   // file modified.
   function pinPersistenceOn(): boolean {
     return Boolean(
-      settings && (settings.savePinsByDefault || settings.saveEvalPrompt),
+      settings && (settings.savePinsByDefault || settings.savePrompt),
     );
   }
   // Mirror a toggle onto the node's durable pin flags.

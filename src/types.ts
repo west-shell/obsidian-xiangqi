@@ -64,7 +64,8 @@ export interface ISettings {
   engineGhostDepth: number;
   showBoardAnnotations: boolean;
   saveEvalByDefault: boolean;
-  saveEvalPrompt: boolean;
+  /** Ask what to include (evals, pinned blocks) before saving to disk. */
+  savePrompt: boolean;
   savePinsByDefault: boolean;
   annotationFormat: AnnotationFormat;
   /**
