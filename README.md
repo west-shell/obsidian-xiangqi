@@ -67,9 +67,9 @@ Every branch is visualized as a tree graph — click any node to jump to that po
 | `Alt+←` / `Alt+→`                       | Cycle through every branch's node at the current ply (short or folded branches are skipped; wraps) |
 | `Alt+Shift+←` / `Alt+Shift+→`           | Jump between the ends of all visible branches (wraps)                                              |
 | `Ctrl+Shift+←` / `Ctrl+Shift+→`         | Cycle between the first steps of all visible branches (wraps)                                      |
-| `↑` / `↓` / `←` / `→` (PGN view)        | Step one move back / forward; jump to game start / end                                             |
+| `↑` / `↓` / `←` / `→`                   | Step one move back / forward; jump to game start / end                                             |
 
-Branch navigation works in both the PGN file view and `xiangqi` code blocks (in code blocks, hover the block and keep focus out of text editors). On macOS, `Ctrl+↑`/`Ctrl+↓` may conflict with Mission Control. All branch-switching shortcuts skip branches hidden by folding. All PGN view navigation actions are also available as commands in the Command Palette — without preset hotkeys, to avoid conflicts with core and other plugins; assign your own in Settings → Hotkeys if you want global bindings. All PGN view shortcuts are built into the view and only active while it is focused. Code block shortcuts are built-in and hover-gated.
+These shortcuts work in the PGN file view and in `xiangqi` code blocks alike. In the PGN view they are built into the view and active while it is focused. In a code block, click the board (or anywhere on the block) first — the focused block takes the shortcuts; click back into the note to return to typing. On macOS, `Ctrl+↑`/`Ctrl+↓` may conflict with Mission Control. All branch-switching shortcuts skip branches hidden by folding. All PGN view navigation actions are also available as commands in the Command Palette — without preset hotkeys, to avoid conflicts with core and other plugins; assign your own in Settings → Hotkeys if you want global bindings.
 
 ### Engine Analysis
 
