@@ -296,9 +296,6 @@
         });
     }
   });
-  // 节点悬停状态：悬停时在节点右上角显示 pin 按钮（固定/取消固定该
-  // 节点的棋盘预览）。离开 svg 一并清零，防布局位移下按钮滞留。
-  let hoveredNodeId = $state<string | null>(null);
 
   // Greedy wrap of one paragraph; breaks at the last space when possible,
   // otherwise hard-breaks by character (CJK has no spaces).
@@ -778,7 +775,6 @@
   class="{CLS_PREFIX}-panel__svg"
   onmouseleave={() => {
     preview?.hideAll();
-    hoveredNodeId = null;
   }}
 >
   <g transform={TRANSFORM_SAFE}>
@@ -929,11 +925,9 @@
         onclick={() => eventBus.emit("node-click", node.id)}
         oncontextmenu={(e) => onNodeContextMenu(e, node)}
         onmouseenter={(e) => {
-          hoveredNodeId = node.id;
           preview?.showNode(node, e, "block");
         }}
         onmouseleave={() => {
-          if (hoveredNodeId === node.id) hoveredNodeId = null;
           preview?.hideNode(node);
         }}
       >
@@ -1065,33 +1059,6 @@
           >
             <!-- eslint-disable-next-line svelte/no-at-html-tags -->
             {@html iconSvg("message_square_text", 7, 1.5, "var(--color-blue)")}
-          </g>
-        {/if}
-        {#if hoveredNodeId === node.id}
-          <!-- 悬停 pin 按钮：固定/取消固定该节点的棋盘预览。 -->
-          <!-- svelte-ignore a11y_click_events_have_key_events -->
-          <!-- svelte-ignore a11y_no_static_element_interactions -->
-          <g
-            class="{CLS_PREFIX}-panel__pinbtn"
-            transform="translate({nw / 2 + 1} {-nodeHeight / 2 - 8})"
-            style="cursor: pointer"
-            aria-label={pinnedBoardIds.has(node.id)
-              ? t("tree.unpinBoard", _lv)
-              : t("tree.pinBoard", _lv)}
-            onclick={(e) => {
-              e.stopPropagation();
-              togglePinBoard(node.id);
-            }}
-          >
-            <circle r="5.5" fill="transparent" />
-            <g transform="translate(-3.5, -3.5)">
-              <!-- eslint-disable-next-line svelte/no-at-html-tags -->
-              {@html iconSvg(
-                pinnedBoardIds.has(node.id) ? "pin_off" : "pin",
-                7,
-                1.5,
-              )}
-            </g>
           </g>
         {/if}
       </g>
