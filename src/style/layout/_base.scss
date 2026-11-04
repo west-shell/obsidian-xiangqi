@@ -54,6 +54,13 @@ body.#{$cls-prefix}-resizing {
   margin: 1rem 0;
 }
 
+// The block container is click-focusable (tabindex -1) so keyboard
+// navigation can target it (see modules/KeyboardNav.ts); keep the
+// focus state visually quiet.
+.#{$cls-prefix}-block:focus {
+  outline: none;
+}
+
 // PGN file view host
 .#{$cls-prefix}-file-view {
   overflow: hidden !important;
