@@ -235,6 +235,7 @@
   "tree.showList": "棋譜を表示",
   "tree.togglePreview": "局面プレビューの切り替え",
   "tree.ghostInsert": "エンジンの指し手を挿入",
+  "tree.ghostHint": "クリックしてエンジンの指し手を挿入",
   "tree.draw": "引き分け",
   "tree.whiteWins": "白の勝ち",
   "tree.redWins": "紅の勝ち",

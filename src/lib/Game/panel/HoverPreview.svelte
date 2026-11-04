@@ -1,6 +1,9 @@
 <script lang="ts">
+  import { onDestroy } from "svelte";
   import type { ChessNode, ISettings } from "../../../types";
   import { CLS_PREFIX, DEFAULT_FEN, type Square } from "../../../chess";
+  import { onLangChange, t } from "../../../i18n";
+  import { isGhostNode } from "../../../modules/Engine/ghost-lines";
   import PreviewBoard from "./PreviewBoard.svelte";
 
   interface Props {
@@ -8,6 +11,9 @@
   }
 
   let { settings }: Props = $props();
+
+  let _lv = $state(0);
+  const unsubLang = onLangChange(() => _lv++);
 
   // ---- Tree node hover preview ----
   // lila-style pv-board: hovering a node in the tree graph shows a mini
@@ -30,6 +36,17 @@
   let previewOrientation: "white" | "black" = $derived(
     settings?.rotated ? "black" : "white",
   );
+
+  // Ghost nodes (engine candidate lines) keep no native <title> tooltip —
+  // it floats on a fixed spot near the cursor and covers this preview
+  // board. The insert hint renders as a caption inside the preview instead.
+  let previewIsGhost = $derived(
+    previewNode !== null && isGhostNode(previewNode),
+  );
+
+  onDestroy(() => {
+    unsubLang();
+  });
 
   function supportsHover(): boolean {
     return activeWindow.matchMedia?.("(hover: hover)").matches ?? true;
@@ -130,5 +147,10 @@
       lastMove={previewLastMove}
       orientation={previewOrientation}
     />
+    {#if previewIsGhost}
+      <div class="{CLS_PREFIX}-tree-preview__hint">
+        {t("tree.ghostHint", _lv)}
+      </div>
+    {/if}
   </div>
 {/if}

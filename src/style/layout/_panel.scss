@@ -167,6 +167,17 @@ button.#{$cls-prefix}-gamenav__arrow svg {
     width: 100%;
     border-radius: 0;
   }
+
+  // Caption under the board, shown only when the hovered tree node is an
+  // engine ghost ("click to insert") — replaces the native <title> tooltip
+  // that covered the preview board.
+  .#{$cls-prefix}-tree-preview__hint {
+    padding: 2px 6px;
+    font-size: var(--font-ui-smaller, 11px);
+    text-align: center;
+    color: var(--text-normal);
+    background-color: var(--background-primary);
+  }
 }
 
 // ---- Eval bar --------------------------------------------------------------------

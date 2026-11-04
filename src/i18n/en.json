@@ -235,6 +235,7 @@
   "tree.showList": "Show move list",
   "tree.togglePreview": "Toggle position preview",
   "tree.ghostInsert": "Insert engine line",
+  "tree.ghostHint": "Click to insert engine line",
   "tree.draw": "Draw",
   "tree.whiteWins": "White wins",
   "tree.redWins": "Red wins",

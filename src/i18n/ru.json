@@ -235,6 +235,7 @@
   "tree.showList": "Показать список ходов",
   "tree.togglePreview": "Переключить превью позиции",
   "tree.ghostInsert": "Вставить вариант движка",
+  "tree.ghostHint": "Нажмите, чтобы вставить вариант движка",
   "tree.draw": "Ничья",
   "tree.whiteWins": "Победа белых",
   "tree.redWins": "Победа красных",

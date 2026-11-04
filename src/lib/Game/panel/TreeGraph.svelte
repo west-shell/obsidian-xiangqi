@@ -768,7 +768,6 @@
           onmouseenter={(e) => preview?.showNode(g, e)}
           onmouseleave={() => preview?.hideNode(g)}
         >
-          <title>{t("tree.ghostInsert", _lv)}</title>
           <rect
             x={-gw / 2}
             y={-nodeHeight / 2}
