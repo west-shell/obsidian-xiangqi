@@ -65,6 +65,8 @@ export interface ISettings {
   showBoardAnnotations: boolean;
   saveEvalByDefault: boolean;
   saveEvalPrompt: boolean;
+  savePinsByDefault: boolean;
+  savePinsPrompt: boolean;
   annotationFormat: AnnotationFormat;
   /**
    * Default vault folder for image/GIF exports. Empty string = follow
@@ -157,6 +159,13 @@ export type ChessNode = {
    * user edits comment text, since rewritten lines lose their attribution.
    */
   commentAuthors?: ({ name: string; user: string } | undefined)[];
+  /**
+   * Pinned blocks on the tree canvas, persisted as {[%pin c,b]} comment
+   * markers in the PGN (c = pinned comment card, b = pinned board
+   * preview). Absent flags default to false; the field is dropped when
+   * nothing is pinned.
+   */
+  pin?: { comment: boolean; board: boolean };
   isCheckmate?: boolean;
   result?: string;
 };
@@ -253,7 +262,12 @@ export interface IHost {
   options: IOptions;
   /** Source content that failed to parse and was skipped (moves, FEN tags) */
   parseWarnings: ParseWarning[];
-  stringifyPGN: (root: ChessNode, includeEval?: boolean) => string;
+  stringifyPGN: (
+    root: ChessNode,
+    includeEval?: boolean,
+    annotationFormat?: AnnotationFormat,
+    includePins?: boolean,
+  ) => string;
   games: GameSlot[];
   currentGameIndex: number;
   /** Bumped every time the underlying PGN data is replaced (file switch) */

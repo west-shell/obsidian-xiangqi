@@ -1,6 +1,6 @@
 import type { IFileHost } from "../../types";
 import { activateGame, splitPGN } from "../Source/parse";
-import { promptSaveEval } from "../../utils/saveEval";
+import { promptSaveInclusions } from "../../utils/saveEval";
 
 export const FileHostModule = {
   init(host: IFileHost) {
@@ -17,8 +17,8 @@ export const FileHostModule = {
     });
 
     eventBus.on("save", async () => {
-      const includeEval = await promptSaveEval(host);
-      if (includeEval === null) return;
+      const inclusions = await promptSaveInclusions(host);
+      if (inclusions === null) return;
 
       const parts: string[] = [];
       for (let i = 0; i < host.games.length; i++) {
@@ -29,7 +29,12 @@ export const FileHostModule = {
             slot.parsed.root = host.root;
             slot.parsed.nodeMap = host.nodeMap;
           }
-          const pgn = host.stringifyPGN(slot.parsed.root, includeEval);
+          const pgn = host.stringifyPGN(
+            slot.parsed.root,
+            inclusions.eval,
+            undefined,
+            inclusions.pins,
+          );
           const content = [slot.parsed.tags?.trim(), pgn]
             .filter(Boolean)
             .join("\n");

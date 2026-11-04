@@ -159,14 +159,56 @@
   let foldedNodes = $state(new SvelteSet<string>());
 
   // ---- Pinned comments (comment box pin button → block on the canvas) ----
-  // Nodes whose comment is pinned as a card on the canvas. Session state:
-  // pins vanish when the view closes, mirroring foldedNodes behavior.
+  // Nodes whose comment is pinned as a card on the canvas. Durable state
+  // lives on the node itself (node.pin, persisted as {[%pin c,b]} in the
+  // PGN); these sets mirror it for reactive layout/rendering and are
+  // rebuilt from the tree whenever the tree is replaced (load / reset /
+  // game switch), so stale pins never outlive their tree.
   // (SvelteSet is reactive on its own — no $state wrap needed.)
   let pinnedCommentIds = new SvelteSet<string>();
-  function togglePinComment(id: string): void {
-    if (pinnedCommentIds.has(id)) pinnedCommentIds.delete(id);
-    else pinnedCommentIds.add(id);
+  // Pin toggles only dirty the file when the flags will actually be
+  // written on save ("save by default" or "ask first" enabled).
+  function pinPersistenceOn(): boolean {
+    return Boolean(
+      settings && (settings.savePinsByDefault || settings.savePinsPrompt),
+    );
   }
+  // Mirror a toggle onto the node's durable pin flags.
+  function syncNodePin(id: string, kind: "comment" | "board", on: boolean) {
+    const node = nodeMap.get(id);
+    if (!node) return;
+    const next = {
+      comment: node.pin?.comment ?? false,
+      board: node.pin?.board ?? false,
+    };
+    next[kind] = on;
+    if (next.comment || next.board) node.pin = next;
+    else delete node.pin;
+    if (pinPersistenceOn()) eventBus.emit("modified");
+  }
+  function togglePinComment(id: string): void {
+    const on = !pinnedCommentIds.has(id);
+    if (on) pinnedCommentIds.add(id);
+    else pinnedCommentIds.delete(id);
+    syncNodePin(id, "comment", on);
+  }
+  // Rebuild both pin sets from the tree's pin flags. Runs whenever the
+  // root node OBJECT changes identity — a re-parse (reset reverts to the
+  // on-disk PGN, file reload) or another game's cached tree activating.
+  // Reset therefore drops session pins and restores only saved markers;
+  // switching back to a cached game keeps its in-memory pins.
+  let pinnedTreeRoot: ChessNode | null = null;
+  $effect(() => {
+    const root = nodeMap.get("node-root") ?? null;
+    if (root === pinnedTreeRoot) return;
+    pinnedTreeRoot = root;
+    pinnedCommentIds.clear();
+    pinnedBoardIds.clear();
+    for (const node of nodeMap.values()) {
+      if (node.pin?.comment) pinnedCommentIds.add(node.id);
+      if (node.pin?.board) pinnedBoardIds.add(node.id);
+    }
+  });
   // Drop pins whose node left the tree (variation deleted / game switched).
   $effect(() => {
     // eslint-disable-next-line no-unused-expressions, @typescript-eslint/no-unused-expressions
@@ -232,8 +274,10 @@
   // cached, so two nodes with the same position share one raster.
   let pinnedBoardIds = new SvelteSet<string>();
   function togglePinBoard(id: string): void {
-    if (pinnedBoardIds.has(id)) pinnedBoardIds.delete(id);
-    else pinnedBoardIds.add(id);
+    const on = !pinnedBoardIds.has(id);
+    if (on) pinnedBoardIds.add(id);
+    else pinnedBoardIds.delete(id);
+    syncNodePin(id, "board", on);
   }
   // Broadcast pin state so the toolbar node menu entries stay in sync
   // (sibling component).
