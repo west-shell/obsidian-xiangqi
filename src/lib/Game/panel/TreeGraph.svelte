@@ -186,10 +186,10 @@
   // boxes + text in the same visual language as move labels: comment text
   // is word-wrapped (canvas-measured, same measurement as move widths),
   // the box sizes to the wrapped lines, and the layout reserves exactly
-  // that box. Each block inserts its OWN row between its node and the
-  // children row (trunk column): the box top sits gapY below the node,
-  // the trunk line runs straight through behind the box, and real
-  // children keep their usual row below the box.
+  // that box. Each block hangs in the children row beside the move
+  // labels (top edge aligned with theirs, extending downward when
+  // taller); its connector starts at the owner node like a regular
+  // edge and ends at the box top.
   let pinnedCommentNodes: ChessNode[] = $state([]);
   const COMMENT_FONT_SIZE = "9px";
   const COMMENT_LINE_HEIGHT = 11;
@@ -697,18 +697,21 @@
       {@const realId = cn.id.slice(PINNED_COMMENT_PREFIX.length)}
       {@const owner = nodeMap.get(realId)}
       {#if owner && owner.x !== undefined && owner.y !== undefined && cn.x !== undefined && cn.y !== undefined}
-        <!-- 评论块占主干列（cn.x === owner.x），此边退化为竖直线；
-             有子节点时真实主干边从块背后穿过，此处补上叶子场景的连线。 -->
+        {@const size = commentBlockSize(owner)}
+        <!-- 侧挂评论块的连线：与招法边同款，从所属节点中心沿本行走
+             水平段再斜接到块顶边——不从子行顶边走，避免看起来像从
+             下方的子节点发出。 -->
         <path
           d={`
         M ${owner.x} ${owner.y}
         L ${cn.x - EDGE_ELBOW * Math.sign(cn.x - owner.x)} ${owner.y}
-        L ${cn.x} ${cn.y}
+        L ${cn.x} ${cn.y - size.height / 2}
         `}
           stroke="var(--tree-line)"
           stroke-linejoin="round"
           stroke-width="1"
-          opacity="0.6"
+          stroke-dasharray="2 1.2"
+          opacity="0.5"
           fill="none"
           style="pointer-events: none"
         />

@@ -9,12 +9,10 @@
  *     尺寸（sizeFn 提供宽高），x = 节点中心像素坐标，y = 节点中心
  *     像素坐标。这样后期把评论块 / 小棋盘 / 插入分支作为任意尺寸
  *     的树元素参与布局时，间距计算天然正确。
- *   - 置顶评论块（pincomment: 虚拟节点）：每个被 pin 的节点在与子
- *     行之间插入独立一行（占据主干列，块中心在节点正下方），真实
- *     子节点 / 幽灵链仅在布局层改挂到块下（真实树不变）；块与节点
- *     同深度（depth-flat），子行的分支左右、主干对齐与无评论时完
- *     全一致，主干直线从块背后穿过。块的宽高由渲染层按换行文本测
- *     量后经 sizeFn 提供。
+ *   - 置顶评论块（pincomment: 虚拟叶子）：每个被 pin 的节点挂一个
+ *     参与布局的虚拟子节点，侧挂在子行里招法标签旁边（顶边与其对
+ *     齐，块更高时向下延伸）；尺寸由渲染层按换行文本测量后经
+ *     sizeFn 提供。
  */
 
 import type { ChessNode, GhostLine, NodeMap } from "../../../types";
@@ -38,9 +36,9 @@ export interface LayoutOptions {
   /** 节点真实尺寸；缺省为 13×11 的紧凑节点。 */
   sizeFn?: NodeSizeFn;
   /**
-   * 需要置顶评论块的节点 id 列表。每个节点在与子行之间插入一个
-   * "pincomment:" 虚拟节点（占主干列，不写回真实树）；块的宽高由
-   * 渲染层按换行后的文本测量，经 sizeFn 提供。
+   * 需要置顶评论块的节点 id 列表。每个节点挂一个 "pincomment:" 虚拟
+   * 叶子参与布局（不写回真实树）；块的宽高由渲染层按换行后的文本
+   * 测量，经 sizeFn 提供。
    */
   pinnedCommentIds?: string[];
 }
@@ -128,37 +126,31 @@ function buildWNode(
   wn.lExt = wn;
   wn.rExt = wn;
 
-  // Pinned comment block: inserts its OWN row between this node and the
-  // children row — the block takes the trunk column (directly below this
-  // node), and real children / ghost chains re-parent under the block for
-  // LAYOUT only (the real tree is never mutated). The block is
-  // depth-flat (shares this node's depth) so the children row keeps its
-  // normal depth parity: branch left/right direction and trunk alignment
-  // stay exactly as without the comment, and the trunk column runs
-  // straight through the block.
-  const commentBlock = commentByParent.get(node.id);
-  let rowHost = wn;
-  if (commentBlock) {
-    const blockWn = buildWNode(
-      commentBlock,
-      wn,
-      foldedNodes,
-      ghostByParent,
-      commentByParent,
-      sizeFn,
-    );
-    blockWn.depth = wn.depth;
-    wn.children.push(blockWn);
-    rowHost = blockWn;
-  }
-
   for (let i = 0; i < node.children.length; i++) {
     const child = node.children[i];
     if (i > 0 && foldedNodes.has(node.id)) continue;
-    rowHost.children.push(
+    wn.children.push(
       buildWNode(
         child,
-        rowHost,
+        wn,
+        foldedNodes,
+        ghostByParent,
+        commentByParent,
+        sizeFn,
+      ),
+    );
+  }
+  // Pinned comment block: a virtual leaf appended AFTER real children and
+  // BEFORE the fold early-return, so a folded node keeps its pinned
+  // comment visible (never mutates the real tree). It hangs in the
+  // children row beside the move labels — top edge aligned with theirs,
+  // extending downward when taller.
+  const commentBlock = commentByParent.get(node.id);
+  if (commentBlock) {
+    wn.children.push(
+      buildWNode(
+        commentBlock,
+        wn,
         foldedNodes,
         ghostByParent,
         commentByParent,
@@ -169,19 +161,11 @@ function buildWNode(
   // Ghost chains append AFTER real children (never mutate node.children):
   // they occupy the outer slot so real branch positions stay as stable as
   // the algorithm allows. Folding the attachment node hides them, same as
-  // real branches; the comment block wraps whatever children remain, so a
-  // folded node keeps its pinned comment visible.
+  // real branches.
   if (foldedNodes.has(node.id)) return wn;
   for (const head of ghostByParent.get(node.id) ?? []) {
-    rowHost.children.push(
-      buildWNode(
-        head,
-        rowHost,
-        foldedNodes,
-        ghostByParent,
-        commentByParent,
-        sizeFn,
-      ),
+    wn.children.push(
+      buildWNode(head, wn, foldedNodes, ghostByParent, commentByParent, sizeFn),
     );
   }
   return wn;
@@ -189,9 +173,10 @@ function buildWNode(
 
 // ─── 纵向延伸（真实尺寸，px） ────────
 
-/** 轮廓的纵向底部估计：非叶节点延伸到子行中心（按最高子元素），叶
- *  节点再多留一行；高叶子（置顶评论块）按实测高度下探，避免轮廓
- *  低估导致重叠。默认紧凑节点（h=11）下与旧值完全一致。 */
+/** 轮廓的纵向底部估计：非叶节点延伸到子行中心（按最高子元素——侧
+ *  挂评论块比招法标签高时正确下探），叶节点再多留一行；高叶子同
+ *  样按实测高度下探，避免轮廓低估导致重叠。默认紧凑节点（h=11）
+ *  下与旧值完全一致。 */
 function nodeBottom(w: WNode): number {
   if (w.children.length === 0) {
     // 默认紧凑节点（h=11）保持原值 2*ROW_STEP，行为不变。
