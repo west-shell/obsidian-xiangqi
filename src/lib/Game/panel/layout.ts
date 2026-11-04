@@ -158,8 +158,35 @@ function buildWNode(
   // comment visible (never mutates the real tree). It hangs in the
   // children row beside the move labels — top edge aligned with theirs,
   // extending downward when taller.
+  // Pinned board preview: another virtual leaf, same rules.
+  // When a node pins BOTH, they form one card: the board occupies the
+  // row slot and the comment hangs directly below it as the board's
+  // virtual child — the pair then moves as a single subtree.
   const commentBlock = commentByParent.get(node.id);
-  if (commentBlock) {
+  const boardBlock = boardByParent.get(node.id);
+  if (commentBlock && boardBlock) {
+    const boardWn = buildWNode(
+      boardBlock,
+      wn,
+      foldedNodes,
+      ghostByParent,
+      commentByParent,
+      boardByParent,
+      sizeFn,
+    );
+    boardWn.children.push(
+      buildWNode(
+        commentBlock,
+        boardWn,
+        foldedNodes,
+        ghostByParent,
+        commentByParent,
+        boardByParent,
+        sizeFn,
+      ),
+    );
+    wn.children.push(boardWn);
+  } else if (commentBlock) {
     wn.children.push(
       buildWNode(
         commentBlock,
@@ -171,12 +198,7 @@ function buildWNode(
         sizeFn,
       ),
     );
-  }
-  // Pinned board preview: another virtual leaf, appended after the
-  // comment block — same row, same rules (never mutates the real tree,
-  // stays visible when the node is folded).
-  const boardBlock = boardByParent.get(node.id);
-  if (boardBlock) {
+  } else if (boardBlock) {
     wn.children.push(
       buildWNode(
         boardBlock,

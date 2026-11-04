@@ -824,24 +824,28 @@
       {@const realId = cn.id.slice(PINNED_COMMENT_PREFIX.length)}
       {@const owner = nodeMap.get(realId)}
       {#if owner && owner.x !== undefined && owner.y !== undefined && cn.x !== undefined && cn.y !== undefined}
-        {@const size = commentBlockSize(cn.comments ?? [])}
-        <!-- 侧挂评论块的连线：与招法边同款，从所属节点中心沿本行走
-             水平段再斜接到块顶边——不从子行顶边走，避免看起来像从
-             下方的子节点发出。 -->
-        <path
-          d={`
+        <!-- 分组卡片（同节点棋盘+评论）里的评论挂在棋盘正下方，不画
+             连线——避免从节点出发的线穿过棋盘；卡片由棋盘的连线牵。 -->
+        {#if !pinnedBoardIds.has(realId)}
+          {@const size = commentBlockSize(cn.comments ?? [])}
+          <!-- 侧挂评论块的连线：与招法边同款，从所属节点中心沿本行走
+               水平段再斜接到块顶边——不从子行顶边走，避免看起来像从
+               下方的子节点发出。 -->
+          <path
+            d={`
         M ${owner.x} ${owner.y}
         L ${cn.x - EDGE_ELBOW * Math.sign(cn.x - owner.x)} ${owner.y}
         L ${cn.x} ${cn.y - size.height / 2}
         `}
-          stroke="var(--tree-line)"
-          stroke-linejoin="round"
-          stroke-width="1"
-          stroke-dasharray="2 1.2"
-          opacity="0.5"
-          fill="none"
-          style="pointer-events: none"
-        />
+            stroke="var(--tree-line)"
+            stroke-linejoin="round"
+            stroke-width="1"
+            stroke-dasharray="2 1.2"
+            opacity="0.5"
+            fill="none"
+            style="pointer-events: none"
+          />
+        {/if}
       {/if}
     {/each}
 
