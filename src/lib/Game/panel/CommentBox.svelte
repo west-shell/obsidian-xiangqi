@@ -22,6 +22,13 @@
   let commentsText = $state("");
   let textareaEl: HTMLTextAreaElement | undefined = $state();
 
+  // Pin-button visibility. saveComments() mutates currentNode.comments in
+  // place — a plain-object write Svelte cannot observe — so the pin
+  // button's {#if} would go stale (button missing after adding a comment,
+  // still shown after deleting it). Track the flag explicitly and sync it
+  // at both mutation sites: the save handler and the node-switch effect.
+  let hasComments = $state(false);
+
   // ---- 自动保存逻辑 ----
   let saveTimeout: number | undefined;
 
@@ -189,6 +196,7 @@
       regularComments.length !== oldComments.length ||
       regularComments.some((c, i) => c !== oldComments[i]);
     currentNode.comments = regularComments;
+    hasComments = regularComments.length > 0;
     if (changed) {
       // Rewritten lines no longer map to their original [%anno] authors.
       currentNode.commentAuthors = undefined;
@@ -211,9 +219,11 @@
     if (!currentNode) {
       commentsText = "";
       commentEditing = false;
+      hasComments = false;
       return;
     }
     commentsText = (currentNode.comments ?? []).join("\n");
+    hasComments = (currentNode.comments ?? []).length > 0;
     commentEditing = false;
     tick().then(() => {
       if (destroyed) return;
@@ -244,7 +254,7 @@
       onkeydown={handleCommentsKeydown}
       rows="1"></textarea>
   {/if}
-  {#if currentNode && (currentNode.comments ?? []).length > 0}
+  {#if currentNode && hasComments}
     <button
       class="{CLS_PREFIX}-btn {CLS_PREFIX}-comment__pin"
       aria-label={commentPinned
