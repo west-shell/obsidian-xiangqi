@@ -9,6 +9,8 @@
  *     尺寸（sizeFn 提供宽高），x = 节点中心像素坐标，y = 节点中心
  *     像素坐标。这样后期把评论块 / 小棋盘 / 插入分支作为任意尺寸
  *     的树元素参与布局时，间距计算天然正确。
+ *   - 置顶评论块（pincomment: 虚拟叶子）作为第一个接入者：每个被
+ *     pin 的节点挂一个参与布局的虚拟子节点，渲染层实测块高后回填。
  */
 
 import type { ChessNode, GhostLine, NodeMap } from "../../../types";
@@ -31,7 +33,19 @@ export interface LayoutOptions {
   gapY?: number;
   /** 节点真实尺寸；缺省为 13×11 的紧凑节点。 */
   sizeFn?: NodeSizeFn;
+  /**
+   * 需要置顶评论块的节点 id 列表。每个节点挂一个 "pincomment:" 虚拟
+   * 叶子参与布局（不写回真实树）；块高由渲染层 DOM 实测后经 sizeFn
+   * 回填，未实测时用 sizeFn 给出的占位高度。
+   */
+  pinnedCommentIds?: string[];
 }
+
+/**
+ * 置顶评论块虚拟节点的 id 前缀：`PINNED_COMMENT_PREFIX + 真实节点 id`。
+ * 渲染层用它反查所属节点（评论内容、实测高度）。
+ */
+export const PINNED_COMMENT_PREFIX = "pincomment:";
 
 const DEFAULT_NODE_SIZE: NodeSize = { width: 13, height: 11 };
 const DEFAULT_GAP_X = 6;
@@ -82,6 +96,7 @@ function buildWNode(
   parent: WNode | null,
   foldedNodes: Set<string>,
   ghostByParent: Map<string, ChessNode[]>,
+  commentByParent: Map<string, ChessNode>,
   sizeFn: NodeSizeFn,
 ): WNode {
   const size = sizeFn(node);
@@ -111,7 +126,32 @@ function buildWNode(
   for (let i = 0; i < node.children.length; i++) {
     const child = node.children[i];
     if (i > 0 && foldedNodes.has(node.id)) continue;
-    wn.children.push(buildWNode(child, wn, foldedNodes, ghostByParent, sizeFn));
+    wn.children.push(
+      buildWNode(
+        child,
+        wn,
+        foldedNodes,
+        ghostByParent,
+        commentByParent,
+        sizeFn,
+      ),
+    );
+  }
+  // Pinned comment block: a virtual leaf appended AFTER real children and
+  // BEFORE the fold early-return, so a folded node keeps its pinned
+  // comment visible (never mutates the real tree).
+  const commentBlock = commentByParent.get(node.id);
+  if (commentBlock) {
+    wn.children.push(
+      buildWNode(
+        commentBlock,
+        wn,
+        foldedNodes,
+        ghostByParent,
+        commentByParent,
+        sizeFn,
+      ),
+    );
   }
   // Ghost chains append AFTER real children (never mutate node.children):
   // they occupy the outer slot so real branch positions stay as stable as
@@ -119,16 +159,23 @@ function buildWNode(
   // real branches.
   if (foldedNodes.has(node.id)) return wn;
   for (const head of ghostByParent.get(node.id) ?? []) {
-    wn.children.push(buildWNode(head, wn, foldedNodes, ghostByParent, sizeFn));
+    wn.children.push(
+      buildWNode(head, wn, foldedNodes, ghostByParent, commentByParent, sizeFn),
+    );
   }
   return wn;
 }
 
 // ─── 纵向延伸（真实尺寸，px） ────────
 
-/** 轮廓的纵向底部估计：非叶节点延伸到子行中心，叶节点再多留一行。 */
+/** 轮廓的纵向底部估计：非叶节点延伸到子行中心，叶节点再多留一行；
+ *  高叶子（置顶评论块）按实测高度下探，避免轮廓低估导致重叠。 */
 function nodeBottom(w: WNode): number {
-  return w.y + (w.children.length === 0 ? 2 : 1) * ROW_STEP;
+  if (w.children.length === 0) {
+    // 默认紧凑节点（h=11）保持原值 2*ROW_STEP，行为不变。
+    return w.y + Math.max(2 * ROW_STEP, w.height / 2 + ROW_STEP);
+  }
+  return w.y + ROW_STEP;
 }
 
 // ─── 核心布局 ───────────────────────
@@ -341,23 +388,30 @@ function resolveX(w: WNode, prevSum?: number, parentX?: number): void {
 /**
  * 使用 Walker 算法计算棋谱树的布局（真实尺寸版，实验分支）。
  *
- * 输出：真实节点数组 + 幽灵节点数组。每个节点的 x / y 直接就是
- * 像素坐标（节点中心），渲染层不再乘 spacing：
+ * 输出：真实节点数组 + 幽灵节点数组 + 置顶评论块虚拟节点数组。每个
+ * 节点的 x / y 直接就是像素坐标（节点中心），渲染层不再乘 spacing：
  *   - x：水平中心，兄弟间距 = 真实半宽之和 + gapX
  *   - y：垂直中心，子行 = 父底边 + gapY + 子半高
- * `options.sizeFn` 提供每个树元素的真实尺寸（px），后期评论块、
- * 小棋盘、插入分支等任意尺寸元素只需给出自己的尺寸即可参与布局。
+ * `options.sizeFn` 提供每个树元素的真实尺寸（px），评论块、小棋盘、
+ * 插入分支等任意尺寸元素只需给出自己的尺寸即可参与布局。
  * `ghosts` 里的幽灵链附加到 attachId 节点的真实子节点之后参与布局，
- * 但绝不写回真实树（node.children 不变）。
+ * 但绝不写回真实树（node.children 不变）。`options.pinnedCommentIds`
+ * 里的节点各挂一个 "pincomment:" 虚拟叶子（同样不写回真实树）。
  */
 export function calculateTreeLayout(
   nodeMap: NodeMap,
   foldedNodes: Set<string>,
   ghosts: GhostLine[] = [],
   options: LayoutOptions = {},
-): { nodes: ChessNode[]; ghostNodes: ChessNode[] } {
+): {
+  nodes: ChessNode[];
+  ghostNodes: ChessNode[];
+  pinnedCommentNodes: ChessNode[];
+} {
   const root = nodeMap.get("node-root");
-  if (!root) return { nodes: [], ghostNodes: [] };
+  if (!root) {
+    return { nodes: [], ghostNodes: [], pinnedCommentNodes: [] };
+  }
 
   const sizeFn = options.sizeFn ?? (() => DEFAULT_NODE_SIZE);
   const gapX = options.gapX ?? DEFAULT_GAP_X;
@@ -383,8 +437,34 @@ export function calculateTreeLayout(
     }
   }
 
+  // Pinned comment blocks: one virtual leaf per pinned, commented node.
+  // Nodes without comments are skipped (deleting the comment unpins the
+  // block visually; the pin set itself is pruned by the rendering layer).
+  const commentByParent = new Map<string, ChessNode>();
+  const commentIdSet = new Set<string>();
+  for (const id of options.pinnedCommentIds ?? []) {
+    const owner = nodeMap.get(id);
+    if (!owner || (owner.comments ?? []).length === 0) continue;
+    const block: ChessNode = {
+      id: PINNED_COMMENT_PREFIX + id,
+      fen: "",
+      move: null,
+      color: null,
+      children: [],
+    };
+    commentByParent.set(id, block);
+    commentIdSet.add(block.id);
+  }
+
   // 1) 建树
-  const wRoot = buildWNode(root, null, foldedNodes, ghostByParent, sizeFn);
+  const wRoot = buildWNode(
+    root,
+    null,
+    foldedNodes,
+    ghostByParent,
+    commentByParent,
+    sizeFn,
+  );
 
   // 2) 布局
   layoutChildren(wRoot, 0, () => gapX, gapY);
@@ -395,11 +475,13 @@ export function calculateTreeLayout(
   // 4) 把结果写回 ChessNode
   const nodes: ChessNode[] = [];
   const ghostNodes: ChessNode[] = [];
+  const pinnedCommentNodes: ChessNode[] = [];
   function collect(wn: WNode): void {
     wn.node.x = Math.round(wn.x * 10) / 10;
     wn.node.y = Math.round(wn.y * 10) / 10;
     wn.node.depth = wn.depth;
-    if (ghostIdSet.has(wn.node.id)) ghostNodes.push(wn.node);
+    if (commentIdSet.has(wn.node.id)) pinnedCommentNodes.push(wn.node);
+    else if (ghostIdSet.has(wn.node.id)) ghostNodes.push(wn.node);
     else nodes.push(wn.node);
     for (const child of wn.children) {
       collect(child);
@@ -407,5 +489,5 @@ export function calculateTreeLayout(
   }
   collect(wRoot);
 
-  return { nodes, ghostNodes };
+  return { nodes, ghostNodes, pinnedCommentNodes };
 }
