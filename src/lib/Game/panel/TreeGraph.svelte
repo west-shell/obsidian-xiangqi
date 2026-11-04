@@ -1076,13 +1076,13 @@
               togglePinBoard(node.id);
             }}
           >
-            <circle r="7" />
-            <g transform="translate(-4.5, -4.5)">
+            <circle r="5.5" fill="transparent" />
+            <g transform="translate(-3.5, -3.5)">
               <!-- eslint-disable-next-line svelte/no-at-html-tags -->
               {@html iconSvg(
                 pinnedBoardIds.has(node.id) ? "pin_off" : "pin",
-                9,
-                1.8,
+                7,
+                1.5,
               )}
             </g>
           </g>

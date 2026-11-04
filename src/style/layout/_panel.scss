@@ -193,24 +193,15 @@ button.#{$cls-prefix}-gamenav__arrow svg {
 // graph (virtual "pinboard:" leaf nodes in panel/layout.ts). The node's
 // hover pin button (and its context-menu entry) toggles them.
 
-// Hover pin button in the tree SVG: small disc at the node's top-right
-// corner, visible while hovering a node. Click toggles the pinned board
-// preview block.
+// Hover pin button in the tree SVG: marker-sized pin icon at the node's
+// top-right corner (same 7px/1.5 stroke language as the comment marker),
+// visible while hovering a node. Click toggles the pinned board preview
+// block; a transparent circle keeps the hit area comfortable.
 .#{$cls-prefix}-panel__pinbtn {
   color: var(--text-muted);
 
-  circle {
-    fill: var(--background-primary);
-    stroke: var(--background-modifier-border);
-    stroke-width: 1;
-  }
-
   &:hover {
     color: var(--text-normal);
-
-    circle {
-      fill: var(--background-modifier-hover);
-    }
   }
 }
 
