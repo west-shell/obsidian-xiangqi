@@ -5,9 +5,37 @@
  *   - 主干（firstChild 链）直线排列
  *   - 偶数层分支往左，奇数层分支往右（根算第 0 层）
  *   - 用轮廓行走消除重叠
+ *   - 实验分支（exp/real-size-layout）：布局直接使用节点的真实像素
+ *     尺寸（sizeFn 提供宽高），x = 节点中心像素坐标，y = 节点中心
+ *     像素坐标。这样后期把评论块 / 小棋盘 / 插入分支作为任意尺寸
+ *     的树元素参与布局时，间距计算天然正确。
  */
 
 import type { ChessNode, GhostLine, NodeMap } from "../../../types";
+
+// ─── 尺寸契约 ───────────────────────
+
+/** 一个树元素的真实渲染尺寸（px）。 */
+export interface NodeSize {
+  width: number;
+  height: number;
+}
+
+/** 按节点取真实尺寸；宽高由渲染层测量（文本测量 / 固定图标宽）。 */
+export type NodeSizeFn = (node: ChessNode) => NodeSize;
+
+export interface LayoutOptions {
+  /** 兄弟节点盒子之间的水平间隙（px，中心距之外的空隙）。 */
+  gapX?: number;
+  /** 父节点底边到子节点顶边的垂直间隙（px）。 */
+  gapY?: number;
+  /** 节点真实尺寸；缺省为 13×11 的紧凑节点。 */
+  sizeFn?: NodeSizeFn;
+}
+
+const DEFAULT_NODE_SIZE: NodeSize = { width: 13, height: 11 };
+const DEFAULT_GAP_X = 6;
+const DEFAULT_GAP_Y = 4;
 
 // ─── 内部节点 ───────────────────────
 
@@ -16,6 +44,10 @@ interface WNode {
   parent: WNode | null;
   children: WNode[];
   depth: number;
+
+  // 真实尺寸（px）
+  width: number;
+  height: number;
 
   x: number;
   y: number;
@@ -39,6 +71,10 @@ interface LowEntry {
   next: LowEntry | null;
 }
 
+// 垂直方向的"一行"步长（px）：nodeBottom 用它估计轮廓的纵向延伸。
+// 由 calculateTreeLayout 每次调用时设置（gapY + 平均行高）。
+let ROW_STEP = DEFAULT_GAP_Y + DEFAULT_NODE_SIZE.height;
+
 // ─── 构建内部树 ────────────────────
 
 function buildWNode(
@@ -46,12 +82,16 @@ function buildWNode(
   parent: WNode | null,
   foldedNodes: Set<string>,
   ghostByParent: Map<string, ChessNode[]>,
+  sizeFn: NodeSizeFn,
 ): WNode {
+  const size = sizeFn(node);
   const wn: WNode = {
     node,
     parent,
     children: [],
     depth: parent === null ? 0 : parent.depth + 1,
+    width: size.width,
+    height: size.height,
     x: 0,
     y: 0,
     relX: 0,
@@ -71,7 +111,7 @@ function buildWNode(
   for (let i = 0; i < node.children.length; i++) {
     const child = node.children[i];
     if (i > 0 && foldedNodes.has(node.id)) continue;
-    wn.children.push(buildWNode(child, wn, foldedNodes, ghostByParent));
+    wn.children.push(buildWNode(child, wn, foldedNodes, ghostByParent, sizeFn));
   }
   // Ghost chains append AFTER real children (never mutate node.children):
   // they occupy the outer slot so real branch positions stay as stable as
@@ -79,17 +119,16 @@ function buildWNode(
   // real branches.
   if (foldedNodes.has(node.id)) return wn;
   for (const head of ghostByParent.get(node.id) ?? []) {
-    wn.children.push(buildWNode(head, wn, foldedNodes, ghostByParent));
+    wn.children.push(buildWNode(head, wn, foldedNodes, ghostByParent, sizeFn));
   }
   return wn;
 }
 
-// ─── 大小（固定大小，配合 spacingX） ─
+// ─── 纵向延伸（真实尺寸，px） ────────
 
-const NODE_H = 1;
-
+/** 轮廓的纵向底部估计：非叶节点延伸到子行中心，叶节点再多留一行。 */
 function nodeBottom(w: WNode): number {
-  return w.y + (w.children.length === 0 ? 2 : 1);
+  return w.y + (w.children.length === 0 ? 2 : 1) * ROW_STEP;
 }
 
 // ─── 核心布局 ───────────────────────
@@ -98,6 +137,7 @@ function layoutChildren(
   w: WNode,
   y: number,
   spacingFn: (a: WNode, b: WNode) => number,
+  gapY: number,
 ): void {
   w.y = y;
 
@@ -111,7 +151,13 @@ function layoutChildren(
 
   for (let i = 0; i < kids.length; i++) {
     const kid = kids[i];
-    layoutChildren(kid, w.y + NODE_H, spacingFn);
+    // 子节点中心 y：父底边 + gapY + 子半高（真实尺寸，px）
+    layoutChildren(
+      kid,
+      w.y + w.height / 2 + gapY + kid.height / 2,
+      spacingFn,
+      gapY,
+    );
 
     const lowY = i === 0 ? nodeBottom(kid.lExt) : nodeBottom(kid.rExt);
     if (i !== 0) separate(w, i, lastLows!, spacingFn);
@@ -140,12 +186,13 @@ function separate(
   while (rContour && lContour) {
     if (nodeBottom(rContour) > lows.lowY) lows = lows.next!;
 
+    // 真实尺寸：中心距 = 左轮廓半宽 + 右轮廓半宽 + 间隙
     const dist =
       rSumMods +
       rContour.prelim -
       (lSumMods + lContour.prelim) +
-      0.5 +
-      0.5 + // xSize/2 + xSize/2 = 1/2 + 1/2
+      rContour.width / 2 +
+      lContour.width / 2 +
       spacingFn(rContour, lContour);
 
     if (dist > 0 || (dist < 0 && isFirst)) {
@@ -292,21 +339,31 @@ function resolveX(w: WNode, prevSum?: number, parentX?: number): void {
 // ─── 主入口 ─────────────────────────
 
 /**
- * 使用 Walker 算法计算棋谱树的布局。
+ * 使用 Walker 算法计算棋谱树的布局（真实尺寸版，实验分支）。
  *
- * 输出：真实节点数组 + 幽灵节点数组，每个节点有 x（水平位置）、y（深度）。
- * 渲染时用 x * spacingX、y * spacingY 转为像素坐标。
+ * 输出：真实节点数组 + 幽灵节点数组。每个节点的 x / y 直接就是
+ * 像素坐标（节点中心），渲染层不再乘 spacing：
+ *   - x：水平中心，兄弟间距 = 真实半宽之和 + gapX
+ *   - y：垂直中心，子行 = 父底边 + gapY + 子半高
+ * `options.sizeFn` 提供每个树元素的真实尺寸（px），后期评论块、
+ * 小棋盘、插入分支等任意尺寸元素只需给出自己的尺寸即可参与布局。
  * `ghosts` 里的幽灵链附加到 attachId 节点的真实子节点之后参与布局，
  * 但绝不写回真实树（node.children 不变）。
  */
 export function calculateTreeLayout(
   nodeMap: NodeMap,
   foldedNodes: Set<string>,
-  spacing: number = 0.3,
   ghosts: GhostLine[] = [],
+  options: LayoutOptions = {},
 ): { nodes: ChessNode[]; ghostNodes: ChessNode[] } {
   const root = nodeMap.get("node-root");
   if (!root) return { nodes: [], ghostNodes: [] };
+
+  const sizeFn = options.sizeFn ?? (() => DEFAULT_NODE_SIZE);
+  const gapX = options.gapX ?? DEFAULT_GAP_X;
+  const gapY = options.gapY ?? DEFAULT_GAP_Y;
+  // nodeBottom 的纵向延伸估计基准：一行的高度（间隙 + 默认行高）。
+  ROW_STEP = gapY + DEFAULT_NODE_SIZE.height;
 
   // Ghost chain heads grouped by their real attachment node.
   const ghostByParent = new Map<string, ChessNode[]>();
@@ -327,10 +384,10 @@ export function calculateTreeLayout(
   }
 
   // 1) 建树
-  const wRoot = buildWNode(root, null, foldedNodes, ghostByParent);
+  const wRoot = buildWNode(root, null, foldedNodes, ghostByParent, sizeFn);
 
   // 2) 布局
-  layoutChildren(wRoot, 0, () => spacing);
+  layoutChildren(wRoot, 0, () => gapX, gapY);
 
   // 3) 解析 x
   resolveX(wRoot);
@@ -340,7 +397,8 @@ export function calculateTreeLayout(
   const ghostNodes: ChessNode[] = [];
   function collect(wn: WNode): void {
     wn.node.x = Math.round(wn.x * 10) / 10;
-    wn.node.y = wn.depth;
+    wn.node.y = Math.round(wn.y * 10) / 10;
+    wn.node.depth = wn.depth;
     if (ghostIdSet.has(wn.node.id)) ghostNodes.push(wn.node);
     else nodes.push(wn.node);
     for (const child of wn.children) {

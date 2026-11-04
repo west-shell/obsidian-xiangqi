@@ -134,6 +134,8 @@ export type ChessNode = {
   step?: number;
   x?: number;
   y?: number;
+  /** Tree depth (root = 0). View state written by the layout pass. */
+  depth?: number;
   parentID?: string | null;
   children: ChessNode[];
   comments?: string[];

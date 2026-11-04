@@ -9,10 +9,8 @@
     getNodeLabel,
     getNodeTextColor,
     getNodeWidth,
-    getTreeSpacingX,
     LAYOUT_CHANGE_EVENT,
     NODE_CHAR_DY,
-    TREE_LAYOUT_SPACING,
   } from "../../../chess";
   import type { EventBus } from "../../../core/event-bus";
   import { onLangChange, t } from "../../../i18n";
@@ -176,8 +174,13 @@
     return `translate(${t.x},${t.y}) scale(${t.k})`;
   });
 
-  const spacingY = 15;
   const nodeHeight = 11;
+  // 真实尺寸布局（exp/real-size-layout）：兄弟水平间隙、行间垂直间隙（px）。
+  // 节点宽高由 sizeFn 实测（文本模式逐节点测量），布局输出直接是像素坐标。
+  const NODE_GAP_X = 6;
+  const ROW_GAP_Y = 4;
+  // 边线肘部回退量（px），衔接父行到子行的折线拐点。
+  const EDGE_ELBOW = 6;
 
   let layoutChangeHandler: (() => void) | null = null;
   let resizeObserver: ResizeObserver | null = null;
@@ -206,8 +209,15 @@
     const res = calculateTreeLayout(
       nodeMap,
       foldedNodes,
-      TREE_LAYOUT_SPACING,
       ghostLines?.lines ?? [],
+      {
+        sizeFn: (node) => ({
+          width: localGetNodeWidth(node),
+          height: nodeHeight,
+        }),
+        gapX: NODE_GAP_X,
+        gapY: ROW_GAP_Y,
+      },
     );
     renderedNodes = res.nodes;
     renderedGhostNodes = res.ghostNodes;
@@ -260,14 +270,14 @@
       !Number.isFinite(maxY)
     )
       return;
-    const treeWidth = (maxX - minX) * spacingX;
-    const treeHeight = (maxY - minY) * spacingY;
+    const treeWidth = maxX - minX;
+    const treeHeight = maxY - minY;
     const { clientWidth, clientHeight } = svgEl;
     const scaleX = (clientWidth - padding * 2) / treeWidth;
     const scaleY = (clientHeight - padding * 2) / treeHeight;
     const k = Math.max(0.75, Math.min(scaleX, scaleY, 2));
-    const tx = clientWidth / 2 - (minX * spacingX + treeWidth / 2) * k;
-    const ty = clientHeight / 2 - (minY * spacingY + treeHeight / 2) * k;
+    const tx = clientWidth / 2 - (minX + treeWidth / 2) * k;
+    const ty = clientHeight / 2 - (minY + treeHeight / 2) * k;
     const t = d3.zoomIdentity.translate(tx, ty).scale(k);
     d3.select(svgEl).transition().duration(300).call(zoomBehavior.transform, t);
   }
@@ -285,8 +295,8 @@
     let translateX = tx,
       translateY = ty,
       scale = sc;
-    const nodeScreenX = node.x * spacingX * scale + translateX;
-    const nodeScreenY = node.y * spacingY * scale + translateY;
+    const nodeScreenX = node.x * scale + translateX;
+    const nodeScreenY = node.y * scale + translateY;
 
     let dx = 0,
       dy = 0;
@@ -340,7 +350,6 @@
 
   let nodeMode = $state(0);
   const MODE_ICONS = ["club", "align-justify"];
-  let spacingX = $derived(getTreeSpacingX(nodeMode));
   function cycleNodeMode() {
     nodeMode = (nodeMode + 1) % 2;
   }
@@ -472,7 +481,7 @@
 
   $effect(() => {
     // eslint-disable-next-line no-unused-expressions, @typescript-eslint/no-unused-expressions
-    nodeMap.size;
+    (nodeMap.size, nodeMode); // nodeMode 切换改变节点宽度，需重排
     updateTreeLayout();
   });
 </script>
@@ -528,9 +537,9 @@
             currentPath.includes(node.id) && currentPath.includes(child.id)}
           <path
             d={`
-        M ${node.x! * spacingX} ${node.y! * spacingY}
-        L ${(child.x! - 0.3 * Math.sign(child.x! - node.x!)) * spacingX} ${node.y! * spacingY}
-        L ${child.x! * spacingX} ${child.y! * spacingY}
+        M ${node.x!} ${node.y!}
+        L ${child.x! - EDGE_ELBOW * Math.sign(child.x! - node.x!)} ${node.y!}
+        L ${child.x!} ${child.y!}
         `}
             stroke="var(--tree-line)"
             stroke-linejoin="round"
@@ -548,9 +557,9 @@
       {#if gInfo && gParent && g.x !== undefined && g.y !== undefined && gParent.x !== undefined && gParent.y !== undefined}
         <path
           d={`
-        M ${gParent.x * spacingX} ${gParent.y * spacingY}
-        L ${(g.x - 0.3 * Math.sign(g.x - gParent.x)) * spacingX} ${gParent.y * spacingY}
-        L ${g.x * spacingX} ${g.y * spacingY}
+        M ${gParent.x} ${gParent.y}
+        L ${g.x - EDGE_ELBOW * Math.sign(g.x - gParent.x)} ${gParent.y}
+        L ${g.x} ${g.y}
         `}
           stroke="var(--tree-line)"
           stroke-linejoin="round"
@@ -565,7 +574,7 @@
 
     {#each renderedNodes as node (node.id)}
       {#if node.children.length > 1}
-        {@const isLeft = (node.y ?? 0) % 2 === 0}
+        {@const isLeft = (node.depth ?? 0) % 2 === 0}
         {@const nw = localGetNodeWidth(node)}
         {@const offPathFold = !(
           currentPath.includes(node.id) &&
@@ -575,9 +584,8 @@
         <!-- svelte-ignore a11y_click_events_have_key_events -->
         <!-- svelte-ignore a11y_no_static_element_interactions -->
         <g
-          transform="translate({node.x! * spacingX +
-            (isLeft ? -nw / 2 : nw / 2)} {node.y! * spacingY}){node.id ===
-          currentNode?.id
+          transform="translate({node.x! +
+            (isLeft ? -nw / 2 : nw / 2)} {node.y!}){node.id === currentNode?.id
             ? ' scale(1.2)'
             : ''}"
           style="cursor: pointer"
@@ -612,8 +620,9 @@
       <!-- svelte-ignore a11y_no_static_element_interactions -->
       <g
         class="{CLS_PREFIX}-panel__node"
-        transform="translate({node.x! * spacingX} {node.y! *
-          spacingY}){isCurrent ? ' scale(1.2)' : ''}"
+        transform="translate({node.x!} {node.y!}){isCurrent
+          ? ' scale(1.2)'
+          : ''}"
         opacity={currentPath.includes(node.id) ? 1 : 0.55}
         stroke-width={isCurrent ? 1 : 0.5}
         onclick={() => eventBus.emit("node-click", node.id)}
@@ -761,7 +770,7 @@
         <!-- svelte-ignore a11y_no_static_element_interactions -->
         <g
           class="{CLS_PREFIX}-panel__node"
-          transform="translate({g.x * spacingX} {g.y * spacingY})"
+          transform="translate({g.x} {g.y})"
           opacity={gInfo.rank === 0 ? 1 : 0.6}
           style="cursor: pointer"
           onclick={() => eventBus.emit("tree-ghost-materialize", g.id)}
