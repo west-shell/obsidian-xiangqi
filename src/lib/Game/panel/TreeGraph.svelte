@@ -182,67 +182,68 @@
   });
 
   // ---- Pinned comment blocks (real-size layout participants) ----
-  // Virtual "pincomment:" leaf nodes produced by the layout. Rendered as
-  // HTML siblings of the SVG so text stays crisp at any zoom; the block
-  // top-left corner maps the layout's block-center pixel coordinates
-  // through the live d3 zoom transform.
+  // Virtual "pincomment:" leaf nodes produced by the layout, rendered as
+  // SVG boxes + text in the same visual language as move labels: comment
+  // text is word-wrapped (canvas-measured, same measurement as move
+  // widths), the box sizes to the wrapped lines, and the layout reserves
+  // exactly that box for the block.
   let pinnedCommentNodes: ChessNode[] = $state([]);
-  // DOM-measured block heights keyed by real node id, fed back into the
-  // next layout pass via sizeFn.
-  const commentHeights = new SvelteMap<string, number>();
-  // Fixed block width (px) reserved by the layout. Keep in sync with the
-  // .#{$cls-prefix}-tree-pin width in style/layout/_panel.scss.
-  const PIN_BLOCK_WIDTH = 240;
-  // Placeholder height until the first DOM measurement lands (blocks stay
-  // hidden until then). Keep in sync with the block's minimum content.
-  const PIN_DEFAULT_HEIGHT = 40;
+  const COMMENT_FONT_SIZE = "9px";
+  const COMMENT_LINE_HEIGHT = 11;
+  const COMMENT_PAD_X = 4;
+  const COMMENT_PAD_Y = 3;
+  // Max content width (px) before wrapping; the box width follows the
+  // longest wrapped line.
+  const COMMENT_MAX_CONTENT_WIDTH = 180;
 
-  // Reactive view of the blocks for the HTML layer. Reads _uiVer so
-  // comment edits (updateUI bumps) refresh block content even though
-  // nodeMap itself is not reactive; commentHeights reads reposition the
-  // blocks as measurements land.
-  let pinnedBlocks = $derived.by(() => {
-    void _uiVer;
-    const list: {
-      id: string;
-      realId: string;
-      comments: string[];
-      x: number;
-      y: number;
-    }[] = [];
-    for (const cn of pinnedCommentNodes) {
-      const realId = cn.id.slice(PINNED_COMMENT_PREFIX.length);
-      const owner = nodeMap.get(realId);
-      if (!owner || cn.x === undefined || cn.y === undefined) continue;
-      list.push({
-        id: cn.id,
-        realId,
-        comments: [...(owner.comments ?? [])],
-        x: cn.x,
-        y: cn.y,
-      });
-    }
-    return list;
-  });
-
-  // Svelte action: observe the block's rendered height and feed it back
-  // into the layout. ResizeObserver fires once on observe (initial
-  // measurement) and again whenever the content changes height (comment
-  // edited while pinned).
-  function usePinnedComment(el: HTMLElement, realId: string) {
-    const ro = new ResizeObserver(() => {
-      const h = el.offsetHeight;
-      if (h > 0 && commentHeights.get(realId) !== h) {
-        commentHeights.set(realId, h);
-        updateTreeLayout();
+  // Greedy wrap of one paragraph; breaks at the last space when possible,
+  // otherwise hard-breaks by character (CJK has no spaces).
+  function wrapCommentLine(para: string): string[] {
+    if (para === "") return [""];
+    const lines: string[] = [];
+    let line = "";
+    let lastSpace = -1;
+    for (let i = 0; i < para.length; i++) {
+      line += para[i];
+      if (para[i] === " ") lastSpace = line.length - 1;
+      if (
+        line.length > 1 &&
+        measureTextWidth(line, COMMENT_FONT_SIZE) > COMMENT_MAX_CONTENT_WIDTH
+      ) {
+        if (lastSpace > 0) {
+          lines.push(line.slice(0, lastSpace));
+          line = line.slice(lastSpace + 1);
+        } else {
+          lines.push(line.slice(0, -1));
+          line = line.slice(-1);
+        }
+        lastSpace = -1;
       }
-    });
-    ro.observe(el);
+    }
+    lines.push(line);
+    return lines;
+  }
+
+  function commentLines(owner: ChessNode): string[] {
+    const lines: string[] = [];
+    for (const para of (owner.comments ?? []).join("\n").split("\n")) {
+      lines.push(...wrapCommentLine(para));
+    }
+    return lines;
+  }
+
+  function commentBlockSize(owner: ChessNode): {
+    width: number;
+    height: number;
+  } {
+    const lines = commentLines(owner);
+    let maxW = 0;
+    for (const line of lines) {
+      maxW = Math.max(maxW, measureTextWidth(line, COMMENT_FONT_SIZE));
+    }
     return {
-      destroy() {
-        ro.disconnect();
-        commentHeights.delete(realId);
-      },
+      width: Math.ceil(maxW) + COMMENT_PAD_X * 2,
+      height: lines.length * COMMENT_LINE_HEIGHT + COMMENT_PAD_Y * 2,
     };
   }
 
@@ -307,13 +308,12 @@
       ghostLines?.lines ?? [],
       {
         sizeFn: (node) => {
-          // 置顶评论块：固定宽度 + DOM 实测高度（未实测用占位高度）。
+          // 置顶评论块：按换行文本测量尺寸（最长行宽 × 行数）。
           if (node.id.startsWith(PINNED_COMMENT_PREFIX)) {
-            const realId = node.id.slice(PINNED_COMMENT_PREFIX.length);
-            return {
-              width: PIN_BLOCK_WIDTH,
-              height: commentHeights.get(realId) ?? PIN_DEFAULT_HEIGHT,
-            };
+            const owner = nodeMap.get(
+              node.id.slice(PINNED_COMMENT_PREFIX.length),
+            );
+            if (owner) return commentBlockSize(owner);
           }
           return {
             width: localGetNodeWidth(node),
@@ -686,14 +686,14 @@
 
     {#each pinnedCommentNodes as cn (cn.id)}
       {@const realId = cn.id.slice(PINNED_COMMENT_PREFIX.length)}
-      {@const pnode = nodeMap.get(realId)}
-      {@const bh = commentHeights.get(realId) ?? PIN_DEFAULT_HEIGHT}
-      {#if pnode && pnode.x !== undefined && pnode.y !== undefined && cn.x !== undefined && cn.y !== undefined}
+      {@const owner = nodeMap.get(realId)}
+      {#if owner && owner.x !== undefined && owner.y !== undefined && cn.x !== undefined && cn.y !== undefined}
+        {@const size = commentBlockSize(owner)}
         <path
           d={`
-        M ${pnode.x} ${pnode.y + nodeHeight / 2}
-        L ${pnode.x} ${cn.y! - bh / 2}
-        L ${cn.x} ${cn.y! - bh / 2}
+        M ${owner.x} ${owner.y + nodeHeight / 2}
+        L ${owner.x} ${cn.y! - size.height / 2}
+        L ${cn.x} ${cn.y! - size.height / 2}
         `}
           stroke="var(--tree-line)"
           stroke-linejoin="round"
@@ -928,6 +928,48 @@
       </g>
     {/each}
 
+    {#each pinnedCommentNodes as cn (cn.id)}
+      {@const realId = cn.id.slice(PINNED_COMMENT_PREFIX.length)}
+      {@const owner = nodeMap.get(realId)}
+      {#if owner && cn.x !== undefined && cn.y !== undefined}
+        {@const lines = commentLines(owner)}
+        {@const size = commentBlockSize(owner)}
+        <!-- svelte-ignore a11y_click_events_have_key_events -->
+        <!-- svelte-ignore a11y_no_static_element_interactions -->
+        <g
+          class="{CLS_PREFIX}-panel__node"
+          transform="translate({cn.x} {cn.y})"
+          onclick={() => eventBus.emit("node-click", realId)}
+          onmouseenter={(e) => preview?.showNode(owner, e)}
+          onmouseleave={() => preview?.hideNode(owner)}
+        >
+          <rect
+            x={-size.width / 2}
+            y={-size.height / 2}
+            width={size.width}
+            height={size.height}
+            rx="2.5"
+            ry="2.5"
+            fill="var(--background-primary)"
+            stroke="var(--tree-line)"
+          />
+          <text
+            y={-size.height / 2 + COMMENT_PAD_Y + COMMENT_LINE_HEIGHT / 2}
+            text-anchor="middle"
+            dominant-baseline="central"
+            font-size={COMMENT_FONT_SIZE}
+            fill="var(--text-normal)"
+            style="pointer-events: none"
+          >
+            {#each lines as line, li (li)}
+              <tspan x="0" dy={li === 0 ? 0 : COMMENT_LINE_HEIGHT}>{line}</tspan
+              >
+            {/each}
+          </text>
+        </g>
+      {/if}
+    {/each}
+
     {#each renderedGhostNodes as g (g.id)}
       {@const gInfo = ghostInfoById.get(g.id)}
       {@const gw = localGetNodeWidth(g)}
@@ -1011,41 +1053,6 @@
     {/each}
   </g>
 </svg>
-
-<!-- Pinned comment blocks: real-size elements that participate in the tree
-     layout (virtual "pincomment:" leaf nodes in layout.ts). HTML siblings
-     of the SVG (host -panel__canvas is position:relative) so text stays
-     crisp at any zoom; the top-left corner maps the layout's block-center
-     pixel coordinates through the live d3 zoom transform. Blocks stay
-     hidden until the ResizeObserver's first height measurement feeds back
-     into the layout. -->
-{#each pinnedBlocks as blk (blk.id)}
-  {@const bh = commentHeights.get(blk.realId) ?? PIN_DEFAULT_HEIGHT}
-  <div
-    class="{CLS_PREFIX}-tree-pin{commentHeights.has(blk.realId)
-      ? ` ${CLS_PREFIX}-tree-pin--ready`
-      : ''}"
-    style="transform: translate({(blk.x - PIN_BLOCK_WIDTH / 2) *
-      zoomTransform.k +
-      zoomTransform.x}px, {(blk.y - bh / 2) * zoomTransform.k +
-      zoomTransform.y}px)"
-    use:usePinnedComment={blk.realId}
-  >
-    <div class="{CLS_PREFIX}-tree-pin__content">
-      {#each blk.comments as c, ci (ci)}
-        <p>{c}</p>
-      {/each}
-    </div>
-    <button
-      class="{CLS_PREFIX}-tree-pin__close"
-      aria-label={t("tree.unpinComment", _lv)}
-      onclick={() => togglePinComment(blk.realId)}
-    >
-      <!-- eslint-disable-next-line svelte/no-at-html-tags -->
-      {@html iconSvg("x", 10, 2)}
-    </button>
-  </div>
-{/each}
 
 <div class="{CLS_PREFIX}-panel__toolbar {CLS_PREFIX}-btn-group">
   {#if canFold}

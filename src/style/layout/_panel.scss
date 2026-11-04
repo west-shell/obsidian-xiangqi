@@ -182,88 +182,14 @@ button.#{$cls-prefix}-gamenav__arrow svg {
 
 // ---- Pinned comment blocks ---------------------------------------------------------
 
-// Comment blocks pinned onto the tree canvas — real-size elements that
-// participate in the tree layout (virtual "pincomment:" leaf nodes in
-// panel/layout.ts). Rendered as HTML siblings of the SVG (host
-// -panel__canvas is position:relative) so text stays crisp at any zoom;
-// the inline transform maps the layout's block-center pixel coordinates
-// (minus half the block size) through the live d3 zoom transform.
-//
-// The layout reserves exactly this width for every block; the height is
-// DOM-measured by the ResizeObserver action and fed back into the next
-// layout pass. Blocks stay visibility:hidden until that first measurement
-// lands (the --ready modifier), so no block ever flashes at its
-// placeholder position.
-.#{$cls-prefix}-tree-pin {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 4;
-  box-sizing: border-box;
-  // Keep in sync with PIN_BLOCK_WIDTH in panel/TreeGraph.svelte — the
-  // layout reserves exactly this width.
-  width: 240px;
-  padding: 6px 8px;
-  border-radius: var(--radius-s, 4px);
-  border: 1px solid var(--background-modifier-border);
-  background-color: var(--background-primary);
-  box-shadow: var(--shadow-s, 0 1px 2px rgba(0, 0, 0, 0.1));
-  font-size: var(--font-ui-smaller, 11px);
-  color: var(--text-normal);
-  visibility: hidden;
-
-  &--ready {
-    visibility: visible;
-  }
-
-  &__content p {
-    margin: 0 0 6px;
-    white-space: pre-wrap;
-    word-break: break-word;
-
-    &:last-child {
-      margin-bottom: 0;
-    }
-  }
-
-  // Floating close (unpin) button at the block's top-right corner; shows
-  // on hover/focus so it never overlaps the text permanently.
-  &__close {
-    position: absolute;
-    top: 2px;
-    right: 2px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 18px;
-    height: 18px;
-    padding: 0;
-    border: none;
-    border-radius: var(--radius-s, 3px);
-    background-color: transparent;
-    color: var(--text-muted);
-    box-shadow: none;
-    cursor: pointer;
-    opacity: 0;
-
-    &:hover {
-      color: var(--text-normal);
-      background-color: var(--background-modifier-hover);
-    }
-
-    &:focus-visible {
-      opacity: 1;
-    }
-  }
-
-  &:hover &__close {
-    opacity: 1;
-  }
-}
+// Pinned comments render as SVG boxes + text inside the tree graph itself
+// (virtual "pincomment:" leaf nodes in panel/layout.ts) — the same visual
+// language as move labels, no dedicated CSS needed. Only the hover pin
+// button below is styled here.
 
 // Hover pin button in the tree SVG: small disc at the node's top-right
 // corner, visible while hovering a commented node. Click toggles the
-// pinned comment card.
+// pinned comment block.
 .#{$cls-prefix}-panel__pinbtn {
   color: var(--text-muted);
 

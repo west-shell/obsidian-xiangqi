@@ -10,7 +10,8 @@
  *     像素坐标。这样后期把评论块 / 小棋盘 / 插入分支作为任意尺寸
  *     的树元素参与布局时，间距计算天然正确。
  *   - 置顶评论块（pincomment: 虚拟叶子）作为第一个接入者：每个被
- *     pin 的节点挂一个参与布局的虚拟子节点，渲染层实测块高后回填。
+ *     pin 的节点挂一个参与布局的虚拟子节点（SVG 方框 + 文字，同招
+ *     法标签的视觉），尺寸由渲染层按换行文本测量后经 sizeFn 提供。
  */
 
 import type { ChessNode, GhostLine, NodeMap } from "../../../types";
@@ -35,8 +36,8 @@ export interface LayoutOptions {
   sizeFn?: NodeSizeFn;
   /**
    * 需要置顶评论块的节点 id 列表。每个节点挂一个 "pincomment:" 虚拟
-   * 叶子参与布局（不写回真实树）；块高由渲染层 DOM 实测后经 sizeFn
-   * 回填，未实测时用 sizeFn 给出的占位高度。
+   * 叶子参与布局（不写回真实树）；块的宽高由渲染层按换行后的文本
+   * 测量，经 sizeFn 提供。
    */
   pinnedCommentIds?: string[];
 }
