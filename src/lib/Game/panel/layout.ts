@@ -213,21 +213,22 @@ function buildWNode(
 // ─── 纵向延伸（真实尺寸，px） ────────
 
 /** 轮廓的纵向底部估计：非叶节点延伸到子行中心（按最高子元素——侧
- *  挂评论块比招法标签高时正确下探），叶节点按实测高度下探后再按比
- *  例多留行数避免轮廓低估导致重叠。紧凑节点（h≤11）与旧值完全一致。
+ *  挂评论块比招法标签高时正确下探），叶节点按实测高度下探后再多留
+ *  固定行数余量避免轮廓低估导致重叠。紧凑节点（h≤11）与旧值完全一
+ *  致。
  *
- *  余量必须 ≥ 真实纵向延伸：fixed-board/评论块这类高叶子往下悬出数
- *  行，若估计小于真实 band 底，轮廓行走会在 bands 仍重叠时提前换
- *  边，深处同侧的固定盘就得不到水平分离而互相遮挡。每多 1 行高度就
- *  多留 1 行步长，紧凑节点（h=11 → extra=0 时 max 取 2*ROW_STEP）
- *  保持旧行为。 */
+ *  余量必须 ≥ 行走需要走过的比较站数：fixed-board / 评论块这类高叶
+ *  子往下悬出数行，若估得太小，轮廓行走会在 bands 仍重叠时提前换
+ *  边，深处同侧的固定盘就得不到水平分离而互相遮挡。余量也不用追着
+ *  真实带底走——按盘高的行数（h=135 时约 9 行）留反而会让行走"挂"
+ *  太久，把间隔 ≥10 行、真实 band 已完全分开的远处的盘也强行横向推
+ *  开（阶梯化）。实测 4 行是两头兼顾的最小值：能抓住同侧两盘仅差 8
+ *  行（15px 薄边重叠）的漏判，又不推走相隔 10 行以上的盘。
+ *  紧凑节点（h=11 → extra=0 时 max 取 2*ROW_STEP）保持旧行为。 */
 function nodeBottom(w: WNode): number {
   if (w.children.length === 0) {
-    const extraRows = w.height > 11 ? Math.ceil((w.height - 11) / ROW_STEP) : 0;
-    return (
-      w.y +
-      Math.max(2 * ROW_STEP, w.height / 2 + ROW_STEP + extraRows * ROW_STEP)
-    );
+    // 高叶子常数多留 4 行；紧凑节点（h≤11）保持旧行为 2*ROW_STEP。
+    return w.y + Math.max(2 * ROW_STEP, w.height / 2 + 5 * ROW_STEP);
   }
   let childHalf = 0;
   for (const c of w.children) childHalf = Math.max(childHalf, c.height / 2);

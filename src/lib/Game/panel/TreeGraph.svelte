@@ -229,7 +229,11 @@
   // Block size on the canvas (px); rendered at 2x for crispness.
   // Height follows the board aspect ratio (chess = square, the xiangqi
   // sibling repo keeps this code but ships a taller ratio).
-  const PIN_BOARD_WIDTH = 140;
+  // 固定盘预览块尺寸（px）：宽高精确等于 9 行的纵向步长。行步 =
+  // 节点高 11 + 行距 4 = 15（下方 nodeHeight / ROW_GAP_Y 常量），之前
+  // 140px ≈ 9.33 行视觉上多出小半行；棋盘方形，宽随高同步收窄 5px。
+  // xiangqi 侧 BOARD_ASPECT_RATIO 更高，高度仍由该常量推出。
+  const PIN_BOARD_WIDTH = 135; // = 9 * (nodeHeight + ROW_GAP_Y)
   const PIN_BOARD_HEIGHT = Math.round(PIN_BOARD_WIDTH / BOARD_ASPECT_RATIO);
   const PIN_BOARD_RENDER_WIDTH = PIN_BOARD_WIDTH * 2;
   // FEN → PNG dataUrl cache. Cleared when theme-relevant settings change;
