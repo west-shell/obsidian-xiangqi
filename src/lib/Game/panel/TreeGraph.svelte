@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { Menu } from "obsidian";
   import { onDestroy, onMount, tick } from "svelte";
   import { SvelteMap, SvelteSet } from "svelte/reactivity";
   import * as d3 from "d3";
@@ -184,6 +183,11 @@
   function onPinComment(id: unknown): void {
     if (typeof id === "string") togglePinComment(id);
   }
+  // The toolbar node menu's "pin board preview" entry comes through the
+  // event bus the same way (sibling component).
+  function onPinBoard(id: unknown): void {
+    if (typeof id === "string") togglePinBoard(id);
+  }
   // Comment edits mutate node.comments in place — nodeMap.size and pin
   // count don't change, so the layout effect never fires. Re-layout on
   // "modified" to refresh pinned comment blocks (text + measured size)
@@ -225,6 +229,11 @@
     if (pinnedBoardIds.has(id)) pinnedBoardIds.delete(id);
     else pinnedBoardIds.add(id);
   }
+  // Broadcast pin state so the toolbar node menu entries stay in sync
+  // (sibling component).
+  $effect(() => {
+    eventBus.emit("pinned-boards-changed", new Set(pinnedBoardIds));
+  });
   let pinnedBoardNodes: ChessNode[] = $state([]);
   // Block size on the canvas (px); rendered at 2x for crispness.
   // Height follows the board aspect ratio (chess = square, the xiangqi
@@ -281,19 +290,6 @@
   // 节点悬停状态：悬停时在节点右上角显示 pin 按钮（固定/取消固定该
   // 节点的棋盘预览）。离开 svg 一并清零，防布局位移下按钮滞留。
   let hoveredNodeId = $state<string | null>(null);
-  function onNodeContextMenu(e: MouseEvent, node: ChessNode): void {
-    e.preventDefault();
-    e.stopPropagation();
-    const pinned = pinnedBoardIds.has(node.id);
-    const menu = new Menu();
-    menu.addItem((item) =>
-      item
-        .setTitle(pinned ? t("tree.unpinBoard", _lv) : t("tree.pinBoard", _lv))
-        .setIcon(pinned ? "pin-off" : "pin")
-        .onClick(() => togglePinBoard(node.id)),
-    );
-    menu.showAtMouseEvent(e);
-  }
 
   // Greedy wrap of one paragraph; breaks at the last space when possible,
   // otherwise hard-breaks by character (CJK has no spaces).
@@ -386,6 +382,7 @@
     eventBus.off("updateUI", onUiVer);
     eventBus.off("tree-ghost-lines", onGhostLines);
     eventBus.off("tree-pin-comment", onPinComment);
+    eventBus.off("tree-pin-board", onPinBoard);
     eventBus.off("modified", onModified);
     if (layoutChangeHandler) {
       activeDocument.body.removeEventListener(
@@ -646,6 +643,7 @@
     eventBus.on("updateUI", onUiVer);
     eventBus.on("tree-ghost-lines", onGhostLines);
     eventBus.on("tree-pin-comment", onPinComment);
+    eventBus.on("tree-pin-board", onPinBoard);
     eventBus.on("modified", onModified);
     if (!svgEl) return;
     updateTreeLayout();
@@ -920,7 +918,6 @@
         stroke-width={isCurrent ? 1 : 0.5}
         style="cursor: pointer"
         onclick={() => eventBus.emit("node-click", node.id)}
-        oncontextmenu={(e) => onNodeContextMenu(e, node)}
         onmouseenter={(e) => {
           hoveredNodeId = node.id;
           preview?.showNode(node, e, "block");

@@ -43,6 +43,27 @@
 
   let modified = $state(false);
 
+  // Pinned board/comment ids mirrored from the tree graph (broadcast over
+  // the event bus) so the node menu's pin entries reflect current state.
+  let pinnedBoardIds = new Set<string>();
+  let pinnedCommentIds = new Set<string>();
+  $effect(() => {
+    const onBoardsChanged = (ids: unknown) => {
+      pinnedBoardIds =
+        ids instanceof Set ? new Set(ids as Set<string>) : new Set();
+    };
+    const onCommentsChanged = (ids: unknown) => {
+      pinnedCommentIds =
+        ids instanceof Set ? new Set(ids as Set<string>) : new Set();
+    };
+    eventBus.on("pinned-boards-changed", onBoardsChanged);
+    eventBus.on("pinned-comments-changed", onCommentsChanged);
+    return () => {
+      eventBus.off("pinned-boards-changed", onBoardsChanged);
+      eventBus.off("pinned-comments-changed", onCommentsChanged);
+    };
+  });
+
   $effect(() => {
     const onModified = () => {
       modified = true;
@@ -314,6 +335,33 @@
     });
 
     menu.addSeparator();
+
+    // Pin board preview / pin comment for the current node (before the
+    // annotate entry). The tree graph owns the pin sets and broadcasts
+    // them over the event bus; toggling goes through the same bus.
+    const node = getCurrentNode?.() ?? null;
+    if (node) {
+      const boardPinned = pinnedBoardIds.has(node.id);
+      menu.addItem((mi) => {
+        mi.setTitle(
+          boardPinned ? t("tree.unpinBoard", _lv) : t("tree.pinBoard", _lv),
+        )
+          .setIcon(boardPinned ? "pin-off" : "pin")
+          .onClick(() => eventBus.emit("tree-pin-board", node.id));
+      });
+      if ((node.comments ?? []).length > 0) {
+        const commentPinned = pinnedCommentIds.has(node.id);
+        menu.addItem((mi) => {
+          mi.setTitle(
+            commentPinned
+              ? t("tree.unpinComment", _lv)
+              : t("tree.pinComment", _lv),
+          )
+            .setIcon(commentPinned ? "pin-off" : "pin")
+            .onClick(() => eventBus.emit("tree-pin-comment", node.id));
+        });
+      }
+    }
 
     menu.addItem((mi) => {
       mi.setTitle(t("toolbar.annotate", _lv)).setIcon("tag");
