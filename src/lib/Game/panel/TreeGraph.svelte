@@ -152,6 +152,35 @@
   // eslint-disable-next-line svelte/no-unnecessary-state-wrap
   let foldedNodes = $state(new SvelteSet<string>());
 
+  // ---- Pinned comments (hover pin button → card fixed on the canvas) ----
+  // Node currently hovered in the tree (drives the pin button visibility).
+  let hoveredNodeId = $state<string | null>(null);
+  // Nodes whose comment is pinned as a card on the canvas. Session state:
+  // pins vanish when the view closes, mirroring foldedNodes behavior.
+  // (SvelteSet is reactive on its own — no $state wrap needed.)
+  let pinnedCommentIds = new SvelteSet<string>();
+  function togglePinComment(id: string): void {
+    if (pinnedCommentIds.has(id)) pinnedCommentIds.delete(id);
+    else pinnedCommentIds.add(id);
+  }
+  // Drop pins whose node left the tree (variation deleted / game switched).
+  $effect(() => {
+    // eslint-disable-next-line no-unused-expressions, @typescript-eslint/no-unused-expressions
+    nodeMap.size;
+    for (const id of [...pinnedCommentIds]) {
+      if (!nodeMap.has(id)) pinnedCommentIds.delete(id);
+    }
+  });
+  // The comment box's pin button toggles the same state over the event bus
+  // (sibling component); the tree hover pin button calls toggle directly.
+  function onPinComment(id: unknown): void {
+    if (typeof id === "string") togglePinComment(id);
+  }
+  // Broadcast pin state so the comment box button icon stays in sync.
+  $effect(() => {
+    eventBus.emit("pinned-comments-changed", new Set(pinnedCommentIds));
+  });
+
   // Mirror the fold state to the host so keyboard actions (Alt+Left/Right
   // same-ply cycling) can skip folded branches.
   $effect(() => {
@@ -192,6 +221,7 @@
     unsubLang();
     eventBus.off("updateUI", onUiVer);
     eventBus.off("tree-ghost-lines", onGhostLines);
+    eventBus.off("tree-pin-comment", onPinComment);
     if (layoutChangeHandler) {
       activeDocument.body.removeEventListener(
         LAYOUT_CHANGE_EVENT,
@@ -405,6 +435,7 @@
   onMount(() => {
     eventBus.on("updateUI", onUiVer);
     eventBus.on("tree-ghost-lines", onGhostLines);
+    eventBus.on("tree-pin-comment", onPinComment);
     if (!svgEl) return;
     updateTreeLayout();
     zoomBehavior = d3.zoom<SVGSVGElement, unknown>().on("zoom", (event) => {
@@ -626,8 +657,14 @@
         opacity={currentPath.includes(node.id) ? 1 : 0.55}
         stroke-width={isCurrent ? 1 : 0.5}
         onclick={() => eventBus.emit("node-click", node.id)}
-        onmouseenter={(e) => preview?.showNode(node, e)}
-        onmouseleave={() => preview?.hideNode(node)}
+        onmouseenter={(e) => {
+          hoveredNodeId = node.id;
+          preview?.showNode(node, e);
+        }}
+        onmouseleave={() => {
+          if (hoveredNodeId === node.id) hoveredNodeId = null;
+          preview?.hideNode(node);
+        }}
       >
         <rect
           x={-nw / 2}
@@ -759,6 +796,32 @@
             {@html iconSvg("message_square_text", 7, 1.5, "var(--color-blue)")}
           </g>
         {/if}
+        {#if (node.comments ?? []).length > 0 && hoveredNodeId === node.id}
+          <!-- svelte-ignore a11y_click_events_have_key_events -->
+          <!-- svelte-ignore a11y_no_static_element_interactions -->
+          <g
+            class="{CLS_PREFIX}-panel__pinbtn"
+            transform="translate({nw / 2 + 1} {-nodeHeight / 2 - 9})"
+            style="cursor: pointer"
+            aria-label={pinnedCommentIds.has(node.id)
+              ? t("tree.unpinComment", _lv)
+              : t("tree.pinComment", _lv)}
+            onclick={(e) => {
+              e.stopPropagation();
+              togglePinComment(node.id);
+            }}
+          >
+            <circle r="7" />
+            <g transform="translate(-4.5, -4.5)">
+              <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+              {@html iconSvg(
+                pinnedCommentIds.has(node.id) ? "pin_off" : "pin",
+                9,
+                1.8,
+              )}
+            </g>
+          </g>
+        {/if}
       </g>
     {/each}
 
@@ -845,6 +908,39 @@
     {/each}
   </g>
 </svg>
+
+<!-- Pinned comment cards: HTML siblings of the SVG (host -panel__canvas is
+     position:relative) so text stays crisp at any zoom; positions map
+     canvas coordinates through the live d3 zoom transform. -->
+{#each pinnedCommentIds as pid (pid)}
+  {@const pnode = nodeMap.get(pid)}
+  {#if pnode && (pnode.comments ?? []).length > 0 && pnode.x !== undefined && pnode.y !== undefined}
+    {@const pw = localGetNodeWidth(pnode)}
+    <div
+      class="{CLS_PREFIX}-tree-pin"
+      style="transform: translate({(pnode.x! + pw / 2 + 8) * zoomTransform.k +
+        zoomTransform.x}px, {(pnode.y! - nodeHeight / 2 - 8) * zoomTransform.k +
+        zoomTransform.y}px)"
+    >
+      <div class="{CLS_PREFIX}-tree-pin__head">
+        <span class="{CLS_PREFIX}-tree-pin__title">{nodeLabel(pnode)}</span>
+        <button
+          class="{CLS_PREFIX}-tree-pin__close"
+          aria-label={t("tree.unpinComment", _lv)}
+          onclick={() => pinnedCommentIds.delete(pid)}
+        >
+          <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+          {@html iconSvg("x", 10, 2)}
+        </button>
+      </div>
+      <div class="{CLS_PREFIX}-tree-pin__body">
+        {#each pnode.comments ?? [] as c, ci (ci)}
+          <p>{c}</p>
+        {/each}
+      </div>
+    </div>
+  {/if}
+{/each}
 
 <div class="{CLS_PREFIX}-panel__toolbar {CLS_PREFIX}-btn-group">
   {#if canFold}

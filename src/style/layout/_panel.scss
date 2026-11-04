@@ -180,6 +180,107 @@ button.#{$cls-prefix}-gamenav__arrow svg {
   }
 }
 
+// ---- Pinned comment cards ---------------------------------------------------------
+
+// Comment cards pinned onto the tree canvas via the hover pin button.
+// Rendered as HTML siblings of the SVG (host -panel__canvas is
+// position:relative) so text stays crisp at any zoom level; positions are
+// canvas coordinates mapped through the live d3 zoom transform in inline
+// styles.
+.#{$cls-prefix}-tree-pin {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 4;
+  width: 220px;
+  max-height: 220px;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-s, 4px);
+  border: 1px solid var(--background-modifier-border);
+  background-color: var(--background-primary);
+  box-shadow: var(--shadow-s, 0 1px 2px rgba(0, 0, 0, 0.1));
+  overflow: hidden;
+  font-size: var(--font-ui-smaller, 11px);
+
+  &__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px;
+    flex: 0 0 auto;
+    padding: 3px 4px 3px 8px;
+    background-color: var(--background-secondary);
+    border-bottom: 1px solid var(--background-modifier-border);
+  }
+
+  &__title {
+    color: var(--text-normal);
+    font-weight: var(--font-medium, 600);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    border: none;
+    border-radius: var(--radius-s, 3px);
+    background-color: transparent;
+    color: var(--text-muted);
+    box-shadow: none;
+    cursor: pointer;
+
+    &:hover {
+      color: var(--text-normal);
+      background-color: var(--background-modifier-hover);
+    }
+  }
+
+  &__body {
+    padding: 6px 8px;
+    overflow-y: auto;
+    color: var(--text-normal);
+    white-space: pre-wrap;
+    word-break: break-word;
+
+    p {
+      margin: 0 0 6px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+}
+
+// Hover pin button in the tree SVG: small disc at the node's top-right
+// corner, visible while hovering a commented node. Click toggles the
+// pinned comment card.
+.#{$cls-prefix}-panel__pinbtn {
+  color: var(--text-muted);
+
+  circle {
+    fill: var(--background-primary);
+    stroke: var(--background-modifier-border);
+    stroke-width: 1;
+  }
+
+  &:hover {
+    color: var(--text-normal);
+
+    circle {
+      fill: var(--background-modifier-hover);
+    }
+  }
+}
+
 // ---- Eval bar --------------------------------------------------------------------
 
 .#{$cls-prefix}-eval {
@@ -710,7 +811,10 @@ button.#{$cls-prefix}-resultbar__btn:hover {
   color: var(--text-muted);
 }
 
-button.#{$cls-prefix}-comment__toggle {
+// Pin button: pins the current node's comment as a card on the tree
+// canvas. Same flat shape as the list toggle button next to it.
+button.#{$cls-prefix}-comment__toggle,
+button.#{$cls-prefix}-comment__pin {
   width: 28px;
   height: auto;
   padding: 0;

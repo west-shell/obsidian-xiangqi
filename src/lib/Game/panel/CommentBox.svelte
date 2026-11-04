@@ -59,6 +59,17 @@
   const unsubLang = onLangChange(() => _lv++);
   let destroyed = false;
 
+  // ---- Pinned comment cards (tree canvas) ----
+  // Mirrors the tree graph's pin state so this button's icon matches the
+  // hover pin button on tree nodes; toggling goes through the event bus.
+  let pinnedIds = $state(new Set<string>());
+  const onPinnedChanged = (ids: unknown) => {
+    pinnedIds = ids instanceof Set ? new Set(ids as Set<string>) : new Set();
+  };
+  let commentPinned = $derived(
+    currentNode ? pinnedIds.has(currentNode.id) : false,
+  );
+
   $effect(() => {
     void _uiVer;
     const node = currentNode;
@@ -133,6 +144,7 @@
 
   onMount(() => {
     eventBus.on("updateUI", onUiVer);
+    eventBus.on("pinned-comments-changed", onPinnedChanged);
     // Panel-mounted-while-hidden path (mirrors the tree graph's initial
     // reset): the commentsText effect measured the textarea while it was
     // display:none (scrollHeight 0), so re-adjust once the box becomes
@@ -150,6 +162,8 @@
   onDestroy(() => {
     destroyed = true;
     unsubLang();
+    eventBus.off("updateUI", onUiVer);
+    eventBus.off("pinned-comments-changed", onPinnedChanged);
     if (saveTimeout) {
       clearTimeout(saveTimeout);
       saveTimeout = undefined;
@@ -229,6 +243,16 @@
       onblur={handleCommentsBlur}
       onkeydown={handleCommentsKeydown}
       rows="1"></textarea>
+  {/if}
+  {#if currentNode && (currentNode.comments ?? []).length > 0}
+    <button
+      class="{CLS_PREFIX}-btn {CLS_PREFIX}-comment__pin"
+      aria-label={commentPinned
+        ? t("tree.unpinComment", _lv)
+        : t("tree.pinComment", _lv)}
+      use:useSetIcon={commentPinned ? "pin-off" : "pin"}
+      onclick={() => eventBus.emit("tree-pin-comment", currentNode!.id)}
+    ></button>
   {/if}
   <button
     class="{CLS_PREFIX}-btn {CLS_PREFIX}-comment__toggle"

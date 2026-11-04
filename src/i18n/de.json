@@ -236,6 +236,8 @@
   "tree.togglePreview": "Stellungsvorschau umschalten",
   "tree.ghostInsert": "Engine-Variante einfügen",
   "tree.ghostHint": "Klicken, um die Engine-Variante einzufügen",
+  "tree.pinComment": "Kommentar anheften",
+  "tree.unpinComment": "Kommentar lösen",
   "tree.draw": "Remis",
   "tree.whiteWins": "Weiß gewinnt",
   "tree.redWins": "Rot gewinnt",

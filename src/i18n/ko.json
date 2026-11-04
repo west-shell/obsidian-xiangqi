@@ -236,6 +236,8 @@
   "tree.togglePreview": "국면 미리보기 전환",
   "tree.ghostInsert": "엔진 수순 삽입",
   "tree.ghostHint": "클릭하여 엔진 수순 삽입",
+  "tree.pinComment": "코멘트 고정",
+  "tree.unpinComment": "코멘트 고정 해제",
   "tree.draw": "무승부",
   "tree.whiteWins": "백 승리",
   "tree.redWins": "홍 승리",

@@ -236,6 +236,8 @@
   "tree.togglePreview": "Переключить превью позиции",
   "tree.ghostInsert": "Вставить вариант движка",
   "tree.ghostHint": "Нажмите, чтобы вставить вариант движка",
+  "tree.pinComment": "Закрепить комментарий",
+  "tree.unpinComment": "Открепить комментарий",
   "tree.draw": "Ничья",
   "tree.whiteWins": "Победа белых",
   "tree.redWins": "Победа красных",

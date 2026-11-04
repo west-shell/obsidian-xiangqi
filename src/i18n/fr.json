@@ -236,6 +236,8 @@
   "tree.togglePreview": "Basculer l'aperçu de position",
   "tree.ghostInsert": "Insérer la ligne du moteur",
   "tree.ghostHint": "Cliquez pour insérer la ligne du moteur",
+  "tree.pinComment": "Épingler le commentaire",
+  "tree.unpinComment": "Détacher le commentaire",
   "tree.draw": "Nulle",
   "tree.whiteWins": "Les Blancs gagnent",
   "tree.redWins": "Les Rouges gagnent",

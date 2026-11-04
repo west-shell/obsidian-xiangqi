@@ -236,6 +236,8 @@
   "tree.togglePreview": "تبديل معاينة الموقف",
   "tree.ghostInsert": "إدراج خط المحرك",
   "tree.ghostHint": "انقر لإدراج خط المحرك",
+  "tree.pinComment": "تثبيت التعليق",
+  "tree.unpinComment": "إلغاء تثبيت التعليق",
   "tree.draw": "تعادل",
   "tree.whiteWins": "فوز الأبيض",
   "tree.redWins": "فوز الأحمر",

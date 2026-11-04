@@ -236,6 +236,8 @@
   "tree.togglePreview": "Toggle position preview",
   "tree.ghostInsert": "Insert engine line",
   "tree.ghostHint": "Click to insert engine line",
+  "tree.pinComment": "Pin comment",
+  "tree.unpinComment": "Unpin comment",
   "tree.draw": "Draw",
   "tree.whiteWins": "White wins",
   "tree.redWins": "Red wins",

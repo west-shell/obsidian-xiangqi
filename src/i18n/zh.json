@@ -237,6 +237,8 @@
   "tree.togglePreview": "切换预览",
   "tree.ghostInsert": "插入引擎着法",
   "tree.ghostHint": "点击插入引擎着法",
+  "tree.pinComment": "固定评论",
+  "tree.unpinComment": "取消固定评论",
   "tree.draw": "平局",
   "tree.whiteWins": "白方获胜",
   "tree.redWins": "红方获胜",
