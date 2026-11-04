@@ -250,6 +250,12 @@
       placeholder={t("tree.placeholder")}
       bind:this={textareaEl}
       oninput={handleCommentsInput}
+      onfocus={() => {
+        // Entering the textarea is editing mode: keeps the {#if} above
+        // from flipping to the rendered view on the first typed
+        // character (which destroyed the textarea and stole focus).
+        commentEditing = true;
+      }}
       onblur={handleCommentsBlur}
       onkeydown={handleCommentsKeydown}
       rows="1"></textarea>
