@@ -182,11 +182,14 @@
   });
 
   // ---- Pinned comment blocks (real-size layout participants) ----
-  // Virtual "pincomment:" leaf nodes produced by the layout, rendered as
-  // SVG boxes + text in the same visual language as move labels: comment
-  // text is word-wrapped (canvas-measured, same measurement as move
-  // widths), the box sizes to the wrapped lines, and the layout reserves
-  // exactly that box for the block.
+  // Virtual "pincomment:" nodes produced by the layout, rendered as SVG
+  // boxes + text in the same visual language as move labels: comment text
+  // is word-wrapped (canvas-measured, same measurement as move widths),
+  // the box sizes to the wrapped lines, and the layout reserves exactly
+  // that box. Each block inserts its OWN row between its node and the
+  // children row (trunk column): the box top sits gapY below the node,
+  // the trunk line runs straight through behind the box, and real
+  // children keep their usual row below the box.
   let pinnedCommentNodes: ChessNode[] = $state([]);
   const COMMENT_FONT_SIZE = "9px";
   const COMMENT_LINE_HEIGHT = 11;
@@ -363,16 +366,22 @@
       maxX = -Infinity,
       minY = Infinity,
       maxY = -Infinity;
-    for (const n of [
-      ...renderedNodes,
-      ...renderedGhostNodes,
-      ...pinnedCommentNodes,
-    ]) {
+    for (const n of [...renderedNodes, ...renderedGhostNodes]) {
       if (n.x === undefined || n.y === undefined) continue;
       minX = Math.min(minX, n.x);
       maxX = Math.max(maxX, n.x);
       minY = Math.min(minY, n.y);
       maxY = Math.max(maxY, n.y);
+    }
+    // 评论块可达 180px 宽，按半宽/半高计入边界，避免被裁。
+    for (const cn of pinnedCommentNodes) {
+      const owner = nodeMap.get(cn.id.slice(PINNED_COMMENT_PREFIX.length));
+      if (!owner || cn.x === undefined || cn.y === undefined) continue;
+      const size = commentBlockSize(owner);
+      minX = Math.min(minX, cn.x - size.width / 2);
+      maxX = Math.max(maxX, cn.x + size.width / 2);
+      minY = Math.min(minY, cn.y - size.height / 2);
+      maxY = Math.max(maxY, cn.y + size.height / 2);
     }
     if (
       !Number.isFinite(minX) ||
@@ -688,18 +697,18 @@
       {@const realId = cn.id.slice(PINNED_COMMENT_PREFIX.length)}
       {@const owner = nodeMap.get(realId)}
       {#if owner && owner.x !== undefined && owner.y !== undefined && cn.x !== undefined && cn.y !== undefined}
-        {@const size = commentBlockSize(owner)}
+        <!-- 评论块占主干列（cn.x === owner.x），此边退化为竖直线；
+             有子节点时真实主干边从块背后穿过，此处补上叶子场景的连线。 -->
         <path
           d={`
-        M ${owner.x} ${owner.y + nodeHeight / 2}
-        L ${owner.x} ${cn.y! - size.height / 2}
-        L ${cn.x} ${cn.y! - size.height / 2}
+        M ${owner.x} ${owner.y}
+        L ${cn.x - EDGE_ELBOW * Math.sign(cn.x - owner.x)} ${owner.y}
+        L ${cn.x} ${cn.y}
         `}
           stroke="var(--tree-line)"
           stroke-linejoin="round"
           stroke-width="1"
-          stroke-dasharray="2 1.2"
-          opacity="0.5"
+          opacity="0.6"
           fill="none"
           style="pointer-events: none"
         />
