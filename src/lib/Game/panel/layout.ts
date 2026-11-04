@@ -213,13 +213,21 @@ function buildWNode(
 // ─── 纵向延伸（真实尺寸，px） ────────
 
 /** 轮廓的纵向底部估计：非叶节点延伸到子行中心（按最高子元素——侧
- *  挂评论块比招法标签高时正确下探），叶节点再多留一行；高叶子同
- *  样按实测高度下探，避免轮廓低估导致重叠。默认紧凑节点（h=11）
- *  下与旧值完全一致。 */
+ *  挂评论块比招法标签高时正确下探），叶节点按实测高度下探后再按比
+ *  例多留行数避免轮廓低估导致重叠。紧凑节点（h≤11）与旧值完全一致。
+ *
+ *  余量必须 ≥ 真实纵向延伸：fixed-board/评论块这类高叶子往下悬出数
+ *  行，若估计小于真实 band 底，轮廓行走会在 bands 仍重叠时提前换
+ *  边，深处同侧的固定盘就得不到水平分离而互相遮挡。每多 1 行高度就
+ *  多留 1 行步长，紧凑节点（h=11 → extra=0 时 max 取 2*ROW_STEP）
+ *  保持旧行为。 */
 function nodeBottom(w: WNode): number {
   if (w.children.length === 0) {
-    // 默认紧凑节点（h=11）保持原值 2*ROW_STEP，行为不变。
-    return w.y + Math.max(2 * ROW_STEP, w.height / 2 + ROW_STEP);
+    const extraRows = w.height > 11 ? Math.ceil((w.height - 11) / ROW_STEP) : 0;
+    return (
+      w.y +
+      Math.max(2 * ROW_STEP, w.height / 2 + ROW_STEP + extraRows * ROW_STEP)
+    );
   }
   let childHalf = 0;
   for (const c of w.children) childHalf = Math.max(childHalf, c.height / 2);
