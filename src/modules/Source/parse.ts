@@ -122,14 +122,10 @@ export function splitPGN(pgn: string): GameSlot[] {
         games.push(makeSlot(currentLines));
         currentLines = [];
         hasMovetext = false;
-        hasTags = false;
-        blankAfterTags = false;
       } else if (blankAfterTags && hasTags) {
         games.push(makeSlot(currentLines));
         currentLines = [];
         hasMovetext = false;
-        hasTags = false;
-        blankAfterTags = false;
       }
       currentLines.push(line);
       hasTags = true;
