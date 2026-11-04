@@ -367,6 +367,8 @@
       }
     }
 
+    menu.addSeparator();
+
     menu.addItem((mi) => {
       mi.setTitle(t("toolbar.annotate", _lv)).setIcon("tag");
       mi.onClick(() => {
