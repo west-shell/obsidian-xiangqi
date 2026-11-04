@@ -306,6 +306,8 @@
   "engine.showGhosts.desc": "Afficher les lignes candidates du moteur sous forme de branches fantômes en pointillés sur l'arbre. Cliquer sur une branche fantôme insère la variante",
   "engine.ghostLines": "Nombre de branches fantômes",
   "engine.ghostLines.desc": "Nombre de lignes candidates du moteur (1–5) affichées en branches fantômes. Au-delà de 3, le moteur cherche plus de lignes, ce qui est plus lent",
+  "engine.ghostDepth": "Profondeur des branches fantômes",
+  "engine.ghostDepth.desc": "Nombre de demi-coups (1–20) affichés par branche fantôme du moteur",
   "engine.analyzing": "Analyse…",
   "engine.failed": "Échec de l'analyse",
   "engine.mate": "M",

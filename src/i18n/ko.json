@@ -306,6 +306,8 @@
   "engine.showGhosts.desc": "엔진의 후보 수를 점선 고스트 가지로 트리에 표시합니다. 고스트 가지를 클릭하면 해당 변화를 삽입합니다",
   "engine.ghostLines": "고스트 가지 수",
   "engine.ghostLines.desc": "고스트 가지로 표시할 엔진 후보 라인 수(1–5). 3을 초과하면 엔진이 더 많은 라인을 탐색해 느려집니다",
+  "engine.ghostDepth": "고스트 가지 깊이",
+  "engine.ghostDepth.desc": "엔진 고스트 가지마다 표시할 수수(1–20)",
   "engine.analyzing": "분석 중…",
   "engine.failed": "분석 실패",
   "engine.mate": "M",

@@ -306,6 +306,8 @@
   "engine.showGhosts.desc": "Render the engine's candidate lines as dashed ghost branches on the tree graph. Clicking a ghost branch inserts the line",
   "engine.ghostLines": "Ghost line count",
   "engine.ghostLines.desc": "How many engine candidate lines (1–5) to render as ghost branches. Values above 3 also make the engine search more lines, which is slower",
+  "engine.ghostDepth": "Ghost branch depth",
+  "engine.ghostDepth.desc": "How many plies (1–20) each engine ghost branch renders",
   "engine.analyzing": "Analyzing…",
   "engine.failed": "Analysis failed",
   "engine.mate": "M",

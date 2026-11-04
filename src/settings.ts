@@ -194,6 +194,7 @@ export const DEFAULT_SETTINGS: ISettings = {
   showEngineAnnotations: true,
   showEngineGhosts: true,
   engineGhostLines: 3,
+  engineGhostDepth: 10,
   showBoardAnnotations: true,
   saveEvalByDefault: false,
   saveEvalPrompt: true,
@@ -292,6 +293,7 @@ const REFRESH_KEYS = new Set<string>([
   "showEngineAnnotations",
   "showEngineGhosts",
   "engineGhostLines",
+  "engineGhostDepth",
   "boardMarginTop",
   "boardMarginBottom",
 ]);
@@ -555,6 +557,17 @@ export class ChessSettingTab extends PluginSettingTab {
               key: "engineGhostLines",
               min: 1,
               max: 5,
+              step: 1,
+            },
+          },
+          {
+            name: t("engine.ghostDepth"),
+            desc: t("engine.ghostDepth.desc"),
+            control: {
+              type: "slider",
+              key: "engineGhostDepth",
+              min: 1,
+              max: 20,
               step: 1,
             },
           },
@@ -1189,6 +1202,20 @@ export class ChessSettingTab extends PluginSettingTab {
       "",
       (v) => {
         settings.engineGhostLines = v;
+        void this.plugin.saveSettings();
+        this.plugin.refresh();
+      },
+    );
+
+    addSliderWithValue(
+      containerEl,
+      t("engine.ghostDepth"),
+      t("engine.ghostDepth.desc"),
+      settings.engineGhostDepth,
+      { min: 1, max: 20, step: 1 },
+      "",
+      (v) => {
+        settings.engineGhostDepth = v;
         void this.plugin.saveSettings();
         this.plugin.refresh();
       },

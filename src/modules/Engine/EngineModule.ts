@@ -9,7 +9,7 @@ import type { Move } from "../../chess";
 import { Chess, getAutoResult, moveToUci } from "../../chess";
 import { engine, type EngineResult } from "./Engine";
 import type { EngineProgress } from "./BaseEngine";
-import { buildGhostLines, GHOST_MAX_PLIES } from "./ghost-lines";
+import { buildGhostLines } from "./ghost-lines";
 import { fillChildrenFromEval } from "./pv-cache";
 import { computeGlyph } from "../../utils/winningChances";
 
@@ -286,7 +286,7 @@ function initEngine(host: object) {
     }
     ghostLines = buildGhostLines(
       node,
-      GHOST_MAX_PLIES,
+      settings.engineGhostDepth,
       settings.engineGhostLines,
     );
     eventBus.emit("tree-ghost-lines", ghostLines);

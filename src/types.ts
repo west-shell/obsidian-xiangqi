@@ -60,6 +60,8 @@ export interface ISettings {
   showEngineGhosts: boolean;
   /** How many engine candidate lines (1–5) to render as ghost branches. */
   engineGhostLines: number;
+  /** How many plies (1–20) each ghost branch renders. */
+  engineGhostDepth: number;
   showBoardAnnotations: boolean;
   saveEvalByDefault: boolean;
   saveEvalPrompt: boolean;

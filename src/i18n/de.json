@@ -306,6 +306,8 @@
   "engine.showGhosts.desc": "Die Kandidatenzüge der Engine als gestrichelte Geist-Zweige im Baumdiagramm anzeigen. Ein Klick auf einen Geist-Zweig fügt die Variante ein",
   "engine.ghostLines": "Anzahl der Geist-Zweige",
   "engine.ghostLines.desc": "Wie viele Kandidatenlinien der Engine (1–5) als Geist-Zweige angezeigt werden. Werte über 3 lassen die Engine mehr Linien suchen, was langsamer ist",
+  "engine.ghostDepth": "Geist-Zweig-Tiefe",
+  "engine.ghostDepth.desc": "Wie viele Halbzüge (1–20) jeder Geist-Zweig der Engine anzeigt",
   "engine.analyzing": "Analysiert…",
   "engine.failed": "Analyse fehlgeschlagen",
   "engine.mate": "M",

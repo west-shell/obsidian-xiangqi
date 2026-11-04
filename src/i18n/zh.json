@@ -307,6 +307,8 @@
   "engine.showGhosts.desc": "将引擎候选着法以虚线幽灵分支的形式显示在棋树上，点击幽灵节点可插入该变例",
   "engine.ghostLines": "虚拟分支数量",
   "engine.ghostLines.desc": "以幽灵分支显示的引擎候选线路数量（1–5）。超过 3 时引擎会搜索更多线路，速度会变慢",
+  "engine.ghostDepth": "虚拟分支深度",
+  "engine.ghostDepth.desc": "每条引擎虚拟分支显示的步数（1–20）",
   "engine.analyzing": "分析中…",
   "engine.failed": "分析失败",
   "engine.mate": "将杀",

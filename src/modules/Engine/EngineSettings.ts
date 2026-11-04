@@ -17,6 +17,7 @@ export const EngineSettingsModule = {
       let showEngineAnn = host.settings.showEngineAnnotations;
       let showGhosts = host.settings.showEngineGhosts;
       let ghostLinesValue = host.settings.engineGhostLines;
+      let ghostDepthValue = host.settings.engineGhostDepth;
 
       engineModal.onOpen = () => {
         const { contentEl } = engineModal;
@@ -130,6 +131,23 @@ export const EngineSettingsModule = {
           ghostLinesLabel.textContent = String(ghostLinesValue);
         });
 
+        contentEl.createEl("label", { text: t("engine.ghostDepth") });
+        const ghostDepthSlider = contentEl.createEl("input", {
+          type: "range",
+        });
+        ghostDepthSlider.setAttribute("min", "1");
+        ghostDepthSlider.setAttribute("max", "20");
+        ghostDepthSlider.setAttribute("step", "1");
+        ghostDepthSlider.value = String(ghostDepthValue);
+        const ghostDepthLabel = contentEl.createDiv({
+          text: String(ghostDepthValue),
+          cls: `${CLS_PREFIX}-range-value`,
+        });
+        ghostDepthSlider.addEventListener("input", () => {
+          ghostDepthValue = Number.parseInt(ghostDepthSlider.value) || 10;
+          ghostDepthLabel.textContent = String(ghostDepthValue);
+        });
+
         const btnContainer = contentEl.createDiv("modal-button-container");
         const okBtn = btnContainer.createEl("button", {
           text: t("confirm.yes"),
@@ -151,6 +169,9 @@ export const EngineSettingsModule = {
           host.settings.showEngineGhosts = showGhosts;
           if (ghostLinesValue >= 1 && ghostLinesValue <= 5) {
             host.settings.engineGhostLines = ghostLinesValue;
+          }
+          if (ghostDepthValue >= 1 && ghostDepthValue <= 20) {
+            host.settings.engineGhostDepth = ghostDepthValue;
           }
           void host.plugin.saveSettings();
           host.plugin.refresh();

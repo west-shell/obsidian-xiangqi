@@ -306,6 +306,8 @@
   "engine.showGhosts.desc": "エンジンの候補手を点線のゴースト枝として棋木図に表示します。ゴースト枝をクリックするとその変化を挿入します",
   "engine.ghostLines": "ゴースト枝の数",
   "engine.ghostLines.desc": "ゴースト枝として表示するエンジンの候補手数（1–5）。3 を超える値ではエンジンがより多くの線を探索するため遅くなります",
+  "engine.ghostDepth": "ゴースト枝の深さ",
+  "engine.ghostDepth.desc": "各ゴースト枝に表示するエンジン候補の手数（1–20）",
   "engine.analyzing": "分析中…",
   "engine.failed": "分析に失敗しました",
   "engine.mate": "M",
