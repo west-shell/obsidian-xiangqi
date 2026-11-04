@@ -223,9 +223,6 @@
   const COMMENT_LINE_HEIGHT = 11;
   const COMMENT_PAD_X = 4;
   const COMMENT_PAD_Y = 3;
-  // Max content width (px) before wrapping; the box width follows the
-  // longest wrapped line.
-  const COMMENT_MAX_CONTENT_WIDTH = 180;
 
   // ---- Pinned board previews (node hover button / context menu) ----
   // Any node's position can be pinned as a board preview block. Session
@@ -254,6 +251,10 @@
   const PIN_BOARD_WIDTH = 135; // = 9 * (nodeHeight + ROW_GAP_Y)
   const PIN_BOARD_HEIGHT = Math.round(PIN_BOARD_WIDTH / BOARD_ASPECT_RATIO);
   const PIN_BOARD_RENDER_WIDTH = PIN_BOARD_WIDTH * 2;
+  // Max content width (px) before wrapping; the box width follows the
+  // longest wrapped line. Capped so the box never exceeds the pinned
+  // board width — grouped cards (board + comment) align their edges.
+  const COMMENT_MAX_CONTENT_WIDTH = PIN_BOARD_WIDTH - COMMENT_PAD_X * 2;
   // FEN → PNG dataUrl cache. Cleared when theme-relevant settings change;
   // in-flight renders are fenced by a generation counter so a stale
   // promise never overwrites a fresh image (or re-adds a cleared entry).
