@@ -152,9 +152,7 @@
   // eslint-disable-next-line svelte/no-unnecessary-state-wrap
   let foldedNodes = $state(new SvelteSet<string>());
 
-  // ---- Pinned comments (hover pin button → card fixed on the canvas) ----
-  // Node currently hovered in the tree (drives the pin button visibility).
-  let hoveredNodeId = $state<string | null>(null);
+  // ---- Pinned comments (comment box pin button → block on the canvas) ----
   // Nodes whose comment is pinned as a card on the canvas. Session state:
   // pins vanish when the view closes, mirroring foldedNodes behavior.
   // (SvelteSet is reactive on its own — no $state wrap needed.)
@@ -171,8 +169,8 @@
       if (!nodeMap.has(id)) pinnedCommentIds.delete(id);
     }
   });
-  // The comment box's pin button toggles the same state over the event bus
-  // (sibling component); the tree hover pin button calls toggle directly.
+  // The comment box's pin button toggles this state over the event bus
+  // (sibling component).
   function onPinComment(id: unknown): void {
     if (typeof id === "string") togglePinComment(id);
   }
@@ -791,11 +789,9 @@
         stroke-width={isCurrent ? 1 : 0.5}
         onclick={() => eventBus.emit("node-click", node.id)}
         onmouseenter={(e) => {
-          hoveredNodeId = node.id;
           preview?.showNode(node, e);
         }}
         onmouseleave={() => {
-          if (hoveredNodeId === node.id) hoveredNodeId = null;
           preview?.hideNode(node);
         }}
       >
@@ -927,32 +923,6 @@
           >
             <!-- eslint-disable-next-line svelte/no-at-html-tags -->
             {@html iconSvg("message_square_text", 7, 1.5, "var(--color-blue)")}
-          </g>
-        {/if}
-        {#if (node.comments ?? []).length > 0 && hoveredNodeId === node.id}
-          <!-- svelte-ignore a11y_click_events_have_key_events -->
-          <!-- svelte-ignore a11y_no_static_element_interactions -->
-          <g
-            class="{CLS_PREFIX}-panel__pinbtn"
-            transform="translate({nw / 2 + 1} {-nodeHeight / 2 - 9})"
-            style="cursor: pointer"
-            aria-label={pinnedCommentIds.has(node.id)
-              ? t("tree.unpinComment", _lv)
-              : t("tree.pinComment", _lv)}
-            onclick={(e) => {
-              e.stopPropagation();
-              togglePinComment(node.id);
-            }}
-          >
-            <circle r="7" />
-            <g transform="translate(-4.5, -4.5)">
-              <!-- eslint-disable-next-line svelte/no-at-html-tags -->
-              {@html iconSvg(
-                pinnedCommentIds.has(node.id) ? "pin_off" : "pin",
-                9,
-                1.8,
-              )}
-            </g>
           </g>
         {/if}
       </g>

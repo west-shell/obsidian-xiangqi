@@ -184,29 +184,8 @@ button.#{$cls-prefix}-gamenav__arrow svg {
 
 // Pinned comments render as SVG boxes + text inside the tree graph itself
 // (virtual "pincomment:" leaf nodes in panel/layout.ts) — the same visual
-// language as move labels, no dedicated CSS needed. Only the hover pin
-// button below is styled here.
-
-// Hover pin button in the tree SVG: small disc at the node's top-right
-// corner, visible while hovering a commented node. Click toggles the
-// pinned comment block.
-.#{$cls-prefix}-panel__pinbtn {
-  color: var(--text-muted);
-
-  circle {
-    fill: var(--background-primary);
-    stroke: var(--background-modifier-border);
-    stroke-width: 1;
-  }
-
-  &:hover {
-    color: var(--text-normal);
-
-    circle {
-      fill: var(--background-modifier-hover);
-    }
-  }
-}
+// language as move labels, no dedicated CSS needed. The pin toggle lives
+// in the comment box (CommentBox.svelte), not in the tree SVG.
 
 // ---- Eval bar --------------------------------------------------------------------
 
