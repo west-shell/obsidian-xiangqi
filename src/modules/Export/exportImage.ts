@@ -1,7 +1,12 @@
 import { toCanvas } from "html-to-image";
 import * as gifenc from "gifenc";
 import type { Api, Config } from "../../chess";
-import { BOARD_ASPECT_RATIO, Chessground, CLS_PREFIX } from "../../chess";
+import {
+  BOARD_ASPECT_RATIO,
+  Chessground,
+  CLS_PREFIX,
+  GRID_SVG,
+} from "../../chess";
 import type { ChessNode, IHost } from "../../types";
 
 /** Rendered pixel size (width) of exported PNG images. */
@@ -50,10 +55,30 @@ class OffscreenBoard {
       animation: { enabled: false },
     };
     this.ground = Chessground(this.stage, config);
+    this.injectGrid();
+  }
+
+  /**
+   * Xiangqi boards need the grid lines injected into the board element
+   * (GRID_SVG is null for chess); re-inject after each fen change because
+   * chessground rewrites the board element content. Parsed via DOMParser
+   * (not insertAdjacentHTML) so the static GRID_SVG artwork lands in the
+   * SVG namespace without tripping no-unsanitized.
+   */
+  private injectGrid(): void {
+    if (!GRID_SVG) return;
+    const inner = this.stage.querySelector("cg-board, xq-board");
+    if (!inner || inner.querySelector("svg.xq-grid")) return;
+    const svg = new DOMParser().parseFromString(
+      GRID_SVG,
+      "image/svg+xml",
+    ).documentElement;
+    inner.prepend(svg);
   }
 
   async setPosition(fen: string): Promise<void> {
     this.ground.set({ fen });
+    this.injectGrid();
     // Two paints: one for the chessground redraw, one for settled styles.
     await nextPaint();
     await nextPaint();
