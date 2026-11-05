@@ -38,8 +38,8 @@ export default tseslint.config(
       "build/**",
       "test-vault/**",
       "node_modules/**",
-      "scripts/**",
       "assets/**",
+      "scripts/**",
       "vite.config.ts",
       "*.js",
       "*.mjs",
@@ -179,6 +179,16 @@ export default tseslint.config(
       },
     },
     rules: typeCheckedRules,
+  },
+
+  {
+    files: ["tests/**/*.ts"],
+    rules: {
+      // Tests run in the node environment, where there is no global
+      // `window`; the rule's autofix (globalThis -> window) would break
+      // them, so keep the rule off outside plugin runtime code.
+      "obsidianmd/no-global-this": "off",
+    },
   },
 
   {

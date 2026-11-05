@@ -14,10 +14,12 @@ build/
 *.local
 
 # Editor directories and files
-.vscode/*
-.claude/*
+.vscode/
+.claude/
 .codegraph/
-!.vscode/extensions.json
+.agent/
+.deveco/
+.obsidian-cache/
 .idea
 .DS_Store
 *.suo
