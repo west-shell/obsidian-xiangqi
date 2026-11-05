@@ -20,7 +20,8 @@ import { EditTagsModule } from "../modules/Edit/EditTags";
 import { EngineSettingsModule } from "../modules/Engine/EngineSettings";
 import { FileHostModule } from "../modules/Hosts/FileHost";
 import { GameSlotsModule } from "../modules/GameSlots";
-import { ImportExportModule } from "../modules/ImportExport";
+import { ImportModule } from "../modules/Import";
+import { ExportModule } from "../modules/Export";
 import { NavigateModule } from "../modules/Navigate";
 import { SpeakerModule } from "../modules/Speak";
 import { TreeEditModule } from "../modules/Edit/TreeEdit";
@@ -40,7 +41,8 @@ const FILE_MODULES: ChessModule[] = [
   GameSlotsModule,
   EditFenModule,
   EditTagsModule,
-  ImportExportModule,
+  ImportModule,
+  ExportModule,
   EngineSettingsModule,
   SpeakerModule,
   EngineModule,
