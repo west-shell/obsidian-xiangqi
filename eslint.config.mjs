@@ -41,6 +41,7 @@ export default tseslint.config(
       "assets/**",
       "scripts/**",
       "vite.config.ts",
+      "vitest.config.ts",
       "*.js",
       "*.mjs",
       "*.cjs",
