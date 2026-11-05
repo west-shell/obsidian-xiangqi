@@ -64,13 +64,26 @@ class OffscreenBoard {
    * chessground rewrites the board element content. Parsed via DOMParser
    * (not insertAdjacentHTML) so the static GRID_SVG artwork lands in the
    * SVG namespace without tripping no-unsanitized.
+   *
+   * GRID_SVG colors itself with var(--xq-grid-color,#555), which resolves
+   * per theme in the live DOM (dark lines on light boards, light on dark,
+   * transparent when the grid is baked into the board image). html-to-image
+   * deep-clones the SVG without walking its children, and the clone loses
+   * body-level custom properties — the var would collapse to the #555
+   * fallback for every theme. Resolve the live computed value here and bake
+   * the concrete color into the markup instead.
    */
   private injectGrid(): void {
     if (!GRID_SVG) return;
     const inner = this.stage.querySelector("cg-board, xq-board");
     if (!inner || inner.querySelector("svg.xq-grid")) return;
+    const color =
+      window
+        .getComputedStyle(this.stage)
+        .getPropertyValue("--xq-grid-color")
+        .trim() || "#555";
     const svg = new DOMParser().parseFromString(
-      GRID_SVG,
+      GRID_SVG.split("var(--xq-grid-color,#555)").join(color),
       "image/svg+xml",
     ).documentElement;
     inner.prepend(svg);
