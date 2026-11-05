@@ -296,7 +296,10 @@
   // xiangqi 侧 BOARD_ASPECT_RATIO 更高，高度仍由该常量推出。
   const PIN_BOARD_WIDTH = 135; // = 9 * (nodeHeight + ROW_GAP_Y)
   const PIN_BOARD_HEIGHT = Math.round(PIN_BOARD_WIDTH / BOARD_ASPECT_RATIO);
-  const PIN_BOARD_RENDER_WIDTH = PIN_BOARD_WIDTH * 2;
+  // 4x supersample: the pinned board is a baked bitmap, so display-side
+  // scaling (Windows 125%/150%, Obsidian zoom, tree zoom) resamples it.
+  // 4x keeps it sharp through non-integer DPI and up to 2x zoom-in.
+  const PIN_BOARD_RENDER_WIDTH = PIN_BOARD_WIDTH * 4;
   // Max content width (px) before wrapping; the box width follows the
   // longest wrapped line. Capped so the box never exceeds the pinned
   // board width — grouped cards (board + comment) align their edges.
