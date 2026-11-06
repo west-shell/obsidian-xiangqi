@@ -320,6 +320,7 @@
   "engine.downloadBtn": "ダウンロード",
   "engine.downloadCancel": "キャンセル",
   "engine.downloadFailed": "ダウンロードに失敗しました。プラグインディレクトリに手動でファイルをダウンロードできます",
+  "engine.corrupted": "エンジンファイルが破損しています。再ダウンロードしてください：",
   "engine.downloadSource": "ダウンロード元:",
   "engine.retry": "再試行",
   "save.title": "保存",

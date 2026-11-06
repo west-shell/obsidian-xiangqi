@@ -320,6 +320,7 @@
   "engine.downloadBtn": "تنزيل",
   "engine.downloadCancel": "إلغاء",
   "engine.downloadFailed": "فشل التنزيل، يمكنك تنزيل الملفات يدويًا إلى مجلد الإضافة",
+  "engine.corrupted": "ملف المحرك تالف، يرجى إعادة التنزيل:",
   "engine.downloadSource": "مصدر التنزيل:",
   "engine.retry": "إعادة المحاولة",
   "save.title": "الحفظ",

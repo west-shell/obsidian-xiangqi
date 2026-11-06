@@ -16,13 +16,44 @@ const BASE_GITHUB = `https://github.com/west-shell/obsidian-xiangqi/releases/dow
 const BASE_GITEE_RELEASE = `https://gitee.com/wesnell/obsidian-xiangqi/releases/download/pikafish-${ENGINE_VERSION}`;
 const ENGINE_FILES = ["pikafish.js", "pikafish.wasm", "pikafish.data"] as const;
 /**
- * Written next to the engine files after a successful download. Its
- * content must match ENGINE_VERSION: assets from a different engine
- * release (or from before release versioning) only work as a matched
- * set with this module's glue, so a missing or mismatched version file
- * triggers a full-set re-download.
+ * Exact byte size of each engine asset in the `pikafish-<ENGINE_VERSION>`
+ * release (identical on GitHub and Gitee). Verified via adapter.stat()
+ * before the engine starts: a size mismatch marks a wrong-version,
+ * corrupted, or truncated download and re-downloads that file, while
+ * manually installed assets of the right release pass without any
+ * marker file.
  */
-const VERSION_FILE = "pikafish.version";
+const EXPECTED_SIZES: Record<string, number> = {
+  "pikafish.js": 77_847,
+  "pikafish.wasm": 845_871,
+  "pikafish.data": 51_585_654,
+};
+/**
+ * SHA-256 of the same release assets (confirmed identical on GitHub
+ * and Gitee). Verified once per session at engine init, where the
+ * bytes are already loaded in memory — catches the rare size-matched
+ * corruption (e.g. a download manager that preallocates the file and
+ * is interrupted mid-download) that the byte-size check above cannot
+ * see.
+ */
+const EXPECTED_SHA256: Record<string, string> = {
+  "pikafish.js":
+    "29643b40d24879e8a1d4042b8982fee1ffbefc7b5d1fabed612bbd0ea72ad4d3",
+  "pikafish.wasm":
+    "2a44866abe24f0172422a8a172b268730004323a0c6c1df8af944c171bdbff3c",
+  "pikafish.data":
+    "3cd15292bf8c979884262f57fc723959fc0dea43b4d8d544f88db5ceb2479e24",
+};
+
+/** Engine assets already hash-verified in this app session. */
+const hashVerified = new Set<string>();
+
+async function sha256Hex(buffer: ArrayBuffer): Promise<string> {
+  const digest = await crypto.subtle.digest("SHA-256", buffer);
+  return Array.from(new Uint8Array(digest))
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
+}
 
 interface DownloadSource {
   key: string;
@@ -50,26 +81,17 @@ export class XiangqiEngine extends BaseEngine {
     const plugin = this.plugin!;
     const adapter = plugin.app.vault.adapter;
     const baseDir = `${plugin.app.vault.configDir}/plugins/xiangqi`;
-    const jsPath = `${baseDir}/pikafish.js`;
-    if (!(await adapter.exists(jsPath))) return [...ENGINE_FILES];
-    // Assets from before release versioning or from a different engine
-    // release: js/wasm/data only work as a matched set, re-download all.
-    const versionPath = `${baseDir}/${VERSION_FILE}`;
-    if (!(await adapter.exists(versionPath))) return [...ENGINE_FILES];
-    if ((await adapter.read(versionPath)).trim() !== ENGINE_VERSION) {
-      return [...ENGINE_FILES];
-    }
     const missing: string[] = [];
     for (const file of ENGINE_FILES) {
-      if (file === "pikafish.js") continue;
-      if (!(await adapter.exists(`${baseDir}/${file}`))) {
+      const stat = await adapter.stat(`${baseDir}/${file}`);
+      if (!stat || stat.type !== "file" || stat.size !== EXPECTED_SIZES[file]) {
         missing.push(file);
       }
     }
     return missing;
   }
 
-  openDownloadModal(missingFiles: string[]): void {
+  openDownloadModal(missingFiles: string[], corrupted = false): void {
     const plugin = this.plugin!;
     const adapter = plugin.app.vault.adapter;
     const baseDir = `${plugin.app.vault.configDir}/plugins/xiangqi`;
@@ -84,7 +106,7 @@ export class XiangqiEngine extends BaseEngine {
     }));
     const modal = new DownloadModal(
       plugin.app,
-      t("engine.downloadFile", 0),
+      corrupted ? t("engine.corrupted", 0) : t("engine.downloadFile", 0),
       files,
       t("engine.downloadBtn", 0),
       t("engine.downloadCancel", 0),
@@ -110,17 +132,12 @@ export class XiangqiEngine extends BaseEngine {
               } else {
                 await adapter.writeBinary(destPath, buffer.buffer);
               }
+              hashVerified.delete(file);
               modal.done(i);
             } catch {
               modal.error(i, t("engine.downloadFailed", 0));
               return;
             }
-          }
-          // Mark the set as the version this module's glue expects.
-          try {
-            await adapter.write(`${baseDir}/${VERSION_FILE}`, ENGINE_VERSION);
-          } catch {
-            /* next check re-downloads the full set */
           }
         })();
       },
@@ -129,23 +146,40 @@ export class XiangqiEngine extends BaseEngine {
     modal.open();
   }
 
+  /**
+   * Read an engine asset and hash-verify it on first load this
+   * session. A size-matched but corrupted file falls through
+   * checkFileExists and is caught here, before the worker swallows
+   * it as a cryptic wasm compile error; the download modal is opened
+   * for the corrupted file instead.
+   */
+  private async readVerifiedAsset(name: string): Promise<ArrayBuffer> {
+    const plugin = this.plugin!;
+    const adapter = plugin.app.vault.adapter;
+    const baseDir = `${plugin.app.vault.configDir}/plugins/xiangqi`;
+    const buffer = await adapter.readBinary(`${baseDir}/${name}`);
+    if (hashVerified.has(name) || !crypto.subtle) return buffer;
+    if ((await sha256Hex(buffer)) === EXPECTED_SHA256[name]) {
+      hashVerified.add(name);
+      return buffer;
+    }
+    this.openDownloadModal([name], true);
+    throw new Error(`Engine asset corrupted: ${name}`);
+  }
+
   private async loadPikafishSource(): Promise<string> {
     if (this.pikafishJs) return this.pikafishJs;
     if (!this.plugin) throw new Error("Plugin not set");
-    const adapter = this.plugin.app.vault.adapter;
-    const baseDir = `${this.plugin.app.vault.configDir}/plugins/xiangqi`;
-    this.pikafishJs = await adapter.read(`${baseDir}/pikafish.js`);
+    this.pikafishJs = new TextDecoder().decode(
+      await this.readVerifiedAsset("pikafish.js"),
+    );
     return this.pikafishJs;
   }
 
   protected async initWorker(): Promise<void> {
     const pikafishSource = await this.loadPikafishSource();
-
-    const adapter = this.plugin!.app.vault.adapter;
-    const baseDir = `${this.plugin!.app.vault.configDir}/plugins/xiangqi`;
-
-    const wasmBuffer = await adapter.readBinary(`${baseDir}/pikafish.wasm`);
-    const dataBuffer = await adapter.readBinary(`${baseDir}/pikafish.data`);
+    const wasmBuffer = await this.readVerifiedAsset("pikafish.wasm");
+    const dataBuffer = await this.readVerifiedAsset("pikafish.data");
 
     const workerCode = `
 self.addEventListener('unhandledrejection', function(e) {

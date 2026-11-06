@@ -320,6 +320,7 @@
   "engine.downloadBtn": "Télécharger",
   "engine.downloadCancel": "Annuler",
   "engine.downloadFailed": "Échec du téléchargement ; vous pouvez télécharger les fichiers manuellement dans le dossier du plugin",
+  "engine.corrupted": "Fichier du moteur corrompu, veuillez le re-télécharger :",
   "engine.downloadSource": "Source de téléchargement :",
   "engine.retry": "Réessayer",
   "save.title": "Enregistrement",

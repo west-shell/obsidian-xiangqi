@@ -321,6 +321,7 @@
   "engine.downloadBtn": "下载",
   "engine.downloadCancel": "取消",
   "engine.downloadFailed": "下载失败，可手动下载文件放到本插件根目录",
+  "engine.corrupted": "引擎文件校验失败，请重新下载：",
   "engine.downloadSource": "下载源：",
   "engine.retry": "重试",
   "save.title": "保存",

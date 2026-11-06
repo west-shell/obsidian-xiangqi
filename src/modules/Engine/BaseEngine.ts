@@ -101,7 +101,7 @@ export abstract class BaseEngine {
   }
 
   abstract checkFileExists(): Promise<string[]>;
-  abstract openDownloadModal(missingFiles: string[]): void;
+  abstract openDownloadModal(missingFiles: string[], corrupted?: boolean): void;
   protected abstract initWorker(): Promise<void>;
 
   protected handleMessage(raw: unknown): void {

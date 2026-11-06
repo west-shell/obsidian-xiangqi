@@ -320,6 +320,7 @@
   "engine.downloadBtn": "Скачать",
   "engine.downloadCancel": "Отмена",
   "engine.downloadFailed": "Не удалось скачать; можно скачать файлы в каталог плагина вручную",
+  "engine.corrupted": "Файл движка повреждён, скачайте его заново:",
   "engine.downloadSource": "Источник загрузки:",
   "engine.retry": "Повторить",
   "save.title": "Сохранение",

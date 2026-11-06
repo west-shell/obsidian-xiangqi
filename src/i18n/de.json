@@ -320,6 +320,7 @@
   "engine.downloadBtn": "Herunterladen",
   "engine.downloadCancel": "Abbrechen",
   "engine.downloadFailed": "Download fehlgeschlagen; Dateien können manuell in den Plugin-Ordner geladen werden",
+  "engine.corrupted": "Engine-Datei beschädigt, bitte neu herunterladen:",
   "engine.downloadSource": "Downloadquelle:",
   "engine.retry": "Erneut versuchen",
   "save.title": "Speichern",
