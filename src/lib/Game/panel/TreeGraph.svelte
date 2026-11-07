@@ -263,7 +263,7 @@
   // taller); its connector starts at the owner node like a regular
   // edge and ends at the box top.
   let pinnedCommentNodes: ChessNode[] = $state([]);
-  const COMMENT_FONT_SIZE = "9px";
+  const COMMENT_FONT_SIZE = "7.5px";
   const COMMENT_LINE_HEIGHT = 11;
   const COMMENT_PAD_X = 4;
   const COMMENT_PAD_Y = 3;
@@ -301,9 +301,9 @@
   // 4x keeps it sharp through non-integer DPI and up to 2x zoom-in.
   const PIN_BOARD_RENDER_WIDTH = PIN_BOARD_WIDTH * 4;
   // Max content width (px) before wrapping; the box width follows the
-  // longest wrapped line. Capped so the box never exceeds the pinned
-  // board width — grouped cards (board + comment) align their edges.
-  const COMMENT_MAX_CONTENT_WIDTH = PIN_BOARD_WIDTH - COMMENT_PAD_X * 2;
+  // longest wrapped line. Content capped at the pinned board width
+  // (box max width = PIN_BOARD_WIDTH + COMMENT_PAD_X * 2).
+  const COMMENT_MAX_CONTENT_WIDTH = PIN_BOARD_WIDTH;
   // FEN → PNG dataUrl cache. Cleared when theme-relevant settings change;
   // in-flight renders are fenced by a generation counter so a stale
   // promise never overwrites a fresh image (or re-adds a cleared entry).
@@ -474,7 +474,12 @@
               // keep showing the stale text.
               const lines = commentLines(owner);
               node.comments = lines;
-              return commentBlockSize(lines);
+              // 与末端节点同理：评论块底部多留一行高的空隙，防止相邻
+              // 行同列时挡住父行肘部连线；只加宽布局 band，渲染尺寸不变。
+              return {
+                ...commentBlockSize(lines),
+                padBottom: COMMENT_LINE_HEIGHT,
+              };
             }
           }
           // 固定盘预览块：固定尺寸（宽随棋盘比例）。
@@ -484,6 +489,12 @@
           return {
             width: localGetNodeWidth(node),
             height: nodeHeight,
+            // 末端节点（无子节点）底部多留一个节点高的空隙（即"2 倍
+            // 高度"的底部预留部分）：相邻行的末端若落到同一列，纵向
+            // 带重叠会触发横向分离，父行连下来的肘部连线不会被末端
+            // 节点挡住；节点自身位置与行距不受影响（只是布局预留，
+            // 不改变渲染高度）。
+            padBottom: node.children.length === 0 ? nodeHeight : 0,
           };
         },
         gapX: NODE_GAP_X,

@@ -23,6 +23,12 @@ import type { ChessNode, GhostLine, NodeMap } from "../../../types";
 export interface NodeSize {
   width: number;
   height: number;
+  /**
+   * 节点底部额外预留的空隙（px，可选）：只向下加宽带（band），用于
+   * 横向分离判定（相邻行的末端节点同列时让出肘部连线的通道），不影
+   * 响节点自身的 y 定位与行距——节点位置与无 pad 时完全一致。
+   */
+  padBottom?: number;
 }
 
 /** 按节点取真实尺寸；宽高由渲染层测量（文本测量 / 固定图标宽）。 */
@@ -75,6 +81,8 @@ interface WNode {
   // 真实尺寸（px）
   width: number;
   height: number;
+  // 底部额外预留空隙（px）：只加宽纵向 band，不参与 y 定位。
+  padBottom: number;
 
   x: number;
   y: number;
@@ -122,6 +130,7 @@ function buildWNode(
     depth: parent === null ? 0 : parent.depth + 1,
     width: size.width,
     height: size.height,
+    padBottom: size.padBottom ?? 0,
     x: 0,
     y: 0,
     relX: 0,
@@ -234,22 +243,17 @@ function buildWNode(
 
 // ─── 纵向延伸（真实尺寸，px） ────────
 
-/** 轮廓的纵向底部估计：非叶节点延伸到子行中心（按最高子元素——侧
- *  挂评论块比招法标签高时正确下探），叶节点按实测高度下探后再多留
- *  固定行数余量避免轮廓低估导致重叠。紧凑节点（h≤11）与旧值完全一
- *  致。
- *
- *  余量必须 ≥ 行走需要走过的比较站数：fixed-board / 评论块这类高叶
- *  子往下悬出数行，若估得太小，轮廓行走会在 bands 仍重叠时提前换
- *  边，深处同侧的固定盘就得不到水平分离而互相遮挡。余量也不用追着
- *  真实带底走——按盘高的行数（h=135 时约 9 行）留反而会让行走"挂"
- *  太久，把间隔 ≥10 行、真实 band 已完全分开的远处的盘也强行横向推
- *  开（阶梯化）。实测 4 行是两头兼顾的最小值：能抓住同侧两盘仅差 8
- *  行（15px 薄边重叠）的漏判，又不推走相隔 10 行以上的盘。
- *  紧凑节点（h=11 → extra=0 时 max 取 2*ROW_STEP）保持旧行为。 */
+/** 轮廓节点的纵向底部估计。注意：separate() 的轮廓推进与横推判定
+ *  已改为按真实 band（y ± height/2）计算，不再使用本函数；它只
+ *  服务于 lows 链表记账——追踪 r 轮廓当前走进左侧哪个兄弟的子树，
+ *  供 distributeExtra 把推力摊到中间兄弟。余量行数只影响摊派粒
+ *  度，不影响是否横推：
+ *  - 紧凑叶子（h≤11）：下探 2 行（旧行为）。
+ *  - 高叶子（置顶评论块 / 固定盘预览）：实测半高 + 5 行余量。
+ *  - 非叶节点：延伸到子行中心（按最高子元素）。 */
 function nodeBottom(w: WNode): number {
   if (w.children.length === 0) {
-    // 高叶子常数多留 4 行；紧凑节点（h≤11）保持旧行为 2*ROW_STEP。
+    if (w.height <= DEFAULT_NODE_SIZE.height) return w.y + 2 * ROW_STEP;
     return w.y + Math.max(2 * ROW_STEP, w.height / 2 + 5 * ROW_STEP);
   }
   let childHalf = 0;
@@ -321,7 +325,19 @@ function separate(
       lContour.width / 2 +
       spacingFn(rContour, lContour);
 
-    if (dist > 0 || (dist < 0 && isFirst)) {
+    // 纵向真实带（band）重叠才允许横推：纵向不重叠的节点对在视觉
+    // 上不碰撞，推开只会把无 pin 树里相隔数行的侧分支阶梯化错开。
+    // band 底部含 padBottom 预留（末端节点底部多留空隙，防肘部连线
+    // 被相邻行同列的末端挡住）。首站是同一父节点的相邻兄弟——子行
+    // 顶部对齐（父底边 + gapY），band 必然重叠，首站负距收紧不受
+    // 影响。
+    const bandsOverlap =
+      rContour.y - rContour.height / 2 <
+        lContour.y + lContour.height / 2 + lContour.padBottom &&
+      lContour.y - lContour.height / 2 <
+        rContour.y + rContour.height / 2 + rContour.padBottom;
+
+    if (bandsOverlap && (dist > 0 || (dist < 0 && isFirst))) {
       lSumMods += dist;
       moveSubtree(cur, dist);
       distributeExtra(w, i, lows.index, dist);
@@ -329,8 +345,13 @@ function separate(
 
     isFirst = false;
 
-    const rBottom = nodeBottom(rContour);
-    const lBottom = nodeBottom(lContour);
+    // 按真实 band 底部（含 padBottom）推进轮廓：底部更高的一侧已不
+    // 可能与对方后续（更靠下的）节点重叠，先行下探；平局两侧同时推
+    // 进。不再使用 nodeBottom 的行数余量估计——余量偏大会让轮廓
+    // "挂"在早已分开的带上强行横推（阶梯化），偏小则提前终止行走
+    // 漏掉深处固定盘的比较站（重叠）。
+    const rBottom = rContour.y + rContour.height / 2 + rContour.padBottom;
+    const lBottom = lContour.y + lContour.height / 2 + lContour.padBottom;
 
     if (rBottom <= lBottom) {
       rContour = nextRContour(rContour);
