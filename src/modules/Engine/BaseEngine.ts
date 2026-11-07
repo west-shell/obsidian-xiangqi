@@ -37,6 +37,13 @@ import type ChessPlugin from "../../main";
 const WATCHDOG_IDLE_MS = 60_000;
 
 /**
+ * Overall engine-init timeout: converts a wedged init (hung asset read,
+ * dead worker) into a rejected promise so callers can surface a visible
+ * error instead of waiting in silence forever.
+ */
+const INIT_TIMEOUT_MS = 120_000;
+
+/**
  * One queued analysis (lila ceval Protocol.Work): the promise endpoints,
  * the per-work parse state, and the stop disposition.
  */
@@ -97,7 +104,15 @@ export abstract class BaseEngine {
   async ensureReady(): Promise<void> {
     if (this.worker && this.ready) return;
     this.terminate();
-    await this.initWorker();
+    await Promise.race([
+      this.initWorker(),
+      new Promise<never>((_, reject) => {
+        window.setTimeout(
+          () => reject(new Error("Engine init timeout")),
+          INIT_TIMEOUT_MS,
+        );
+      }),
+    ]);
   }
 
   abstract checkFileExists(): Promise<string[]>;

@@ -1,3 +1,4 @@
+import { Notice } from "obsidian";
 import type {
   ChessNode,
   GhostLines,
@@ -7,6 +8,7 @@ import type {
 } from "../../types";
 import type { Move } from "../../chess";
 import { Chess, getAutoResult, moveToUci } from "../../chess";
+import { t } from "../../i18n";
 import { engine, type EngineResult } from "./Engine";
 import type { EngineProgress } from "./BaseEngine";
 import { buildGhostLines } from "./ghost-lines";
@@ -343,6 +345,10 @@ function initEngine(host: object) {
       await engine.ensureReady();
     } catch (e) {
       console.error("[Engine] ensureReady failed:", e);
+      new Notice(
+        `${t("engine.failed", 0)}: ${e instanceof Error ? e.message : String(e)}`,
+        8000,
+      );
       return;
     }
     dispatchMode(mode);
@@ -906,6 +912,10 @@ function initEngine(host: object) {
         await engine.ensureReady();
       } catch (e) {
         console.error("[Engine] ensureReady failed:", e);
+        new Notice(
+          `${t("engine.failed", 0)}: ${e instanceof Error ? e.message : String(e)}`,
+          8000,
+        );
         stopSim();
         return;
       }
