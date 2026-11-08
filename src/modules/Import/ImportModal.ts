@@ -3,7 +3,7 @@ import { CLS_PREFIX, DEFAULT_FEN, PGN_PLACEHOLDER } from "../../chess";
 import { t } from "../../i18n";
 import type { ChessNode, GameSlot, IHost } from "../../types";
 import { validateFen } from "../../utils/chessEngine";
-import { activateGame } from "../Source/parse";
+import { activateGame, extractHeaders } from "../Source/parse";
 import { PGNParser } from "../Source/parser";
 
 export class ImportModal extends Modal {
@@ -139,13 +139,14 @@ export class ImportModal extends Modal {
     const eventBus = host.eventBus;
 
     if (mode === "game") {
+      const tags = parser.getTags();
       const newSlot: GameSlot = {
         raw: pgn,
-        headers: new Map(),
+        headers: extractHeaders(tags),
         parsed: {
           root: parser.getRoot(),
           nodeMap: parser.getMap(),
-          tags: parser.getTags(),
+          tags,
           parser,
         },
       };
@@ -170,6 +171,8 @@ export class ImportModal extends Modal {
       host.root = newRoot;
       host.nodeMap = newMap;
       host.tags = newTags;
+      const slot = host.games[host.currentGameIndex];
+      if (slot) slot.headers = extractHeaders(newTags);
     } else {
       if (newRoot.fen !== host.root.fen) {
         new Notice(t("import.fenMismatch"));
