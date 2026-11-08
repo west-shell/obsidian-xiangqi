@@ -163,7 +163,7 @@ npm run build:debug  # Unminified production build (with sourcemaps)
 
 - Rules engine: [xiangqi.js](https://github.com/west-shell/xiangqi.js)
 - Board rendering: [xiangqiground](https://github.com/west-shell/xiangqiground)
-- Engine: [Pikafish](https://github.com/official-pikafish/Pikafish) (WASM)
+- Engine: [Pikafish-wasm](https://github.com/west-shell/Pikafish-wasm) — single-threaded Asyncify WASM port of [Pikafish](https://github.com/official-pikafish/Pikafish), with prebuilt engine assets released per version
 - i18n: English and Chinese UI
 
 Released under [GPL-3.0](./LICENSE).

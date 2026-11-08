@@ -163,7 +163,7 @@ npm run build:debug  # 开发版本（不压缩，带 sourcemap）
 
 - 棋规引擎：[xiangqi.js](https://github.com/west-shell/xiangqi.js)
 - 棋盘渲染：[xiangqiground](https://github.com/west-shell/xiangqiground)
-- 引擎：[皮卡鱼 Pikafish](https://github.com/official-pikafish/Pikafish) (WASM)
+- 引擎：[皮卡鱼 WASM 移植 Pikafish-wasm](https://github.com/west-shell/Pikafish-wasm) —— 基于官方 [皮卡鱼 Pikafish](https://github.com/official-pikafish/Pikafish) 的单线程 Asyncify WASM 移植，各版本预编译引擎资产随 release 发布
 - 国际化：中文和英文界面
 
 以 [GPL-3.0](./LICENSE) 许可发布。
