@@ -1,5 +1,7 @@
 import { Chess, type Move } from "../../chess";
 import {
+  canonicalTagKey,
+  canonicalTagValue,
   DEFAULT_FEN,
   EVAL_REGEX,
   getPgnVariantTag,
@@ -96,7 +98,14 @@ export class PGNParser {
     // hand-written PGNs): carry the header result onto the mainline tip
     // so the move list and result toolbar reflect it. An explicit
     // movetext result token (set while parsing above) always wins.
-    const headerResult = this.tags.get("Result");
+    // Localized tag aliases (e.g. [结果 "红胜"]) resolve to Result first.
+    let headerResult: string | undefined;
+    for (const [k, v] of this.tags) {
+      if (canonicalTagKey(k) === "Result") {
+        headerResult = canonicalTagValue("Result", v);
+        break;
+      }
+    }
     if (
       headerResult === "1-0" ||
       headerResult === "0-1" ||
@@ -141,7 +150,9 @@ export class PGNParser {
     const token = this.consume();
     const tagText = token.value;
 
-    const match = tagText.match(/^\[(\w+)\s+"([^"]*)"\]$/);
+    // Keys are stored raw (round-trip safe on save); localized keys such
+    // as [红方 "..."] are valid tags and are canonicalized at read layers.
+    const match = tagText.match(/^\[([\w\u4e00-\u9fff]+)\s+"([^"]*)"\]$/);
     if (!match) return;
 
     const [, tagName, tagValue] = match;

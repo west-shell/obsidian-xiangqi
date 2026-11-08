@@ -1,6 +1,7 @@
 import { describe, expect, test } from "vitest";
 
 import { PGNParser } from "../src/modules/Source/parser";
+import { extractHeaders, splitPGN } from "../src/modules/Source/parse";
 
 describe("中国象棋PGN解析器", () => {
   test("解析简单着法序列", () => {
@@ -171,5 +172,65 @@ describe("中国象棋PGN解析器", () => {
     const variation = gameTree.children[1];
     expect(variation.move?.iccs).toBe("H0-G2");
     expect(variation.comments).toEqual(["变着"]);
+  });
+});
+
+describe("中文tag别名识别", () => {
+  test("extractHeaders 将中文tag键映射为标准键", () => {
+    const raw = [
+      '[赛事 "碧桂园杯"]',
+      '[红方 "王天一"]',
+      '[黑方 "郑惟桐"]',
+      '[结果 "红胜"]',
+      '[日期 "2026.01.01"]',
+    ].join("\n");
+    const headers = extractHeaders(raw);
+    expect(headers.get("Event")).toBe("碧桂园杯");
+    expect(headers.get("Red")).toBe("王天一");
+    expect(headers.get("Black")).toBe("郑惟桐");
+    expect(headers.get("Result")).toBe("1-0");
+    expect(headers.get("Date")).toBe("2026.01.01");
+  });
+
+  test("显式标准键优先于中文别名（无论出现顺序）", () => {
+    const aliasFirst = extractHeaders('[红方 "甲"]\n[Red "乙"]');
+    expect(aliasFirst.get("Red")).toBe("乙");
+    const explicitFirst = extractHeaders('[Red "乙"]\n[红方 "甲"]');
+    expect(explicitFirst.get("Red")).toBe("乙");
+  });
+
+  test('[结果 "红胜"] 无着法终止符时结果落到主线末端', () => {
+    const pgn = ['[结果 "红胜"]', "", "1. H2-E2 H7-E7"].join("\n");
+    let tip = new PGNParser(pgn).getRoot();
+    while (tip.children.length > 0) tip = tip.children[0];
+    expect(tip.result).toBe("1-0");
+  });
+
+  test('[结果 "和棋"] 映射为 1/2-1/2', () => {
+    const headers = extractHeaders('[结果 "和棋"]');
+    expect(headers.get("Result")).toBe("1/2-1/2");
+  });
+
+  test("getTags 保留原始中文键（保存回写安全）", () => {
+    const pgn = '[红方 "王天一"]\n\n1. H2-E2 H7-E7';
+    const serialized = new PGNParser(pgn).getTags();
+    expect(serialized).toContain('[红方 "王天一"]');
+    expect(serialized).not.toContain("[Red");
+  });
+
+  test("splitPGN 正确切分仅含中文tag的多局棋谱", () => {
+    const pgn = [
+      '[红方 "甲"]',
+      "",
+      "1. H2-E2 H7-E7",
+      "",
+      '[红方 "乙"]',
+      "",
+      "1. H0-G2 H9-G7",
+    ].join("\n");
+    const slots = splitPGN(pgn);
+    expect(slots).toHaveLength(2);
+    expect(slots[0].headers.get("Red")).toBe("甲");
+    expect(slots[1].headers.get("Red")).toBe("乙");
   });
 });

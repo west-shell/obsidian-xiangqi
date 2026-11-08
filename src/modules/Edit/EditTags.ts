@@ -15,7 +15,7 @@ export const EditTagsModule = {
         if (!payload || payload.name !== "edit-tags") return;
         host.markedPos = null;
         const tagPairs: { key: string; value: string }[] = [];
-        const tagRe = /\[(\w+)\s+"([^"]*)"\]/g;
+        const tagRe = /\[([\w\u4e00-\u9fff]+)\s+"([^"]*)"\]/g;
         let m: RegExpExecArray | null;
         while ((m = tagRe.exec(host.tags ?? "")) !== null) {
           if (m[1] === "FEN") continue;
@@ -49,8 +49,11 @@ export const EditTagsModule = {
             // header preserves it, but it is not editable here:
             // results are set per branch via the result toolbar.
             if (pair.key === "Result") continue;
+            // t() echoes a missing key back, so fall back to the raw key
+            // for tags without an i18n label (e.g. localized tag names).
+            const label = t(`tag.${pair.key}`, 0);
             const setting = new Setting(contentEl).setName(
-              t(`tag.${pair.key}`, 0) || pair.key,
+              label.startsWith("tag.") ? pair.key : label,
             );
             setting.addText((text) => {
               text.setValue(pair.value).onChange((v) => {

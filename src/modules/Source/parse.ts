@@ -1,5 +1,11 @@
 import { Chess, type Move } from "../../chess";
-import { DEFAULT_FEN, FEN_REGEX, parseExternalUrl } from "../../chess";
+import {
+  canonicalTagKey,
+  canonicalTagValue,
+  DEFAULT_FEN,
+  FEN_REGEX,
+  parseExternalUrl,
+} from "../../chess";
 import { PGNParser } from "./parser";
 import {
   type GameSlot,
@@ -115,7 +121,7 @@ export function splitPGN(pgn: string): GameSlot[] {
     }
     const inComment = commentDepth > 0;
 
-    const isTagLine = /^\[\w+\s+"[^"]*"\]$/.test(trimmed);
+    const isTagLine = /^\[[\w\u4e00-\u9fff]+\s+"[^"]*"\]$/.test(trimmed);
 
     if (isTagLine && !inComment) {
       if (hasMovetext && currentLines.length > 0) {
@@ -163,10 +169,15 @@ function makeSlot(lines: string[]): GameSlot {
 
 export function extractHeaders(raw: string): Map<string, string> {
   const headers = new Map<string, string>();
-  const tagRe = /^\[(\w+)\s+"([^"]*)"\]$/gm;
+  // Tag keys may be localized (e.g. Chinese 红方); canonicalize them so the
+  // UI always reads canonical keys. An explicit canonical key beats an
+  // alias of the same key regardless of order.
+  const tagRe = /^\[([\w\u4e00-\u9fff]+)\s+"([^"]*)"\]$/gm;
   let m: RegExpExecArray | null;
   while ((m = tagRe.exec(raw)) !== null) {
-    headers.set(m[1], m[2]);
+    const key = canonicalTagKey(m[1]);
+    if (m[1] !== key && headers.has(key)) continue;
+    headers.set(key, canonicalTagValue(key, m[2]));
   }
   return headers;
 }
