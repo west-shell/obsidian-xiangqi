@@ -83,4 +83,93 @@ describe("中国象棋PGN解析器", () => {
       "10",
     ]);
   });
+
+  test("解析中文着法序列", () => {
+    const pgn = `
+      [Event "测试棋局"]
+      1. 炮二平五 马8进7
+      2. 马二进三 车9平8
+      3. 车一平二
+    `;
+    const parser = new PGNParser(pgn);
+    const gameTree = parser.getRoot();
+    expect(parser.getSkipped()).toHaveLength(0);
+
+    const move1 = gameTree.children[0];
+    expect(move1.move?.iccs).toBe("H2-E2");
+    expect(move1.move?.zh).toBe("炮二平五");
+    expect(move1.color).toBe("white");
+
+    const move2 = move1.children[0];
+    expect(move2.move?.iccs).toBe("H9-G7");
+    expect(move2.color).toBe("black");
+
+    const move3 = move2.children[0];
+    expect(move3.move?.iccs).toBe("H0-G2");
+
+    const move4 = move3.children[0];
+    expect(move4.move?.iccs).toBe("I9-H9");
+
+    const move5 = move4.children[0];
+    expect(move5.move?.iccs).toBe("I0-H0");
+  });
+
+  test("解析全角数字与繁体字着法", () => {
+    const pgn = "1. 炮２平５ 馬８进７ 2. 傌八进七";
+    const parser = new PGNParser(pgn);
+    const gameTree = parser.getRoot();
+    expect(parser.getSkipped()).toHaveLength(0);
+
+    expect(gameTree.children[0].move?.iccs).toBe("H2-E2");
+    expect(gameTree.children[0].children[0].move?.iccs).toBe("H9-G7");
+    expect(gameTree.children[0].children[0].children[0].move?.iccs).toBe(
+      "B0-C2",
+    );
+  });
+
+  test("解析ICCS与中文混排棋谱", () => {
+    const pgn = "1. H2-E2 马8进7 2. 马二进三 车9平8";
+    const parser = new PGNParser(pgn);
+    const gameTree = parser.getRoot();
+    expect(parser.getSkipped()).toHaveLength(0);
+
+    expect(gameTree.children[0].move?.iccs).toBe("H2-E2");
+    expect(gameTree.children[0].children[0].move?.iccs).toBe("H9-G7");
+    expect(gameTree.children[0].children[0].children[0].move?.iccs).toBe(
+      "H0-G2",
+    );
+    expect(
+      gameTree.children[0].children[0].children[0].children[0].move?.iccs,
+    ).toBe("I9-H9");
+  });
+
+  test("解析前后炮消歧与FEN起始局面", () => {
+    const pgn = `
+      [FEN "r1bakab1r/9/1c7/4p4/9/7C1/9/7C1/9/1NBAKABN1 w - - 0 1"]
+      1. 前炮进四 卒5进1 2. 后炮进四
+    `;
+    const parser = new PGNParser(pgn);
+    const gameTree = parser.getRoot();
+    expect(parser.getSkipped()).toHaveLength(0);
+
+    const move1 = gameTree.children[0];
+    expect(move1.move?.iccs).toBe("H4-H8");
+    expect(move1.children[0].move?.iccs).toBe("E6-E5");
+    expect(move1.children[0].children[0].move?.iccs).toBe("H2-H6");
+  });
+
+  test("中文着法分支变化与注释", () => {
+    const pgn = "1. 炮二平五 {当头炮} (马二进三 {变着}) 马8进7";
+    const parser = new PGNParser(pgn);
+    const gameTree = parser.getRoot();
+
+    const mainLine = gameTree.children[0];
+    expect(mainLine.move?.zh).toBe("炮二平五");
+    expect(mainLine.comments).toEqual(["当头炮"]);
+
+    expect(gameTree.children).toHaveLength(2);
+    const variation = gameTree.children[1];
+    expect(variation.move?.iccs).toBe("H0-G2");
+    expect(variation.comments).toEqual(["变着"]);
+  });
 });
