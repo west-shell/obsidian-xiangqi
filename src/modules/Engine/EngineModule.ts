@@ -432,6 +432,7 @@ function initEngine(host: object) {
       lastResult = null;
       batchCancelled = true;
       simFenCounts.clear();
+      simCountedFen = null;
       clearGhosts();
       if (analyzing) {
         engine.stop();
@@ -758,6 +759,7 @@ function initEngine(host: object) {
     simBlack = false;
     clearSimTimer();
     simFenCounts.clear();
+    simCountedFen = null;
     emitSimState();
   }
 
@@ -793,14 +795,23 @@ function initEngine(host: object) {
     }
   }
 
+  /** Last position whose visit was already counted; wait-retries on the
+   * same position must not count as another occurrence. */
+  let simCountedFen: string | null = null;
+
   /** Stops the simulation on endless shuffling: threefold repetition of
-   * the same position or the 50-move rule (halfmove clock reaches 100). */
+   * the same position or the 50-move rule (halfmove clock reaches 100).
+   * Each position visit counts once — busy-engine retries (500 ms) and
+   * human-turn ticks on the same node must not inflate the counter into
+   * a false threefold that kills the sim. */
   function simReachedRepetition(fen: string): boolean {
     const parts = fen.split(" ");
     const halfmove = Number.parseInt(parts[4] ?? "0", 10) || 0;
     if (halfmove >= 100) {
       return true;
     }
+    if (simCountedFen === fen) return false;
+    simCountedFen = fen;
     const key = parts.slice(0, 4).join(" ");
     const count = (simFenCounts.get(key) ?? 0) + 1;
     simFenCounts.set(key, count);
@@ -899,6 +910,7 @@ function initEngine(host: object) {
     if (!simActive()) {
       clearSimTimer();
       simFenCounts.clear();
+      simCountedFen = null;
       return;
     }
     if (!engine.isReady()) {
