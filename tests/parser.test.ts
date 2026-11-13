@@ -159,6 +159,30 @@ describe("中国象棋PGN解析器", () => {
     expect(move1.children[0].children[0].move?.iccs).toBe("H2-H6");
   });
 
+  test("解析含退着的整局中文棋谱（百变象棋谱·八阵图）", () => {
+    const pgn = `[Game "Chinese Chess"]
+[Event "百变象棋谱"]
+[Title "八阵图(《百变象棋谱》第1局)"]
+[Result "*"]
+[FEN "2bak3C/4a4/4b4/3P3R1/9/6R2/9/3p1p3/4K4/3r1r3 w - - 0 1"]
+
+1. 车三进五 士５退６ 2. 车三退一 士６进５ 3. 车二进三 士５退６
+4. 车三平五 士４进５ 5. 车二退一 象５退７ 6. 车二平五 将５平４
+7. 车五进一 将４进１ 8. 兵六进一 将４进１ 9. 车五平六 *`;
+    const parser = new PGNParser(pgn);
+    const gameTree = parser.getRoot();
+    expect(parser.getSkipped()).toHaveLength(0);
+
+    let tip = gameTree;
+    let count = 0;
+    while (tip.children.length > 0) {
+      tip = tip.children[0];
+      count++;
+    }
+    expect(count).toBe(17);
+    expect(tip.move?.zh).toBe("车五平六");
+  });
+
   test("中文着法分支变化与注释", () => {
     const pgn = "1. 炮二平五 {当头炮} (马二进三 {变着}) 马8进7";
     const parser = new PGNParser(pgn);
