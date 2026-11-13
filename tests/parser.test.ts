@@ -215,6 +215,78 @@ describe("中国象棋PGN解析器", () => {
     expect(tip.move?.zh).toBe("前车平四");
   });
 
+  test("解析多卒序数与前后中消歧的整局棋谱（百变象棋谱·廉蔺争功(改图2)）", () => {
+    const pgn = `[Game "Chinese Chess"]
+[Event "百变象棋谱"]
+[Site "https://xiangqiai.com"]
+[Round "13"]
+[Title "廉蔺争功(改图2)(《百变象棋谱》第13局)"]
+[Result "*"]
+[FEN "3a1k3/4a4/4b3R/4p4/6b2/2pc5/4P4/2p1B3R/4p4/3K5 w - - 0 1"]
+[GameId "01a1829d-b17b-7662-8028-12947635d831"]
+[Source "xiangqiai.com official ancient collection"]
+
+1. 后车平四 将６平５ 2. 车一进二 象５退７ 3. 车一平三 士５退６ 4. 车四进七 ( 4. 车三平四 将５进１ 5. 后车进六 将５进１
+6. 前车平五 将５平４ 7. 车五平六 将４平５ 8. 车六退五 二卒平４ 9. 车四平六 卒３平４ 10. 车六退四 卒４进１ 11. 车六退三 前卒平４
+12. 帅六进一 ) 将５进１ 5. 车四平五 将５平４ 6. 车五平六 将４平５ 7. 车三平五 将５平６ 8. 车六退一 ( 8. 车五平四 将６平５
+9. 车四退八 三卒平６ 10. 相五进七 ( 10. 帅六进一 炮４平８ 11. 相五进七 炮８进３ 12. 帅六退一 卒６平５ ) 卒６平５
+11. 车六退五 卒３进１ 12. 相七退九 ) 将６进１ 9. 车六退四 二卒平４ 10. 车五平六 卒３平４ 11. 车六退五 卒４进１ 12. 车六退三
+前卒平４ 13. 帅六进一 *`;
+    const parser = new PGNParser(pgn);
+    const root = parser.getRoot();
+    expect(parser.getSkipped()).toHaveLength(0);
+
+    // 主线 25 手，终着 帅六进一
+    let tip = root;
+    let count = 0;
+    while (tip.children.length > 0) {
+      tip = tip.children[0];
+      count++;
+    }
+    expect(count).toBe(25);
+    expect(tip.move?.zh).toBe("帅六进一");
+
+    // 第 4 回合红方变着：车三平四（与主线 车四进七 同源）
+    let node = root;
+    for (let i = 0; i < 6; i++) node = node.children[0];
+    expect(node.move?.zh).toBe("士５退６");
+    expect(node.children).toHaveLength(2);
+    expect(node.children[0].move?.zh).toBe("车四进七");
+    expect(node.children[1].move?.zh).toBe("车三平四");
+
+    // 第 8 回合红方变着：车五平四，内含 三卒平６（e1 吃 f1 车）
+    node = root;
+    for (let i = 0; i < 14; i++) node = node.children[0];
+    expect(node.move?.zh).toBe("将５平６");
+    expect(node.children).toHaveLength(2);
+    expect(node.children[1].move?.zh).toBe("车五平四");
+
+    const sanNode = node.children[1].children[0].children[0].children[0];
+    expect(sanNode.move?.zh).toBe("三卒平６");
+    expect(sanNode.move?.iccs).toBe("E1-F1");
+
+    // 变着内第 10 回合嵌套变着：帅六进一（与 相五进七 同源）
+    expect(sanNode.children[0].move?.zh).toBe("相五进七");
+    expect(sanNode.children).toHaveLength(2);
+    expect(sanNode.children[1].move?.zh).toBe("帅六进一");
+
+    // 主线 9...二卒平４ 及其后的 卒３平４ / 前卒平４（多卒消歧）
+    node = root;
+    for (let i = 0; i < 18; i++) node = node.children[0];
+    expect(node.move?.zh).toBe("二卒平４");
+    for (const zh of [
+      "车五平六",
+      "卒３平４",
+      "车六退五",
+      "卒４进１",
+      "车六退三",
+      "前卒平４",
+    ]) {
+      node = node.children[0];
+      expect(node.move?.zh).toBe(zh);
+    }
+  });
+
   test("中文着法分支变化与注释", () => {
     const pgn = "1. 炮二平五 {当头炮} (马二进三 {变着}) 马8进7";
     const parser = new PGNParser(pgn);

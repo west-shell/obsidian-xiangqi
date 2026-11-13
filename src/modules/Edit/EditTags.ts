@@ -26,6 +26,7 @@ export const EditTagsModule = {
           "Site",
           "Date",
           "Round",
+          "Title",
           PRIMARY_PLAYER_KEY,
           "Black",
         ];

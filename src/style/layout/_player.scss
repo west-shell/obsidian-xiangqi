@@ -13,10 +13,16 @@
 // board + bars keep the same envelope the board alone used to fill.
 $player-bar-reserve: 2.7em;
 
+// Extra room for the [Title] game-title strip above the top player bar.
+$game-title-reserve: 1.4em;
+$bars-reserve-total: $player-bar-reserve + $game-title-reserve;
+
 // Default (col1 board, PGN file view): shrink the element by the bars'
 // height — the host either centers it or flex-packs its neighbours, so no
-// dead space appears next to the shrunken element.
+// dead space appears next to the shrunken element. The reserve flows
+// through a custom property so the game-title strip can extend it.
 .#{$cls-prefix}-layout__board--bars {
+  --#{$cls-prefix}-bars-reserve: #{$player-bar-reserve};
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -27,9 +33,19 @@ $player-bar-reserve: 2.7em;
           var(--board-max, 100vh) * var(--#{$cls-prefix}-board-scale, 0.85),
           100%
         )
-      ) -
-      #{$player-bar-reserve} * #{$board-ratio}
+      ) - var(--#{$cls-prefix}-bars-reserve) *
+      #{$board-ratio}
   );
+}
+
+// A [Title] header adds one more strip above the player bars.
+.#{$cls-prefix}-layout--game-title .#{$cls-prefix}-layout__board--bars {
+  --#{$cls-prefix}-bars-reserve: #{$bars-reserve-total};
+}
+
+// Title-only games (no player/clock bars): reserve just the title strip.
+.#{$cls-prefix}-layout--title-only .#{$cls-prefix}-layout__board--bars {
+  --#{$cls-prefix}-bars-reserve: #{$game-title-reserve};
 }
 
 // Code-block col2 lays the board column on a FIXED grid track
@@ -42,6 +58,28 @@ $player-bar-reserve: 2.7em;
     grid-template-columns:
       calc(
         var(--#{$cls-prefix}-col2-width) - #{$player-bar-reserve} *
+          #{$board-ratio}
+      )
+      auto
+      $uniboard-table;
+  }
+
+  // Game-title strip: narrow the track by the extra reserve line too.
+  .#{$cls-prefix}-block .#{$cls-prefix}-layout--game-title {
+    grid-template-columns:
+      calc(
+        var(--#{$cls-prefix}-col2-width) - #{$bars-reserve-total} *
+          #{$board-ratio}
+      )
+      auto
+      $uniboard-table;
+  }
+
+  // Title-only games: reserve only the title strip's height.
+  .#{$cls-prefix}-block .#{$cls-prefix}-layout--title-only {
+    grid-template-columns:
+      calc(
+        var(--#{$cls-prefix}-col2-width) - #{$game-title-reserve} *
           #{$board-ratio}
       )
       auto
@@ -91,6 +129,20 @@ $player-bar-reserve: 2.7em;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+
+  // Game-title strip ([Title] header) above the top player bar.
+  &--game-title {
+    min-width: 0;
+  }
+
+  &__game-title {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 600;
   }
 
   &__rating {
