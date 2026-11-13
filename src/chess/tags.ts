@@ -32,3 +32,10 @@ export function canonicalTagKey(key: string): string {
 export function canonicalTagValue(key: string, value: string): string {
   return key === "Result" ? (TAG_VALUE_ALIASES[value] ?? value) : value;
 }
+
+/**
+ * Tag line(s) seeded into newly created games and PGN files, matching
+ * xiangqiai.com exports. Empty for the chess-tree (standard chess)
+ * adapter.
+ */
+export const DEFAULT_GAME_TAGS: string = '[Game "Chinese Chess"]';

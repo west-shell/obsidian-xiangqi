@@ -1,5 +1,6 @@
 import { t } from "../i18n";
 import type { GameSlot, IHost } from "../types";
+import { DEFAULT_GAME_TAGS } from "../chess";
 import { ConfirmModal } from "../utils/confirmModal";
 import { activateGame, extractHeaders } from "./Source/parse";
 import { isFileHost } from "./Actions/shared";
@@ -33,7 +34,9 @@ export const GameSlotsModule = {
 
     eventBus.on("create-game", () => {
       if (!isFileHost(host)) return;
-      const tags = '[Result "*"]';
+      const tags = DEFAULT_GAME_TAGS
+        ? `${DEFAULT_GAME_TAGS}\n[Result "*"]`
+        : '[Result "*"]';
       const newSlot: GameSlot = {
         raw: tags,
         headers: extractHeaders(tags),

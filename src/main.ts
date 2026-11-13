@@ -14,6 +14,7 @@ import { ensureFolders, normalizeFolderPath } from "./utils/folderSuggest";
 import type { ISettings } from "./types";
 import {
   DEFAULT_FILENAME,
+  DEFAULT_GAME_TAGS,
   LAYOUT_CHANGE_EVENT,
   randomChess960Fen,
   RIBBON_ICON,
@@ -79,7 +80,7 @@ export default class ChessPlugin extends Plugin {
           fileName = `${baseFileName} ${counter}${fileExtension}`;
         }
 
-        const fileContent = "";
+        const fileContent = DEFAULT_GAME_TAGS ? `${DEFAULT_GAME_TAGS}\n` : "";
 
         try {
           await ensureFolders(this.app, folder);
