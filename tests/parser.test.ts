@@ -183,6 +183,38 @@ describe("中国象棋PGN解析器", () => {
     expect(tip.move?.zh).toBe("车五平六");
   });
 
+  test("解析将军局面下前后缀消歧的整局棋谱（百变象棋谱·二十八宿闹昆阳）", () => {
+    const pgn = `[Game "Chinese Chess"]
+[Event "百变象棋谱"]
+[Site "https://xiangqiai.com"]
+[Round "2"]
+[Title "二十八宿闹昆阳(《百变象棋谱》第2局)"]
+[Result "*"]
+[FEN "5a3/4aP3/b2kb1NC1/1P4p2/9/N1p1cp3/4c4/2p1R1p2/2nrRrn2/2BAKAB2 w - - 0 1"]
+
+1. 马九进七 将４退１ 2. 马三进四 士５退６ 3. 马七进八 将４退１ 4. 炮二进二 士６进５ 5. 兵四进一 象５退７ 6. 兵四平三 士５退６
+7. 兵三平四 后炮退５ 8. 兵四平五 将４平５ 9. 前车进一 将５平６ 10. 前车进六 将６进１ 11. 后车进七 将６进１ 12. 前车平四 *`;
+    const parser = new PGNParser(pgn);
+    const gameTree = parser.getRoot();
+    expect(parser.getSkipped()).toHaveLength(0);
+
+    // 第 7 回合黑方被将军，后炮退５（e4-e9 垫炮）是唯一合法应着，
+    // 前/后消歧须依据棋盘位置而非合法走法列表
+    let node = gameTree;
+    for (let i = 0; i < 14; i++) node = node.children[0];
+    expect(node.move?.zh).toBe("后炮退５");
+    expect(node.move?.iccs).toBe("E4-E9");
+
+    let tip = gameTree;
+    let count = 0;
+    while (tip.children.length > 0) {
+      tip = tip.children[0];
+      count++;
+    }
+    expect(count).toBe(23);
+    expect(tip.move?.zh).toBe("前车平四");
+  });
+
   test("中文着法分支变化与注释", () => {
     const pgn = "1. 炮二平五 {当头炮} (马二进三 {变着}) 马8进7";
     const parser = new PGNParser(pgn);
