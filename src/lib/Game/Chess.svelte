@@ -39,7 +39,6 @@
     clockForColor,
     formatClock,
     formatSeconds,
-    getGameTitle,
     getPlayerInfo,
     initialClockSeconds,
     type PlayerInfo,
@@ -230,8 +229,6 @@
 
   // ---- Player bars (names / ratings / clocks above and below the board) ---
   let gameHeaders = $derived(games[currentGameIndex]?.headers);
-  /** Game name from [Title], shown as a strip above the top player bar. */
-  let gameTitle = $derived(getGameTitle(gameHeaders));
   /** First player (White/Red) sits at the bottom unless the board is flipped. */
   let boardFirst = $derived(!rotated);
   let bottomInfo = $derived(getPlayerInfo(gameHeaders, boardFirst));
@@ -281,13 +278,12 @@
   function hasPlayerText(info: PlayerInfo): boolean {
     return !!(info.name || info.title || info.rating);
   }
-  let hasPlayerBar = $derived(
+  let showPlayerBar = $derived(
     hasPlayerText(topInfo) ||
       hasPlayerText(bottomInfo) ||
       topClock !== undefined ||
       bottomClock !== undefined,
   );
-  let showPlayerBar = $derived(hasPlayerBar || !!gameTitle);
 
   let destroyed = false;
   onDestroy(() => {
@@ -410,27 +406,15 @@
 {/snippet}
 
 {#snippet topBar()}
-  {#if gameTitle}
-    <div
-      class="{CLS_PREFIX}-player-bar {CLS_PREFIX}-player-bar--game-title"
-      title={gameTitle}
-    >
-      <span class="{CLS_PREFIX}-player-bar__game-title">{gameTitle}</span>
-    </div>
-  {/if}
-  {#if hasPlayerBar}
-    <div class="{CLS_PREFIX}-player-bar {CLS_PREFIX}-player-bar--top">
-      {@render barContent(topInfo, topClock, topActive, topColor)}
-    </div>
-  {/if}
+  <div class="{CLS_PREFIX}-player-bar {CLS_PREFIX}-player-bar--top">
+    {@render barContent(topInfo, topClock, topActive, topColor)}
+  </div>
 {/snippet}
 
 {#snippet bottomBar()}
-  {#if hasPlayerBar}
-    <div class="{CLS_PREFIX}-player-bar {CLS_PREFIX}-player-bar--bottom">
-      {@render barContent(bottomInfo, bottomClock, bottomActive, bottomColor)}
-    </div>
-  {/if}
+  <div class="{CLS_PREFIX}-player-bar {CLS_PREFIX}-player-bar--bottom">
+    {@render barContent(bottomInfo, bottomClock, bottomActive, bottomColor)}
+  </div>
 {/snippet}
 
 {#if showParseWarning}
@@ -479,8 +463,6 @@
   <div
     class="{CLS_PREFIX}-layout{showPlayerBar
       ? ` ${CLS_PREFIX}-layout--bars`
-      : ''}{gameTitle
-      ? ` ${CLS_PREFIX}-layout--game-title${hasPlayerBar ? '' : ` ${CLS_PREFIX}-layout--title-only`}`
       : ''}"
     use:viewFrame
     use:blockLayout

@@ -6,7 +6,6 @@ import {
   clockForColor,
   formatClock,
   formatSeconds,
-  getGameTitle,
   getPlayerInfo,
   initialClockSeconds,
 } from "../src/lib/Game/player";
@@ -65,21 +64,6 @@ describe("player info from headers", () => {
 
   test("undefined headers yield empty info", () => {
     expect(getPlayerInfo(undefined, true)).toEqual({});
-  });
-});
-
-describe("game title from [Title] header", () => {
-  test("reads the title when present", () => {
-    expect(
-      getGameTitle(
-        headersOf({ Title: "廉蔺争功(改图2)(《百变象棋谱》第13局)" }),
-      ),
-    ).toBe("廉蔺争功(改图2)(《百变象棋谱》第13局)");
-  });
-
-  test("missing or empty headers yield undefined", () => {
-    expect(getGameTitle(headersOf({}))).toBeUndefined();
-    expect(getGameTitle(undefined)).toBeUndefined();
   });
 });
 

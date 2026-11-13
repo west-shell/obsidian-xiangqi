@@ -38,6 +38,7 @@
   });
   function hasDisplayInfo(h: Map<string, string>): boolean {
     return !!(
+      h.get("Title") ||
       h.get(PRIMARY_PLAYER_KEY) ||
       h.get("Black") ||
       h.get("Event") ||
@@ -45,6 +46,7 @@
     );
   }
   function describeGame(h: Map<string, string>): string {
+    const title = h.get("Title") || "";
     const white = h.get(PRIMARY_PLAYER_KEY) || "";
     const black = h.get("Black") || "";
     const event = h.get("Event") || "";
@@ -57,7 +59,13 @@
     } else if (resultRaw && resultRaw !== "*") {
       label = result;
     }
-    if (event) label += (label ? ", " : "") + event;
+    if (title) {
+      // [Title] leads the label; it usually already names the event
+      // (e.g. ancient manuals), so [Event] is dropped when present.
+      label = label ? `${title} · ${label}` : title;
+    } else if (event) {
+      label += (label ? ", " : "") + event;
+    }
     if (date) label += (label ? " " : "") + date;
     return label || t("game.untitled", _lv);
   }

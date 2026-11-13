@@ -36,14 +36,6 @@ export function getPlayerInfo(
   };
 }
 
-/** Game name from the [Title] header, shown in the info bar when present. */
-export function getGameTitle(
-  headers: Map<string, string> | undefined,
-): string | undefined {
-  if (!headers) return undefined;
-  return headerValue(headers, "Title");
-}
-
 /**
  * Initial time in seconds from [TimeControl], undefined when untimed.
  * Accepts "300+0" (sudden death), "40/7200+30" (moves/seconds per period,
