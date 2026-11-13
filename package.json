@@ -35,7 +35,7 @@
     "@tsconfig/svelte": "^5.0.4",
     "@types/d3": "^7.4.3",
     "@types/node": "^24.19.2",
-    "@weshell/xiangqi.js": "^1.0.5",
+    "@weshell/xiangqi.js": "^1.0.6",
     "@weshell/xiangqiground": "^1.1.1",
     "d3": "^7.9.2",
     "eslint": "^10.14.0",
